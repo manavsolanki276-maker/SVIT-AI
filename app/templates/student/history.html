@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat History - SVIT AI Assistant</title>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Linked CSS File -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/student/chat_history.css') }}">
+    <style>
+        /* Header Actions Layout */
+        .page-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Clear History Dropdown Styling */
+        .clear-dropdown-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .btn-clear-history {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-clear-history:hover {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+            color: #1e293b;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 115%;
+            background-color: #ffffff;
+            min-width: 210px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            z-index: 100;
+            padding: 6px 0;
+            overflow: hidden;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background-color: #e2e8f0;
+            margin: 6px 0;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 9px 14px;
+            border: none;
+            background: none;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f1f5f9;
+        }
+
+        .dropdown-item.danger-item {
+            color: #dc2626;
+        }
+
+        .dropdown-item.danger-item:hover {
+            background-color: #fef2f2;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation Header Bar -->
+    <header class="top-navbar">
+        <a href="{{ url_for('student.chat') if 'student.chat' in bootstrap_endpoints else '/' }}" class="portal-brand">
+            <i data-lucide="graduation-cap"></i>
+            <span>SVIT AI Assistant</span>
+        </a>
+
+        <div class="nav-actions">
+            <button class="icon-btn-top" title="Notifications">
+                <i data-lucide="bell" style="width: 20px; height: 20px;"></i>
+                <span class="notif-badge"></span>
+            </button>
+            <button class="icon-btn-top" title="Help">
+                <i data-lucide="help-circle" style="width: 20px; height: 20px;"></i>
+            </button>
+            <img src="{{ url_for('static', filename=current_user.avatar_url) if (current_user and current_user.avatar_url is defined and current_user.avatar_url) else 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100' }}" alt="User" class="user-avatar-top">
+        </div>
+    </header>
+
+    <!-- Main Content Layout -->
+    <main class="main-container">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Chat History</h1>
+            
+            <div class="page-header-actions">
+                <!-- Clear History Multi-Option Dropdown -->
+                <div class="clear-dropdown-wrapper">
+                    <button class="btn-clear-history" onclick="toggleClearDropdown(event)">
+                        <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                        <span>Clear History</span>
+                        <i data-lucide="chevron-down" style="width: 14px; height: 14px;"></i>
+                    </button>
+                    
+                    <div class="dropdown-menu" id="clearDropdownMenu">
+                        <button class="dropdown-item" onclick="clearRange('1hour')">
+                            <i data-lucide="clock" style="width: 14px; height: 14px;"></i>
+                            <span>Delete Last 1 Hour</span>
+                        </button>
+                        <button class="dropdown-item" onclick="clearRange('5hours')">
+                            <i data-lucide="clock" style="width: 14px; height: 14px;"></i>
+                            <span>Delete Last 5 Hours</span>
+                        </button>
+                        <button class="dropdown-item" onclick="clearRange('today')">
+                            <i data-lucide="calendar" style="width: 14px; height: 14px;"></i>
+                            <span>Delete Today</span>
+                        </button>
+                        <button class="dropdown-item" onclick="clearRange('24hours')">
+                            <i data-lucide="calendar" style="width: 14px; height: 14px;"></i>
+                            <span>Delete Last 24 Hours</span>
+                        </button>
+                        <button class="dropdown-item" onclick="clearRange('7days')">
+                            <i data-lucide="calendar" style="width: 14px; height: 14px;"></i>
+                            <span>Delete Last 7 Days</span>
+                        </button>
+
+                        <div class="dropdown-divider"></div>
+
+                        <button class="dropdown-item danger-item" onclick="clearRange('all')">
+                            <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                            <span>Delete All History</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- New Chat Button -->
+                <a href="{{ url_for('student.chat') if 'student.chat' in bootstrap_endpoints else '/' }}" class="btn-new-chat">
+                    <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+                    <span>New Chat</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Conversation Search Input -->
+        <div class="conv-search-box">
+            <i data-lucide="search"></i>
+            <input type="text" id="convSearchInput" placeholder="Search conversations..." oninput="filterConversations()">
+        </div>
+
+        <!-- Filter Pills -->
+        <div class="filter-pills">
+            <button class="pill-btn active" id="pill-all" onclick="setFilter('all')">All</button>
+            <button class="pill-btn" id="pill-today" onclick="setFilter('today')">Today</button>
+            <button class="pill-btn" id="pill-yesterday" onclick="setFilter('yesterday')">Yesterday</button>
+            <button class="pill-btn" id="pill-7days" onclick="setFilter('7days')">7 Days</button>
+            <button class="pill-btn" id="pill-saved" onclick="setFilter('saved')">
+                <i data-lucide="bookmark" style="width: 14px; height: 14px;"></i> Saved
+            </button>
+        </div>
+
+        <!-- Dynamic History Threads Container -->
+        <div id="historyThreadContainer">
+            <!-- Dynamically populated via JavaScript -->
+        </div>
+
+    </main>
+
+    <!-- Client-Side Render Logic -->
+    <script>
+        lucide.createIcons();
+
+        let currentFilter = 'all';
+        let rawHistoryData = {};
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadChatHistory();
+        });
+
+        function toggleClearDropdown(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('clearDropdownMenu');
+            menu.classList.toggle('show');
+        }
+
+        // Close dropdown menu when clicking anywhere outside
+        window.addEventListener('click', () => {
+            const menu = document.getElementById('clearDropdownMenu');
+            if (menu && menu.classList.contains('show')) {
+                menu.classList.remove('show');
+            }
+        });
+
+        async function clearRange(rangeType) {
+            const rangeLabels = {
+                '1hour': 'chats from the last 1 hour',
+                '5hours': 'chats from the last 5 hours',
+                'today': 'all chats from today',
+                '24hours': 'chats from the last 24 hours',
+                '7days': 'chats from the last 7 days',
+                'all': 'ALL chat history'
+            };
+
+            const label = rangeLabels[rangeType] || 'selected history';
+            if (!confirm(`Are you sure you want to delete ${label}? This cannot be undone.`)) return;
+
+            try {
+                const res = await fetch(`/chat/clear-range?range=${rangeType}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    loadChatHistory();
+                } else {
+                    alert(data.message || "Failed to clear specified history range.");
+                }
+            } catch (err) {
+                console.error("Error clearing history range:", err);
+            }
+        }
+
+        function setFilter(filterType) {
+            currentFilter = filterType;
+            
+            document.querySelectorAll('.pill-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById(`pill-${filterType}`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            renderFilteredData();
+        }
+
+        async function loadChatHistory() {
+            const container = document.getElementById('historyThreadContainer');
+            try {
+                const res = await fetch('/chat/history');
+                const data = await res.json();
+
+                if (data.status === 'success') {
+                    rawHistoryData = data.history;
+                    renderFilteredData();
+                } else {
+                    container.innerHTML = `<div class="empty-placeholder">Failed to load chat history.</div>`;
+                }
+            } catch (err) {
+                console.error("Error loading chat history:", err);
+                container.innerHTML = `<div class="empty-placeholder">Connection error. Please try again.</div>`;
+            }
+        }
+
+        function filterConversations() {
+            renderFilteredData();
+        }
+
+        function renderFilteredData() {
+            const container = document.getElementById('historyThreadContainer');
+            const searchQ = document.getElementById('convSearchInput').value.toLowerCase().trim();
+
+            let html = '';
+            let totalRendered = 0;
+
+            const timeKeys = {
+                today: "TODAY",
+                yesterday: "YESTERDAY",
+                last_7_days: "LAST 7 DAYS",
+                last_month: "LAST 30 DAYS",
+                older: "OLDER"
+            };
+
+            for (const [groupKey, list] of Object.entries(rawHistoryData)) {
+                
+                if (currentFilter === 'today' && groupKey !== 'today') continue;
+                if (currentFilter === 'yesterday' && groupKey !== 'yesterday') continue;
+                if (currentFilter === '7days' && groupKey !== 'today' && groupKey !== 'yesterday' && groupKey !== 'last_7_days') continue;
+
+                const matchingItems = (list || []).filter(item => {
+                    const matchesSearch = !searchQ || (item.title && item.title.toLowerCase().includes(searchQ));
+                    const matchesSaved = (currentFilter !== 'saved') || item.is_saved;
+                    return matchesSearch && matchesSaved;
+                });
+
+                if (matchingItems.length > 0) {
+                    totalRendered += matchingItems.length;
+                    html += `
+                        <div class="time-group">
+                            <div class="time-group-label">${timeKeys[groupKey] || groupKey.toUpperCase()}</div>
+                            ${matchingItems.map(item => createCardHTML(item)).join('')}
+                        </div>
+                    `;
+                }
+            }
+
+            if (totalRendered === 0) {
+                html = `
+                    <div class="empty-placeholder">
+                        <p>No conversations found matching your query.</p>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+            lucide.createIcons();
+        }
+
+        function createCardHTML(item) {
+            let iconName = 'message-square';
+            let iconClass = 'icon-purple';
+            const titleLower = (item.title || '').toLowerCase();
+
+            if (titleLower.includes('timetable') || titleLower.includes('schedule')) {
+                iconName = 'calendar';
+                iconClass = 'icon-green';
+            } else if (titleLower.includes('library') || titleLower.includes('book')) {
+                iconName = 'book-open';
+                iconClass = 'icon-amber';
+            } else if (titleLower.includes('placement') || titleLower.includes('job')) {
+                iconName = 'briefcase';
+                iconClass = 'icon-purple';
+            } else if (titleLower.includes('room') || titleLower.includes('where')) {
+                iconName = 'map-pin';
+                iconClass = 'icon-blue';
+            }
+
+            const formattedTime = item.updated_at ? new Date(item.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+
+            return `
+                <div class="chat-card" id="card-${item.id}">
+                    <div class="card-left" onclick="openChat('${item.id}')">
+                        <div class="card-icon-box ${iconClass}">
+                            <i data-lucide="${iconName}" style="width: 20px; height: 20px;"></i>
+                        </div>
+                        <div class="card-info">
+                            <div class="card-title">${escapeHtml(item.title || 'Untitled Conversation')}</div>
+                            <div class="card-snippet">Academic details and query summary</div>
+                        </div>
+                    </div>
+                    <div class="card-right">
+                        <span class="card-time">${formattedTime}</span>
+                        <div class="card-actions">
+                            <button class="action-icon-btn ${item.is_saved ? 'saved-active' : ''}" title="Bookmark" onclick="toggleSaveCard('${item.id}', event)">
+                                <i data-lucide="bookmark" style="width: 16px; height: 16px;"></i>
+                            </button>
+                            <button class="action-icon-btn" title="Delete" onclick="deleteCard('${item.id}', event)">
+                                <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function openChat(convId) {
+            window.location.href = `/?conversation_id=${convId}`;
+        }
+
+        async function toggleSaveCard(convId, event) {
+            event.stopPropagation();
+            try {
+                const res = await fetch(`/chat/${convId}/toggle-save`, { method: 'POST' });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    loadChatHistory();
+                }
+            } catch (err) {
+                console.error("Error toggling bookmark:", err);
+            }
+        }
+
+        async function deleteCard(convId, event) {
+            event.stopPropagation();
+            if (!confirm("Are you sure you want to delete this conversation?")) return;
+
+            try {
+                const res = await fetch(`/chat/${convId}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    const el = document.getElementById(`card-${convId}`);
+                    if (el) el.remove();
+                    loadChatHistory();
+                }
+            } catch (err) {
+                console.error("Error deleting conversation:", err);
+            }
+        }
+
+        function escapeHtml(str) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return str.replace(/[&<>"']/g, m => map[m]);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - SVIT AI Assistant</title>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth/login.css') }}">
+</head>
+<body>
+    <div class="login-wrapper">
+        <!-- Left Hero Banner -->
+        <div class="hero-section">
+            <div class="brand-header">
+                <i data-lucide="graduation-cap" style="width:40px; height:40px; color:#38bdf8;"></i>
+                <div class="brand-text">
+                    <h1>SVIT</h1>
+                    <p>VASAD</p>
+                    <span>AI ASSISTANT</span>
+                </div>
+            </div>
+
+            <div class="hero-tagline">
+                <h2>Welcome to<br><span>SVIT <span class="highlight">AI</span> Assistant</span></h2>
+                <p>Your 24×7 Smart College Companion. Get information, support, and guidance instantly.</p>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <i data-lucide="message-square"></i>
+                    <span>AI Chatbot</span>
+                    <small>24×7 Support</small>
+                </div>
+                <div class="feature-item">
+                    <i data-lucide="calendar"></i>
+                    <span>Timetable</span>
+                    <small>& Schedule</small>
+                </div>
+                <div class="feature-item">
+                    <i data-lucide="bell"></i>
+                    <span>Notices &</span>
+                    <small>Updates</small>
+                </div>
+                <div class="feature-item">
+                    <i data-lucide="book-open"></i>
+                    <span>Academic</span>
+                    <small>Information</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Form Panel -->
+        <div class="form-section">
+            <div class="top-bar">
+                <button type="button" class="theme-toggle" id="themeToggle">
+                    <i data-lucide="moon" id="themeIcon"></i>
+                    <span id="themeText">Dark Mode</span>
+                </button>
+            </div>
+
+            <div class="form-card">
+                <div class="form-header">
+                    <div class="user-avatar">
+                        <i data-lucide="user" id="headerIcon"></i>
+                    </div>
+                    <h2 id="formTitle">Login to Your Account</h2>
+                    <p id="formSub">Access your SVIT AI Assistant dashboard</p>
+                </div>
+
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, message in messages %}
+                      <div class="alert alert-{{ category }}" style="color: #ef4444; background: #fef2f2; border: 1px solid #fca5a5; padding: 0.6rem; border-radius: 8px; margin-bottom: 1rem; text-align: center; font-size: 0.85rem;">
+                        {{ message }}
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+
+                <!-- Role Tabs -->
+                <div class="role-tabs">
+                    <button type="button" class="tab-btn active" id="studentTab" onclick="switchRole('student')">
+                        <i data-lucide="user"></i>
+                        <span>Student / Faculty</span>
+                    </button>
+                    <button type="button" class="tab-btn" id="adminTab" onclick="switchRole('admin')">
+                        <i data-lucide="shield-check"></i>
+                        <span>Admin</span>
+                    </button>
+                </div>
+
+                <!-- Form -->
+                <form id="loginForm" action="{{ url_for('auth.login') }}" method="POST">
+                    <input type="hidden" name="role" id="roleInput" value="student">
+
+                    <div class="input-group">
+                        <label for="identifier" id="identifierLabel">Email or Enrollment ID</label>
+                        <div class="input-field">
+                            <i data-lucide="mail"></i>
+                            <input type="text" id="identifier" name="identifier" placeholder="Enter your email or enrollment ID" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <div class="input-field">
+                            <i data-lucide="lock"></i>
+                            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">
+                                <i data-lucide="eye" id="eyeIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-options">
+                        <label class="remember-me">
+                            <input type="checkbox" name="remember">
+                            <span>Remember me</span>
+                        </label>
+                        <a href="#" class="forgot-link">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        <i data-lucide="log-in"></i>
+                        <span>Login</span>
+                    </button>
+                </form>
+
+                <div class="divider">
+                    <span>or continue with</span>
+                </div>
+
+                <div class="sso-providers">
+                    <button type="button" class="sso-btn">
+                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google">
+                        <span>Google</span>
+                    </button>
+                    <button type="button" class="sso-btn">
+                        <img src="https://www.svgrepo.com/show/452062/microsoft.svg" alt="Microsoft">
+                        <span>Microsoft</span>
+                    </button>
+                    <button type="button" class="sso-btn">
+                        <i data-lucide="landmark"></i>
+                        <span>SVIT SSO</span>
+                    </button>
+                </div>
+
+                <p class="register-prompt">
+                    New here? <a href="#">Register now</a>
+                </p>
+            </div>
+
+            <div class="global-footer">
+                <p>&copy; 2026 SVIT, Vasad. All Rights Reserved.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function switchRole(role) {
+            const studentTab = document.getElementById('studentTab');
+            const adminTab = document.getElementById('adminTab');
+            const roleInput = document.getElementById('roleInput');
+            const identifierLabel = document.getElementById('identifierLabel');
+            const identifierInput = document.getElementById('identifier');
+            const loginForm = document.getElementById('loginForm');
+            const formTitle = document.getElementById('formTitle');
+            const headerIcon = document.getElementById('headerIcon');
+
+            // Both roles target unified auth.login route
+            loginForm.action = "{{ url_for('auth.login') }}";
+
+            if (role === 'admin') {
+                studentTab.classList.remove('active');
+                adminTab.classList.add('active');
+                roleInput.value = 'admin';
+                formTitle.textContent = 'Admin Portal Login';
+                identifierLabel.textContent = 'Admin Username / Email';
+                identifierInput.placeholder = 'Enter admin username or email';
+                headerIcon.setAttribute('data-lucide', 'shield-check');
+            } else {
+                adminTab.classList.remove('active');
+                studentTab.classList.add('active');
+                roleInput.value = 'student';
+                formTitle.textContent = 'Login to Your Account';
+                identifierLabel.textContent = 'Email or Enrollment ID';
+                identifierInput.placeholder = 'Enter your email or enrollment ID';
+                headerIcon.setAttribute('data-lucide', 'user');
+            }
+            lucide.createIcons();
+        }
+
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
+
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            document.getElementById('themeText').textContent = isDark ? 'Light Mode' : 'Dark Mode';
+            document.getElementById('themeIcon').setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

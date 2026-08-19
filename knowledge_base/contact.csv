@@ -1,0 +1,21 @@
+contact_id,office_name,category,location,phone,email,working_days,opening_time,closing_time
+C001,Administration Office,Administration,Main Building,0265-2452500,admin@svit.edu.in,Monday-Friday,09:00 AM,05:00 PM
+C002,Principal Office,Administration,Admin Block,0265-2452501,principal@svit.edu.in,Monday-Friday,09:00 AM,05:00 PM
+C003,Admission Cell,Admissions,Admin Block,0265-2452502,admission@svit.edu.in,Monday-Saturday,09:00 AM,04:30 PM
+C004,Computer Engineering Office,Department,CE Block,0265-2452601,ce@svit.edu.in,Monday-Friday,09:00 AM,05:00 PM
+C005,Civil Engineering Office,Department,Civil Block,0265-2452602,civil@svit.edu.in,Monday-Friday,09:00 AM,05:00 PM
+C006,Mechanical Engineering Office,Department,Mechanical Block,0265-2452603,mech@svit.edu.in,Monday-Friday,09:00 AM,05:00 PM
+C007,Electrical Engineering Office,Department,Electrical Block,0265-2452604,ee@svit.edu.in,Monday-Friday,09:00 AM,05:00 PM
+C008,IT Department Office,Department,IT Block,0265-2452605,it@svit.edu.in,Monday-Friday,09:00 AM,05:00 PM
+C009,EC Department Office,Department,EC Block,0265-2452606,ec@svit.edu.in,Monday-Friday,09:00 AM,05:00 PM
+C010,AI & ML Department,Department,AI Center,0265-2452607,aiml@svit.edu.in,Monday-Friday,09:00 AM,05:00 PM
+C011,Data Science Department,Department,DS Lab,0265-2452608,datascience@svit.edu.in,Monday-Friday,09:00 AM,05:00 PM
+C012,MCA Office,Department,MCA Block,0265-2452609,mca@svit.edu.in,Monday-Friday,09:00 AM,05:00 PM
+C013,BCA Office,Department,BCA Block,0265-2452610,bca@svit.edu.in,Monday-Friday,09:00 AM,05:00 PM
+C014,Training & Placement Cell,Placement,Placement Block,0265-2452701,placement@svit.edu.in,Monday-Friday,09:00 AM,05:00 PM
+C015,Library,Library,Central Library,0265-2452801,library@svit.edu.in,Monday-Saturday,08:30 AM,07:00 PM
+C016,Canteen,Facility,Canteen Block,0265-2452901,canteen@svit.edu.in,Monday-Saturday,08:00 AM,05:30 PM
+C017,Transport Office,Transport,Transport Office,0265-2452950,transport@svit.edu.in,Monday-Saturday,08:00 AM,05:00 PM
+C018,Sports Office,Sports,Sports Complex,0265-2452960,sports@svit.edu.in,Monday-Friday,09:00 AM,05:00 PM
+C019,Hostel Office,Hostel,Hostel Block,0265-2452970,hostel@svit.edu.in,Monday-Friday,09:00 AM,05:00 PM
+C020,Emergency Help Desk,Emergency,Main Gate,0265-2452999,helpdesk@svit.edu.in,24x7,12:00 AM,11:59 PM

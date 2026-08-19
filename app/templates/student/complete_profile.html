@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Profile - SVIT AI Assistant</title>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/student/chat.css') }}">
+    <style>
+        .onboarding-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            padding: 24px;
+        }
+        .onboarding-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 650px;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            padding: 40px;
+        }
+        .onboarding-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .onboarding-icon {
+            width: 56px;
+            height: 56px;
+            background: #eef2ff;
+            color: #4f46e5;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px auto;
+        }
+        .onboarding-header h2 {
+            margin: 0 0 8px 0;
+            font-size: 1.6rem;
+            color: #0f172a;
+            font-weight: 700;
+        }
+        .onboarding-header p {
+            margin: 0;
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        .form-group label {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #334155;
+        }
+        .form-group input, .form-group select {
+            padding: 11px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: #ffffff;
+            color: #1e293b;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        .btn-submit-onboarding {
+            width: 100%;
+            margin-top: 24px;
+            padding: 12px;
+            background: #4f46e5;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s ease;
+        }
+        .btn-submit-onboarding:hover {
+            background: #4338ca;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="onboarding-wrapper">
+        <div class="onboarding-card">
+            
+            <div class="onboarding-header">
+                <div class="onboarding-icon">
+                    <i data-lucide="sparkles" style="width: 28px; height: 28px;"></i>
+                </div>
+                <h2>Complete Your Student Profile</h2>
+                <p>Please enter your academic details to personalize your AI assistant.</p>
+            </div>
+
+            <form method="POST" action="/student/profile/complete">
+                <div class="form-grid">
+                    
+                    <div class="form-group full-width">
+                        <label>Full Name</label>
+                        <input type="text" name="full_name" value="{{ current_user.full_name or current_user.name or '' }}" placeholder="e.g. John Doe" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Enrollment Number</label>
+                        <input type="text" name="enrollment_no" value="{{ current_user.enrollment_no or '' }}" placeholder="e.g. 210410107001" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Department</label>
+                        <select name="department" required>
+                            <option value="Computer Engineering" {% if current_user and current_user.department == 'Computer Engineering' %}selected{% endif %}>Computer Engineering</option>
+                            <option value="Information Technology" {% if current_user and current_user.department == 'Information Technology' %}selected{% endif %}>Information Technology</option>
+                            <option value="Mechanical Engineering" {% if current_user and current_user.department == 'Mechanical Engineering' %}selected{% endif %}>Mechanical Engineering</option>
+                            <option value="Civil Engineering" {% if current_user and current_user.department == 'Civil Engineering' %}selected{% endif %}>Civil Engineering</option>
+                            <option value="Electrical Engineering" {% if current_user and current_user.department == 'Electrical Engineering' %}selected{% endif %}>Electrical Engineering</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Semester</label>
+                        <select name="semester" required>
+                            {% for sem in range(1, 9) %}
+                                <option value="{{ sem }}" {% if current_user and current_user.semester == sem %}selected{% endif %}>Semester {{ sem }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phone / Mobile</label>
+                        <input type="tel" name="phone" value="{{ current_user.phone or current_user.contact or '' }}" placeholder="e.g. 9876543210" required>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Gender</label>
+                        <select name="gender" required>
+                            <option value="Male" {% if current_user and current_user.gender == 'Male' %}selected{% endif %}>Male</option>
+                            <option value="Female" {% if current_user and current_user.gender == 'Female' %}selected{% endif %}>Female</option>
+                            <option value="Other" {% if current_user and current_user.gender == 'Other' %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <button type="submit" class="btn-submit-onboarding">
+                    <span>Save & Get Started</span>
+                    <i data-lucide="arrow-right"></i>
+                </button>
+            </form>
+
+        </div>
+    </div>
+
+    <script>
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

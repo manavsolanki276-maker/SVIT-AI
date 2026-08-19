@@ -1,0 +1,172 @@
+import os
+import logging
+from datetime import timedelta
+from flask import Flask, redirect, url_for, render_template
+from flask_login import current_user
+from app.extensions import db, login_manager
+
+# Configure logging to monitor application context events
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+def create_app():
+    app = Flask(__name__)
+
+    # =========================================================
+    # 1. BASE CONFIGURATIONS
+    # =========================================================
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-key-svit-ai-assistant')
+    
+    # Enable automatic login during local development
+    app.config['AUTO_LOGIN_DEV'] = False  # Set to False when deploying to production
+    
+    # Keep session active for 30 days
+    app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=30)
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
+
+    # Database setup
+    base_dir = os.path.abspath(os.path.dirname(__file__))
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+        'DATABASE_URL', 
+        'sqlite:///' + os.path.join(base_dir, 'svit_assistant.db')
+    )
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    # Ensure static upload folders exist
+    profile_upload_path = os.path.join(app.root_path, 'static', 'profile_images')
+    os.makedirs(profile_upload_path, exist_ok=True)
+
+    # =========================================================
+    # 2. EXTENSION INITIALIZATION
+    # =========================================================
+    db.init_app(app)
+    login_manager.init_app(app)
+    
+    # Set default login view to student login
+    login_manager.login_view = 'auth.student_login'
+
+    # Import User models for login loader
+    from app.database.models import Admin, Student
+
+    # =========================================================
+    # 3. FLASK-LOGIN USER LOADER Callback
+    # =========================================================
+    @login_manager.user_loader
+    def load_user(user_id):
+        user_str = str(user_id)
+        if user_str.startswith('admin_'):
+            real_id = int(user_str.split('_')[1])
+            return Admin.query.get(real_id)
+        elif user_str.startswith('student_'):
+            real_id = int(user_str.split('_')[1])
+            return Student.query.get(real_id)
+        
+        # Fallback for legacy raw IDs
+        try:
+            return Student.query.get(int(user_id)) or Admin.query.get(int(user_id))
+        except (ValueError, TypeError):
+            return None
+
+    # =========================================================
+    # 4. BLUEPRINT REGISTRATIONS
+    # =========================================================
+    # Auth Blueprint
+    try:
+        from app.routes.auth import auth_bp
+    except ImportError:
+        from app.auth.routes import auth_bp
+
+    # Student Blueprint
+    try:
+        from app.routes.student import student_bp
+    except ImportError:
+        from app.student.routes import student_bp
+
+    # Admin Blueprint
+    try:
+        from app.routes.admin import admin_bp
+    except ImportError:
+        admin_bp = None
+
+    # Chat API Blueprint
+    from app.routes.chat import chat_bp
+
+    # Feature Blueprints
+    from app.routes.history_routes import history_bp
+    from app.routes.profile_routes import profile_bp
+    
+    try:
+        from app.routes.settings_routes import settings_bp
+    except ImportError:
+        settings_bp = None
+
+    try:
+        from app.routes.notification_routes import notification_bp
+    except ImportError:
+        notification_bp = None
+
+    # Register Blueprints
+    app.register_blueprint(auth_bp)        # Handles /auth/...
+    app.register_blueprint(student_bp)     # Handles /student/...
+    app.register_blueprint(chat_bp)        # Handles /api/chat
+    app.register_blueprint(history_bp)     # Handles /chat/history-page, /chat/clear-range
+    app.register_blueprint(profile_bp)     # Handles /student/profile/
+
+    if admin_bp:
+        app.register_blueprint(admin_bp)
+    if settings_bp:
+        app.register_blueprint(settings_bp)
+    if notification_bp:
+        app.register_blueprint(notification_bp)
+
+    # =========================================================
+    # 5. JINJA CONTEXT PROCESSORS & UTILITIES
+    # =========================================================
+    @app.context_processor
+    def inject_endpoints():
+        return {
+            'bootstrap_endpoints': set(app.view_functions.keys())
+        }
+
+    app.jinja_env.globals.update(
+        getattr=getattr,
+        hasattr=hasattr,
+        str=str,
+        int=int,
+        len=len
+    )
+
+    # =========================================================
+    # 6. DEFAULT APPLICATION ROOT ROUTE
+    # =========================================================
+    @app.route('/')
+    def index():
+        if current_user.is_authenticated:
+            if getattr(current_user, 'is_admin', False):
+                return redirect(url_for('admin.dashboard'))
+            
+            # Check profile completion status
+            is_complete = getattr(current_user, 'is_profile_completed', getattr(current_user, 'is_profile_complete', True))
+            if not is_complete:
+                return redirect('/student/profile/complete')
+            
+            # Render chat page directly without an intermediate 302 bounce
+            return render_template('student/chat.html')
+
+        return redirect(url_for('auth.student_login'))
+
+    # =========================================================
+    # 7. MODEL METADATA REGISTRATION & TABLE INITIALIZATION
+    # =========================================================
+    with app.app_context():
+        try:
+            from app.models.chat_history import ChatConversation, ChatMessage, SavedConversation
+            from app.models.user_settings import UserSettings
+            from app.models.notification import Notification
+        except ImportError as e:
+            logger.warning(f"Secondary models registration notice: {e}")
+
+        db.create_all()
+
+    return app

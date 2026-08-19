@@ -1,0 +1,41 @@
+route_id,route_name,bus_no,starting_point,destination,stops,departure_time,arrival_time,driver_name,contact_number,capacity,status
+R01,Vadodara Route 1,GJ06-BUS-101,Tarsali,SVIT Vasad Campus,Tarsali -> Bhayli -> Ellora Park -> Sindhrot -> Bill -> Fatehgunj -> Vasad -> SVIT,07:15 AM,08:15 AM,Driver 1,9487554709,52,Active
+R02,Vadodara Route 2,GJ06-BUS-102,Sindhrot,SVIT Vasad Campus,Sindhrot -> Ajwa -> Manjalpur -> Kalali -> Chhani -> Nizampura -> Vasad -> SVIT,07:00 AM,08:45 AM,Driver 2,9524215954,45,Active
+R03,Vadodara Route 3,GJ06-BUS-103,Ajwa Road,SVIT Vasad Campus,Ajwa Road -> Gotri -> Subhanpura -> Tarsali -> Karelibaug -> Bill -> Vasad -> SVIT,07:30 AM,08:30 AM,Driver 3,9781701340,40,Active
+R04,Vadodara Route 4,GJ06-BUS-104,Por,SVIT Vasad Campus,Por -> Koyali -> Waghodia -> Raopura -> Kalali -> Bill -> Vasad -> SVIT,06:45 AM,08:45 AM,Driver 4,9576475683,40,Active
+R05,Vadodara Route 5,GJ06-BUS-105,Subhanpura,SVIT Vasad Campus,Subhanpura -> Sindhrot -> Vasna Road -> Nizampura -> Fatehgunj -> Akota -> Vasad -> SVIT,07:00 AM,08:30 AM,Driver 5,9340302870,45,Active
+R06,Vadodara Route 6,GJ06-BUS-106,Jarod,SVIT Vasad Campus,Jarod -> Harni -> Atladara -> Laxmipura -> Vasna Road -> Chhani -> Vasad -> SVIT,07:30 AM,08:45 AM,Driver 6,9927100918,45,Active
+R07,Vadodara Route 7,GJ06-BUS-107,Sayajigunj,SVIT Vasad Campus,Sayajigunj -> Vasna Road -> Gorwa -> Halol -> Por -> Nizampura -> Vasad -> SVIT,06:30 AM,08:45 AM,Driver 7,9359474974,50,Active
+R08,Vadodara Route 8,GJ06-BUS-108,Por,SVIT Vasad Campus,Por -> Waghodia Road -> Kareli Baug -> Fatehgunj -> Dabhoi Road -> Sindhrot -> Vasad -> SVIT,07:30 AM,08:00 AM,Driver 8,9820520732,45,Active
+R09,Vadodara Route 9,GJ06-BUS-109,Waghodia,SVIT Vasad Campus,Waghodia -> Gorwa -> Makarpura -> Bapod -> Ajwa Road -> Sama -> Vasad -> SVIT,06:30 AM,08:15 AM,Driver 9,9440956780,50,Active
+R10,Vadodara Route 10,GJ06-BUS-110,Nizampura,SVIT Vasad Campus,Nizampura -> Manjalpur -> Raopura -> Fatehgunj -> Jarod -> Akota -> Vasad -> SVIT,07:00 AM,08:45 AM,Driver 10,9477773956,45,Active
+R11,Vadodara Route 11,GJ06-BUS-111,Alkapuri,SVIT Vasad Campus,Alkapuri -> Akota -> Laxmipura -> Atladara -> Por -> Dabhoi Road -> Vasad -> SVIT,06:30 AM,08:45 AM,Driver 11,9233940382,50,Active
+R12,Vadodara Route 12,GJ06-BUS-112,Halol,SVIT Vasad Campus,Halol -> Ajwa Road -> Waghodia -> Savli -> Sindhrot -> Kareli Baug -> Vasad -> SVIT,07:00 AM,08:15 AM,Driver 12,9819158887,40,Active
+R13,Vadodara Route 13,GJ06-BUS-113,Laxmipura,SVIT Vasad Campus,Laxmipura -> Vasna Road -> Sama -> Koyali -> Harni -> Karjan -> Vasad -> SVIT,07:00 AM,08:45 AM,Driver 13,9434371044,50,Active
+R14,Vadodara Route 14,GJ06-BUS-114,Por,SVIT Vasad Campus,Por -> Sama -> Makarpura -> Sindhrot -> Bill -> Ajwa Road -> Vasad -> SVIT,06:30 AM,08:45 AM,Driver 14,9809969018,50,Active
+R15,Vadodara Route 15,GJ06-BUS-115,Nizampura,SVIT Vasad Campus,Nizampura -> Vasna Road -> Makarpura -> Gotri -> Manjalpur -> Sevasi -> Vasad -> SVIT,07:15 AM,08:30 AM,Driver 15,9762666119,50,Active
+R16,Vadodara Route 16,GJ06-BUS-116,Gotri,SVIT Vasad Campus,Gotri -> Sama -> Vasna Road -> Makarpura -> Ellora Park -> Nizampura -> Vasad -> SVIT,07:30 AM,08:45 AM,Driver 16,9529407620,52,Active
+R17,Vadodara Route 17,GJ06-BUS-117,Sayajigunj,SVIT Vasad Campus,Sayajigunj -> Subhanpura -> Harni -> Atladara -> Por -> Sama -> Vasad -> SVIT,07:15 AM,08:00 AM,Driver 17,9695830455,50,Active
+R18,Vadodara Route 18,GJ06-BUS-118,Karelibaug,SVIT Vasad Campus,Karelibaug -> Jarod -> Karjan -> Waghodia Road -> Kalali -> Alkapuri -> Vasad -> SVIT,07:00 AM,08:45 AM,Driver 18,9425732434,45,Active
+R19,Vadodara Route 19,GJ06-BUS-119,Ajwa,SVIT Vasad Campus,Ajwa -> Sayajigunj -> Bill -> Makarpura -> Koyali -> Manjalpur -> Vasad -> SVIT,07:30 AM,08:00 AM,Driver 19,9958157954,40,Active
+R20,Vadodara Route 20,GJ06-BUS-120,Vasna Road,SVIT Vasad Campus,Vasna Road -> Padra -> Alkapuri -> Subhanpura -> Akota -> Bhayli -> Vasad -> SVIT,07:15 AM,08:45 AM,Driver 20,9529119359,45,Active
+R21,Vadodara Route 21,GJ06-BUS-121,Raopura,SVIT Vasad Campus,Raopura -> Ajwa Road -> Savli -> Laxmipura -> Waghodia Road -> Kalali -> Vasad -> SVIT,07:30 AM,08:45 AM,Driver 21,9629236308,50,Active
+R22,Vadodara Route 22,GJ06-BUS-122,Kalali,SVIT Vasad Campus,Kalali -> Savli -> Karelibaug -> Jarod -> Sayajigunj -> Subhanpura -> Vasad -> SVIT,06:45 AM,08:00 AM,Driver 22,9426606970,50,Active
+R23,Vadodara Route 23,GJ06-BUS-123,Ellora Park,SVIT Vasad Campus,Ellora Park -> Gorwa -> Laxmipura -> Alkapuri -> Kalali -> Akota -> Vasad -> SVIT,06:45 AM,08:00 AM,Driver 23,9811689159,52,Active
+R24,Vadodara Route 24,GJ06-BUS-124,Makarpura,SVIT Vasad Campus,Makarpura -> Sindhrot -> Laxmipura -> Nizampura -> Gorwa -> Manjalpur -> Vasad -> SVIT,07:15 AM,08:15 AM,Driver 24,9778018827,45,Active
+R25,Vadodara Route 25,GJ06-BUS-125,Subhanpura,SVIT Vasad Campus,Subhanpura -> Por -> Karelibaug -> Gotri -> Alkapuri -> Manjalpur -> Vasad -> SVIT,07:15 AM,08:30 AM,Driver 25,9237872075,52,Active
+R26,Vadodara Route 26,GJ06-BUS-126,Jarod,SVIT Vasad Campus,Jarod -> Vasna Road -> Laxmipura -> Halol -> Harni -> Padra -> Vasad -> SVIT,07:30 AM,08:45 AM,Driver 26,9962207585,52,Active
+R27,Vadodara Route 27,GJ06-BUS-127,Ajwa Road,SVIT Vasad Campus,Ajwa Road -> Halol -> Koyali -> Por -> Akota -> Karelibaug -> Vasad -> SVIT,07:00 AM,08:30 AM,Driver 27,9228739890,45,Active
+R28,Vadodara Route 28,GJ06-BUS-128,Por,SVIT Vasad Campus,Por -> Sama -> Nizampura -> Fatehgunj -> Sevasi -> Harni -> Vasad -> SVIT,06:30 AM,08:00 AM,Driver 28,9148515575,50,Active
+R29,Vadodara Route 29,GJ06-BUS-129,Bapod,SVIT Vasad Campus,Bapod -> Tarsali -> Karelibaug -> Nizampura -> Sayajigunj -> Sevasi -> Vasad -> SVIT,07:15 AM,08:00 AM,Driver 29,9252179610,52,Active
+R30,Vadodara Route 30,GJ06-BUS-130,Fatehgunj,SVIT Vasad Campus,Fatehgunj -> Koyali -> Ellora Park -> Atladara -> Halol -> Vasna Road -> Vasad -> SVIT,07:30 AM,08:45 AM,Driver 30,9307639527,52,Active
+R31,Vadodara Route 31,GJ06-BUS-131,Ajwa,SVIT Vasad Campus,Ajwa -> Waghodia -> Ajwa Road -> Waghodia Road -> Sindhrot -> Bapod -> Vasad -> SVIT,07:15 AM,08:00 AM,Driver 31,9251877057,40,Active
+R32,Vadodara Route 32,GJ06-BUS-132,Alkapuri,SVIT Vasad Campus,Alkapuri -> Padra -> Gorwa -> Nizampura -> Sevasi -> Waghodia -> Vasad -> SVIT,07:15 AM,08:45 AM,Driver 32,9791097639,52,Active
+R33,Vadodara Route 33,GJ06-BUS-133,Bill,SVIT Vasad Campus,Bill -> Fatehgunj -> Subhanpura -> Gotri -> Raopura -> Sayajigunj -> Vasad -> SVIT,07:30 AM,08:30 AM,Driver 33,9848256747,50,Active
+R34,Vadodara Route 34,GJ06-BUS-134,Laxmipura,SVIT Vasad Campus,Laxmipura -> Kalali -> Karjan -> Sindhrot -> Por -> Fatehgunj -> Vasad -> SVIT,06:30 AM,08:15 AM,Driver 34,9156908902,40,Active
+R35,Vadodara Route 35,GJ06-BUS-135,Halol,SVIT Vasad Campus,Halol -> Nizampura -> Karelibaug -> Dabhoi Road -> Laxmipura -> Gotri -> Vasad -> SVIT,06:30 AM,08:00 AM,Driver 35,9469582407,40,Active
+R36,Vadodara Route 36,GJ06-BUS-136,Ajwa Road,SVIT Vasad Campus,Ajwa Road -> Ajwa -> Makarpura -> Tarsali -> Laxmipura -> Manjalpur -> Vasad -> SVIT,07:30 AM,08:00 AM,Driver 36,9212404962,40,Active
+R37,Vadodara Route 37,GJ06-BUS-137,Dabhoi Road,SVIT Vasad Campus,Dabhoi Road -> Bapod -> Gorwa -> Kalali -> Ellora Park -> Sindhrot -> Vasad -> SVIT,06:45 AM,08:00 AM,Driver 37,9598876363,45,Active
+R38,Vadodara Route 38,GJ06-BUS-138,Ajwa Road,SVIT Vasad Campus,Ajwa Road -> Gorwa -> Kalali -> Vasna Road -> Halol -> Harni -> Vasad -> SVIT,06:45 AM,08:00 AM,Driver 38,9768619167,50,Active
+R39,Vadodara Route 39,GJ06-BUS-139,Padra,SVIT Vasad Campus,Padra -> Gotri -> Sayajigunj -> New VIP Road -> Alkapuri -> Makarpura -> Vasad -> SVIT,07:30 AM,08:30 AM,Driver 39,9443325567,45,Active
+R40,Vadodara Route 40,GJ06-BUS-140,Sindhrot,SVIT Vasad Campus,Sindhrot -> Karjan -> New VIP Road -> Kareli Baug -> Makarpura -> Bapod -> Vasad -> SVIT,06:30 AM,08:15 AM,Driver 40,9691799109,45,Active

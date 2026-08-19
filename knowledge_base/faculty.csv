@@ -1,0 +1,251 @@
+faculty_id,full_name,designation,department,program,subject,email,phone,cabin,qualification,experience,specialization,office_hours
+F001,Dr. Parth Modi,Lecturer,Automobile Engineering,Diploma,Automobile Engines,parth.modi1@svit.edu.in,9353365612,AU-122,MCA,17 Years,Cloud Computing,10:00-15:00
+F002,Prof. Krunal Desai,Professor,Artificial Intelligence & ML,BE,Machine Learning,krunal.desai2@svit.edu.in,9539205702,AR-297,M.E.,23 Years,Embedded Systems,10:00-17:00
+F003,Prof. Sneha Rathod,HOD,Civil Engineering,Diploma,Structural Analysis,sneha.rathod3@svit.edu.in,9396136654,CI-326,PhD,24 Years,Software Engineering,09:00-14:00
+F004,Prof. Komal Bhatt,Associate Professor,Computer Applications,MCA,Java,komal.bhatt4@svit.edu.in,9157034410,CO-339,M.Sc.,2 Years,Structural Design,09:00-17:00
+F005,Prof. Jignesh Dave,Professor,Data Science,BE,Big Data,jignesh.dave5@svit.edu.in,9927982545,DA-399,M.E.,15 Years,Cloud Computing,09:00-15:00
+F006,Dr. Sneha Trivedi,Assistant Professor,Electronics & Communication,Diploma,VLSI,sneha.trivedi6@svit.edu.in,9406024521,EL-190,M.Tech,13 Years,IoT,09:00-13:00
+F007,Prof. Jignesh Bhatt,Professor,Computer Applications,MCA,Software Engineering,jignesh.bhatt7@svit.edu.in,9968670466,CO-134,M.Tech,26 Years,Cyber Security,09:00-15:00
+F008,Dr. Amit Solanki,Assistant Professor,Artificial Intelligence & ML,BE,Machine Learning,amit.solanki8@svit.edu.in,9862511634,AR-377,M.Tech,26 Years,Structural Design,09:00-14:00
+F009,Prof. Komal Modi,Lecturer,Civil Engineering,ME,Surveying,komal.modi9@svit.edu.in,9302099244,CI-200,M.E.,2 Years,Data Science,10:00-17:00
+F010,Prof. Rina Prajapati,Assistant Professor,Computer Engineering,Diploma,Data Structures,rina.prajapati10@svit.edu.in,9987223530,CO-342,M.Sc.,14 Years,Artificial Intelligence,10:00-14:00
+F011,Prof. Kinjal Patel,Associate Professor,Civil Engineering,Diploma,Surveying,kinjal.patel11@svit.edu.in,9880039529,CI-284,M.Sc.,16 Years,Software Engineering,10:00-16:00
+F012,Dr. Nilesh Solanki,Lecturer,Computer Engineering,Diploma,Python Programming,nilesh.solanki12@svit.edu.in,9184945359,CO-238,M.Tech,4 Years,IoT,11:00-14:00
+F013,Prof. Nirav Joshi,Professor,Electronics & Communication,BE,VLSI,nirav.joshi13@svit.edu.in,9343877305,EL-345,M.E.,22 Years,Embedded Systems,09:00-13:00
+F014,Prof. Amit Trivedi,HOD,Electrical Engineering,Diploma,Power Systems,amit.trivedi14@svit.edu.in,9105065691,EL-135,M.Sc.,23 Years,Structural Design,09:00-16:00
+F015,Prof. Bhavna Solanki,Associate Professor,Mechanical Engineering,ME,Thermodynamics,bhavna.solanki15@svit.edu.in,9822747478,ME-227,PhD,30 Years,Artificial Intelligence,09:00-13:00
+F016,Prof. Hiren Joshi,Professor,Civil Engineering,Diploma,Structural Analysis,hiren.joshi16@svit.edu.in,9663297594,CI-201,M.Sc.,20 Years,Networks,09:00-17:00
+F017,Prof. Bhavna Vyas,HOD,Information Technology,Diploma,Cyber Security,bhavna.vyas17@svit.edu.in,9326619153,IN-160,PhD,21 Years,Networks,11:00-16:00
+F018,Prof. Priya Bhatt,Associate Professor,Civil Engineering,ME,Structural Analysis,priya.bhatt18@svit.edu.in,9478347962,CI-216,MCA,23 Years,IoT,11:00-16:00
+F019,Prof. Rahul Desai,HOD,Mechanical Engineering,BE,CAD/CAM,rahul.desai19@svit.edu.in,9983894841,ME-329,M.E.,15 Years,Cloud Computing,10:00-17:00
+F020,Prof. Rahul Modi,Associate Professor,Computer Applications,BCA,Software Engineering,rahul.modi20@svit.edu.in,9591049404,CO-151,M.Tech,29 Years,Data Science,09:00-14:00
+F021,Prof. Kinjal Solanki,Lecturer,Computer Applications,BCA,Python,kinjal.solanki21@svit.edu.in,9328428314,CO-400,PhD,14 Years,Cloud Computing,09:00-16:00
+F022,Prof. Parth Mehta,Assistant Professor,Information Technology,Diploma,Web Development,parth.mehta22@svit.edu.in,9936479049,IN-105,M.E.,1 Years,Software Engineering,11:00-14:00
+F023,Prof. Rahul Rathod,Assistant Professor,Computer Applications,MCA,Java,rahul.rathod23@svit.edu.in,9355413116,CO-188,MCA,29 Years,IoT,10:00-16:00
+F024,Dr. Nirav Shah,Assistant Professor,Mechanical Engineering,Diploma,Manufacturing,nirav.shah24@svit.edu.in,9968831109,ME-368,MCA,4 Years,Cyber Security,11:00-15:00
+F025,Dr. Dhaval Prajapati,HOD,Artificial Intelligence & ML,BE,AI Fundamentals,dhaval.prajapati25@svit.edu.in,9337916466,AR-248,M.E.,25 Years,Cloud Computing,09:00-17:00
+F026,Prof. Rina Dave,Assistant Professor,Civil Engineering,BE,Surveying,rina.dave26@svit.edu.in,9510019537,CI-381,M.Tech,2 Years,Artificial Intelligence,09:00-15:00
+F027,Prof. Parth Prajapati,Assistant Professor,Computer Engineering,BE,Computer Networks,parth.prajapati27@svit.edu.in,9500240241,CO-361,M.Tech,3 Years,Artificial Intelligence,11:00-13:00
+F028,Prof. Sneha Mehta,Lecturer,Computer Applications,MCA,Java,sneha.mehta28@svit.edu.in,9267155293,CO-264,MCA,3 Years,Software Engineering,09:00-17:00
+F029,Dr. Ketan Dave,Professor,Electronics & Communication,Diploma,Microprocessors,ketan.dave29@svit.edu.in,9714773744,EL-234,PhD,10 Years,Algorithms,10:00-17:00
+F030,Prof. Kinjal Mehta,Professor,Computer Engineering,BE,Computer Networks,kinjal.mehta30@svit.edu.in,9288478549,CO-356,PhD,18 Years,Networks,09:00-16:00
+F031,Dr. Jignesh Shah,Professor,Data Science,BE,Data Analytics,jignesh.shah31@svit.edu.in,9685701007,DA-304,MCA,14 Years,Software Engineering,11:00-16:00
+F032,Prof. Bhavna Patel,HOD,Computer Engineering,Diploma,Operating Systems,bhavna.patel32@svit.edu.in,9974974604,CO-400,M.E.,10 Years,Structural Design,09:00-14:00
+F033,Prof. Rina Dave,Associate Professor,Information Technology,Diploma,Cloud Computing,rina.dave33@svit.edu.in,9634053175,IN-318,M.Tech,22 Years,Cloud Computing,11:00-14:00
+F034,Prof. Harsh Bhatt,Assistant Professor,Computer Applications,BCA,Python,harsh.bhatt34@svit.edu.in,9349689436,CO-223,MCA,22 Years,IoT,11:00-15:00
+F035,Dr. Kinjal Rathod,Lecturer,Electronics & Communication,BE,VLSI,kinjal.rathod35@svit.edu.in,9162854432,EL-419,M.Sc.,24 Years,Networks,11:00-13:00
+F036,Prof. Bhavna Solanki,Assistant Professor,Mechanical Engineering,Diploma,Manufacturing,bhavna.solanki36@svit.edu.in,9978676795,ME-125,M.Tech,18 Years,Algorithms,10:00-15:00
+F037,Dr. Rajesh Pandya,Lecturer,Information Technology,Diploma,Cloud Computing,rajesh.pandya37@svit.edu.in,9465965082,IN-172,PhD,25 Years,Cyber Security,10:00-17:00
+F038,Prof. Mehul Shah,Lecturer,Computer Applications,MCA,Python,mehul.shah38@svit.edu.in,9686077842,CO-221,M.Tech,1 Years,Networks,09:00-13:00
+F039,Prof. Rina Joshi,HOD,Electronics & Communication,Diploma,VLSI,rina.joshi39@svit.edu.in,9399432968,EL-357,M.Sc.,11 Years,Structural Design,10:00-17:00
+F040,Prof. Rakesh Desai,Assistant Professor,Information Technology,Diploma,Cyber Security,rakesh.desai40@svit.edu.in,9418215823,IN-245,M.Sc.,7 Years,Structural Design,11:00-15:00
+F041,Dr. Rahul Modi,HOD,Electronics & Communication,BE,VLSI,rahul.modi41@svit.edu.in,9312184932,EL-369,M.Sc.,10 Years,Embedded Systems,10:00-16:00
+F042,Dr. Sneha Bhatt,Assistant Professor,Electronics & Communication,BE,Digital Electronics,sneha.bhatt42@svit.edu.in,9353712572,EL-137,M.Sc.,13 Years,Structural Design,11:00-14:00
+F043,Dr. Harsh Bhatt,Assistant Professor,Civil Engineering,Diploma,Structural Analysis,harsh.bhatt43@svit.edu.in,9294820698,CI-109,M.E.,26 Years,Algorithms,10:00-15:00
+F044,Prof. Parth Mehta,Professor,Civil Engineering,ME,Structural Analysis,parth.mehta44@svit.edu.in,9347044890,CI-357,M.E.,23 Years,Embedded Systems,09:00-16:00
+F045,Prof. Komal Prajapati,Associate Professor,Mechanical Engineering,Diploma,Manufacturing,komal.prajapati45@svit.edu.in,9675567962,ME-215,M.Sc.,6 Years,Artificial Intelligence,09:00-13:00
+F046,Prof. Neha Solanki,Assistant Professor,Artificial Intelligence & ML,BE,AI Fundamentals,neha.solanki46@svit.edu.in,9818825759,AR-184,M.Sc.,3 Years,Structural Design,09:00-15:00
+F047,Dr. Rahul Mehta,HOD,Artificial Intelligence & ML,BE,AI Fundamentals,rahul.mehta47@svit.edu.in,9429520126,AR-170,MCA,27 Years,Structural Design,09:00-15:00
+F048,Prof. Priya Desai,Associate Professor,Computer Applications,BCA,Python,priya.desai48@svit.edu.in,9688541271,CO-370,M.Sc.,27 Years,Software Engineering,09:00-15:00
+F049,Prof. Amit Patel,Associate Professor,Mechanical Engineering,ME,Fluid Mechanics,amit.patel49@svit.edu.in,9007755359,ME-313,PhD,8 Years,Artificial Intelligence,09:00-14:00
+F050,Dr. Kinjal Pandya,Professor,Electronics & Communication,BE,Microprocessors,kinjal.pandya50@svit.edu.in,9075501612,EL-310,PhD,15 Years,Software Engineering,10:00-15:00
+F051,Prof. Parth Modi,HOD,Data Science,BE,Big Data,parth.modi51@svit.edu.in,9078070206,DA-143,M.Sc.,28 Years,Software Engineering,09:00-15:00
+F052,Prof. Dhaval Pandya,Professor,Electronics & Communication,BE,Microprocessors,dhaval.pandya52@svit.edu.in,9252083153,EL-334,M.Tech,27 Years,Algorithms,10:00-17:00
+F053,Prof. Priya Vyas,Professor,Electrical Engineering,BE,Control Systems,priya.vyas53@svit.edu.in,9450435361,EL-315,M.E.,29 Years,IoT,11:00-15:00
+F054,Dr. Bhavna Patel,Lecturer,Computer Engineering,Diploma,Python Programming,bhavna.patel54@svit.edu.in,9154826392,CO-339,MCA,7 Years,Software Engineering,11:00-14:00
+F055,Prof. Rajesh Rathod,HOD,Electrical Engineering,BE,Electrical Machines,rajesh.rathod55@svit.edu.in,9025781652,EL-313,M.Tech,11 Years,Structural Design,11:00-14:00
+F056,Prof. Mehul Pandya,Associate Professor,Electrical Engineering,Diploma,Power Systems,mehul.pandya56@svit.edu.in,9781007303,EL-162,PhD,27 Years,Cyber Security,11:00-15:00
+F057,Prof. Amit Joshi,HOD,Electrical Engineering,Diploma,Power Systems,amit.joshi57@svit.edu.in,9200631124,EL-102,M.Sc.,9 Years,Structural Design,09:00-17:00
+F058,Prof. Priya Dave,Lecturer,Computer Engineering,Diploma,Computer Networks,priya.dave58@svit.edu.in,9873521029,CO-177,MCA,7 Years,Cloud Computing,10:00-14:00
+F059,Prof. Rajesh Patel,Assistant Professor,Electrical Engineering,Diploma,Electrical Machines,rajesh.patel59@svit.edu.in,9086950741,EL-201,MCA,29 Years,Software Engineering,10:00-15:00
+F060,Dr. Komal Chauhan,Assistant Professor,Artificial Intelligence & ML,BE,AI Fundamentals,komal.chauhan60@svit.edu.in,9420240871,AR-260,M.Sc.,2 Years,Data Science,10:00-14:00
+F061,Prof. Bhavna Pandya,HOD,Computer Engineering,BE,Python Programming,bhavna.pandya61@svit.edu.in,9853144766,CO-384,PhD,22 Years,Embedded Systems,09:00-15:00
+F062,Dr. Neha Chauhan,Professor,Computer Applications,MCA,Python,neha.chauhan62@svit.edu.in,9275154738,CO-306,MCA,7 Years,Cloud Computing,10:00-13:00
+F063,Prof. Rina Vyas,HOD,Computer Applications,BCA,Software Engineering,rina.vyas63@svit.edu.in,9405522333,CO-389,M.Sc.,26 Years,Networks,09:00-17:00
+F064,Prof. Hiren Trivedi,Lecturer,Automobile Engineering,Diploma,Vehicle Dynamics,hiren.trivedi64@svit.edu.in,9622132551,AU-416,M.E.,26 Years,Algorithms,09:00-16:00
+F065,Prof. Nirav Pandya,Professor,Information Technology,BE,Web Development,nirav.pandya65@svit.edu.in,9799072922,IN-258,M.Tech,19 Years,Networks,10:00-17:00
+F066,Dr. Parth Modi,Assistant Professor,Artificial Intelligence & ML,BE,Deep Learning,parth.modi66@svit.edu.in,9215406201,AR-411,PhD,6 Years,Artificial Intelligence,09:00-14:00
+F067,Dr. Vivek Dave,Assistant Professor,Electrical Engineering,Diploma,Control Systems,vivek.dave67@svit.edu.in,9866904816,EL-102,MCA,25 Years,Software Engineering,10:00-15:00
+F068,Dr. Sonal Shah,Assistant Professor,Electronics & Communication,BE,VLSI,sonal.shah68@svit.edu.in,9644076727,EL-293,M.Sc.,27 Years,Networks,11:00-13:00
+F069,Prof. Komal Mehta,Associate Professor,Mechanical Engineering,ME,Fluid Mechanics,komal.mehta69@svit.edu.in,9885419479,ME-151,PhD,5 Years,Embedded Systems,09:00-16:00
+F070,Prof. Komal Chauhan,HOD,Electronics & Communication,BE,VLSI,komal.chauhan70@svit.edu.in,9757259196,EL-375,M.Sc.,22 Years,Data Science,10:00-17:00
+F071,Dr. Rahul Solanki,HOD,Computer Engineering,ME,Data Structures,rahul.solanki71@svit.edu.in,9163995673,CO-182,M.Sc.,15 Years,Networks,09:00-17:00
+F072,Prof. Rajesh Desai,Associate Professor,Mechanical Engineering,Diploma,Manufacturing,rajesh.desai72@svit.edu.in,9593002141,ME-251,M.Sc.,26 Years,Cloud Computing,11:00-15:00
+F073,Prof. Rajesh Bhatt,Professor,Electronics & Communication,Diploma,Microprocessors,rajesh.bhatt73@svit.edu.in,9191517079,EL-227,M.Sc.,5 Years,Cyber Security,11:00-15:00
+F074,Prof. Mehul Pandya,HOD,Mechanical Engineering,BE,Fluid Mechanics,mehul.pandya74@svit.edu.in,9554327198,ME-122,PhD,4 Years,IoT,09:00-15:00
+F075,Prof. Rajesh Prajapati,HOD,Civil Engineering,ME,Transportation Engineering,rajesh.prajapati75@svit.edu.in,9384244242,CI-127,PhD,17 Years,IoT,11:00-16:00
+F076,Prof. Parth Dave,Assistant Professor,Mechanical Engineering,BE,Thermodynamics,parth.dave76@svit.edu.in,9983852155,ME-286,PhD,16 Years,Artificial Intelligence,10:00-15:00
+F077,Prof. Jignesh Solanki,Associate Professor,Electronics & Communication,BE,Microprocessors,jignesh.solanki77@svit.edu.in,9205971369,EL-371,M.Sc.,28 Years,Algorithms,10:00-17:00
+F078,Prof. Rina Modi,Assistant Professor,Civil Engineering,BE,Transportation Engineering,rina.modi78@svit.edu.in,9981111440,CI-388,PhD,17 Years,Networks,11:00-17:00
+F079,Prof. Mehul Prajapati,Professor,Electronics & Communication,Diploma,VLSI,mehul.prajapati79@svit.edu.in,9851317420,EL-142,M.Sc.,1 Years,Software Engineering,10:00-17:00
+F080,Prof. Kinjal Modi,Professor,Information Technology,Diploma,Cyber Security,kinjal.modi80@svit.edu.in,9466063298,IN-232,M.Sc.,13 Years,Algorithms,11:00-17:00
+F081,Prof. Dhaval Mehta,Assistant Professor,Electronics & Communication,BE,VLSI,dhaval.mehta81@svit.edu.in,9628464280,EL-207,M.Tech,2 Years,Software Engineering,09:00-17:00
+F082,Prof. Vivek Desai,Assistant Professor,Electrical Engineering,BE,Control Systems,vivek.desai82@svit.edu.in,9873932531,EL-238,M.Tech,7 Years,IoT,11:00-15:00
+F083,Prof. Amit Dave,Assistant Professor,Civil Engineering,BE,Structural Analysis,amit.dave83@svit.edu.in,9552863033,CI-317,M.Tech,26 Years,Algorithms,10:00-14:00
+F084,Prof. Krunal Prajapati,Lecturer,Data Science,BE,Data Analytics,krunal.prajapati84@svit.edu.in,9249374635,DA-235,M.Tech,7 Years,Artificial Intelligence,11:00-15:00
+F085,Prof. Priya Trivedi,HOD,Civil Engineering,BE,Structural Analysis,priya.trivedi85@svit.edu.in,9706794025,CI-302,M.Sc.,5 Years,IoT,09:00-14:00
+F086,Dr. Hiren Modi,Professor,Civil Engineering,ME,Concrete Technology,hiren.modi86@svit.edu.in,9459493771,CI-347,M.E.,23 Years,Software Engineering,09:00-16:00
+F087,Prof. Hiren Trivedi,HOD,Computer Applications,MCA,Java,hiren.trivedi87@svit.edu.in,9113571632,CO-144,MCA,22 Years,Networks,10:00-15:00
+F088,Prof. Rina Patel,Professor,Computer Applications,MCA,Software Engineering,rina.patel88@svit.edu.in,9417417447,CO-222,M.Sc.,24 Years,IoT,11:00-14:00
+F089,Prof. Rahul Joshi,Professor,Electronics & Communication,Diploma,Digital Electronics,rahul.joshi89@svit.edu.in,9526328958,EL-400,MCA,13 Years,Embedded Systems,09:00-13:00
+F090,Prof. Bhavna Trivedi,HOD,Mechanical Engineering,BE,Fluid Mechanics,bhavna.trivedi90@svit.edu.in,9917264722,ME-345,MCA,27 Years,Data Science,10:00-13:00
+F091,Prof. Hiren Desai,Assistant Professor,Civil Engineering,ME,Structural Analysis,hiren.desai91@svit.edu.in,9154344040,CI-269,M.E.,15 Years,Software Engineering,10:00-15:00
+F092,Prof. Nirav Trivedi,Assistant Professor,Automobile Engineering,Diploma,Automobile Engines,nirav.trivedi92@svit.edu.in,9997852220,AU-390,MCA,20 Years,IoT,10:00-17:00
+F093,Prof. Mehul Prajapati,Professor,Information Technology,Diploma,Cyber Security,mehul.prajapati93@svit.edu.in,9392719022,IN-349,M.Sc.,12 Years,Data Science,09:00-14:00
+F094,Prof. Jay Vyas,Professor,Electrical Engineering,Diploma,Electrical Machines,jay.vyas94@svit.edu.in,9476956198,EL-368,M.Tech,26 Years,Embedded Systems,09:00-14:00
+F095,Dr. Jay Mehta,HOD,Computer Applications,MCA,Software Engineering,jay.mehta95@svit.edu.in,9703394382,CO-153,M.E.,25 Years,Networks,09:00-17:00
+F096,Prof. Jay Modi,Associate Professor,Computer Applications,MCA,Java,jay.modi96@svit.edu.in,9375897696,CO-203,M.Tech,30 Years,Software Engineering,10:00-14:00
+F097,Prof. Sonal Shah,Professor,Mechanical Engineering,ME,CAD/CAM,sonal.shah97@svit.edu.in,9399292672,ME-379,M.Sc.,16 Years,Embedded Systems,09:00-17:00
+F098,Prof. Krunal Patel,Professor,Civil Engineering,ME,Concrete Technology,krunal.patel98@svit.edu.in,9702992960,CI-366,MCA,14 Years,Embedded Systems,10:00-13:00
+F099,Prof. Mehul Desai,Assistant Professor,Data Science,BE,Big Data,mehul.desai99@svit.edu.in,9180867233,DA-234,M.Sc.,8 Years,Cloud Computing,11:00-17:00
+F100,Dr. Mehul Desai,Professor,Computer Engineering,BE,Python Programming,mehul.desai100@svit.edu.in,9104373741,CO-347,M.E.,8 Years,Data Science,10:00-17:00
+F101,Dr. Bhavna Shah,Professor,Computer Applications,BCA,Java,bhavna.shah101@svit.edu.in,9284316590,CO-287,PhD,15 Years,Artificial Intelligence,11:00-15:00
+F102,Prof. Sneha Vyas,Associate Professor,Civil Engineering,BE,Surveying,sneha.vyas102@svit.edu.in,9061373558,CI-326,M.E.,20 Years,Cyber Security,10:00-17:00
+F103,Dr. Neha Trivedi,Lecturer,Computer Engineering,Diploma,Data Structures,neha.trivedi103@svit.edu.in,9279182712,CO-199,M.E.,24 Years,Structural Design,09:00-13:00
+F104,Prof. Dhaval Pandya,Assistant Professor,Computer Engineering,ME,Python Programming,dhaval.pandya104@svit.edu.in,9846966601,CO-174,M.Sc.,21 Years,Algorithms,09:00-17:00
+F105,Prof. Dhaval Mehta,Professor,Mechanical Engineering,Diploma,Fluid Mechanics,dhaval.mehta105@svit.edu.in,9168818376,ME-143,M.E.,5 Years,Data Science,11:00-14:00
+F106,Prof. Nirav Patel,Assistant Professor,Electronics & Communication,Diploma,VLSI,nirav.patel106@svit.edu.in,9062608941,EL-398,MCA,17 Years,Data Science,10:00-13:00
+F107,Dr. Krunal Bhatt,Associate Professor,Electrical Engineering,Diploma,Control Systems,krunal.bhatt107@svit.edu.in,9958652025,EL-184,M.Sc.,3 Years,Data Science,10:00-14:00
+F108,Prof. Vivek Chauhan,Associate Professor,Information Technology,BE,Web Development,vivek.chauhan108@svit.edu.in,9202498995,IN-329,MCA,25 Years,Artificial Intelligence,10:00-15:00
+F109,Dr. Neha Bhatt,Professor,Mechanical Engineering,BE,Manufacturing,neha.bhatt109@svit.edu.in,9113153058,ME-142,M.Tech,13 Years,Artificial Intelligence,11:00-13:00
+F110,Dr. Vivek Joshi,HOD,Computer Applications,MCA,Software Engineering,vivek.joshi110@svit.edu.in,9644568565,CO-102,M.E.,4 Years,Networks,11:00-17:00
+F111,Prof. Komal Mehta,Associate Professor,Computer Engineering,ME,Python Programming,komal.mehta111@svit.edu.in,9742090777,CO-243,M.Tech,4 Years,IoT,09:00-16:00
+F112,Prof. Kinjal Trivedi,Professor,Information Technology,BE,Cyber Security,kinjal.trivedi112@svit.edu.in,9125036122,IN-222,MCA,6 Years,Structural Design,09:00-15:00
+F113,Dr. Priya Shah,Associate Professor,Artificial Intelligence & ML,BE,Deep Learning,priya.shah113@svit.edu.in,9281088122,AR-217,MCA,17 Years,Software Engineering,09:00-15:00
+F114,Prof. Ketan Vyas,HOD,Computer Engineering,Diploma,Data Structures,ketan.vyas114@svit.edu.in,9310357106,CO-341,M.Sc.,17 Years,Cloud Computing,10:00-13:00
+F115,Prof. Kinjal Chauhan,Associate Professor,Information Technology,Diploma,Cloud Computing,kinjal.chauhan115@svit.edu.in,9403787767,IN-255,PhD,30 Years,Networks,10:00-16:00
+F116,Prof. Harsh Solanki,Associate Professor,Computer Engineering,Diploma,Data Structures,harsh.solanki116@svit.edu.in,9184739023,CO-217,PhD,14 Years,Algorithms,10:00-14:00
+F117,Prof. Komal Solanki,HOD,Information Technology,Diploma,Cyber Security,komal.solanki117@svit.edu.in,9524879774,IN-352,M.E.,16 Years,Networks,09:00-16:00
+F118,Prof. Rina Shah,Associate Professor,Computer Applications,MCA,Software Engineering,rina.shah118@svit.edu.in,9261794257,CO-188,PhD,28 Years,Networks,09:00-15:00
+F119,Dr. Bhavna Shah,Assistant Professor,Computer Engineering,BE,Data Structures,bhavna.shah119@svit.edu.in,9433250438,CO-405,M.Tech,18 Years,Artificial Intelligence,09:00-13:00
+F120,Dr. Vivek Vyas,HOD,Civil Engineering,BE,Surveying,vivek.vyas120@svit.edu.in,9314529615,CI-257,MCA,18 Years,Structural Design,11:00-17:00
+F121,Prof. Rakesh Chauhan,Lecturer,Electrical Engineering,BE,Power Systems,rakesh.chauhan121@svit.edu.in,9761693110,EL-130,MCA,7 Years,Algorithms,10:00-15:00
+F122,Prof. Jignesh Joshi,Assistant Professor,Civil Engineering,BE,Surveying,jignesh.joshi122@svit.edu.in,9063507171,CI-265,PhD,30 Years,IoT,10:00-13:00
+F123,Prof. Sonal Modi,Lecturer,Civil Engineering,Diploma,Surveying,sonal.modi123@svit.edu.in,9126969784,CI-349,M.E.,15 Years,Software Engineering,09:00-15:00
+F124,Dr. Jay Chauhan,Professor,Automobile Engineering,Diploma,Vehicle Dynamics,jay.chauhan124@svit.edu.in,9481886291,AU-164,PhD,17 Years,Structural Design,11:00-17:00
+F125,Prof. Rajesh Chauhan,Lecturer,Electronics & Communication,BE,VLSI,rajesh.chauhan125@svit.edu.in,9125698301,EL-198,M.Tech,20 Years,Artificial Intelligence,10:00-13:00
+F126,Prof. Nilesh Joshi,Associate Professor,Computer Engineering,ME,Operating Systems,nilesh.joshi126@svit.edu.in,9691880334,CO-345,M.Sc.,13 Years,Structural Design,09:00-15:00
+F127,Prof. Jignesh Modi,HOD,Artificial Intelligence & ML,BE,AI Fundamentals,jignesh.modi127@svit.edu.in,9854643930,AR-286,M.E.,29 Years,Artificial Intelligence,11:00-17:00
+F128,Dr. Bhavna Vyas,Associate Professor,Information Technology,BE,Cloud Computing,bhavna.vyas128@svit.edu.in,9156307180,IN-368,M.E.,17 Years,Data Science,10:00-16:00
+F129,Prof. Sonal Mehta,Lecturer,Civil Engineering,Diploma,Transportation Engineering,sonal.mehta129@svit.edu.in,9298742812,CI-255,PhD,23 Years,Algorithms,09:00-15:00
+F130,Prof. Krunal Rathod,Associate Professor,Electronics & Communication,Diploma,Microprocessors,krunal.rathod130@svit.edu.in,9363163335,EL-200,M.E.,3 Years,Software Engineering,10:00-14:00
+F131,Prof. Krunal Bhatt,HOD,Computer Applications,MCA,Software Engineering,krunal.bhatt131@svit.edu.in,9927814654,CO-398,M.E.,15 Years,Software Engineering,11:00-13:00
+F132,Prof. Neha Prajapati,Professor,Computer Applications,BCA,Java,neha.prajapati132@svit.edu.in,9781028187,CO-101,PhD,30 Years,Cloud Computing,11:00-15:00
+F133,Prof. Priya Chauhan,Lecturer,Mechanical Engineering,Diploma,Fluid Mechanics,priya.chauhan133@svit.edu.in,9083151562,ME-406,M.Tech,15 Years,Software Engineering,09:00-17:00
+F134,Dr. Rakesh Mehta,Professor,Mechanical Engineering,Diploma,Thermodynamics,rakesh.mehta134@svit.edu.in,9202522206,ME-133,MCA,18 Years,Networks,11:00-16:00
+F135,Dr. Mehul Trivedi,Professor,Artificial Intelligence & ML,BE,Deep Learning,mehul.trivedi135@svit.edu.in,9339138811,AR-323,M.Sc.,23 Years,Artificial Intelligence,11:00-13:00
+F136,Prof. Sneha Modi,Lecturer,Electronics & Communication,BE,Microprocessors,sneha.modi136@svit.edu.in,9292133998,EL-258,PhD,1 Years,Embedded Systems,10:00-14:00
+F137,Prof. Parth Trivedi,Assistant Professor,Data Science,BE,Big Data,parth.trivedi137@svit.edu.in,9372368087,DA-387,M.E.,14 Years,Software Engineering,09:00-16:00
+F138,Prof. Amit Desai,HOD,Computer Applications,BCA,Java,amit.desai138@svit.edu.in,9284482230,CO-218,MCA,14 Years,Embedded Systems,09:00-16:00
+F139,Prof. Nilesh Chauhan,HOD,Electronics & Communication,Diploma,VLSI,nilesh.chauhan139@svit.edu.in,9996936545,EL-126,M.Sc.,28 Years,Cyber Security,11:00-14:00
+F140,Prof. Dhaval Mehta,HOD,Computer Applications,MCA,Java,dhaval.mehta140@svit.edu.in,9864165893,CO-250,PhD,27 Years,Algorithms,09:00-17:00
+F141,Prof. Jignesh Rathod,Associate Professor,Information Technology,BE,Web Development,jignesh.rathod141@svit.edu.in,9709828898,IN-364,M.Sc.,27 Years,Artificial Intelligence,11:00-15:00
+F142,Dr. Komal Chauhan,Associate Professor,Computer Applications,MCA,Python,komal.chauhan142@svit.edu.in,9866730295,CO-112,PhD,13 Years,Cyber Security,09:00-15:00
+F143,Prof. Neha Dave,HOD,Electrical Engineering,Diploma,Electrical Machines,neha.dave143@svit.edu.in,9033221951,EL-320,M.E.,4 Years,Algorithms,09:00-17:00
+F144,Prof. Neha Vyas,HOD,Electronics & Communication,Diploma,VLSI,neha.vyas144@svit.edu.in,9604416459,EL-189,PhD,8 Years,Cloud Computing,11:00-16:00
+F145,Dr. Bhavna Mehta,Lecturer,Electronics & Communication,BE,Microprocessors,bhavna.mehta145@svit.edu.in,9909302596,EL-399,M.Sc.,28 Years,Software Engineering,09:00-13:00
+F146,Prof. Jay Solanki,Associate Professor,Automobile Engineering,Diploma,Automobile Engines,jay.solanki146@svit.edu.in,9710642152,AU-283,M.Tech,28 Years,Software Engineering,10:00-17:00
+F147,Prof. Kinjal Rathod,Assistant Professor,Civil Engineering,BE,Structural Analysis,kinjal.rathod147@svit.edu.in,9596448649,CI-211,M.Sc.,1 Years,Data Science,11:00-13:00
+F148,Dr. Harsh Joshi,Assistant Professor,Automobile Engineering,Diploma,Vehicle Dynamics,harsh.joshi148@svit.edu.in,9065486714,AU-215,M.E.,10 Years,Software Engineering,11:00-13:00
+F149,Prof. Jignesh Dave,Professor,Mechanical Engineering,Diploma,Manufacturing,jignesh.dave149@svit.edu.in,9137232476,ME-329,MCA,30 Years,Software Engineering,09:00-16:00
+F150,Prof. Jay Chauhan,Lecturer,Data Science,BE,Statistics,jay.chauhan150@svit.edu.in,9317453093,DA-377,PhD,29 Years,Software Engineering,11:00-17:00
+F151,Prof. Vivek Pandya,Lecturer,Computer Engineering,Diploma,Python Programming,vivek.pandya151@svit.edu.in,9503668619,CO-188,M.Sc.,19 Years,Software Engineering,11:00-17:00
+F152,Dr. Krunal Desai,Professor,Mechanical Engineering,Diploma,Fluid Mechanics,krunal.desai152@svit.edu.in,9288049633,ME-367,PhD,21 Years,Artificial Intelligence,10:00-13:00
+F153,Dr. Harsh Trivedi,Assistant Professor,Automobile Engineering,Diploma,Vehicle Dynamics,harsh.trivedi153@svit.edu.in,9535820654,AU-305,M.Sc.,29 Years,Artificial Intelligence,10:00-15:00
+F154,Prof. Sonal Joshi,HOD,Computer Engineering,BE,Operating Systems,sonal.joshi154@svit.edu.in,9739867532,CO-373,PhD,9 Years,Cyber Security,09:00-17:00
+F155,Prof. Bhavna Joshi,Professor,Electronics & Communication,BE,VLSI,bhavna.joshi155@svit.edu.in,9377744112,EL-173,MCA,5 Years,Artificial Intelligence,11:00-17:00
+F156,Prof. Priya Modi,Professor,Civil Engineering,BE,Concrete Technology,priya.modi156@svit.edu.in,9774989518,CI-420,M.Sc.,15 Years,Cyber Security,11:00-17:00
+F157,Prof. Nirav Trivedi,Professor,Mechanical Engineering,Diploma,Thermodynamics,nirav.trivedi157@svit.edu.in,9330342699,ME-251,MCA,14 Years,Structural Design,09:00-16:00
+F158,Prof. Hiren Chauhan,Professor,Electrical Engineering,BE,Electrical Machines,hiren.chauhan158@svit.edu.in,9772698269,EL-338,M.Sc.,21 Years,Software Engineering,09:00-17:00
+F159,Prof. Sonal Prajapati,Lecturer,Electrical Engineering,BE,Electrical Machines,sonal.prajapati159@svit.edu.in,9062425816,EL-407,M.E.,13 Years,Artificial Intelligence,10:00-13:00
+F160,Prof. Jay Modi,HOD,Mechanical Engineering,BE,CAD/CAM,jay.modi160@svit.edu.in,9007288461,ME-313,MCA,28 Years,Embedded Systems,10:00-14:00
+F161,Prof. Priya Prajapati,Assistant Professor,Civil Engineering,BE,Concrete Technology,priya.prajapati161@svit.edu.in,9676704264,CI-300,M.Tech,9 Years,Structural Design,10:00-16:00
+F162,Dr. Harsh Mehta,HOD,Mechanical Engineering,Diploma,Fluid Mechanics,harsh.mehta162@svit.edu.in,9972666370,ME-323,M.E.,2 Years,Data Science,11:00-13:00
+F163,Prof. Sonal Mehta,Assistant Professor,Computer Applications,MCA,Python,sonal.mehta163@svit.edu.in,9779692321,CO-223,M.E.,6 Years,Networks,11:00-16:00
+F164,Prof. Sonal Mehta,HOD,Electronics & Communication,BE,VLSI,sonal.mehta164@svit.edu.in,9222733213,EL-259,M.E.,11 Years,Cyber Security,10:00-15:00
+F165,Dr. Priya Dave,Lecturer,Mechanical Engineering,Diploma,Fluid Mechanics,priya.dave165@svit.edu.in,9109174929,ME-215,MCA,28 Years,Structural Design,10:00-14:00
+F166,Prof. Bhavna Joshi,HOD,Electronics & Communication,Diploma,Microprocessors,bhavna.joshi166@svit.edu.in,9228794968,EL-104,M.Sc.,15 Years,Embedded Systems,10:00-16:00
+F167,Prof. Neha Dave,Professor,Electrical Engineering,Diploma,Electrical Machines,neha.dave167@svit.edu.in,9234155826,EL-279,M.E.,7 Years,Algorithms,11:00-13:00
+F168,Prof. Ketan Bhatt,Professor,Mechanical Engineering,ME,Manufacturing,ketan.bhatt168@svit.edu.in,9934022840,ME-302,M.Tech,3 Years,Networks,10:00-14:00
+F169,Prof. Sonal Trivedi,Professor,Electrical Engineering,BE,Control Systems,sonal.trivedi169@svit.edu.in,9715093494,EL-381,M.Tech,9 Years,Data Science,09:00-13:00
+F170,Dr. Amit Chauhan,Associate Professor,Information Technology,BE,Cloud Computing,amit.chauhan170@svit.edu.in,9022332992,IN-389,MCA,15 Years,Artificial Intelligence,10:00-13:00
+F171,Dr. Harsh Rathod,HOD,Computer Engineering,ME,Data Structures,harsh.rathod171@svit.edu.in,9849802744,CO-208,PhD,25 Years,Cloud Computing,09:00-13:00
+F172,Dr. Parth Vyas,HOD,Computer Engineering,ME,Computer Networks,parth.vyas172@svit.edu.in,9391038953,CO-405,M.E.,12 Years,IoT,11:00-13:00
+F173,Prof. Rakesh Mehta,Lecturer,Civil Engineering,Diploma,Concrete Technology,rakesh.mehta173@svit.edu.in,9551747636,CI-347,M.Tech,14 Years,Structural Design,09:00-16:00
+F174,Prof. Nirav Desai,Professor,Electrical Engineering,BE,Electrical Machines,nirav.desai174@svit.edu.in,9171917631,EL-354,PhD,4 Years,Structural Design,10:00-13:00
+F175,Prof. Rajesh Modi,Professor,Electrical Engineering,BE,Control Systems,rajesh.modi175@svit.edu.in,9119275750,EL-321,M.Sc.,3 Years,Artificial Intelligence,11:00-15:00
+F176,Dr. Jay Vyas,Lecturer,Data Science,BE,Data Analytics,jay.vyas176@svit.edu.in,9820915308,DA-393,M.E.,21 Years,Data Science,11:00-17:00
+F177,Dr. Jay Patel,Professor,Artificial Intelligence & ML,BE,AI Fundamentals,jay.patel177@svit.edu.in,9670265186,AR-108,MCA,22 Years,Data Science,09:00-15:00
+F178,Dr. Mehul Desai,Professor,Mechanical Engineering,ME,CAD/CAM,mehul.desai178@svit.edu.in,9940100033,ME-179,M.Tech,4 Years,Cloud Computing,10:00-14:00
+F179,Prof. Krunal Rathod,Assistant Professor,Computer Engineering,BE,Operating Systems,krunal.rathod179@svit.edu.in,9048637904,CO-407,PhD,9 Years,Data Science,11:00-17:00
+F180,Prof. Amit Chauhan,Assistant Professor,Civil Engineering,BE,Transportation Engineering,amit.chauhan180@svit.edu.in,9468895906,CI-343,MCA,16 Years,Cyber Security,11:00-13:00
+F181,Prof. Priya Shah,Lecturer,Civil Engineering,BE,Concrete Technology,priya.shah181@svit.edu.in,9718297730,CI-336,M.Sc.,27 Years,Artificial Intelligence,11:00-16:00
+F182,Prof. Mehul Mehta,Professor,Computer Engineering,BE,Computer Networks,mehul.mehta182@svit.edu.in,9959729692,CO-124,M.E.,6 Years,Artificial Intelligence,09:00-17:00
+F183,Prof. Jay Pandya,Professor,Electronics & Communication,Diploma,Digital Electronics,jay.pandya183@svit.edu.in,9872631480,EL-236,M.E.,4 Years,Structural Design,09:00-17:00
+F184,Prof. Rajesh Rathod,HOD,Information Technology,Diploma,Cyber Security,rajesh.rathod184@svit.edu.in,9326943491,IN-141,M.E.,22 Years,IoT,09:00-13:00
+F185,Dr. Harsh Modi,Assistant Professor,Electronics & Communication,BE,VLSI,harsh.modi185@svit.edu.in,9343364314,EL-336,PhD,20 Years,Algorithms,10:00-14:00
+F186,Prof. Rina Rathod,Assistant Professor,Computer Applications,MCA,Software Engineering,rina.rathod186@svit.edu.in,9805850400,CO-189,M.Tech,6 Years,Networks,11:00-13:00
+F187,Prof. Kinjal Vyas,HOD,Mechanical Engineering,ME,Thermodynamics,kinjal.vyas187@svit.edu.in,9211130359,ME-193,M.E.,25 Years,Software Engineering,10:00-16:00
+F188,Prof. Rajesh Desai,Lecturer,Mechanical Engineering,ME,Thermodynamics,rajesh.desai188@svit.edu.in,9950688431,ME-257,MCA,8 Years,Data Science,09:00-16:00
+F189,Dr. Jignesh Desai,Lecturer,Computer Engineering,BE,Operating Systems,jignesh.desai189@svit.edu.in,9458759874,CO-194,M.Tech,26 Years,IoT,10:00-15:00
+F190,Prof. Hiren Chauhan,Assistant Professor,Civil Engineering,Diploma,Transportation Engineering,hiren.chauhan190@svit.edu.in,9416701953,CI-408,M.E.,14 Years,IoT,10:00-14:00
+F191,Dr. Komal Shah,Associate Professor,Electrical Engineering,BE,Control Systems,komal.shah191@svit.edu.in,9279531763,EL-297,M.Tech,21 Years,Cloud Computing,11:00-14:00
+F192,Prof. Harsh Mehta,Lecturer,Civil Engineering,ME,Concrete Technology,harsh.mehta192@svit.edu.in,9801642079,CI-330,M.Sc.,29 Years,Cyber Security,09:00-14:00
+F193,Prof. Bhavna Patel,Lecturer,Mechanical Engineering,Diploma,Manufacturing,bhavna.patel193@svit.edu.in,9705329187,ME-211,PhD,11 Years,Embedded Systems,09:00-17:00
+F194,Dr. Krunal Prajapati,HOD,Electrical Engineering,BE,Electrical Machines,krunal.prajapati194@svit.edu.in,9969978208,EL-299,PhD,18 Years,Artificial Intelligence,10:00-17:00
+F195,Dr. Bhavna Bhatt,Associate Professor,Computer Engineering,BE,DBMS,bhavna.bhatt195@svit.edu.in,9938665172,CO-349,M.E.,24 Years,Embedded Systems,10:00-17:00
+F196,Prof. Pooja Trivedi,Lecturer,Electronics & Communication,BE,Microprocessors,pooja.trivedi196@svit.edu.in,9973790328,EL-383,M.Sc.,17 Years,Data Science,11:00-13:00
+F197,Prof. Sonal Joshi,Associate Professor,Information Technology,BE,Web Development,sonal.joshi197@svit.edu.in,9614404289,IN-155,MCA,14 Years,Artificial Intelligence,09:00-16:00
+F198,Prof. Komal Vyas,Associate Professor,Electronics & Communication,BE,VLSI,komal.vyas198@svit.edu.in,9083281200,EL-118,M.E.,24 Years,Data Science,09:00-14:00
+F199,Prof. Rahul Desai,Lecturer,Data Science,BE,Data Analytics,rahul.desai199@svit.edu.in,9279570504,DA-125,MCA,12 Years,Software Engineering,10:00-15:00
+F200,Prof. Jay Vyas,HOD,Electronics & Communication,BE,Microprocessors,jay.vyas200@svit.edu.in,9995388300,EL-311,MCA,17 Years,Networks,11:00-15:00
+F201,Prof. Harsh Trivedi,Associate Professor,Electrical Engineering,Diploma,Power Systems,harsh.trivedi201@svit.edu.in,9632929928,EL-388,M.Sc.,3 Years,Embedded Systems,09:00-15:00
+F202,Prof. Jignesh Dave,Associate Professor,Data Science,BE,Statistics,jignesh.dave202@svit.edu.in,9922077918,DA-159,PhD,4 Years,Networks,09:00-15:00
+F203,Prof. Rina Desai,HOD,Computer Engineering,ME,Operating Systems,rina.desai203@svit.edu.in,9771017336,CO-123,M.Tech,23 Years,Data Science,10:00-13:00
+F204,Prof. Kinjal Chauhan,Professor,Computer Engineering,Diploma,Operating Systems,kinjal.chauhan204@svit.edu.in,9088907070,CO-420,M.Tech,20 Years,Artificial Intelligence,10:00-14:00
+F205,Prof. Bhavna Bhatt,HOD,Artificial Intelligence & ML,BE,Deep Learning,bhavna.bhatt205@svit.edu.in,9616965444,AR-311,M.E.,27 Years,Software Engineering,10:00-13:00
+F206,Dr. Nilesh Prajapati,Associate Professor,Artificial Intelligence & ML,BE,Deep Learning,nilesh.prajapati206@svit.edu.in,9252577578,AR-131,M.Tech,30 Years,Software Engineering,09:00-15:00
+F207,Prof. Mehul Bhatt,Professor,Computer Applications,MCA,Software Engineering,mehul.bhatt207@svit.edu.in,9689994854,CO-397,PhD,12 Years,Software Engineering,10:00-15:00
+F208,Dr. Rina Solanki,Assistant Professor,Computer Applications,BCA,Python,rina.solanki208@svit.edu.in,9420105058,CO-256,MCA,5 Years,Embedded Systems,10:00-17:00
+F209,Dr. Hiren Modi,Lecturer,Information Technology,Diploma,Cyber Security,hiren.modi209@svit.edu.in,9040196119,IN-411,MCA,26 Years,Cloud Computing,10:00-15:00
+F210,Prof. Rina Shah,Professor,Computer Applications,MCA,Python,rina.shah210@svit.edu.in,9205615212,CO-202,M.Sc.,10 Years,Cyber Security,10:00-14:00
+F211,Prof. Pooja Pandya,Professor,Artificial Intelligence & ML,BE,Machine Learning,pooja.pandya211@svit.edu.in,9579715599,AR-359,M.E.,13 Years,Embedded Systems,09:00-17:00
+F212,Dr. Mehul Shah,Associate Professor,Automobile Engineering,Diploma,Vehicle Dynamics,mehul.shah212@svit.edu.in,9513777929,AU-214,M.E.,24 Years,Structural Design,09:00-16:00
+F213,Prof. Rina Prajapati,Lecturer,Computer Applications,MCA,Software Engineering,rina.prajapati213@svit.edu.in,9270342206,CO-282,M.E.,14 Years,Software Engineering,11:00-14:00
+F214,Prof. Amit Shah,Professor,Computer Engineering,ME,DBMS,amit.shah214@svit.edu.in,9877566812,CO-130,M.E.,10 Years,Software Engineering,09:00-15:00
+F215,Prof. Pooja Desai,HOD,Artificial Intelligence & ML,BE,AI Fundamentals,pooja.desai215@svit.edu.in,9860243284,AR-355,M.Tech,30 Years,Artificial Intelligence,09:00-13:00
+F216,Dr. Jignesh Bhatt,Associate Professor,Civil Engineering,BE,Transportation Engineering,jignesh.bhatt216@svit.edu.in,9096952101,CI-306,M.Tech,19 Years,Cyber Security,09:00-17:00
+F217,Prof. Neha Bhatt,Assistant Professor,Civil Engineering,Diploma,Concrete Technology,neha.bhatt217@svit.edu.in,9204564216,CI-163,M.Sc.,21 Years,Cyber Security,11:00-17:00
+F218,Prof. Sneha Joshi,Lecturer,Mechanical Engineering,Diploma,Fluid Mechanics,sneha.joshi218@svit.edu.in,9199770293,ME-229,M.Tech,6 Years,Structural Design,11:00-14:00
+F219,Dr. Bhavna Bhatt,Professor,Civil Engineering,ME,Concrete Technology,bhavna.bhatt219@svit.edu.in,9403820006,CI-139,M.Tech,9 Years,IoT,11:00-16:00
+F220,Prof. Jay Chauhan,Associate Professor,Mechanical Engineering,Diploma,Thermodynamics,jay.chauhan220@svit.edu.in,9962713298,ME-218,M.Sc.,16 Years,Artificial Intelligence,09:00-15:00
+F221,Prof. Amit Patel,Assistant Professor,Computer Engineering,ME,Python Programming,amit.patel221@svit.edu.in,9667267649,CO-269,MCA,7 Years,Software Engineering,09:00-16:00
+F222,Prof. Rajesh Mehta,HOD,Electronics & Communication,Diploma,VLSI,rajesh.mehta222@svit.edu.in,9150521955,EL-327,PhD,28 Years,Embedded Systems,09:00-16:00
+F223,Prof. Sonal Mehta,Lecturer,Civil Engineering,ME,Surveying,sonal.mehta223@svit.edu.in,9421645439,CI-354,M.E.,25 Years,Embedded Systems,09:00-15:00
+F224,Dr. Dhaval Dave,Associate Professor,Artificial Intelligence & ML,BE,Machine Learning,dhaval.dave224@svit.edu.in,9997165660,AR-295,M.E.,2 Years,Data Science,10:00-17:00
+F225,Prof. Nirav Bhatt,Lecturer,Electronics & Communication,Diploma,VLSI,nirav.bhatt225@svit.edu.in,9635359248,EL-169,M.Tech,24 Years,Structural Design,09:00-15:00
+F226,Dr. Dhaval Chauhan,Professor,Automobile Engineering,Diploma,Vehicle Dynamics,dhaval.chauhan226@svit.edu.in,9290315382,AU-398,MCA,1 Years,Artificial Intelligence,10:00-13:00
+F227,Prof. Bhavna Joshi,HOD,Mechanical Engineering,BE,Manufacturing,bhavna.joshi227@svit.edu.in,9165883799,ME-322,PhD,26 Years,IoT,11:00-13:00
+F228,Prof. Sneha Desai,Associate Professor,Electrical Engineering,BE,Electrical Machines,sneha.desai228@svit.edu.in,9853986059,EL-193,M.E.,30 Years,Artificial Intelligence,10:00-13:00
+F229,Prof. Parth Pandya,Assistant Professor,Civil Engineering,BE,Concrete Technology,parth.pandya229@svit.edu.in,9294839989,CI-315,M.Sc.,7 Years,Software Engineering,10:00-14:00
+F230,Prof. Krunal Solanki,Professor,Computer Applications,BCA,Python,krunal.solanki230@svit.edu.in,9919110374,CO-364,M.Sc.,6 Years,Algorithms,09:00-15:00
+F231,Prof. Rina Solanki,Associate Professor,Civil Engineering,BE,Concrete Technology,rina.solanki231@svit.edu.in,9654776673,CI-316,PhD,24 Years,Cyber Security,10:00-14:00
+F232,Prof. Vivek Patel,Associate Professor,Computer Applications,BCA,Software Engineering,vivek.patel232@svit.edu.in,9071941903,CO-309,MCA,18 Years,Algorithms,11:00-15:00
+F233,Prof. Sneha Pandya,Assistant Professor,Civil Engineering,Diploma,Concrete Technology,sneha.pandya233@svit.edu.in,9645226268,CI-397,MCA,15 Years,Cloud Computing,09:00-16:00
+F234,Dr. Amit Dave,HOD,Mechanical Engineering,BE,CAD/CAM,amit.dave234@svit.edu.in,9046664438,ME-134,M.Sc.,27 Years,Artificial Intelligence,11:00-14:00
+F235,Dr. Rina Modi,HOD,Mechanical Engineering,BE,Manufacturing,rina.modi235@svit.edu.in,9134028910,ME-112,M.Tech,25 Years,Embedded Systems,10:00-17:00
+F236,Prof. Parth Mehta,Assistant Professor,Electrical Engineering,Diploma,Power Systems,parth.mehta236@svit.edu.in,9009974625,EL-267,M.Tech,27 Years,Software Engineering,09:00-15:00
+F237,Dr. Amit Desai,Lecturer,Computer Engineering,ME,Operating Systems,amit.desai237@svit.edu.in,9329820426,CO-347,MCA,3 Years,Structural Design,11:00-13:00
+F238,Dr. Jignesh Mehta,Assistant Professor,Computer Engineering,BE,DBMS,jignesh.mehta238@svit.edu.in,9186117509,CO-417,PhD,19 Years,IoT,11:00-16:00
+F239,Prof. Nilesh Joshi,Assistant Professor,Computer Engineering,Diploma,DBMS,nilesh.joshi239@svit.edu.in,9042590981,CO-287,MCA,9 Years,Data Science,09:00-14:00
+F240,Dr. Krunal Vyas,Lecturer,Electrical Engineering,Diploma,Control Systems,krunal.vyas240@svit.edu.in,9642613259,EL-280,M.E.,19 Years,Embedded Systems,09:00-13:00
+F241,Prof. Parth Shah,HOD,Mechanical Engineering,BE,Manufacturing,parth.shah241@svit.edu.in,9295898798,ME-222,PhD,27 Years,Networks,09:00-14:00
+F242,Prof. Priya Joshi,HOD,Electrical Engineering,BE,Power Systems,priya.joshi242@svit.edu.in,9874024023,EL-351,M.E.,30 Years,Embedded Systems,11:00-16:00
+F243,Prof. Jignesh Joshi,HOD,Mechanical Engineering,ME,CAD/CAM,jignesh.joshi243@svit.edu.in,9255907694,ME-171,PhD,8 Years,Embedded Systems,10:00-13:00
+F244,Prof. Priya Prajapati,Assistant Professor,Civil Engineering,Diploma,Surveying,priya.prajapati244@svit.edu.in,9539313639,CI-314,PhD,9 Years,Structural Design,11:00-13:00
+F245,Prof. Rahul Bhatt,HOD,Civil Engineering,ME,Transportation Engineering,rahul.bhatt245@svit.edu.in,9721823958,CI-398,PhD,25 Years,IoT,09:00-16:00
+F246,Prof. Parth Solanki,HOD,Artificial Intelligence & ML,BE,AI Fundamentals,parth.solanki246@svit.edu.in,9154140249,AR-392,PhD,6 Years,IoT,11:00-15:00
+F247,Prof. Neha Bhatt,Lecturer,Mechanical Engineering,ME,CAD/CAM,neha.bhatt247@svit.edu.in,9291250890,ME-317,MCA,20 Years,Algorithms,10:00-16:00
+F248,Dr. Harsh Prajapati,Professor,Electronics & Communication,BE,Microprocessors,harsh.prajapati248@svit.edu.in,9914693283,EL-157,M.Tech,28 Years,Cyber Security,11:00-17:00
+F249,Prof. Vivek Dave,Lecturer,Electrical Engineering,BE,Electrical Machines,vivek.dave249@svit.edu.in,9972414998,EL-388,M.Sc.,28 Years,Networks,10:00-13:00
+F250,Prof. Pooja Dave,Professor,Information Technology,BE,Cloud Computing,pooja.dave250@svit.edu.in,9247578082,IN-140,M.Tech,27 Years,Embedded Systems,10:00-14:00

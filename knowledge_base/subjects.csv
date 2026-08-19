@@ -1,0 +1,641 @@
+subject_id,program,department,year,semester,subject_code,subject_name,subject_type,credits
+S0001,Diploma,Computer Engineering,FY,1,DICO101,Programming Fundamentals,Theory,4
+S0002,Diploma,Computer Engineering,FY,1,DICO102,Python Programming,Theory,4
+S0003,Diploma,Computer Engineering,FY,1,DICO103,Data Structures,Theory,4
+S0004,Diploma,Computer Engineering,FY,1,DICO104,DBMS,Practical,2
+S0005,Diploma,Computer Engineering,FY,1,DICO105,Computer Networks,Practical,2
+S0006,Diploma,Computer Engineering,FY,2,DICO201,Programming Fundamentals,Theory,4
+S0007,Diploma,Computer Engineering,FY,2,DICO202,Python Programming,Theory,4
+S0008,Diploma,Computer Engineering,FY,2,DICO203,Data Structures,Theory,4
+S0009,Diploma,Computer Engineering,FY,2,DICO204,DBMS,Practical,2
+S0010,Diploma,Computer Engineering,FY,2,DICO205,Computer Networks,Practical,2
+S0011,Diploma,Computer Engineering,SY,3,DICO301,Programming Fundamentals,Theory,4
+S0012,Diploma,Computer Engineering,SY,3,DICO302,Python Programming,Theory,4
+S0013,Diploma,Computer Engineering,SY,3,DICO303,Data Structures,Theory,4
+S0014,Diploma,Computer Engineering,SY,3,DICO304,DBMS,Practical,2
+S0015,Diploma,Computer Engineering,SY,3,DICO305,Computer Networks,Practical,2
+S0016,Diploma,Computer Engineering,SY,4,DICO401,Programming Fundamentals,Theory,4
+S0017,Diploma,Computer Engineering,SY,4,DICO402,Python Programming,Theory,4
+S0018,Diploma,Computer Engineering,SY,4,DICO403,Data Structures,Theory,4
+S0019,Diploma,Computer Engineering,SY,4,DICO404,DBMS,Practical,2
+S0020,Diploma,Computer Engineering,SY,4,DICO405,Computer Networks,Practical,2
+S0021,Diploma,Computer Engineering,TY,5,DICO501,Programming Fundamentals,Theory,4
+S0022,Diploma,Computer Engineering,TY,5,DICO502,Python Programming,Theory,4
+S0023,Diploma,Computer Engineering,TY,5,DICO503,Data Structures,Theory,4
+S0024,Diploma,Computer Engineering,TY,5,DICO504,DBMS,Practical,2
+S0025,Diploma,Computer Engineering,TY,5,DICO505,Computer Networks,Practical,2
+S0026,Diploma,Computer Engineering,TY,6,DICO601,Programming Fundamentals,Theory,4
+S0027,Diploma,Computer Engineering,TY,6,DICO602,Python Programming,Theory,4
+S0028,Diploma,Computer Engineering,TY,6,DICO603,Data Structures,Theory,4
+S0029,Diploma,Computer Engineering,TY,6,DICO604,DBMS,Practical,2
+S0030,Diploma,Computer Engineering,TY,6,DICO605,Computer Networks,Practical,2
+S0031,Diploma,Civil Engineering,FY,1,DICI101,Engineering Mechanics,Theory,4
+S0032,Diploma,Civil Engineering,FY,1,DICI102,Surveying,Theory,4
+S0033,Diploma,Civil Engineering,FY,1,DICI103,Concrete Technology,Theory,4
+S0034,Diploma,Civil Engineering,FY,1,DICI104,Transportation Engineering,Practical,2
+S0035,Diploma,Civil Engineering,FY,1,DICI105,Structural Analysis,Practical,2
+S0036,Diploma,Civil Engineering,FY,2,DICI201,Engineering Mechanics,Theory,4
+S0037,Diploma,Civil Engineering,FY,2,DICI202,Surveying,Theory,4
+S0038,Diploma,Civil Engineering,FY,2,DICI203,Concrete Technology,Theory,4
+S0039,Diploma,Civil Engineering,FY,2,DICI204,Transportation Engineering,Practical,2
+S0040,Diploma,Civil Engineering,FY,2,DICI205,Structural Analysis,Practical,2
+S0041,Diploma,Civil Engineering,SY,3,DICI301,Engineering Mechanics,Theory,4
+S0042,Diploma,Civil Engineering,SY,3,DICI302,Surveying,Theory,4
+S0043,Diploma,Civil Engineering,SY,3,DICI303,Concrete Technology,Theory,4
+S0044,Diploma,Civil Engineering,SY,3,DICI304,Transportation Engineering,Practical,2
+S0045,Diploma,Civil Engineering,SY,3,DICI305,Structural Analysis,Practical,2
+S0046,Diploma,Civil Engineering,SY,4,DICI401,Engineering Mechanics,Theory,4
+S0047,Diploma,Civil Engineering,SY,4,DICI402,Surveying,Theory,4
+S0048,Diploma,Civil Engineering,SY,4,DICI403,Concrete Technology,Theory,4
+S0049,Diploma,Civil Engineering,SY,4,DICI404,Transportation Engineering,Practical,2
+S0050,Diploma,Civil Engineering,SY,4,DICI405,Structural Analysis,Practical,2
+S0051,Diploma,Civil Engineering,TY,5,DICI501,Engineering Mechanics,Theory,4
+S0052,Diploma,Civil Engineering,TY,5,DICI502,Surveying,Theory,4
+S0053,Diploma,Civil Engineering,TY,5,DICI503,Concrete Technology,Theory,4
+S0054,Diploma,Civil Engineering,TY,5,DICI504,Transportation Engineering,Practical,2
+S0055,Diploma,Civil Engineering,TY,5,DICI505,Structural Analysis,Practical,2
+S0056,Diploma,Civil Engineering,TY,6,DICI601,Engineering Mechanics,Theory,4
+S0057,Diploma,Civil Engineering,TY,6,DICI602,Surveying,Theory,4
+S0058,Diploma,Civil Engineering,TY,6,DICI603,Concrete Technology,Theory,4
+S0059,Diploma,Civil Engineering,TY,6,DICI604,Transportation Engineering,Practical,2
+S0060,Diploma,Civil Engineering,TY,6,DICI605,Structural Analysis,Practical,2
+S0061,Diploma,Mechanical Engineering,FY,1,DIME101,Engineering Drawing,Theory,4
+S0062,Diploma,Mechanical Engineering,FY,1,DIME102,Thermodynamics,Theory,4
+S0063,Diploma,Mechanical Engineering,FY,1,DIME103,Fluid Mechanics,Theory,4
+S0064,Diploma,Mechanical Engineering,FY,1,DIME104,CAD/CAM,Practical,2
+S0065,Diploma,Mechanical Engineering,FY,1,DIME105,Manufacturing Technology,Practical,2
+S0066,Diploma,Mechanical Engineering,FY,2,DIME201,Engineering Drawing,Theory,4
+S0067,Diploma,Mechanical Engineering,FY,2,DIME202,Thermodynamics,Theory,4
+S0068,Diploma,Mechanical Engineering,FY,2,DIME203,Fluid Mechanics,Theory,4
+S0069,Diploma,Mechanical Engineering,FY,2,DIME204,CAD/CAM,Practical,2
+S0070,Diploma,Mechanical Engineering,FY,2,DIME205,Manufacturing Technology,Practical,2
+S0071,Diploma,Mechanical Engineering,SY,3,DIME301,Engineering Drawing,Theory,4
+S0072,Diploma,Mechanical Engineering,SY,3,DIME302,Thermodynamics,Theory,4
+S0073,Diploma,Mechanical Engineering,SY,3,DIME303,Fluid Mechanics,Theory,4
+S0074,Diploma,Mechanical Engineering,SY,3,DIME304,CAD/CAM,Practical,2
+S0075,Diploma,Mechanical Engineering,SY,3,DIME305,Manufacturing Technology,Practical,2
+S0076,Diploma,Mechanical Engineering,SY,4,DIME401,Engineering Drawing,Theory,4
+S0077,Diploma,Mechanical Engineering,SY,4,DIME402,Thermodynamics,Theory,4
+S0078,Diploma,Mechanical Engineering,SY,4,DIME403,Fluid Mechanics,Theory,4
+S0079,Diploma,Mechanical Engineering,SY,4,DIME404,CAD/CAM,Practical,2
+S0080,Diploma,Mechanical Engineering,SY,4,DIME405,Manufacturing Technology,Practical,2
+S0081,Diploma,Mechanical Engineering,TY,5,DIME501,Engineering Drawing,Theory,4
+S0082,Diploma,Mechanical Engineering,TY,5,DIME502,Thermodynamics,Theory,4
+S0083,Diploma,Mechanical Engineering,TY,5,DIME503,Fluid Mechanics,Theory,4
+S0084,Diploma,Mechanical Engineering,TY,5,DIME504,CAD/CAM,Practical,2
+S0085,Diploma,Mechanical Engineering,TY,5,DIME505,Manufacturing Technology,Practical,2
+S0086,Diploma,Mechanical Engineering,TY,6,DIME601,Engineering Drawing,Theory,4
+S0087,Diploma,Mechanical Engineering,TY,6,DIME602,Thermodynamics,Theory,4
+S0088,Diploma,Mechanical Engineering,TY,6,DIME603,Fluid Mechanics,Theory,4
+S0089,Diploma,Mechanical Engineering,TY,6,DIME604,CAD/CAM,Practical,2
+S0090,Diploma,Mechanical Engineering,TY,6,DIME605,Manufacturing Technology,Practical,2
+S0091,Diploma,Electrical Engineering,FY,1,DIEL101,Basic Electrical,Theory,4
+S0092,Diploma,Electrical Engineering,FY,1,DIEL102,Electrical Machines,Theory,4
+S0093,Diploma,Electrical Engineering,FY,1,DIEL103,Power Systems,Theory,4
+S0094,Diploma,Electrical Engineering,FY,1,DIEL104,Control Systems,Practical,2
+S0095,Diploma,Electrical Engineering,FY,1,DIEL105,Power Electronics,Practical,2
+S0096,Diploma,Electrical Engineering,FY,2,DIEL201,Basic Electrical,Theory,4
+S0097,Diploma,Electrical Engineering,FY,2,DIEL202,Electrical Machines,Theory,4
+S0098,Diploma,Electrical Engineering,FY,2,DIEL203,Power Systems,Theory,4
+S0099,Diploma,Electrical Engineering,FY,2,DIEL204,Control Systems,Practical,2
+S0100,Diploma,Electrical Engineering,FY,2,DIEL205,Power Electronics,Practical,2
+S0101,Diploma,Electrical Engineering,SY,3,DIEL301,Basic Electrical,Theory,4
+S0102,Diploma,Electrical Engineering,SY,3,DIEL302,Electrical Machines,Theory,4
+S0103,Diploma,Electrical Engineering,SY,3,DIEL303,Power Systems,Theory,4
+S0104,Diploma,Electrical Engineering,SY,3,DIEL304,Control Systems,Practical,2
+S0105,Diploma,Electrical Engineering,SY,3,DIEL305,Power Electronics,Practical,2
+S0106,Diploma,Electrical Engineering,SY,4,DIEL401,Basic Electrical,Theory,4
+S0107,Diploma,Electrical Engineering,SY,4,DIEL402,Electrical Machines,Theory,4
+S0108,Diploma,Electrical Engineering,SY,4,DIEL403,Power Systems,Theory,4
+S0109,Diploma,Electrical Engineering,SY,4,DIEL404,Control Systems,Practical,2
+S0110,Diploma,Electrical Engineering,SY,4,DIEL405,Power Electronics,Practical,2
+S0111,Diploma,Electrical Engineering,TY,5,DIEL501,Basic Electrical,Theory,4
+S0112,Diploma,Electrical Engineering,TY,5,DIEL502,Electrical Machines,Theory,4
+S0113,Diploma,Electrical Engineering,TY,5,DIEL503,Power Systems,Theory,4
+S0114,Diploma,Electrical Engineering,TY,5,DIEL504,Control Systems,Practical,2
+S0115,Diploma,Electrical Engineering,TY,5,DIEL505,Power Electronics,Practical,2
+S0116,Diploma,Electrical Engineering,TY,6,DIEL601,Basic Electrical,Theory,4
+S0117,Diploma,Electrical Engineering,TY,6,DIEL602,Electrical Machines,Theory,4
+S0118,Diploma,Electrical Engineering,TY,6,DIEL603,Power Systems,Theory,4
+S0119,Diploma,Electrical Engineering,TY,6,DIEL604,Control Systems,Practical,2
+S0120,Diploma,Electrical Engineering,TY,6,DIEL605,Power Electronics,Practical,2
+S0121,Diploma,Information Technology,FY,1,DIIN101,Web Development,Theory,4
+S0122,Diploma,Information Technology,FY,1,DIIN102,Cloud Computing,Theory,4
+S0123,Diploma,Information Technology,FY,1,DIIN103,Cyber Security,Theory,4
+S0124,Diploma,Information Technology,FY,1,DIIN104,Java Programming,Practical,2
+S0125,Diploma,Information Technology,FY,1,DIIN105,Software Engineering,Practical,2
+S0126,Diploma,Information Technology,FY,2,DIIN201,Web Development,Theory,4
+S0127,Diploma,Information Technology,FY,2,DIIN202,Cloud Computing,Theory,4
+S0128,Diploma,Information Technology,FY,2,DIIN203,Cyber Security,Theory,4
+S0129,Diploma,Information Technology,FY,2,DIIN204,Java Programming,Practical,2
+S0130,Diploma,Information Technology,FY,2,DIIN205,Software Engineering,Practical,2
+S0131,Diploma,Information Technology,SY,3,DIIN301,Web Development,Theory,4
+S0132,Diploma,Information Technology,SY,3,DIIN302,Cloud Computing,Theory,4
+S0133,Diploma,Information Technology,SY,3,DIIN303,Cyber Security,Theory,4
+S0134,Diploma,Information Technology,SY,3,DIIN304,Java Programming,Practical,2
+S0135,Diploma,Information Technology,SY,3,DIIN305,Software Engineering,Practical,2
+S0136,Diploma,Information Technology,SY,4,DIIN401,Web Development,Theory,4
+S0137,Diploma,Information Technology,SY,4,DIIN402,Cloud Computing,Theory,4
+S0138,Diploma,Information Technology,SY,4,DIIN403,Cyber Security,Theory,4
+S0139,Diploma,Information Technology,SY,4,DIIN404,Java Programming,Practical,2
+S0140,Diploma,Information Technology,SY,4,DIIN405,Software Engineering,Practical,2
+S0141,Diploma,Information Technology,TY,5,DIIN501,Web Development,Theory,4
+S0142,Diploma,Information Technology,TY,5,DIIN502,Cloud Computing,Theory,4
+S0143,Diploma,Information Technology,TY,5,DIIN503,Cyber Security,Theory,4
+S0144,Diploma,Information Technology,TY,5,DIIN504,Java Programming,Practical,2
+S0145,Diploma,Information Technology,TY,5,DIIN505,Software Engineering,Practical,2
+S0146,Diploma,Information Technology,TY,6,DIIN601,Web Development,Theory,4
+S0147,Diploma,Information Technology,TY,6,DIIN602,Cloud Computing,Theory,4
+S0148,Diploma,Information Technology,TY,6,DIIN603,Cyber Security,Theory,4
+S0149,Diploma,Information Technology,TY,6,DIIN604,Java Programming,Practical,2
+S0150,Diploma,Information Technology,TY,6,DIIN605,Software Engineering,Practical,2
+S0151,Diploma,Electronics & Communication,FY,1,DIEL101,Digital Electronics,Theory,4
+S0152,Diploma,Electronics & Communication,FY,1,DIEL102,Microprocessors,Theory,4
+S0153,Diploma,Electronics & Communication,FY,1,DIEL103,Communication Systems,Theory,4
+S0154,Diploma,Electronics & Communication,FY,1,DIEL104,VLSI,Practical,2
+S0155,Diploma,Electronics & Communication,FY,1,DIEL105,Embedded Systems,Practical,2
+S0156,Diploma,Electronics & Communication,FY,2,DIEL201,Digital Electronics,Theory,4
+S0157,Diploma,Electronics & Communication,FY,2,DIEL202,Microprocessors,Theory,4
+S0158,Diploma,Electronics & Communication,FY,2,DIEL203,Communication Systems,Theory,4
+S0159,Diploma,Electronics & Communication,FY,2,DIEL204,VLSI,Practical,2
+S0160,Diploma,Electronics & Communication,FY,2,DIEL205,Embedded Systems,Practical,2
+S0161,Diploma,Electronics & Communication,SY,3,DIEL301,Digital Electronics,Theory,4
+S0162,Diploma,Electronics & Communication,SY,3,DIEL302,Microprocessors,Theory,4
+S0163,Diploma,Electronics & Communication,SY,3,DIEL303,Communication Systems,Theory,4
+S0164,Diploma,Electronics & Communication,SY,3,DIEL304,VLSI,Practical,2
+S0165,Diploma,Electronics & Communication,SY,3,DIEL305,Embedded Systems,Practical,2
+S0166,Diploma,Electronics & Communication,SY,4,DIEL401,Digital Electronics,Theory,4
+S0167,Diploma,Electronics & Communication,SY,4,DIEL402,Microprocessors,Theory,4
+S0168,Diploma,Electronics & Communication,SY,4,DIEL403,Communication Systems,Theory,4
+S0169,Diploma,Electronics & Communication,SY,4,DIEL404,VLSI,Practical,2
+S0170,Diploma,Electronics & Communication,SY,4,DIEL405,Embedded Systems,Practical,2
+S0171,Diploma,Electronics & Communication,TY,5,DIEL501,Digital Electronics,Theory,4
+S0172,Diploma,Electronics & Communication,TY,5,DIEL502,Microprocessors,Theory,4
+S0173,Diploma,Electronics & Communication,TY,5,DIEL503,Communication Systems,Theory,4
+S0174,Diploma,Electronics & Communication,TY,5,DIEL504,VLSI,Practical,2
+S0175,Diploma,Electronics & Communication,TY,5,DIEL505,Embedded Systems,Practical,2
+S0176,Diploma,Electronics & Communication,TY,6,DIEL601,Digital Electronics,Theory,4
+S0177,Diploma,Electronics & Communication,TY,6,DIEL602,Microprocessors,Theory,4
+S0178,Diploma,Electronics & Communication,TY,6,DIEL603,Communication Systems,Theory,4
+S0179,Diploma,Electronics & Communication,TY,6,DIEL604,VLSI,Practical,2
+S0180,Diploma,Electronics & Communication,TY,6,DIEL605,Embedded Systems,Practical,2
+S0181,Diploma,Automobile Engineering,FY,1,DIAU101,Automobile Engineering,Theory,4
+S0182,Diploma,Automobile Engineering,FY,1,DIAU102,Vehicle Dynamics,Theory,4
+S0183,Diploma,Automobile Engineering,FY,1,DIAU103,Automobile Engines,Theory,4
+S0184,Diploma,Automobile Engineering,FY,1,DIAU104,Auto CAD,Practical,2
+S0185,Diploma,Automobile Engineering,FY,1,DIAU105,Vehicle Maintenance,Practical,2
+S0186,Diploma,Automobile Engineering,FY,2,DIAU201,Automobile Engineering,Theory,4
+S0187,Diploma,Automobile Engineering,FY,2,DIAU202,Vehicle Dynamics,Theory,4
+S0188,Diploma,Automobile Engineering,FY,2,DIAU203,Automobile Engines,Theory,4
+S0189,Diploma,Automobile Engineering,FY,2,DIAU204,Auto CAD,Practical,2
+S0190,Diploma,Automobile Engineering,FY,2,DIAU205,Vehicle Maintenance,Practical,2
+S0191,Diploma,Automobile Engineering,SY,3,DIAU301,Automobile Engineering,Theory,4
+S0192,Diploma,Automobile Engineering,SY,3,DIAU302,Vehicle Dynamics,Theory,4
+S0193,Diploma,Automobile Engineering,SY,3,DIAU303,Automobile Engines,Theory,4
+S0194,Diploma,Automobile Engineering,SY,3,DIAU304,Auto CAD,Practical,2
+S0195,Diploma,Automobile Engineering,SY,3,DIAU305,Vehicle Maintenance,Practical,2
+S0196,Diploma,Automobile Engineering,SY,4,DIAU401,Automobile Engineering,Theory,4
+S0197,Diploma,Automobile Engineering,SY,4,DIAU402,Vehicle Dynamics,Theory,4
+S0198,Diploma,Automobile Engineering,SY,4,DIAU403,Automobile Engines,Theory,4
+S0199,Diploma,Automobile Engineering,SY,4,DIAU404,Auto CAD,Practical,2
+S0200,Diploma,Automobile Engineering,SY,4,DIAU405,Vehicle Maintenance,Practical,2
+S0201,Diploma,Automobile Engineering,TY,5,DIAU501,Automobile Engineering,Theory,4
+S0202,Diploma,Automobile Engineering,TY,5,DIAU502,Vehicle Dynamics,Theory,4
+S0203,Diploma,Automobile Engineering,TY,5,DIAU503,Automobile Engines,Theory,4
+S0204,Diploma,Automobile Engineering,TY,5,DIAU504,Auto CAD,Practical,2
+S0205,Diploma,Automobile Engineering,TY,5,DIAU505,Vehicle Maintenance,Practical,2
+S0206,Diploma,Automobile Engineering,TY,6,DIAU601,Automobile Engineering,Theory,4
+S0207,Diploma,Automobile Engineering,TY,6,DIAU602,Vehicle Dynamics,Theory,4
+S0208,Diploma,Automobile Engineering,TY,6,DIAU603,Automobile Engines,Theory,4
+S0209,Diploma,Automobile Engineering,TY,6,DIAU604,Auto CAD,Practical,2
+S0210,Diploma,Automobile Engineering,TY,6,DIAU605,Vehicle Maintenance,Practical,2
+S0211,BE,Computer Engineering,FY,1,BECO101,Programming Fundamentals,Theory,4
+S0212,BE,Computer Engineering,FY,1,BECO102,Python Programming,Theory,4
+S0213,BE,Computer Engineering,FY,1,BECO103,Data Structures,Theory,4
+S0214,BE,Computer Engineering,FY,1,BECO104,DBMS,Practical,2
+S0215,BE,Computer Engineering,FY,1,BECO105,Computer Networks,Practical,2
+S0216,BE,Computer Engineering,FY,2,BECO201,Programming Fundamentals,Theory,4
+S0217,BE,Computer Engineering,FY,2,BECO202,Python Programming,Theory,4
+S0218,BE,Computer Engineering,FY,2,BECO203,Data Structures,Theory,4
+S0219,BE,Computer Engineering,FY,2,BECO204,DBMS,Practical,2
+S0220,BE,Computer Engineering,FY,2,BECO205,Computer Networks,Practical,2
+S0221,BE,Computer Engineering,SY,3,BECO301,Programming Fundamentals,Theory,4
+S0222,BE,Computer Engineering,SY,3,BECO302,Python Programming,Theory,4
+S0223,BE,Computer Engineering,SY,3,BECO303,Data Structures,Theory,4
+S0224,BE,Computer Engineering,SY,3,BECO304,DBMS,Practical,2
+S0225,BE,Computer Engineering,SY,3,BECO305,Computer Networks,Practical,2
+S0226,BE,Computer Engineering,SY,4,BECO401,Programming Fundamentals,Theory,4
+S0227,BE,Computer Engineering,SY,4,BECO402,Python Programming,Theory,4
+S0228,BE,Computer Engineering,SY,4,BECO403,Data Structures,Theory,4
+S0229,BE,Computer Engineering,SY,4,BECO404,DBMS,Practical,2
+S0230,BE,Computer Engineering,SY,4,BECO405,Computer Networks,Practical,2
+S0231,BE,Computer Engineering,TY,5,BECO501,Programming Fundamentals,Theory,4
+S0232,BE,Computer Engineering,TY,5,BECO502,Python Programming,Theory,4
+S0233,BE,Computer Engineering,TY,5,BECO503,Data Structures,Theory,4
+S0234,BE,Computer Engineering,TY,5,BECO504,DBMS,Practical,2
+S0235,BE,Computer Engineering,TY,5,BECO505,Computer Networks,Practical,2
+S0236,BE,Computer Engineering,TY,6,BECO601,Programming Fundamentals,Theory,4
+S0237,BE,Computer Engineering,TY,6,BECO602,Python Programming,Theory,4
+S0238,BE,Computer Engineering,TY,6,BECO603,Data Structures,Theory,4
+S0239,BE,Computer Engineering,TY,6,BECO604,DBMS,Practical,2
+S0240,BE,Computer Engineering,TY,6,BECO605,Computer Networks,Practical,2
+S0241,BE,Computer Engineering,LY,7,BECO701,Programming Fundamentals,Theory,4
+S0242,BE,Computer Engineering,LY,7,BECO702,Python Programming,Theory,4
+S0243,BE,Computer Engineering,LY,7,BECO703,Data Structures,Theory,4
+S0244,BE,Computer Engineering,LY,7,BECO704,DBMS,Practical,2
+S0245,BE,Computer Engineering,LY,7,BECO705,Computer Networks,Practical,2
+S0246,BE,Computer Engineering,LY,8,BECO801,Programming Fundamentals,Theory,4
+S0247,BE,Computer Engineering,LY,8,BECO802,Python Programming,Theory,4
+S0248,BE,Computer Engineering,LY,8,BECO803,Data Structures,Theory,4
+S0249,BE,Computer Engineering,LY,8,BECO804,DBMS,Practical,2
+S0250,BE,Computer Engineering,LY,8,BECO805,Computer Networks,Practical,2
+S0251,BE,Information Technology,FY,1,BEIN101,Web Development,Theory,4
+S0252,BE,Information Technology,FY,1,BEIN102,Cloud Computing,Theory,4
+S0253,BE,Information Technology,FY,1,BEIN103,Cyber Security,Theory,4
+S0254,BE,Information Technology,FY,1,BEIN104,Java Programming,Practical,2
+S0255,BE,Information Technology,FY,1,BEIN105,Software Engineering,Practical,2
+S0256,BE,Information Technology,FY,2,BEIN201,Web Development,Theory,4
+S0257,BE,Information Technology,FY,2,BEIN202,Cloud Computing,Theory,4
+S0258,BE,Information Technology,FY,2,BEIN203,Cyber Security,Theory,4
+S0259,BE,Information Technology,FY,2,BEIN204,Java Programming,Practical,2
+S0260,BE,Information Technology,FY,2,BEIN205,Software Engineering,Practical,2
+S0261,BE,Information Technology,SY,3,BEIN301,Web Development,Theory,4
+S0262,BE,Information Technology,SY,3,BEIN302,Cloud Computing,Theory,4
+S0263,BE,Information Technology,SY,3,BEIN303,Cyber Security,Theory,4
+S0264,BE,Information Technology,SY,3,BEIN304,Java Programming,Practical,2
+S0265,BE,Information Technology,SY,3,BEIN305,Software Engineering,Practical,2
+S0266,BE,Information Technology,SY,4,BEIN401,Web Development,Theory,4
+S0267,BE,Information Technology,SY,4,BEIN402,Cloud Computing,Theory,4
+S0268,BE,Information Technology,SY,4,BEIN403,Cyber Security,Theory,4
+S0269,BE,Information Technology,SY,4,BEIN404,Java Programming,Practical,2
+S0270,BE,Information Technology,SY,4,BEIN405,Software Engineering,Practical,2
+S0271,BE,Information Technology,TY,5,BEIN501,Web Development,Theory,4
+S0272,BE,Information Technology,TY,5,BEIN502,Cloud Computing,Theory,4
+S0273,BE,Information Technology,TY,5,BEIN503,Cyber Security,Theory,4
+S0274,BE,Information Technology,TY,5,BEIN504,Java Programming,Practical,2
+S0275,BE,Information Technology,TY,5,BEIN505,Software Engineering,Practical,2
+S0276,BE,Information Technology,TY,6,BEIN601,Web Development,Theory,4
+S0277,BE,Information Technology,TY,6,BEIN602,Cloud Computing,Theory,4
+S0278,BE,Information Technology,TY,6,BEIN603,Cyber Security,Theory,4
+S0279,BE,Information Technology,TY,6,BEIN604,Java Programming,Practical,2
+S0280,BE,Information Technology,TY,6,BEIN605,Software Engineering,Practical,2
+S0281,BE,Information Technology,LY,7,BEIN701,Web Development,Theory,4
+S0282,BE,Information Technology,LY,7,BEIN702,Cloud Computing,Theory,4
+S0283,BE,Information Technology,LY,7,BEIN703,Cyber Security,Theory,4
+S0284,BE,Information Technology,LY,7,BEIN704,Java Programming,Practical,2
+S0285,BE,Information Technology,LY,7,BEIN705,Software Engineering,Practical,2
+S0286,BE,Information Technology,LY,8,BEIN801,Web Development,Theory,4
+S0287,BE,Information Technology,LY,8,BEIN802,Cloud Computing,Theory,4
+S0288,BE,Information Technology,LY,8,BEIN803,Cyber Security,Theory,4
+S0289,BE,Information Technology,LY,8,BEIN804,Java Programming,Practical,2
+S0290,BE,Information Technology,LY,8,BEIN805,Software Engineering,Practical,2
+S0291,BE,Civil Engineering,FY,1,BECI101,Engineering Mechanics,Theory,4
+S0292,BE,Civil Engineering,FY,1,BECI102,Surveying,Theory,4
+S0293,BE,Civil Engineering,FY,1,BECI103,Concrete Technology,Theory,4
+S0294,BE,Civil Engineering,FY,1,BECI104,Transportation Engineering,Practical,2
+S0295,BE,Civil Engineering,FY,1,BECI105,Structural Analysis,Practical,2
+S0296,BE,Civil Engineering,FY,2,BECI201,Engineering Mechanics,Theory,4
+S0297,BE,Civil Engineering,FY,2,BECI202,Surveying,Theory,4
+S0298,BE,Civil Engineering,FY,2,BECI203,Concrete Technology,Theory,4
+S0299,BE,Civil Engineering,FY,2,BECI204,Transportation Engineering,Practical,2
+S0300,BE,Civil Engineering,FY,2,BECI205,Structural Analysis,Practical,2
+S0301,BE,Civil Engineering,SY,3,BECI301,Engineering Mechanics,Theory,4
+S0302,BE,Civil Engineering,SY,3,BECI302,Surveying,Theory,4
+S0303,BE,Civil Engineering,SY,3,BECI303,Concrete Technology,Theory,4
+S0304,BE,Civil Engineering,SY,3,BECI304,Transportation Engineering,Practical,2
+S0305,BE,Civil Engineering,SY,3,BECI305,Structural Analysis,Practical,2
+S0306,BE,Civil Engineering,SY,4,BECI401,Engineering Mechanics,Theory,4
+S0307,BE,Civil Engineering,SY,4,BECI402,Surveying,Theory,4
+S0308,BE,Civil Engineering,SY,4,BECI403,Concrete Technology,Theory,4
+S0309,BE,Civil Engineering,SY,4,BECI404,Transportation Engineering,Practical,2
+S0310,BE,Civil Engineering,SY,4,BECI405,Structural Analysis,Practical,2
+S0311,BE,Civil Engineering,TY,5,BECI501,Engineering Mechanics,Theory,4
+S0312,BE,Civil Engineering,TY,5,BECI502,Surveying,Theory,4
+S0313,BE,Civil Engineering,TY,5,BECI503,Concrete Technology,Theory,4
+S0314,BE,Civil Engineering,TY,5,BECI504,Transportation Engineering,Practical,2
+S0315,BE,Civil Engineering,TY,5,BECI505,Structural Analysis,Practical,2
+S0316,BE,Civil Engineering,TY,6,BECI601,Engineering Mechanics,Theory,4
+S0317,BE,Civil Engineering,TY,6,BECI602,Surveying,Theory,4
+S0318,BE,Civil Engineering,TY,6,BECI603,Concrete Technology,Theory,4
+S0319,BE,Civil Engineering,TY,6,BECI604,Transportation Engineering,Practical,2
+S0320,BE,Civil Engineering,TY,6,BECI605,Structural Analysis,Practical,2
+S0321,BE,Civil Engineering,LY,7,BECI701,Engineering Mechanics,Theory,4
+S0322,BE,Civil Engineering,LY,7,BECI702,Surveying,Theory,4
+S0323,BE,Civil Engineering,LY,7,BECI703,Concrete Technology,Theory,4
+S0324,BE,Civil Engineering,LY,7,BECI704,Transportation Engineering,Practical,2
+S0325,BE,Civil Engineering,LY,7,BECI705,Structural Analysis,Practical,2
+S0326,BE,Civil Engineering,LY,8,BECI801,Engineering Mechanics,Theory,4
+S0327,BE,Civil Engineering,LY,8,BECI802,Surveying,Theory,4
+S0328,BE,Civil Engineering,LY,8,BECI803,Concrete Technology,Theory,4
+S0329,BE,Civil Engineering,LY,8,BECI804,Transportation Engineering,Practical,2
+S0330,BE,Civil Engineering,LY,8,BECI805,Structural Analysis,Practical,2
+S0331,BE,Mechanical Engineering,FY,1,BEME101,Engineering Drawing,Theory,4
+S0332,BE,Mechanical Engineering,FY,1,BEME102,Thermodynamics,Theory,4
+S0333,BE,Mechanical Engineering,FY,1,BEME103,Fluid Mechanics,Theory,4
+S0334,BE,Mechanical Engineering,FY,1,BEME104,CAD/CAM,Practical,2
+S0335,BE,Mechanical Engineering,FY,1,BEME105,Manufacturing Technology,Practical,2
+S0336,BE,Mechanical Engineering,FY,2,BEME201,Engineering Drawing,Theory,4
+S0337,BE,Mechanical Engineering,FY,2,BEME202,Thermodynamics,Theory,4
+S0338,BE,Mechanical Engineering,FY,2,BEME203,Fluid Mechanics,Theory,4
+S0339,BE,Mechanical Engineering,FY,2,BEME204,CAD/CAM,Practical,2
+S0340,BE,Mechanical Engineering,FY,2,BEME205,Manufacturing Technology,Practical,2
+S0341,BE,Mechanical Engineering,SY,3,BEME301,Engineering Drawing,Theory,4
+S0342,BE,Mechanical Engineering,SY,3,BEME302,Thermodynamics,Theory,4
+S0343,BE,Mechanical Engineering,SY,3,BEME303,Fluid Mechanics,Theory,4
+S0344,BE,Mechanical Engineering,SY,3,BEME304,CAD/CAM,Practical,2
+S0345,BE,Mechanical Engineering,SY,3,BEME305,Manufacturing Technology,Practical,2
+S0346,BE,Mechanical Engineering,SY,4,BEME401,Engineering Drawing,Theory,4
+S0347,BE,Mechanical Engineering,SY,4,BEME402,Thermodynamics,Theory,4
+S0348,BE,Mechanical Engineering,SY,4,BEME403,Fluid Mechanics,Theory,4
+S0349,BE,Mechanical Engineering,SY,4,BEME404,CAD/CAM,Practical,2
+S0350,BE,Mechanical Engineering,SY,4,BEME405,Manufacturing Technology,Practical,2
+S0351,BE,Mechanical Engineering,TY,5,BEME501,Engineering Drawing,Theory,4
+S0352,BE,Mechanical Engineering,TY,5,BEME502,Thermodynamics,Theory,4
+S0353,BE,Mechanical Engineering,TY,5,BEME503,Fluid Mechanics,Theory,4
+S0354,BE,Mechanical Engineering,TY,5,BEME504,CAD/CAM,Practical,2
+S0355,BE,Mechanical Engineering,TY,5,BEME505,Manufacturing Technology,Practical,2
+S0356,BE,Mechanical Engineering,TY,6,BEME601,Engineering Drawing,Theory,4
+S0357,BE,Mechanical Engineering,TY,6,BEME602,Thermodynamics,Theory,4
+S0358,BE,Mechanical Engineering,TY,6,BEME603,Fluid Mechanics,Theory,4
+S0359,BE,Mechanical Engineering,TY,6,BEME604,CAD/CAM,Practical,2
+S0360,BE,Mechanical Engineering,TY,6,BEME605,Manufacturing Technology,Practical,2
+S0361,BE,Mechanical Engineering,LY,7,BEME701,Engineering Drawing,Theory,4
+S0362,BE,Mechanical Engineering,LY,7,BEME702,Thermodynamics,Theory,4
+S0363,BE,Mechanical Engineering,LY,7,BEME703,Fluid Mechanics,Theory,4
+S0364,BE,Mechanical Engineering,LY,7,BEME704,CAD/CAM,Practical,2
+S0365,BE,Mechanical Engineering,LY,7,BEME705,Manufacturing Technology,Practical,2
+S0366,BE,Mechanical Engineering,LY,8,BEME801,Engineering Drawing,Theory,4
+S0367,BE,Mechanical Engineering,LY,8,BEME802,Thermodynamics,Theory,4
+S0368,BE,Mechanical Engineering,LY,8,BEME803,Fluid Mechanics,Theory,4
+S0369,BE,Mechanical Engineering,LY,8,BEME804,CAD/CAM,Practical,2
+S0370,BE,Mechanical Engineering,LY,8,BEME805,Manufacturing Technology,Practical,2
+S0371,BE,Electrical Engineering,FY,1,BEEL101,Basic Electrical,Theory,4
+S0372,BE,Electrical Engineering,FY,1,BEEL102,Electrical Machines,Theory,4
+S0373,BE,Electrical Engineering,FY,1,BEEL103,Power Systems,Theory,4
+S0374,BE,Electrical Engineering,FY,1,BEEL104,Control Systems,Practical,2
+S0375,BE,Electrical Engineering,FY,1,BEEL105,Power Electronics,Practical,2
+S0376,BE,Electrical Engineering,FY,2,BEEL201,Basic Electrical,Theory,4
+S0377,BE,Electrical Engineering,FY,2,BEEL202,Electrical Machines,Theory,4
+S0378,BE,Electrical Engineering,FY,2,BEEL203,Power Systems,Theory,4
+S0379,BE,Electrical Engineering,FY,2,BEEL204,Control Systems,Practical,2
+S0380,BE,Electrical Engineering,FY,2,BEEL205,Power Electronics,Practical,2
+S0381,BE,Electrical Engineering,SY,3,BEEL301,Basic Electrical,Theory,4
+S0382,BE,Electrical Engineering,SY,3,BEEL302,Electrical Machines,Theory,4
+S0383,BE,Electrical Engineering,SY,3,BEEL303,Power Systems,Theory,4
+S0384,BE,Electrical Engineering,SY,3,BEEL304,Control Systems,Practical,2
+S0385,BE,Electrical Engineering,SY,3,BEEL305,Power Electronics,Practical,2
+S0386,BE,Electrical Engineering,SY,4,BEEL401,Basic Electrical,Theory,4
+S0387,BE,Electrical Engineering,SY,4,BEEL402,Electrical Machines,Theory,4
+S0388,BE,Electrical Engineering,SY,4,BEEL403,Power Systems,Theory,4
+S0389,BE,Electrical Engineering,SY,4,BEEL404,Control Systems,Practical,2
+S0390,BE,Electrical Engineering,SY,4,BEEL405,Power Electronics,Practical,2
+S0391,BE,Electrical Engineering,TY,5,BEEL501,Basic Electrical,Theory,4
+S0392,BE,Electrical Engineering,TY,5,BEEL502,Electrical Machines,Theory,4
+S0393,BE,Electrical Engineering,TY,5,BEEL503,Power Systems,Theory,4
+S0394,BE,Electrical Engineering,TY,5,BEEL504,Control Systems,Practical,2
+S0395,BE,Electrical Engineering,TY,5,BEEL505,Power Electronics,Practical,2
+S0396,BE,Electrical Engineering,TY,6,BEEL601,Basic Electrical,Theory,4
+S0397,BE,Electrical Engineering,TY,6,BEEL602,Electrical Machines,Theory,4
+S0398,BE,Electrical Engineering,TY,6,BEEL603,Power Systems,Theory,4
+S0399,BE,Electrical Engineering,TY,6,BEEL604,Control Systems,Practical,2
+S0400,BE,Electrical Engineering,TY,6,BEEL605,Power Electronics,Practical,2
+S0401,BE,Electrical Engineering,LY,7,BEEL701,Basic Electrical,Theory,4
+S0402,BE,Electrical Engineering,LY,7,BEEL702,Electrical Machines,Theory,4
+S0403,BE,Electrical Engineering,LY,7,BEEL703,Power Systems,Theory,4
+S0404,BE,Electrical Engineering,LY,7,BEEL704,Control Systems,Practical,2
+S0405,BE,Electrical Engineering,LY,7,BEEL705,Power Electronics,Practical,2
+S0406,BE,Electrical Engineering,LY,8,BEEL801,Basic Electrical,Theory,4
+S0407,BE,Electrical Engineering,LY,8,BEEL802,Electrical Machines,Theory,4
+S0408,BE,Electrical Engineering,LY,8,BEEL803,Power Systems,Theory,4
+S0409,BE,Electrical Engineering,LY,8,BEEL804,Control Systems,Practical,2
+S0410,BE,Electrical Engineering,LY,8,BEEL805,Power Electronics,Practical,2
+S0411,BE,Electronics & Communication,FY,1,BEEL101,Digital Electronics,Theory,4
+S0412,BE,Electronics & Communication,FY,1,BEEL102,Microprocessors,Theory,4
+S0413,BE,Electronics & Communication,FY,1,BEEL103,Communication Systems,Theory,4
+S0414,BE,Electronics & Communication,FY,1,BEEL104,VLSI,Practical,2
+S0415,BE,Electronics & Communication,FY,1,BEEL105,Embedded Systems,Practical,2
+S0416,BE,Electronics & Communication,FY,2,BEEL201,Digital Electronics,Theory,4
+S0417,BE,Electronics & Communication,FY,2,BEEL202,Microprocessors,Theory,4
+S0418,BE,Electronics & Communication,FY,2,BEEL203,Communication Systems,Theory,4
+S0419,BE,Electronics & Communication,FY,2,BEEL204,VLSI,Practical,2
+S0420,BE,Electronics & Communication,FY,2,BEEL205,Embedded Systems,Practical,2
+S0421,BE,Electronics & Communication,SY,3,BEEL301,Digital Electronics,Theory,4
+S0422,BE,Electronics & Communication,SY,3,BEEL302,Microprocessors,Theory,4
+S0423,BE,Electronics & Communication,SY,3,BEEL303,Communication Systems,Theory,4
+S0424,BE,Electronics & Communication,SY,3,BEEL304,VLSI,Practical,2
+S0425,BE,Electronics & Communication,SY,3,BEEL305,Embedded Systems,Practical,2
+S0426,BE,Electronics & Communication,SY,4,BEEL401,Digital Electronics,Theory,4
+S0427,BE,Electronics & Communication,SY,4,BEEL402,Microprocessors,Theory,4
+S0428,BE,Electronics & Communication,SY,4,BEEL403,Communication Systems,Theory,4
+S0429,BE,Electronics & Communication,SY,4,BEEL404,VLSI,Practical,2
+S0430,BE,Electronics & Communication,SY,4,BEEL405,Embedded Systems,Practical,2
+S0431,BE,Electronics & Communication,TY,5,BEEL501,Digital Electronics,Theory,4
+S0432,BE,Electronics & Communication,TY,5,BEEL502,Microprocessors,Theory,4
+S0433,BE,Electronics & Communication,TY,5,BEEL503,Communication Systems,Theory,4
+S0434,BE,Electronics & Communication,TY,5,BEEL504,VLSI,Practical,2
+S0435,BE,Electronics & Communication,TY,5,BEEL505,Embedded Systems,Practical,2
+S0436,BE,Electronics & Communication,TY,6,BEEL601,Digital Electronics,Theory,4
+S0437,BE,Electronics & Communication,TY,6,BEEL602,Microprocessors,Theory,4
+S0438,BE,Electronics & Communication,TY,6,BEEL603,Communication Systems,Theory,4
+S0439,BE,Electronics & Communication,TY,6,BEEL604,VLSI,Practical,2
+S0440,BE,Electronics & Communication,TY,6,BEEL605,Embedded Systems,Practical,2
+S0441,BE,Electronics & Communication,LY,7,BEEL701,Digital Electronics,Theory,4
+S0442,BE,Electronics & Communication,LY,7,BEEL702,Microprocessors,Theory,4
+S0443,BE,Electronics & Communication,LY,7,BEEL703,Communication Systems,Theory,4
+S0444,BE,Electronics & Communication,LY,7,BEEL704,VLSI,Practical,2
+S0445,BE,Electronics & Communication,LY,7,BEEL705,Embedded Systems,Practical,2
+S0446,BE,Electronics & Communication,LY,8,BEEL801,Digital Electronics,Theory,4
+S0447,BE,Electronics & Communication,LY,8,BEEL802,Microprocessors,Theory,4
+S0448,BE,Electronics & Communication,LY,8,BEEL803,Communication Systems,Theory,4
+S0449,BE,Electronics & Communication,LY,8,BEEL804,VLSI,Practical,2
+S0450,BE,Electronics & Communication,LY,8,BEEL805,Embedded Systems,Practical,2
+S0451,BE,Artificial Intelligence & Machine Learning,FY,1,BEAR101,AI Fundamentals,Theory,4
+S0452,BE,Artificial Intelligence & Machine Learning,FY,1,BEAR102,Machine Learning,Theory,4
+S0453,BE,Artificial Intelligence & Machine Learning,FY,1,BEAR103,Deep Learning,Theory,4
+S0454,BE,Artificial Intelligence & Machine Learning,FY,1,BEAR104,Computer Vision,Practical,2
+S0455,BE,Artificial Intelligence & Machine Learning,FY,1,BEAR105,Natural Language Processing,Practical,2
+S0456,BE,Artificial Intelligence & Machine Learning,FY,2,BEAR201,AI Fundamentals,Theory,4
+S0457,BE,Artificial Intelligence & Machine Learning,FY,2,BEAR202,Machine Learning,Theory,4
+S0458,BE,Artificial Intelligence & Machine Learning,FY,2,BEAR203,Deep Learning,Theory,4
+S0459,BE,Artificial Intelligence & Machine Learning,FY,2,BEAR204,Computer Vision,Practical,2
+S0460,BE,Artificial Intelligence & Machine Learning,FY,2,BEAR205,Natural Language Processing,Practical,2
+S0461,BE,Artificial Intelligence & Machine Learning,SY,3,BEAR301,AI Fundamentals,Theory,4
+S0462,BE,Artificial Intelligence & Machine Learning,SY,3,BEAR302,Machine Learning,Theory,4
+S0463,BE,Artificial Intelligence & Machine Learning,SY,3,BEAR303,Deep Learning,Theory,4
+S0464,BE,Artificial Intelligence & Machine Learning,SY,3,BEAR304,Computer Vision,Practical,2
+S0465,BE,Artificial Intelligence & Machine Learning,SY,3,BEAR305,Natural Language Processing,Practical,2
+S0466,BE,Artificial Intelligence & Machine Learning,SY,4,BEAR401,AI Fundamentals,Theory,4
+S0467,BE,Artificial Intelligence & Machine Learning,SY,4,BEAR402,Machine Learning,Theory,4
+S0468,BE,Artificial Intelligence & Machine Learning,SY,4,BEAR403,Deep Learning,Theory,4
+S0469,BE,Artificial Intelligence & Machine Learning,SY,4,BEAR404,Computer Vision,Practical,2
+S0470,BE,Artificial Intelligence & Machine Learning,SY,4,BEAR405,Natural Language Processing,Practical,2
+S0471,BE,Artificial Intelligence & Machine Learning,TY,5,BEAR501,AI Fundamentals,Theory,4
+S0472,BE,Artificial Intelligence & Machine Learning,TY,5,BEAR502,Machine Learning,Theory,4
+S0473,BE,Artificial Intelligence & Machine Learning,TY,5,BEAR503,Deep Learning,Theory,4
+S0474,BE,Artificial Intelligence & Machine Learning,TY,5,BEAR504,Computer Vision,Practical,2
+S0475,BE,Artificial Intelligence & Machine Learning,TY,5,BEAR505,Natural Language Processing,Practical,2
+S0476,BE,Artificial Intelligence & Machine Learning,TY,6,BEAR601,AI Fundamentals,Theory,4
+S0477,BE,Artificial Intelligence & Machine Learning,TY,6,BEAR602,Machine Learning,Theory,4
+S0478,BE,Artificial Intelligence & Machine Learning,TY,6,BEAR603,Deep Learning,Theory,4
+S0479,BE,Artificial Intelligence & Machine Learning,TY,6,BEAR604,Computer Vision,Practical,2
+S0480,BE,Artificial Intelligence & Machine Learning,TY,6,BEAR605,Natural Language Processing,Practical,2
+S0481,BE,Artificial Intelligence & Machine Learning,LY,7,BEAR701,AI Fundamentals,Theory,4
+S0482,BE,Artificial Intelligence & Machine Learning,LY,7,BEAR702,Machine Learning,Theory,4
+S0483,BE,Artificial Intelligence & Machine Learning,LY,7,BEAR703,Deep Learning,Theory,4
+S0484,BE,Artificial Intelligence & Machine Learning,LY,7,BEAR704,Computer Vision,Practical,2
+S0485,BE,Artificial Intelligence & Machine Learning,LY,7,BEAR705,Natural Language Processing,Practical,2
+S0486,BE,Artificial Intelligence & Machine Learning,LY,8,BEAR801,AI Fundamentals,Theory,4
+S0487,BE,Artificial Intelligence & Machine Learning,LY,8,BEAR802,Machine Learning,Theory,4
+S0488,BE,Artificial Intelligence & Machine Learning,LY,8,BEAR803,Deep Learning,Theory,4
+S0489,BE,Artificial Intelligence & Machine Learning,LY,8,BEAR804,Computer Vision,Practical,2
+S0490,BE,Artificial Intelligence & Machine Learning,LY,8,BEAR805,Natural Language Processing,Practical,2
+S0491,BE,Data Science,FY,1,BEDA101,Statistics,Theory,4
+S0492,BE,Data Science,FY,1,BEDA102,Python for Data Science,Theory,4
+S0493,BE,Data Science,FY,1,BEDA103,Data Analytics,Theory,4
+S0494,BE,Data Science,FY,1,BEDA104,Big Data,Practical,2
+S0495,BE,Data Science,FY,1,BEDA105,Data Visualization,Practical,2
+S0496,BE,Data Science,FY,2,BEDA201,Statistics,Theory,4
+S0497,BE,Data Science,FY,2,BEDA202,Python for Data Science,Theory,4
+S0498,BE,Data Science,FY,2,BEDA203,Data Analytics,Theory,4
+S0499,BE,Data Science,FY,2,BEDA204,Big Data,Practical,2
+S0500,BE,Data Science,FY,2,BEDA205,Data Visualization,Practical,2
+S0501,BE,Data Science,SY,3,BEDA301,Statistics,Theory,4
+S0502,BE,Data Science,SY,3,BEDA302,Python for Data Science,Theory,4
+S0503,BE,Data Science,SY,3,BEDA303,Data Analytics,Theory,4
+S0504,BE,Data Science,SY,3,BEDA304,Big Data,Practical,2
+S0505,BE,Data Science,SY,3,BEDA305,Data Visualization,Practical,2
+S0506,BE,Data Science,SY,4,BEDA401,Statistics,Theory,4
+S0507,BE,Data Science,SY,4,BEDA402,Python for Data Science,Theory,4
+S0508,BE,Data Science,SY,4,BEDA403,Data Analytics,Theory,4
+S0509,BE,Data Science,SY,4,BEDA404,Big Data,Practical,2
+S0510,BE,Data Science,SY,4,BEDA405,Data Visualization,Practical,2
+S0511,BE,Data Science,TY,5,BEDA501,Statistics,Theory,4
+S0512,BE,Data Science,TY,5,BEDA502,Python for Data Science,Theory,4
+S0513,BE,Data Science,TY,5,BEDA503,Data Analytics,Theory,4
+S0514,BE,Data Science,TY,5,BEDA504,Big Data,Practical,2
+S0515,BE,Data Science,TY,5,BEDA505,Data Visualization,Practical,2
+S0516,BE,Data Science,TY,6,BEDA601,Statistics,Theory,4
+S0517,BE,Data Science,TY,6,BEDA602,Python for Data Science,Theory,4
+S0518,BE,Data Science,TY,6,BEDA603,Data Analytics,Theory,4
+S0519,BE,Data Science,TY,6,BEDA604,Big Data,Practical,2
+S0520,BE,Data Science,TY,6,BEDA605,Data Visualization,Practical,2
+S0521,BE,Data Science,LY,7,BEDA701,Statistics,Theory,4
+S0522,BE,Data Science,LY,7,BEDA702,Python for Data Science,Theory,4
+S0523,BE,Data Science,LY,7,BEDA703,Data Analytics,Theory,4
+S0524,BE,Data Science,LY,7,BEDA704,Big Data,Practical,2
+S0525,BE,Data Science,LY,7,BEDA705,Data Visualization,Practical,2
+S0526,BE,Data Science,LY,8,BEDA801,Statistics,Theory,4
+S0527,BE,Data Science,LY,8,BEDA802,Python for Data Science,Theory,4
+S0528,BE,Data Science,LY,8,BEDA803,Data Analytics,Theory,4
+S0529,BE,Data Science,LY,8,BEDA804,Big Data,Practical,2
+S0530,BE,Data Science,LY,8,BEDA805,Data Visualization,Practical,2
+S0531,MCA,Computer Applications,FY,1,MCCO101,Programming in C,Theory,4
+S0532,MCA,Computer Applications,FY,1,MCCO102,Java Programming,Theory,4
+S0533,MCA,Computer Applications,FY,1,MCCO103,Python Programming,Theory,4
+S0534,MCA,Computer Applications,FY,1,MCCO104,DBMS,Practical,2
+S0535,MCA,Computer Applications,FY,1,MCCO105,Software Engineering,Practical,2
+S0536,MCA,Computer Applications,FY,2,MCCO201,Programming in C,Theory,4
+S0537,MCA,Computer Applications,FY,2,MCCO202,Java Programming,Theory,4
+S0538,MCA,Computer Applications,FY,2,MCCO203,Python Programming,Theory,4
+S0539,MCA,Computer Applications,FY,2,MCCO204,DBMS,Practical,2
+S0540,MCA,Computer Applications,FY,2,MCCO205,Software Engineering,Practical,2
+S0541,MCA,Computer Applications,SY,3,MCCO301,Programming in C,Theory,4
+S0542,MCA,Computer Applications,SY,3,MCCO302,Java Programming,Theory,4
+S0543,MCA,Computer Applications,SY,3,MCCO303,Python Programming,Theory,4
+S0544,MCA,Computer Applications,SY,3,MCCO304,DBMS,Practical,2
+S0545,MCA,Computer Applications,SY,3,MCCO305,Software Engineering,Practical,2
+S0546,MCA,Computer Applications,SY,4,MCCO401,Programming in C,Theory,4
+S0547,MCA,Computer Applications,SY,4,MCCO402,Java Programming,Theory,4
+S0548,MCA,Computer Applications,SY,4,MCCO403,Python Programming,Theory,4
+S0549,MCA,Computer Applications,SY,4,MCCO404,DBMS,Practical,2
+S0550,MCA,Computer Applications,SY,4,MCCO405,Software Engineering,Practical,2
+S0551,BCA,Computer Applications,FY,1,BCCO101,Programming in C,Theory,4
+S0552,BCA,Computer Applications,FY,1,BCCO102,Java Programming,Theory,4
+S0553,BCA,Computer Applications,FY,1,BCCO103,Python Programming,Theory,4
+S0554,BCA,Computer Applications,FY,1,BCCO104,DBMS,Practical,2
+S0555,BCA,Computer Applications,FY,1,BCCO105,Software Engineering,Practical,2
+S0556,BCA,Computer Applications,FY,2,BCCO201,Programming in C,Theory,4
+S0557,BCA,Computer Applications,FY,2,BCCO202,Java Programming,Theory,4
+S0558,BCA,Computer Applications,FY,2,BCCO203,Python Programming,Theory,4
+S0559,BCA,Computer Applications,FY,2,BCCO204,DBMS,Practical,2
+S0560,BCA,Computer Applications,FY,2,BCCO205,Software Engineering,Practical,2
+S0561,BCA,Computer Applications,SY,3,BCCO301,Programming in C,Theory,4
+S0562,BCA,Computer Applications,SY,3,BCCO302,Java Programming,Theory,4
+S0563,BCA,Computer Applications,SY,3,BCCO303,Python Programming,Theory,4
+S0564,BCA,Computer Applications,SY,3,BCCO304,DBMS,Practical,2
+S0565,BCA,Computer Applications,SY,3,BCCO305,Software Engineering,Practical,2
+S0566,BCA,Computer Applications,SY,4,BCCO401,Programming in C,Theory,4
+S0567,BCA,Computer Applications,SY,4,BCCO402,Java Programming,Theory,4
+S0568,BCA,Computer Applications,SY,4,BCCO403,Python Programming,Theory,4
+S0569,BCA,Computer Applications,SY,4,BCCO404,DBMS,Practical,2
+S0570,BCA,Computer Applications,SY,4,BCCO405,Software Engineering,Practical,2
+S0571,BCA,Computer Applications,TY,5,BCCO501,Programming in C,Theory,4
+S0572,BCA,Computer Applications,TY,5,BCCO502,Java Programming,Theory,4
+S0573,BCA,Computer Applications,TY,5,BCCO503,Python Programming,Theory,4
+S0574,BCA,Computer Applications,TY,5,BCCO504,DBMS,Practical,2
+S0575,BCA,Computer Applications,TY,5,BCCO505,Software Engineering,Practical,2
+S0576,BCA,Computer Applications,TY,6,BCCO601,Programming in C,Theory,4
+S0577,BCA,Computer Applications,TY,6,BCCO602,Java Programming,Theory,4
+S0578,BCA,Computer Applications,TY,6,BCCO603,Python Programming,Theory,4
+S0579,BCA,Computer Applications,TY,6,BCCO604,DBMS,Practical,2
+S0580,BCA,Computer Applications,TY,6,BCCO605,Software Engineering,Practical,2
+S0581,ME,Computer Engineering,FY,1,MECO101,Programming Fundamentals,Theory,4
+S0582,ME,Computer Engineering,FY,1,MECO102,Python Programming,Theory,4
+S0583,ME,Computer Engineering,FY,1,MECO103,Data Structures,Theory,4
+S0584,ME,Computer Engineering,FY,1,MECO104,DBMS,Practical,2
+S0585,ME,Computer Engineering,FY,1,MECO105,Computer Networks,Practical,2
+S0586,ME,Computer Engineering,FY,2,MECO201,Programming Fundamentals,Theory,4
+S0587,ME,Computer Engineering,FY,2,MECO202,Python Programming,Theory,4
+S0588,ME,Computer Engineering,FY,2,MECO203,Data Structures,Theory,4
+S0589,ME,Computer Engineering,FY,2,MECO204,DBMS,Practical,2
+S0590,ME,Computer Engineering,FY,2,MECO205,Computer Networks,Practical,2
+S0591,ME,Computer Engineering,SY,3,MECO301,Programming Fundamentals,Theory,4
+S0592,ME,Computer Engineering,SY,3,MECO302,Python Programming,Theory,4
+S0593,ME,Computer Engineering,SY,3,MECO303,Data Structures,Theory,4
+S0594,ME,Computer Engineering,SY,3,MECO304,DBMS,Practical,2
+S0595,ME,Computer Engineering,SY,3,MECO305,Computer Networks,Practical,2
+S0596,ME,Computer Engineering,SY,4,MECO401,Programming Fundamentals,Theory,4
+S0597,ME,Computer Engineering,SY,4,MECO402,Python Programming,Theory,4
+S0598,ME,Computer Engineering,SY,4,MECO403,Data Structures,Theory,4
+S0599,ME,Computer Engineering,SY,4,MECO404,DBMS,Practical,2
+S0600,ME,Computer Engineering,SY,4,MECO405,Computer Networks,Practical,2
+S0601,ME,Civil Engineering,FY,1,MECI101,Engineering Mechanics,Theory,4
+S0602,ME,Civil Engineering,FY,1,MECI102,Surveying,Theory,4
+S0603,ME,Civil Engineering,FY,1,MECI103,Concrete Technology,Theory,4
+S0604,ME,Civil Engineering,FY,1,MECI104,Transportation Engineering,Practical,2
+S0605,ME,Civil Engineering,FY,1,MECI105,Structural Analysis,Practical,2
+S0606,ME,Civil Engineering,FY,2,MECI201,Engineering Mechanics,Theory,4
+S0607,ME,Civil Engineering,FY,2,MECI202,Surveying,Theory,4
+S0608,ME,Civil Engineering,FY,2,MECI203,Concrete Technology,Theory,4
+S0609,ME,Civil Engineering,FY,2,MECI204,Transportation Engineering,Practical,2
+S0610,ME,Civil Engineering,FY,2,MECI205,Structural Analysis,Practical,2
+S0611,ME,Civil Engineering,SY,3,MECI301,Engineering Mechanics,Theory,4
+S0612,ME,Civil Engineering,SY,3,MECI302,Surveying,Theory,4
+S0613,ME,Civil Engineering,SY,3,MECI303,Concrete Technology,Theory,4
+S0614,ME,Civil Engineering,SY,3,MECI304,Transportation Engineering,Practical,2
+S0615,ME,Civil Engineering,SY,3,MECI305,Structural Analysis,Practical,2
+S0616,ME,Civil Engineering,SY,4,MECI401,Engineering Mechanics,Theory,4
+S0617,ME,Civil Engineering,SY,4,MECI402,Surveying,Theory,4
+S0618,ME,Civil Engineering,SY,4,MECI403,Concrete Technology,Theory,4
+S0619,ME,Civil Engineering,SY,4,MECI404,Transportation Engineering,Practical,2
+S0620,ME,Civil Engineering,SY,4,MECI405,Structural Analysis,Practical,2
+S0621,ME,Mechanical Engineering,FY,1,MEME101,Engineering Drawing,Theory,4
+S0622,ME,Mechanical Engineering,FY,1,MEME102,Thermodynamics,Theory,4
+S0623,ME,Mechanical Engineering,FY,1,MEME103,Fluid Mechanics,Theory,4
+S0624,ME,Mechanical Engineering,FY,1,MEME104,CAD/CAM,Practical,2
+S0625,ME,Mechanical Engineering,FY,1,MEME105,Manufacturing Technology,Practical,2
+S0626,ME,Mechanical Engineering,FY,2,MEME201,Engineering Drawing,Theory,4
+S0627,ME,Mechanical Engineering,FY,2,MEME202,Thermodynamics,Theory,4
+S0628,ME,Mechanical Engineering,FY,2,MEME203,Fluid Mechanics,Theory,4
+S0629,ME,Mechanical Engineering,FY,2,MEME204,CAD/CAM,Practical,2
+S0630,ME,Mechanical Engineering,FY,2,MEME205,Manufacturing Technology,Practical,2
+S0631,ME,Mechanical Engineering,SY,3,MEME301,Engineering Drawing,Theory,4
+S0632,ME,Mechanical Engineering,SY,3,MEME302,Thermodynamics,Theory,4
+S0633,ME,Mechanical Engineering,SY,3,MEME303,Fluid Mechanics,Theory,4
+S0634,ME,Mechanical Engineering,SY,3,MEME304,CAD/CAM,Practical,2
+S0635,ME,Mechanical Engineering,SY,3,MEME305,Manufacturing Technology,Practical,2
+S0636,ME,Mechanical Engineering,SY,4,MEME401,Engineering Drawing,Theory,4
+S0637,ME,Mechanical Engineering,SY,4,MEME402,Thermodynamics,Theory,4
+S0638,ME,Mechanical Engineering,SY,4,MEME403,Fluid Mechanics,Theory,4
+S0639,ME,Mechanical Engineering,SY,4,MEME404,CAD/CAM,Practical,2
+S0640,ME,Mechanical Engineering,SY,4,MEME405,Manufacturing Technology,Practical,2

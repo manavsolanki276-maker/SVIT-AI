@@ -1,0 +1,641 @@
+book_id,program,department,year,semester,subject,book_title,author,publisher,edition,isbn,available_copies,shelf
+B00001,Diploma,Computer Engineering,FY,1,Programming Fundamentals,Programming Fundamentals - Complete Guide,Author 2,McGraw Hill,2th,978-93-100001,3,CO-1-2
+B00002,Diploma,Computer Engineering,FY,1,Python Programming,Python Programming - Complete Guide,Author 3,McGraw Hill,3th,978-93-100002,4,CO-1-3
+B00003,Diploma,Computer Engineering,FY,1,Data Structures,Data Structures - Complete Guide,Author 4,McGraw Hill,4th,978-93-100003,5,CO-1-4
+B00004,Diploma,Computer Engineering,FY,1,DBMS,DBMS - Complete Guide,Author 5,McGraw Hill,5th,978-93-100004,6,CO-1-5
+B00005,Diploma,Computer Engineering,FY,1,Computer Networks,Computer Networks - Complete Guide,Author 6,McGraw Hill,1th,978-93-100005,7,CO-1-6
+B00006,Diploma,Computer Engineering,FY,2,Programming Fundamentals,Programming Fundamentals - Complete Guide,Author 7,McGraw Hill,2th,978-93-100006,8,CO-1-7
+B00007,Diploma,Computer Engineering,FY,2,Python Programming,Python Programming - Complete Guide,Author 8,McGraw Hill,3th,978-93-100007,9,CO-1-8
+B00008,Diploma,Computer Engineering,FY,2,Data Structures,Data Structures - Complete Guide,Author 9,McGraw Hill,4th,978-93-100008,2,CO-1-9
+B00009,Diploma,Computer Engineering,FY,2,DBMS,DBMS - Complete Guide,Author 10,McGraw Hill,5th,978-93-100009,3,CO-1-10
+B00010,Diploma,Computer Engineering,FY,2,Computer Networks,Computer Networks - Complete Guide,Author 11,McGraw Hill,1th,978-93-100010,4,CO-1-11
+B00011,Diploma,Computer Engineering,SY,3,Programming Fundamentals,Programming Fundamentals - Complete Guide,Author 12,McGraw Hill,2th,978-93-100011,5,CO-2-12
+B00012,Diploma,Computer Engineering,SY,3,Python Programming,Python Programming - Complete Guide,Author 13,McGraw Hill,3th,978-93-100012,6,CO-2-13
+B00013,Diploma,Computer Engineering,SY,3,Data Structures,Data Structures - Complete Guide,Author 14,McGraw Hill,4th,978-93-100013,7,CO-2-14
+B00014,Diploma,Computer Engineering,SY,3,DBMS,DBMS - Complete Guide,Author 15,McGraw Hill,5th,978-93-100014,8,CO-2-15
+B00015,Diploma,Computer Engineering,SY,3,Computer Networks,Computer Networks - Complete Guide,Author 16,McGraw Hill,1th,978-93-100015,9,CO-2-16
+B00016,Diploma,Computer Engineering,SY,4,Programming Fundamentals,Programming Fundamentals - Complete Guide,Author 17,McGraw Hill,2th,978-93-100016,2,CO-2-17
+B00017,Diploma,Computer Engineering,SY,4,Python Programming,Python Programming - Complete Guide,Author 18,McGraw Hill,3th,978-93-100017,3,CO-2-18
+B00018,Diploma,Computer Engineering,SY,4,Data Structures,Data Structures - Complete Guide,Author 19,McGraw Hill,4th,978-93-100018,4,CO-2-19
+B00019,Diploma,Computer Engineering,SY,4,DBMS,DBMS - Complete Guide,Author 20,McGraw Hill,5th,978-93-100019,5,CO-2-20
+B00020,Diploma,Computer Engineering,SY,4,Computer Networks,Computer Networks - Complete Guide,Author 21,McGraw Hill,1th,978-93-100020,6,CO-2-1
+B00021,Diploma,Computer Engineering,TY,5,Programming Fundamentals,Programming Fundamentals - Complete Guide,Author 22,McGraw Hill,2th,978-93-100021,7,CO-3-2
+B00022,Diploma,Computer Engineering,TY,5,Python Programming,Python Programming - Complete Guide,Author 23,McGraw Hill,3th,978-93-100022,8,CO-3-3
+B00023,Diploma,Computer Engineering,TY,5,Data Structures,Data Structures - Complete Guide,Author 24,McGraw Hill,4th,978-93-100023,9,CO-3-4
+B00024,Diploma,Computer Engineering,TY,5,DBMS,DBMS - Complete Guide,Author 25,McGraw Hill,5th,978-93-100024,2,CO-3-5
+B00025,Diploma,Computer Engineering,TY,5,Computer Networks,Computer Networks - Complete Guide,Author 26,McGraw Hill,1th,978-93-100025,3,CO-3-6
+B00026,Diploma,Computer Engineering,TY,6,Programming Fundamentals,Programming Fundamentals - Complete Guide,Author 27,McGraw Hill,2th,978-93-100026,4,CO-3-7
+B00027,Diploma,Computer Engineering,TY,6,Python Programming,Python Programming - Complete Guide,Author 28,McGraw Hill,3th,978-93-100027,5,CO-3-8
+B00028,Diploma,Computer Engineering,TY,6,Data Structures,Data Structures - Complete Guide,Author 29,McGraw Hill,4th,978-93-100028,6,CO-3-9
+B00029,Diploma,Computer Engineering,TY,6,DBMS,DBMS - Complete Guide,Author 30,McGraw Hill,5th,978-93-100029,7,CO-3-10
+B00030,Diploma,Computer Engineering,TY,6,Computer Networks,Computer Networks - Complete Guide,Author 31,McGraw Hill,1th,978-93-100030,8,CO-3-11
+B00031,Diploma,Civil Engineering,FY,1,Engineering Mechanics,Engineering Mechanics - Complete Guide,Author 32,McGraw Hill,2th,978-93-100031,9,CI-1-12
+B00032,Diploma,Civil Engineering,FY,1,Surveying,Surveying - Complete Guide,Author 33,McGraw Hill,3th,978-93-100032,2,CI-1-13
+B00033,Diploma,Civil Engineering,FY,1,Concrete Technology,Concrete Technology - Complete Guide,Author 34,McGraw Hill,4th,978-93-100033,3,CI-1-14
+B00034,Diploma,Civil Engineering,FY,1,Transportation Engineering,Transportation Engineering - Complete Guide,Author 35,McGraw Hill,5th,978-93-100034,4,CI-1-15
+B00035,Diploma,Civil Engineering,FY,1,Structural Analysis,Structural Analysis - Complete Guide,Author 36,McGraw Hill,1th,978-93-100035,5,CI-1-16
+B00036,Diploma,Civil Engineering,FY,2,Engineering Mechanics,Engineering Mechanics - Complete Guide,Author 37,McGraw Hill,2th,978-93-100036,6,CI-1-17
+B00037,Diploma,Civil Engineering,FY,2,Surveying,Surveying - Complete Guide,Author 38,McGraw Hill,3th,978-93-100037,7,CI-1-18
+B00038,Diploma,Civil Engineering,FY,2,Concrete Technology,Concrete Technology - Complete Guide,Author 39,McGraw Hill,4th,978-93-100038,8,CI-1-19
+B00039,Diploma,Civil Engineering,FY,2,Transportation Engineering,Transportation Engineering - Complete Guide,Author 40,McGraw Hill,5th,978-93-100039,9,CI-1-20
+B00040,Diploma,Civil Engineering,FY,2,Structural Analysis,Structural Analysis - Complete Guide,Author 41,McGraw Hill,1th,978-93-100040,2,CI-1-1
+B00041,Diploma,Civil Engineering,SY,3,Engineering Mechanics,Engineering Mechanics - Complete Guide,Author 42,McGraw Hill,2th,978-93-100041,3,CI-2-2
+B00042,Diploma,Civil Engineering,SY,3,Surveying,Surveying - Complete Guide,Author 43,McGraw Hill,3th,978-93-100042,4,CI-2-3
+B00043,Diploma,Civil Engineering,SY,3,Concrete Technology,Concrete Technology - Complete Guide,Author 44,McGraw Hill,4th,978-93-100043,5,CI-2-4
+B00044,Diploma,Civil Engineering,SY,3,Transportation Engineering,Transportation Engineering - Complete Guide,Author 45,McGraw Hill,5th,978-93-100044,6,CI-2-5
+B00045,Diploma,Civil Engineering,SY,3,Structural Analysis,Structural Analysis - Complete Guide,Author 46,McGraw Hill,1th,978-93-100045,7,CI-2-6
+B00046,Diploma,Civil Engineering,SY,4,Engineering Mechanics,Engineering Mechanics - Complete Guide,Author 47,McGraw Hill,2th,978-93-100046,8,CI-2-7
+B00047,Diploma,Civil Engineering,SY,4,Surveying,Surveying - Complete Guide,Author 48,McGraw Hill,3th,978-93-100047,9,CI-2-8
+B00048,Diploma,Civil Engineering,SY,4,Concrete Technology,Concrete Technology - Complete Guide,Author 49,McGraw Hill,4th,978-93-100048,2,CI-2-9
+B00049,Diploma,Civil Engineering,SY,4,Transportation Engineering,Transportation Engineering - Complete Guide,Author 50,McGraw Hill,5th,978-93-100049,3,CI-2-10
+B00050,Diploma,Civil Engineering,SY,4,Structural Analysis,Structural Analysis - Complete Guide,Author 1,McGraw Hill,1th,978-93-100050,4,CI-2-11
+B00051,Diploma,Civil Engineering,TY,5,Engineering Mechanics,Engineering Mechanics - Complete Guide,Author 2,McGraw Hill,2th,978-93-100051,5,CI-3-12
+B00052,Diploma,Civil Engineering,TY,5,Surveying,Surveying - Complete Guide,Author 3,McGraw Hill,3th,978-93-100052,6,CI-3-13
+B00053,Diploma,Civil Engineering,TY,5,Concrete Technology,Concrete Technology - Complete Guide,Author 4,McGraw Hill,4th,978-93-100053,7,CI-3-14
+B00054,Diploma,Civil Engineering,TY,5,Transportation Engineering,Transportation Engineering - Complete Guide,Author 5,McGraw Hill,5th,978-93-100054,8,CI-3-15
+B00055,Diploma,Civil Engineering,TY,5,Structural Analysis,Structural Analysis - Complete Guide,Author 6,McGraw Hill,1th,978-93-100055,9,CI-3-16
+B00056,Diploma,Civil Engineering,TY,6,Engineering Mechanics,Engineering Mechanics - Complete Guide,Author 7,McGraw Hill,2th,978-93-100056,2,CI-3-17
+B00057,Diploma,Civil Engineering,TY,6,Surveying,Surveying - Complete Guide,Author 8,McGraw Hill,3th,978-93-100057,3,CI-3-18
+B00058,Diploma,Civil Engineering,TY,6,Concrete Technology,Concrete Technology - Complete Guide,Author 9,McGraw Hill,4th,978-93-100058,4,CI-3-19
+B00059,Diploma,Civil Engineering,TY,6,Transportation Engineering,Transportation Engineering - Complete Guide,Author 10,McGraw Hill,5th,978-93-100059,5,CI-3-20
+B00060,Diploma,Civil Engineering,TY,6,Structural Analysis,Structural Analysis - Complete Guide,Author 11,McGraw Hill,1th,978-93-100060,6,CI-3-1
+B00061,Diploma,Mechanical Engineering,FY,1,Engineering Drawing,Engineering Drawing - Complete Guide,Author 12,McGraw Hill,2th,978-93-100061,7,ME-1-2
+B00062,Diploma,Mechanical Engineering,FY,1,Thermodynamics,Thermodynamics - Complete Guide,Author 13,McGraw Hill,3th,978-93-100062,8,ME-1-3
+B00063,Diploma,Mechanical Engineering,FY,1,Fluid Mechanics,Fluid Mechanics - Complete Guide,Author 14,McGraw Hill,4th,978-93-100063,9,ME-1-4
+B00064,Diploma,Mechanical Engineering,FY,1,CAD/CAM,CAD/CAM - Complete Guide,Author 15,McGraw Hill,5th,978-93-100064,2,ME-1-5
+B00065,Diploma,Mechanical Engineering,FY,1,Manufacturing Technology,Manufacturing Technology - Complete Guide,Author 16,McGraw Hill,1th,978-93-100065,3,ME-1-6
+B00066,Diploma,Mechanical Engineering,FY,2,Engineering Drawing,Engineering Drawing - Complete Guide,Author 17,McGraw Hill,2th,978-93-100066,4,ME-1-7
+B00067,Diploma,Mechanical Engineering,FY,2,Thermodynamics,Thermodynamics - Complete Guide,Author 18,McGraw Hill,3th,978-93-100067,5,ME-1-8
+B00068,Diploma,Mechanical Engineering,FY,2,Fluid Mechanics,Fluid Mechanics - Complete Guide,Author 19,McGraw Hill,4th,978-93-100068,6,ME-1-9
+B00069,Diploma,Mechanical Engineering,FY,2,CAD/CAM,CAD/CAM - Complete Guide,Author 20,McGraw Hill,5th,978-93-100069,7,ME-1-10
+B00070,Diploma,Mechanical Engineering,FY,2,Manufacturing Technology,Manufacturing Technology - Complete Guide,Author 21,McGraw Hill,1th,978-93-100070,8,ME-1-11
+B00071,Diploma,Mechanical Engineering,SY,3,Engineering Drawing,Engineering Drawing - Complete Guide,Author 22,McGraw Hill,2th,978-93-100071,9,ME-2-12
+B00072,Diploma,Mechanical Engineering,SY,3,Thermodynamics,Thermodynamics - Complete Guide,Author 23,McGraw Hill,3th,978-93-100072,2,ME-2-13
+B00073,Diploma,Mechanical Engineering,SY,3,Fluid Mechanics,Fluid Mechanics - Complete Guide,Author 24,McGraw Hill,4th,978-93-100073,3,ME-2-14
+B00074,Diploma,Mechanical Engineering,SY,3,CAD/CAM,CAD/CAM - Complete Guide,Author 25,McGraw Hill,5th,978-93-100074,4,ME-2-15
+B00075,Diploma,Mechanical Engineering,SY,3,Manufacturing Technology,Manufacturing Technology - Complete Guide,Author 26,McGraw Hill,1th,978-93-100075,5,ME-2-16
+B00076,Diploma,Mechanical Engineering,SY,4,Engineering Drawing,Engineering Drawing - Complete Guide,Author 27,McGraw Hill,2th,978-93-100076,6,ME-2-17
+B00077,Diploma,Mechanical Engineering,SY,4,Thermodynamics,Thermodynamics - Complete Guide,Author 28,McGraw Hill,3th,978-93-100077,7,ME-2-18
+B00078,Diploma,Mechanical Engineering,SY,4,Fluid Mechanics,Fluid Mechanics - Complete Guide,Author 29,McGraw Hill,4th,978-93-100078,8,ME-2-19
+B00079,Diploma,Mechanical Engineering,SY,4,CAD/CAM,CAD/CAM - Complete Guide,Author 30,McGraw Hill,5th,978-93-100079,9,ME-2-20
+B00080,Diploma,Mechanical Engineering,SY,4,Manufacturing Technology,Manufacturing Technology - Complete Guide,Author 31,McGraw Hill,1th,978-93-100080,2,ME-2-1
+B00081,Diploma,Mechanical Engineering,TY,5,Engineering Drawing,Engineering Drawing - Complete Guide,Author 32,McGraw Hill,2th,978-93-100081,3,ME-3-2
+B00082,Diploma,Mechanical Engineering,TY,5,Thermodynamics,Thermodynamics - Complete Guide,Author 33,McGraw Hill,3th,978-93-100082,4,ME-3-3
+B00083,Diploma,Mechanical Engineering,TY,5,Fluid Mechanics,Fluid Mechanics - Complete Guide,Author 34,McGraw Hill,4th,978-93-100083,5,ME-3-4
+B00084,Diploma,Mechanical Engineering,TY,5,CAD/CAM,CAD/CAM - Complete Guide,Author 35,McGraw Hill,5th,978-93-100084,6,ME-3-5
+B00085,Diploma,Mechanical Engineering,TY,5,Manufacturing Technology,Manufacturing Technology - Complete Guide,Author 36,McGraw Hill,1th,978-93-100085,7,ME-3-6
+B00086,Diploma,Mechanical Engineering,TY,6,Engineering Drawing,Engineering Drawing - Complete Guide,Author 37,McGraw Hill,2th,978-93-100086,8,ME-3-7
+B00087,Diploma,Mechanical Engineering,TY,6,Thermodynamics,Thermodynamics - Complete Guide,Author 38,McGraw Hill,3th,978-93-100087,9,ME-3-8
+B00088,Diploma,Mechanical Engineering,TY,6,Fluid Mechanics,Fluid Mechanics - Complete Guide,Author 39,McGraw Hill,4th,978-93-100088,2,ME-3-9
+B00089,Diploma,Mechanical Engineering,TY,6,CAD/CAM,CAD/CAM - Complete Guide,Author 40,McGraw Hill,5th,978-93-100089,3,ME-3-10
+B00090,Diploma,Mechanical Engineering,TY,6,Manufacturing Technology,Manufacturing Technology - Complete Guide,Author 41,McGraw Hill,1th,978-93-100090,4,ME-3-11
+B00091,Diploma,Electrical Engineering,FY,1,Basic Electrical,Basic Electrical - Complete Guide,Author 42,McGraw Hill,2th,978-93-100091,5,EL-1-12
+B00092,Diploma,Electrical Engineering,FY,1,Electrical Machines,Electrical Machines - Complete Guide,Author 43,McGraw Hill,3th,978-93-100092,6,EL-1-13
+B00093,Diploma,Electrical Engineering,FY,1,Power Systems,Power Systems - Complete Guide,Author 44,McGraw Hill,4th,978-93-100093,7,EL-1-14
+B00094,Diploma,Electrical Engineering,FY,1,Control Systems,Control Systems - Complete Guide,Author 45,McGraw Hill,5th,978-93-100094,8,EL-1-15
+B00095,Diploma,Electrical Engineering,FY,1,Power Electronics,Power Electronics - Complete Guide,Author 46,McGraw Hill,1th,978-93-100095,9,EL-1-16
+B00096,Diploma,Electrical Engineering,FY,2,Basic Electrical,Basic Electrical - Complete Guide,Author 47,McGraw Hill,2th,978-93-100096,2,EL-1-17
+B00097,Diploma,Electrical Engineering,FY,2,Electrical Machines,Electrical Machines - Complete Guide,Author 48,McGraw Hill,3th,978-93-100097,3,EL-1-18
+B00098,Diploma,Electrical Engineering,FY,2,Power Systems,Power Systems - Complete Guide,Author 49,McGraw Hill,4th,978-93-100098,4,EL-1-19
+B00099,Diploma,Electrical Engineering,FY,2,Control Systems,Control Systems - Complete Guide,Author 50,McGraw Hill,5th,978-93-100099,5,EL-1-20
+B00100,Diploma,Electrical Engineering,FY,2,Power Electronics,Power Electronics - Complete Guide,Author 1,McGraw Hill,1th,978-93-100100,6,EL-1-1
+B00101,Diploma,Electrical Engineering,SY,3,Basic Electrical,Basic Electrical - Complete Guide,Author 2,McGraw Hill,2th,978-93-100101,7,EL-2-2
+B00102,Diploma,Electrical Engineering,SY,3,Electrical Machines,Electrical Machines - Complete Guide,Author 3,McGraw Hill,3th,978-93-100102,8,EL-2-3
+B00103,Diploma,Electrical Engineering,SY,3,Power Systems,Power Systems - Complete Guide,Author 4,McGraw Hill,4th,978-93-100103,9,EL-2-4
+B00104,Diploma,Electrical Engineering,SY,3,Control Systems,Control Systems - Complete Guide,Author 5,McGraw Hill,5th,978-93-100104,2,EL-2-5
+B00105,Diploma,Electrical Engineering,SY,3,Power Electronics,Power Electronics - Complete Guide,Author 6,McGraw Hill,1th,978-93-100105,3,EL-2-6
+B00106,Diploma,Electrical Engineering,SY,4,Basic Electrical,Basic Electrical - Complete Guide,Author 7,McGraw Hill,2th,978-93-100106,4,EL-2-7
+B00107,Diploma,Electrical Engineering,SY,4,Electrical Machines,Electrical Machines - Complete Guide,Author 8,McGraw Hill,3th,978-93-100107,5,EL-2-8
+B00108,Diploma,Electrical Engineering,SY,4,Power Systems,Power Systems - Complete Guide,Author 9,McGraw Hill,4th,978-93-100108,6,EL-2-9
+B00109,Diploma,Electrical Engineering,SY,4,Control Systems,Control Systems - Complete Guide,Author 10,McGraw Hill,5th,978-93-100109,7,EL-2-10
+B00110,Diploma,Electrical Engineering,SY,4,Power Electronics,Power Electronics - Complete Guide,Author 11,McGraw Hill,1th,978-93-100110,8,EL-2-11
+B00111,Diploma,Electrical Engineering,TY,5,Basic Electrical,Basic Electrical - Complete Guide,Author 12,McGraw Hill,2th,978-93-100111,9,EL-3-12
+B00112,Diploma,Electrical Engineering,TY,5,Electrical Machines,Electrical Machines - Complete Guide,Author 13,McGraw Hill,3th,978-93-100112,2,EL-3-13
+B00113,Diploma,Electrical Engineering,TY,5,Power Systems,Power Systems - Complete Guide,Author 14,McGraw Hill,4th,978-93-100113,3,EL-3-14
+B00114,Diploma,Electrical Engineering,TY,5,Control Systems,Control Systems - Complete Guide,Author 15,McGraw Hill,5th,978-93-100114,4,EL-3-15
+B00115,Diploma,Electrical Engineering,TY,5,Power Electronics,Power Electronics - Complete Guide,Author 16,McGraw Hill,1th,978-93-100115,5,EL-3-16
+B00116,Diploma,Electrical Engineering,TY,6,Basic Electrical,Basic Electrical - Complete Guide,Author 17,McGraw Hill,2th,978-93-100116,6,EL-3-17
+B00117,Diploma,Electrical Engineering,TY,6,Electrical Machines,Electrical Machines - Complete Guide,Author 18,McGraw Hill,3th,978-93-100117,7,EL-3-18
+B00118,Diploma,Electrical Engineering,TY,6,Power Systems,Power Systems - Complete Guide,Author 19,McGraw Hill,4th,978-93-100118,8,EL-3-19
+B00119,Diploma,Electrical Engineering,TY,6,Control Systems,Control Systems - Complete Guide,Author 20,McGraw Hill,5th,978-93-100119,9,EL-3-20
+B00120,Diploma,Electrical Engineering,TY,6,Power Electronics,Power Electronics - Complete Guide,Author 21,McGraw Hill,1th,978-93-100120,2,EL-3-1
+B00121,Diploma,Information Technology,FY,1,Web Development,Web Development - Complete Guide,Author 22,McGraw Hill,2th,978-93-100121,3,IN-1-2
+B00122,Diploma,Information Technology,FY,1,Cloud Computing,Cloud Computing - Complete Guide,Author 23,McGraw Hill,3th,978-93-100122,4,IN-1-3
+B00123,Diploma,Information Technology,FY,1,Cyber Security,Cyber Security - Complete Guide,Author 24,McGraw Hill,4th,978-93-100123,5,IN-1-4
+B00124,Diploma,Information Technology,FY,1,Java Programming,Java Programming - Complete Guide,Author 25,McGraw Hill,5th,978-93-100124,6,IN-1-5
+B00125,Diploma,Information Technology,FY,1,Software Engineering,Software Engineering - Complete Guide,Author 26,McGraw Hill,1th,978-93-100125,7,IN-1-6
+B00126,Diploma,Information Technology,FY,2,Web Development,Web Development - Complete Guide,Author 27,McGraw Hill,2th,978-93-100126,8,IN-1-7
+B00127,Diploma,Information Technology,FY,2,Cloud Computing,Cloud Computing - Complete Guide,Author 28,McGraw Hill,3th,978-93-100127,9,IN-1-8
+B00128,Diploma,Information Technology,FY,2,Cyber Security,Cyber Security - Complete Guide,Author 29,McGraw Hill,4th,978-93-100128,2,IN-1-9
+B00129,Diploma,Information Technology,FY,2,Java Programming,Java Programming - Complete Guide,Author 30,McGraw Hill,5th,978-93-100129,3,IN-1-10
+B00130,Diploma,Information Technology,FY,2,Software Engineering,Software Engineering - Complete Guide,Author 31,McGraw Hill,1th,978-93-100130,4,IN-1-11
+B00131,Diploma,Information Technology,SY,3,Web Development,Web Development - Complete Guide,Author 32,McGraw Hill,2th,978-93-100131,5,IN-2-12
+B00132,Diploma,Information Technology,SY,3,Cloud Computing,Cloud Computing - Complete Guide,Author 33,McGraw Hill,3th,978-93-100132,6,IN-2-13
+B00133,Diploma,Information Technology,SY,3,Cyber Security,Cyber Security - Complete Guide,Author 34,McGraw Hill,4th,978-93-100133,7,IN-2-14
+B00134,Diploma,Information Technology,SY,3,Java Programming,Java Programming - Complete Guide,Author 35,McGraw Hill,5th,978-93-100134,8,IN-2-15
+B00135,Diploma,Information Technology,SY,3,Software Engineering,Software Engineering - Complete Guide,Author 36,McGraw Hill,1th,978-93-100135,9,IN-2-16
+B00136,Diploma,Information Technology,SY,4,Web Development,Web Development - Complete Guide,Author 37,McGraw Hill,2th,978-93-100136,2,IN-2-17
+B00137,Diploma,Information Technology,SY,4,Cloud Computing,Cloud Computing - Complete Guide,Author 38,McGraw Hill,3th,978-93-100137,3,IN-2-18
+B00138,Diploma,Information Technology,SY,4,Cyber Security,Cyber Security - Complete Guide,Author 39,McGraw Hill,4th,978-93-100138,4,IN-2-19
+B00139,Diploma,Information Technology,SY,4,Java Programming,Java Programming - Complete Guide,Author 40,McGraw Hill,5th,978-93-100139,5,IN-2-20
+B00140,Diploma,Information Technology,SY,4,Software Engineering,Software Engineering - Complete Guide,Author 41,McGraw Hill,1th,978-93-100140,6,IN-2-1
+B00141,Diploma,Information Technology,TY,5,Web Development,Web Development - Complete Guide,Author 42,McGraw Hill,2th,978-93-100141,7,IN-3-2
+B00142,Diploma,Information Technology,TY,5,Cloud Computing,Cloud Computing - Complete Guide,Author 43,McGraw Hill,3th,978-93-100142,8,IN-3-3
+B00143,Diploma,Information Technology,TY,5,Cyber Security,Cyber Security - Complete Guide,Author 44,McGraw Hill,4th,978-93-100143,9,IN-3-4
+B00144,Diploma,Information Technology,TY,5,Java Programming,Java Programming - Complete Guide,Author 45,McGraw Hill,5th,978-93-100144,2,IN-3-5
+B00145,Diploma,Information Technology,TY,5,Software Engineering,Software Engineering - Complete Guide,Author 46,McGraw Hill,1th,978-93-100145,3,IN-3-6
+B00146,Diploma,Information Technology,TY,6,Web Development,Web Development - Complete Guide,Author 47,McGraw Hill,2th,978-93-100146,4,IN-3-7
+B00147,Diploma,Information Technology,TY,6,Cloud Computing,Cloud Computing - Complete Guide,Author 48,McGraw Hill,3th,978-93-100147,5,IN-3-8
+B00148,Diploma,Information Technology,TY,6,Cyber Security,Cyber Security - Complete Guide,Author 49,McGraw Hill,4th,978-93-100148,6,IN-3-9
+B00149,Diploma,Information Technology,TY,6,Java Programming,Java Programming - Complete Guide,Author 50,McGraw Hill,5th,978-93-100149,7,IN-3-10
+B00150,Diploma,Information Technology,TY,6,Software Engineering,Software Engineering - Complete Guide,Author 1,McGraw Hill,1th,978-93-100150,8,IN-3-11
+B00151,Diploma,Electronics & Communication,FY,1,Digital Electronics,Digital Electronics - Complete Guide,Author 2,McGraw Hill,2th,978-93-100151,9,EL-1-12
+B00152,Diploma,Electronics & Communication,FY,1,Microprocessors,Microprocessors - Complete Guide,Author 3,McGraw Hill,3th,978-93-100152,2,EL-1-13
+B00153,Diploma,Electronics & Communication,FY,1,Communication Systems,Communication Systems - Complete Guide,Author 4,McGraw Hill,4th,978-93-100153,3,EL-1-14
+B00154,Diploma,Electronics & Communication,FY,1,VLSI,VLSI - Complete Guide,Author 5,McGraw Hill,5th,978-93-100154,4,EL-1-15
+B00155,Diploma,Electronics & Communication,FY,1,Embedded Systems,Embedded Systems - Complete Guide,Author 6,McGraw Hill,1th,978-93-100155,5,EL-1-16
+B00156,Diploma,Electronics & Communication,FY,2,Digital Electronics,Digital Electronics - Complete Guide,Author 7,McGraw Hill,2th,978-93-100156,6,EL-1-17
+B00157,Diploma,Electronics & Communication,FY,2,Microprocessors,Microprocessors - Complete Guide,Author 8,McGraw Hill,3th,978-93-100157,7,EL-1-18
+B00158,Diploma,Electronics & Communication,FY,2,Communication Systems,Communication Systems - Complete Guide,Author 9,McGraw Hill,4th,978-93-100158,8,EL-1-19
+B00159,Diploma,Electronics & Communication,FY,2,VLSI,VLSI - Complete Guide,Author 10,McGraw Hill,5th,978-93-100159,9,EL-1-20
+B00160,Diploma,Electronics & Communication,FY,2,Embedded Systems,Embedded Systems - Complete Guide,Author 11,McGraw Hill,1th,978-93-100160,2,EL-1-1
+B00161,Diploma,Electronics & Communication,SY,3,Digital Electronics,Digital Electronics - Complete Guide,Author 12,McGraw Hill,2th,978-93-100161,3,EL-2-2
+B00162,Diploma,Electronics & Communication,SY,3,Microprocessors,Microprocessors - Complete Guide,Author 13,McGraw Hill,3th,978-93-100162,4,EL-2-3
+B00163,Diploma,Electronics & Communication,SY,3,Communication Systems,Communication Systems - Complete Guide,Author 14,McGraw Hill,4th,978-93-100163,5,EL-2-4
+B00164,Diploma,Electronics & Communication,SY,3,VLSI,VLSI - Complete Guide,Author 15,McGraw Hill,5th,978-93-100164,6,EL-2-5
+B00165,Diploma,Electronics & Communication,SY,3,Embedded Systems,Embedded Systems - Complete Guide,Author 16,McGraw Hill,1th,978-93-100165,7,EL-2-6
+B00166,Diploma,Electronics & Communication,SY,4,Digital Electronics,Digital Electronics - Complete Guide,Author 17,McGraw Hill,2th,978-93-100166,8,EL-2-7
+B00167,Diploma,Electronics & Communication,SY,4,Microprocessors,Microprocessors - Complete Guide,Author 18,McGraw Hill,3th,978-93-100167,9,EL-2-8
+B00168,Diploma,Electronics & Communication,SY,4,Communication Systems,Communication Systems - Complete Guide,Author 19,McGraw Hill,4th,978-93-100168,2,EL-2-9
+B00169,Diploma,Electronics & Communication,SY,4,VLSI,VLSI - Complete Guide,Author 20,McGraw Hill,5th,978-93-100169,3,EL-2-10
+B00170,Diploma,Electronics & Communication,SY,4,Embedded Systems,Embedded Systems - Complete Guide,Author 21,McGraw Hill,1th,978-93-100170,4,EL-2-11
+B00171,Diploma,Electronics & Communication,TY,5,Digital Electronics,Digital Electronics - Complete Guide,Author 22,McGraw Hill,2th,978-93-100171,5,EL-3-12
+B00172,Diploma,Electronics & Communication,TY,5,Microprocessors,Microprocessors - Complete Guide,Author 23,McGraw Hill,3th,978-93-100172,6,EL-3-13
+B00173,Diploma,Electronics & Communication,TY,5,Communication Systems,Communication Systems - Complete Guide,Author 24,McGraw Hill,4th,978-93-100173,7,EL-3-14
+B00174,Diploma,Electronics & Communication,TY,5,VLSI,VLSI - Complete Guide,Author 25,McGraw Hill,5th,978-93-100174,8,EL-3-15
+B00175,Diploma,Electronics & Communication,TY,5,Embedded Systems,Embedded Systems - Complete Guide,Author 26,McGraw Hill,1th,978-93-100175,9,EL-3-16
+B00176,Diploma,Electronics & Communication,TY,6,Digital Electronics,Digital Electronics - Complete Guide,Author 27,McGraw Hill,2th,978-93-100176,2,EL-3-17
+B00177,Diploma,Electronics & Communication,TY,6,Microprocessors,Microprocessors - Complete Guide,Author 28,McGraw Hill,3th,978-93-100177,3,EL-3-18
+B00178,Diploma,Electronics & Communication,TY,6,Communication Systems,Communication Systems - Complete Guide,Author 29,McGraw Hill,4th,978-93-100178,4,EL-3-19
+B00179,Diploma,Electronics & Communication,TY,6,VLSI,VLSI - Complete Guide,Author 30,McGraw Hill,5th,978-93-100179,5,EL-3-20
+B00180,Diploma,Electronics & Communication,TY,6,Embedded Systems,Embedded Systems - Complete Guide,Author 31,McGraw Hill,1th,978-93-100180,6,EL-3-1
+B00181,Diploma,Automobile Engineering,FY,1,Automobile Engineering,Automobile Engineering - Complete Guide,Author 32,McGraw Hill,2th,978-93-100181,7,AU-1-2
+B00182,Diploma,Automobile Engineering,FY,1,Vehicle Dynamics,Vehicle Dynamics - Complete Guide,Author 33,McGraw Hill,3th,978-93-100182,8,AU-1-3
+B00183,Diploma,Automobile Engineering,FY,1,Automobile Engines,Automobile Engines - Complete Guide,Author 34,McGraw Hill,4th,978-93-100183,9,AU-1-4
+B00184,Diploma,Automobile Engineering,FY,1,Auto CAD,Auto CAD - Complete Guide,Author 35,McGraw Hill,5th,978-93-100184,2,AU-1-5
+B00185,Diploma,Automobile Engineering,FY,1,Maintenance,Maintenance - Complete Guide,Author 36,McGraw Hill,1th,978-93-100185,3,AU-1-6
+B00186,Diploma,Automobile Engineering,FY,2,Automobile Engineering,Automobile Engineering - Complete Guide,Author 37,McGraw Hill,2th,978-93-100186,4,AU-1-7
+B00187,Diploma,Automobile Engineering,FY,2,Vehicle Dynamics,Vehicle Dynamics - Complete Guide,Author 38,McGraw Hill,3th,978-93-100187,5,AU-1-8
+B00188,Diploma,Automobile Engineering,FY,2,Automobile Engines,Automobile Engines - Complete Guide,Author 39,McGraw Hill,4th,978-93-100188,6,AU-1-9
+B00189,Diploma,Automobile Engineering,FY,2,Auto CAD,Auto CAD - Complete Guide,Author 40,McGraw Hill,5th,978-93-100189,7,AU-1-10
+B00190,Diploma,Automobile Engineering,FY,2,Maintenance,Maintenance - Complete Guide,Author 41,McGraw Hill,1th,978-93-100190,8,AU-1-11
+B00191,Diploma,Automobile Engineering,SY,3,Automobile Engineering,Automobile Engineering - Complete Guide,Author 42,McGraw Hill,2th,978-93-100191,9,AU-2-12
+B00192,Diploma,Automobile Engineering,SY,3,Vehicle Dynamics,Vehicle Dynamics - Complete Guide,Author 43,McGraw Hill,3th,978-93-100192,2,AU-2-13
+B00193,Diploma,Automobile Engineering,SY,3,Automobile Engines,Automobile Engines - Complete Guide,Author 44,McGraw Hill,4th,978-93-100193,3,AU-2-14
+B00194,Diploma,Automobile Engineering,SY,3,Auto CAD,Auto CAD - Complete Guide,Author 45,McGraw Hill,5th,978-93-100194,4,AU-2-15
+B00195,Diploma,Automobile Engineering,SY,3,Maintenance,Maintenance - Complete Guide,Author 46,McGraw Hill,1th,978-93-100195,5,AU-2-16
+B00196,Diploma,Automobile Engineering,SY,4,Automobile Engineering,Automobile Engineering - Complete Guide,Author 47,McGraw Hill,2th,978-93-100196,6,AU-2-17
+B00197,Diploma,Automobile Engineering,SY,4,Vehicle Dynamics,Vehicle Dynamics - Complete Guide,Author 48,McGraw Hill,3th,978-93-100197,7,AU-2-18
+B00198,Diploma,Automobile Engineering,SY,4,Automobile Engines,Automobile Engines - Complete Guide,Author 49,McGraw Hill,4th,978-93-100198,8,AU-2-19
+B00199,Diploma,Automobile Engineering,SY,4,Auto CAD,Auto CAD - Complete Guide,Author 50,McGraw Hill,5th,978-93-100199,9,AU-2-20
+B00200,Diploma,Automobile Engineering,SY,4,Maintenance,Maintenance - Complete Guide,Author 1,McGraw Hill,1th,978-93-100200,2,AU-2-1
+B00201,Diploma,Automobile Engineering,TY,5,Automobile Engineering,Automobile Engineering - Complete Guide,Author 2,McGraw Hill,2th,978-93-100201,3,AU-3-2
+B00202,Diploma,Automobile Engineering,TY,5,Vehicle Dynamics,Vehicle Dynamics - Complete Guide,Author 3,McGraw Hill,3th,978-93-100202,4,AU-3-3
+B00203,Diploma,Automobile Engineering,TY,5,Automobile Engines,Automobile Engines - Complete Guide,Author 4,McGraw Hill,4th,978-93-100203,5,AU-3-4
+B00204,Diploma,Automobile Engineering,TY,5,Auto CAD,Auto CAD - Complete Guide,Author 5,McGraw Hill,5th,978-93-100204,6,AU-3-5
+B00205,Diploma,Automobile Engineering,TY,5,Maintenance,Maintenance - Complete Guide,Author 6,McGraw Hill,1th,978-93-100205,7,AU-3-6
+B00206,Diploma,Automobile Engineering,TY,6,Automobile Engineering,Automobile Engineering - Complete Guide,Author 7,McGraw Hill,2th,978-93-100206,8,AU-3-7
+B00207,Diploma,Automobile Engineering,TY,6,Vehicle Dynamics,Vehicle Dynamics - Complete Guide,Author 8,McGraw Hill,3th,978-93-100207,9,AU-3-8
+B00208,Diploma,Automobile Engineering,TY,6,Automobile Engines,Automobile Engines - Complete Guide,Author 9,McGraw Hill,4th,978-93-100208,2,AU-3-9
+B00209,Diploma,Automobile Engineering,TY,6,Auto CAD,Auto CAD - Complete Guide,Author 10,McGraw Hill,5th,978-93-100209,3,AU-3-10
+B00210,Diploma,Automobile Engineering,TY,6,Maintenance,Maintenance - Complete Guide,Author 11,McGraw Hill,1th,978-93-100210,4,AU-3-11
+B00211,BE,Computer Engineering,FY,1,Programming Fundamentals,Programming Fundamentals - Complete Guide,Author 12,McGraw Hill,2th,978-93-100211,5,CO-1-12
+B00212,BE,Computer Engineering,FY,1,Python Programming,Python Programming - Complete Guide,Author 13,McGraw Hill,3th,978-93-100212,6,CO-1-13
+B00213,BE,Computer Engineering,FY,1,Data Structures,Data Structures - Complete Guide,Author 14,McGraw Hill,4th,978-93-100213,7,CO-1-14
+B00214,BE,Computer Engineering,FY,1,DBMS,DBMS - Complete Guide,Author 15,McGraw Hill,5th,978-93-100214,8,CO-1-15
+B00215,BE,Computer Engineering,FY,1,Computer Networks,Computer Networks - Complete Guide,Author 16,McGraw Hill,1th,978-93-100215,9,CO-1-16
+B00216,BE,Computer Engineering,FY,2,Programming Fundamentals,Programming Fundamentals - Complete Guide,Author 17,McGraw Hill,2th,978-93-100216,2,CO-1-17
+B00217,BE,Computer Engineering,FY,2,Python Programming,Python Programming - Complete Guide,Author 18,McGraw Hill,3th,978-93-100217,3,CO-1-18
+B00218,BE,Computer Engineering,FY,2,Data Structures,Data Structures - Complete Guide,Author 19,McGraw Hill,4th,978-93-100218,4,CO-1-19
+B00219,BE,Computer Engineering,FY,2,DBMS,DBMS - Complete Guide,Author 20,McGraw Hill,5th,978-93-100219,5,CO-1-20
+B00220,BE,Computer Engineering,FY,2,Computer Networks,Computer Networks - Complete Guide,Author 21,McGraw Hill,1th,978-93-100220,6,CO-1-1
+B00221,BE,Computer Engineering,SY,3,Programming Fundamentals,Programming Fundamentals - Complete Guide,Author 22,McGraw Hill,2th,978-93-100221,7,CO-2-2
+B00222,BE,Computer Engineering,SY,3,Python Programming,Python Programming - Complete Guide,Author 23,McGraw Hill,3th,978-93-100222,8,CO-2-3
+B00223,BE,Computer Engineering,SY,3,Data Structures,Data Structures - Complete Guide,Author 24,McGraw Hill,4th,978-93-100223,9,CO-2-4
+B00224,BE,Computer Engineering,SY,3,DBMS,DBMS - Complete Guide,Author 25,McGraw Hill,5th,978-93-100224,2,CO-2-5
+B00225,BE,Computer Engineering,SY,3,Computer Networks,Computer Networks - Complete Guide,Author 26,McGraw Hill,1th,978-93-100225,3,CO-2-6
+B00226,BE,Computer Engineering,SY,4,Programming Fundamentals,Programming Fundamentals - Complete Guide,Author 27,McGraw Hill,2th,978-93-100226,4,CO-2-7
+B00227,BE,Computer Engineering,SY,4,Python Programming,Python Programming - Complete Guide,Author 28,McGraw Hill,3th,978-93-100227,5,CO-2-8
+B00228,BE,Computer Engineering,SY,4,Data Structures,Data Structures - Complete Guide,Author 29,McGraw Hill,4th,978-93-100228,6,CO-2-9
+B00229,BE,Computer Engineering,SY,4,DBMS,DBMS - Complete Guide,Author 30,McGraw Hill,5th,978-93-100229,7,CO-2-10
+B00230,BE,Computer Engineering,SY,4,Computer Networks,Computer Networks - Complete Guide,Author 31,McGraw Hill,1th,978-93-100230,8,CO-2-11
+B00231,BE,Computer Engineering,TY,5,Programming Fundamentals,Programming Fundamentals - Complete Guide,Author 32,McGraw Hill,2th,978-93-100231,9,CO-3-12
+B00232,BE,Computer Engineering,TY,5,Python Programming,Python Programming - Complete Guide,Author 33,McGraw Hill,3th,978-93-100232,2,CO-3-13
+B00233,BE,Computer Engineering,TY,5,Data Structures,Data Structures - Complete Guide,Author 34,McGraw Hill,4th,978-93-100233,3,CO-3-14
+B00234,BE,Computer Engineering,TY,5,DBMS,DBMS - Complete Guide,Author 35,McGraw Hill,5th,978-93-100234,4,CO-3-15
+B00235,BE,Computer Engineering,TY,5,Computer Networks,Computer Networks - Complete Guide,Author 36,McGraw Hill,1th,978-93-100235,5,CO-3-16
+B00236,BE,Computer Engineering,TY,6,Programming Fundamentals,Programming Fundamentals - Complete Guide,Author 37,McGraw Hill,2th,978-93-100236,6,CO-3-17
+B00237,BE,Computer Engineering,TY,6,Python Programming,Python Programming - Complete Guide,Author 38,McGraw Hill,3th,978-93-100237,7,CO-3-18
+B00238,BE,Computer Engineering,TY,6,Data Structures,Data Structures - Complete Guide,Author 39,McGraw Hill,4th,978-93-100238,8,CO-3-19
+B00239,BE,Computer Engineering,TY,6,DBMS,DBMS - Complete Guide,Author 40,McGraw Hill,5th,978-93-100239,9,CO-3-20
+B00240,BE,Computer Engineering,TY,6,Computer Networks,Computer Networks - Complete Guide,Author 41,McGraw Hill,1th,978-93-100240,2,CO-3-1
+B00241,BE,Computer Engineering,LY,7,Programming Fundamentals,Programming Fundamentals - Complete Guide,Author 42,McGraw Hill,2th,978-93-100241,3,CO-4-2
+B00242,BE,Computer Engineering,LY,7,Python Programming,Python Programming - Complete Guide,Author 43,McGraw Hill,3th,978-93-100242,4,CO-4-3
+B00243,BE,Computer Engineering,LY,7,Data Structures,Data Structures - Complete Guide,Author 44,McGraw Hill,4th,978-93-100243,5,CO-4-4
+B00244,BE,Computer Engineering,LY,7,DBMS,DBMS - Complete Guide,Author 45,McGraw Hill,5th,978-93-100244,6,CO-4-5
+B00245,BE,Computer Engineering,LY,7,Computer Networks,Computer Networks - Complete Guide,Author 46,McGraw Hill,1th,978-93-100245,7,CO-4-6
+B00246,BE,Computer Engineering,LY,8,Programming Fundamentals,Programming Fundamentals - Complete Guide,Author 47,McGraw Hill,2th,978-93-100246,8,CO-4-7
+B00247,BE,Computer Engineering,LY,8,Python Programming,Python Programming - Complete Guide,Author 48,McGraw Hill,3th,978-93-100247,9,CO-4-8
+B00248,BE,Computer Engineering,LY,8,Data Structures,Data Structures - Complete Guide,Author 49,McGraw Hill,4th,978-93-100248,2,CO-4-9
+B00249,BE,Computer Engineering,LY,8,DBMS,DBMS - Complete Guide,Author 50,McGraw Hill,5th,978-93-100249,3,CO-4-10
+B00250,BE,Computer Engineering,LY,8,Computer Networks,Computer Networks - Complete Guide,Author 1,McGraw Hill,1th,978-93-100250,4,CO-4-11
+B00251,BE,Information Technology,FY,1,Web Development,Web Development - Complete Guide,Author 2,McGraw Hill,2th,978-93-100251,5,IN-1-12
+B00252,BE,Information Technology,FY,1,Cloud Computing,Cloud Computing - Complete Guide,Author 3,McGraw Hill,3th,978-93-100252,6,IN-1-13
+B00253,BE,Information Technology,FY,1,Cyber Security,Cyber Security - Complete Guide,Author 4,McGraw Hill,4th,978-93-100253,7,IN-1-14
+B00254,BE,Information Technology,FY,1,Java Programming,Java Programming - Complete Guide,Author 5,McGraw Hill,5th,978-93-100254,8,IN-1-15
+B00255,BE,Information Technology,FY,1,Software Engineering,Software Engineering - Complete Guide,Author 6,McGraw Hill,1th,978-93-100255,9,IN-1-16
+B00256,BE,Information Technology,FY,2,Web Development,Web Development - Complete Guide,Author 7,McGraw Hill,2th,978-93-100256,2,IN-1-17
+B00257,BE,Information Technology,FY,2,Cloud Computing,Cloud Computing - Complete Guide,Author 8,McGraw Hill,3th,978-93-100257,3,IN-1-18
+B00258,BE,Information Technology,FY,2,Cyber Security,Cyber Security - Complete Guide,Author 9,McGraw Hill,4th,978-93-100258,4,IN-1-19
+B00259,BE,Information Technology,FY,2,Java Programming,Java Programming - Complete Guide,Author 10,McGraw Hill,5th,978-93-100259,5,IN-1-20
+B00260,BE,Information Technology,FY,2,Software Engineering,Software Engineering - Complete Guide,Author 11,McGraw Hill,1th,978-93-100260,6,IN-1-1
+B00261,BE,Information Technology,SY,3,Web Development,Web Development - Complete Guide,Author 12,McGraw Hill,2th,978-93-100261,7,IN-2-2
+B00262,BE,Information Technology,SY,3,Cloud Computing,Cloud Computing - Complete Guide,Author 13,McGraw Hill,3th,978-93-100262,8,IN-2-3
+B00263,BE,Information Technology,SY,3,Cyber Security,Cyber Security - Complete Guide,Author 14,McGraw Hill,4th,978-93-100263,9,IN-2-4
+B00264,BE,Information Technology,SY,3,Java Programming,Java Programming - Complete Guide,Author 15,McGraw Hill,5th,978-93-100264,2,IN-2-5
+B00265,BE,Information Technology,SY,3,Software Engineering,Software Engineering - Complete Guide,Author 16,McGraw Hill,1th,978-93-100265,3,IN-2-6
+B00266,BE,Information Technology,SY,4,Web Development,Web Development - Complete Guide,Author 17,McGraw Hill,2th,978-93-100266,4,IN-2-7
+B00267,BE,Information Technology,SY,4,Cloud Computing,Cloud Computing - Complete Guide,Author 18,McGraw Hill,3th,978-93-100267,5,IN-2-8
+B00268,BE,Information Technology,SY,4,Cyber Security,Cyber Security - Complete Guide,Author 19,McGraw Hill,4th,978-93-100268,6,IN-2-9
+B00269,BE,Information Technology,SY,4,Java Programming,Java Programming - Complete Guide,Author 20,McGraw Hill,5th,978-93-100269,7,IN-2-10
+B00270,BE,Information Technology,SY,4,Software Engineering,Software Engineering - Complete Guide,Author 21,McGraw Hill,1th,978-93-100270,8,IN-2-11
+B00271,BE,Information Technology,TY,5,Web Development,Web Development - Complete Guide,Author 22,McGraw Hill,2th,978-93-100271,9,IN-3-12
+B00272,BE,Information Technology,TY,5,Cloud Computing,Cloud Computing - Complete Guide,Author 23,McGraw Hill,3th,978-93-100272,2,IN-3-13
+B00273,BE,Information Technology,TY,5,Cyber Security,Cyber Security - Complete Guide,Author 24,McGraw Hill,4th,978-93-100273,3,IN-3-14
+B00274,BE,Information Technology,TY,5,Java Programming,Java Programming - Complete Guide,Author 25,McGraw Hill,5th,978-93-100274,4,IN-3-15
+B00275,BE,Information Technology,TY,5,Software Engineering,Software Engineering - Complete Guide,Author 26,McGraw Hill,1th,978-93-100275,5,IN-3-16
+B00276,BE,Information Technology,TY,6,Web Development,Web Development - Complete Guide,Author 27,McGraw Hill,2th,978-93-100276,6,IN-3-17
+B00277,BE,Information Technology,TY,6,Cloud Computing,Cloud Computing - Complete Guide,Author 28,McGraw Hill,3th,978-93-100277,7,IN-3-18
+B00278,BE,Information Technology,TY,6,Cyber Security,Cyber Security - Complete Guide,Author 29,McGraw Hill,4th,978-93-100278,8,IN-3-19
+B00279,BE,Information Technology,TY,6,Java Programming,Java Programming - Complete Guide,Author 30,McGraw Hill,5th,978-93-100279,9,IN-3-20
+B00280,BE,Information Technology,TY,6,Software Engineering,Software Engineering - Complete Guide,Author 31,McGraw Hill,1th,978-93-100280,2,IN-3-1
+B00281,BE,Information Technology,LY,7,Web Development,Web Development - Complete Guide,Author 32,McGraw Hill,2th,978-93-100281,3,IN-4-2
+B00282,BE,Information Technology,LY,7,Cloud Computing,Cloud Computing - Complete Guide,Author 33,McGraw Hill,3th,978-93-100282,4,IN-4-3
+B00283,BE,Information Technology,LY,7,Cyber Security,Cyber Security - Complete Guide,Author 34,McGraw Hill,4th,978-93-100283,5,IN-4-4
+B00284,BE,Information Technology,LY,7,Java Programming,Java Programming - Complete Guide,Author 35,McGraw Hill,5th,978-93-100284,6,IN-4-5
+B00285,BE,Information Technology,LY,7,Software Engineering,Software Engineering - Complete Guide,Author 36,McGraw Hill,1th,978-93-100285,7,IN-4-6
+B00286,BE,Information Technology,LY,8,Web Development,Web Development - Complete Guide,Author 37,McGraw Hill,2th,978-93-100286,8,IN-4-7
+B00287,BE,Information Technology,LY,8,Cloud Computing,Cloud Computing - Complete Guide,Author 38,McGraw Hill,3th,978-93-100287,9,IN-4-8
+B00288,BE,Information Technology,LY,8,Cyber Security,Cyber Security - Complete Guide,Author 39,McGraw Hill,4th,978-93-100288,2,IN-4-9
+B00289,BE,Information Technology,LY,8,Java Programming,Java Programming - Complete Guide,Author 40,McGraw Hill,5th,978-93-100289,3,IN-4-10
+B00290,BE,Information Technology,LY,8,Software Engineering,Software Engineering - Complete Guide,Author 41,McGraw Hill,1th,978-93-100290,4,IN-4-11
+B00291,BE,Civil Engineering,FY,1,Engineering Mechanics,Engineering Mechanics - Complete Guide,Author 42,McGraw Hill,2th,978-93-100291,5,CI-1-12
+B00292,BE,Civil Engineering,FY,1,Surveying,Surveying - Complete Guide,Author 43,McGraw Hill,3th,978-93-100292,6,CI-1-13
+B00293,BE,Civil Engineering,FY,1,Concrete Technology,Concrete Technology - Complete Guide,Author 44,McGraw Hill,4th,978-93-100293,7,CI-1-14
+B00294,BE,Civil Engineering,FY,1,Transportation Engineering,Transportation Engineering - Complete Guide,Author 45,McGraw Hill,5th,978-93-100294,8,CI-1-15
+B00295,BE,Civil Engineering,FY,1,Structural Analysis,Structural Analysis - Complete Guide,Author 46,McGraw Hill,1th,978-93-100295,9,CI-1-16
+B00296,BE,Civil Engineering,FY,2,Engineering Mechanics,Engineering Mechanics - Complete Guide,Author 47,McGraw Hill,2th,978-93-100296,2,CI-1-17
+B00297,BE,Civil Engineering,FY,2,Surveying,Surveying - Complete Guide,Author 48,McGraw Hill,3th,978-93-100297,3,CI-1-18
+B00298,BE,Civil Engineering,FY,2,Concrete Technology,Concrete Technology - Complete Guide,Author 49,McGraw Hill,4th,978-93-100298,4,CI-1-19
+B00299,BE,Civil Engineering,FY,2,Transportation Engineering,Transportation Engineering - Complete Guide,Author 50,McGraw Hill,5th,978-93-100299,5,CI-1-20
+B00300,BE,Civil Engineering,FY,2,Structural Analysis,Structural Analysis - Complete Guide,Author 1,McGraw Hill,1th,978-93-100300,6,CI-1-1
+B00301,BE,Civil Engineering,SY,3,Engineering Mechanics,Engineering Mechanics - Complete Guide,Author 2,McGraw Hill,2th,978-93-100301,7,CI-2-2
+B00302,BE,Civil Engineering,SY,3,Surveying,Surveying - Complete Guide,Author 3,McGraw Hill,3th,978-93-100302,8,CI-2-3
+B00303,BE,Civil Engineering,SY,3,Concrete Technology,Concrete Technology - Complete Guide,Author 4,McGraw Hill,4th,978-93-100303,9,CI-2-4
+B00304,BE,Civil Engineering,SY,3,Transportation Engineering,Transportation Engineering - Complete Guide,Author 5,McGraw Hill,5th,978-93-100304,2,CI-2-5
+B00305,BE,Civil Engineering,SY,3,Structural Analysis,Structural Analysis - Complete Guide,Author 6,McGraw Hill,1th,978-93-100305,3,CI-2-6
+B00306,BE,Civil Engineering,SY,4,Engineering Mechanics,Engineering Mechanics - Complete Guide,Author 7,McGraw Hill,2th,978-93-100306,4,CI-2-7
+B00307,BE,Civil Engineering,SY,4,Surveying,Surveying - Complete Guide,Author 8,McGraw Hill,3th,978-93-100307,5,CI-2-8
+B00308,BE,Civil Engineering,SY,4,Concrete Technology,Concrete Technology - Complete Guide,Author 9,McGraw Hill,4th,978-93-100308,6,CI-2-9
+B00309,BE,Civil Engineering,SY,4,Transportation Engineering,Transportation Engineering - Complete Guide,Author 10,McGraw Hill,5th,978-93-100309,7,CI-2-10
+B00310,BE,Civil Engineering,SY,4,Structural Analysis,Structural Analysis - Complete Guide,Author 11,McGraw Hill,1th,978-93-100310,8,CI-2-11
+B00311,BE,Civil Engineering,TY,5,Engineering Mechanics,Engineering Mechanics - Complete Guide,Author 12,McGraw Hill,2th,978-93-100311,9,CI-3-12
+B00312,BE,Civil Engineering,TY,5,Surveying,Surveying - Complete Guide,Author 13,McGraw Hill,3th,978-93-100312,2,CI-3-13
+B00313,BE,Civil Engineering,TY,5,Concrete Technology,Concrete Technology - Complete Guide,Author 14,McGraw Hill,4th,978-93-100313,3,CI-3-14
+B00314,BE,Civil Engineering,TY,5,Transportation Engineering,Transportation Engineering - Complete Guide,Author 15,McGraw Hill,5th,978-93-100314,4,CI-3-15
+B00315,BE,Civil Engineering,TY,5,Structural Analysis,Structural Analysis - Complete Guide,Author 16,McGraw Hill,1th,978-93-100315,5,CI-3-16
+B00316,BE,Civil Engineering,TY,6,Engineering Mechanics,Engineering Mechanics - Complete Guide,Author 17,McGraw Hill,2th,978-93-100316,6,CI-3-17
+B00317,BE,Civil Engineering,TY,6,Surveying,Surveying - Complete Guide,Author 18,McGraw Hill,3th,978-93-100317,7,CI-3-18
+B00318,BE,Civil Engineering,TY,6,Concrete Technology,Concrete Technology - Complete Guide,Author 19,McGraw Hill,4th,978-93-100318,8,CI-3-19
+B00319,BE,Civil Engineering,TY,6,Transportation Engineering,Transportation Engineering - Complete Guide,Author 20,McGraw Hill,5th,978-93-100319,9,CI-3-20
+B00320,BE,Civil Engineering,TY,6,Structural Analysis,Structural Analysis - Complete Guide,Author 21,McGraw Hill,1th,978-93-100320,2,CI-3-1
+B00321,BE,Civil Engineering,LY,7,Engineering Mechanics,Engineering Mechanics - Complete Guide,Author 22,McGraw Hill,2th,978-93-100321,3,CI-4-2
+B00322,BE,Civil Engineering,LY,7,Surveying,Surveying - Complete Guide,Author 23,McGraw Hill,3th,978-93-100322,4,CI-4-3
+B00323,BE,Civil Engineering,LY,7,Concrete Technology,Concrete Technology - Complete Guide,Author 24,McGraw Hill,4th,978-93-100323,5,CI-4-4
+B00324,BE,Civil Engineering,LY,7,Transportation Engineering,Transportation Engineering - Complete Guide,Author 25,McGraw Hill,5th,978-93-100324,6,CI-4-5
+B00325,BE,Civil Engineering,LY,7,Structural Analysis,Structural Analysis - Complete Guide,Author 26,McGraw Hill,1th,978-93-100325,7,CI-4-6
+B00326,BE,Civil Engineering,LY,8,Engineering Mechanics,Engineering Mechanics - Complete Guide,Author 27,McGraw Hill,2th,978-93-100326,8,CI-4-7
+B00327,BE,Civil Engineering,LY,8,Surveying,Surveying - Complete Guide,Author 28,McGraw Hill,3th,978-93-100327,9,CI-4-8
+B00328,BE,Civil Engineering,LY,8,Concrete Technology,Concrete Technology - Complete Guide,Author 29,McGraw Hill,4th,978-93-100328,2,CI-4-9
+B00329,BE,Civil Engineering,LY,8,Transportation Engineering,Transportation Engineering - Complete Guide,Author 30,McGraw Hill,5th,978-93-100329,3,CI-4-10
+B00330,BE,Civil Engineering,LY,8,Structural Analysis,Structural Analysis - Complete Guide,Author 31,McGraw Hill,1th,978-93-100330,4,CI-4-11
+B00331,BE,Mechanical Engineering,FY,1,Engineering Drawing,Engineering Drawing - Complete Guide,Author 32,McGraw Hill,2th,978-93-100331,5,ME-1-12
+B00332,BE,Mechanical Engineering,FY,1,Thermodynamics,Thermodynamics - Complete Guide,Author 33,McGraw Hill,3th,978-93-100332,6,ME-1-13
+B00333,BE,Mechanical Engineering,FY,1,Fluid Mechanics,Fluid Mechanics - Complete Guide,Author 34,McGraw Hill,4th,978-93-100333,7,ME-1-14
+B00334,BE,Mechanical Engineering,FY,1,CAD/CAM,CAD/CAM - Complete Guide,Author 35,McGraw Hill,5th,978-93-100334,8,ME-1-15
+B00335,BE,Mechanical Engineering,FY,1,Manufacturing Technology,Manufacturing Technology - Complete Guide,Author 36,McGraw Hill,1th,978-93-100335,9,ME-1-16
+B00336,BE,Mechanical Engineering,FY,2,Engineering Drawing,Engineering Drawing - Complete Guide,Author 37,McGraw Hill,2th,978-93-100336,2,ME-1-17
+B00337,BE,Mechanical Engineering,FY,2,Thermodynamics,Thermodynamics - Complete Guide,Author 38,McGraw Hill,3th,978-93-100337,3,ME-1-18
+B00338,BE,Mechanical Engineering,FY,2,Fluid Mechanics,Fluid Mechanics - Complete Guide,Author 39,McGraw Hill,4th,978-93-100338,4,ME-1-19
+B00339,BE,Mechanical Engineering,FY,2,CAD/CAM,CAD/CAM - Complete Guide,Author 40,McGraw Hill,5th,978-93-100339,5,ME-1-20
+B00340,BE,Mechanical Engineering,FY,2,Manufacturing Technology,Manufacturing Technology - Complete Guide,Author 41,McGraw Hill,1th,978-93-100340,6,ME-1-1
+B00341,BE,Mechanical Engineering,SY,3,Engineering Drawing,Engineering Drawing - Complete Guide,Author 42,McGraw Hill,2th,978-93-100341,7,ME-2-2
+B00342,BE,Mechanical Engineering,SY,3,Thermodynamics,Thermodynamics - Complete Guide,Author 43,McGraw Hill,3th,978-93-100342,8,ME-2-3
+B00343,BE,Mechanical Engineering,SY,3,Fluid Mechanics,Fluid Mechanics - Complete Guide,Author 44,McGraw Hill,4th,978-93-100343,9,ME-2-4
+B00344,BE,Mechanical Engineering,SY,3,CAD/CAM,CAD/CAM - Complete Guide,Author 45,McGraw Hill,5th,978-93-100344,2,ME-2-5
+B00345,BE,Mechanical Engineering,SY,3,Manufacturing Technology,Manufacturing Technology - Complete Guide,Author 46,McGraw Hill,1th,978-93-100345,3,ME-2-6
+B00346,BE,Mechanical Engineering,SY,4,Engineering Drawing,Engineering Drawing - Complete Guide,Author 47,McGraw Hill,2th,978-93-100346,4,ME-2-7
+B00347,BE,Mechanical Engineering,SY,4,Thermodynamics,Thermodynamics - Complete Guide,Author 48,McGraw Hill,3th,978-93-100347,5,ME-2-8
+B00348,BE,Mechanical Engineering,SY,4,Fluid Mechanics,Fluid Mechanics - Complete Guide,Author 49,McGraw Hill,4th,978-93-100348,6,ME-2-9
+B00349,BE,Mechanical Engineering,SY,4,CAD/CAM,CAD/CAM - Complete Guide,Author 50,McGraw Hill,5th,978-93-100349,7,ME-2-10
+B00350,BE,Mechanical Engineering,SY,4,Manufacturing Technology,Manufacturing Technology - Complete Guide,Author 1,McGraw Hill,1th,978-93-100350,8,ME-2-11
+B00351,BE,Mechanical Engineering,TY,5,Engineering Drawing,Engineering Drawing - Complete Guide,Author 2,McGraw Hill,2th,978-93-100351,9,ME-3-12
+B00352,BE,Mechanical Engineering,TY,5,Thermodynamics,Thermodynamics - Complete Guide,Author 3,McGraw Hill,3th,978-93-100352,2,ME-3-13
+B00353,BE,Mechanical Engineering,TY,5,Fluid Mechanics,Fluid Mechanics - Complete Guide,Author 4,McGraw Hill,4th,978-93-100353,3,ME-3-14
+B00354,BE,Mechanical Engineering,TY,5,CAD/CAM,CAD/CAM - Complete Guide,Author 5,McGraw Hill,5th,978-93-100354,4,ME-3-15
+B00355,BE,Mechanical Engineering,TY,5,Manufacturing Technology,Manufacturing Technology - Complete Guide,Author 6,McGraw Hill,1th,978-93-100355,5,ME-3-16
+B00356,BE,Mechanical Engineering,TY,6,Engineering Drawing,Engineering Drawing - Complete Guide,Author 7,McGraw Hill,2th,978-93-100356,6,ME-3-17
+B00357,BE,Mechanical Engineering,TY,6,Thermodynamics,Thermodynamics - Complete Guide,Author 8,McGraw Hill,3th,978-93-100357,7,ME-3-18
+B00358,BE,Mechanical Engineering,TY,6,Fluid Mechanics,Fluid Mechanics - Complete Guide,Author 9,McGraw Hill,4th,978-93-100358,8,ME-3-19
+B00359,BE,Mechanical Engineering,TY,6,CAD/CAM,CAD/CAM - Complete Guide,Author 10,McGraw Hill,5th,978-93-100359,9,ME-3-20
+B00360,BE,Mechanical Engineering,TY,6,Manufacturing Technology,Manufacturing Technology - Complete Guide,Author 11,McGraw Hill,1th,978-93-100360,2,ME-3-1
+B00361,BE,Mechanical Engineering,LY,7,Engineering Drawing,Engineering Drawing - Complete Guide,Author 12,McGraw Hill,2th,978-93-100361,3,ME-4-2
+B00362,BE,Mechanical Engineering,LY,7,Thermodynamics,Thermodynamics - Complete Guide,Author 13,McGraw Hill,3th,978-93-100362,4,ME-4-3
+B00363,BE,Mechanical Engineering,LY,7,Fluid Mechanics,Fluid Mechanics - Complete Guide,Author 14,McGraw Hill,4th,978-93-100363,5,ME-4-4
+B00364,BE,Mechanical Engineering,LY,7,CAD/CAM,CAD/CAM - Complete Guide,Author 15,McGraw Hill,5th,978-93-100364,6,ME-4-5
+B00365,BE,Mechanical Engineering,LY,7,Manufacturing Technology,Manufacturing Technology - Complete Guide,Author 16,McGraw Hill,1th,978-93-100365,7,ME-4-6
+B00366,BE,Mechanical Engineering,LY,8,Engineering Drawing,Engineering Drawing - Complete Guide,Author 17,McGraw Hill,2th,978-93-100366,8,ME-4-7
+B00367,BE,Mechanical Engineering,LY,8,Thermodynamics,Thermodynamics - Complete Guide,Author 18,McGraw Hill,3th,978-93-100367,9,ME-4-8
+B00368,BE,Mechanical Engineering,LY,8,Fluid Mechanics,Fluid Mechanics - Complete Guide,Author 19,McGraw Hill,4th,978-93-100368,2,ME-4-9
+B00369,BE,Mechanical Engineering,LY,8,CAD/CAM,CAD/CAM - Complete Guide,Author 20,McGraw Hill,5th,978-93-100369,3,ME-4-10
+B00370,BE,Mechanical Engineering,LY,8,Manufacturing Technology,Manufacturing Technology - Complete Guide,Author 21,McGraw Hill,1th,978-93-100370,4,ME-4-11
+B00371,BE,Electrical Engineering,FY,1,Basic Electrical,Basic Electrical - Complete Guide,Author 22,McGraw Hill,2th,978-93-100371,5,EL-1-12
+B00372,BE,Electrical Engineering,FY,1,Electrical Machines,Electrical Machines - Complete Guide,Author 23,McGraw Hill,3th,978-93-100372,6,EL-1-13
+B00373,BE,Electrical Engineering,FY,1,Power Systems,Power Systems - Complete Guide,Author 24,McGraw Hill,4th,978-93-100373,7,EL-1-14
+B00374,BE,Electrical Engineering,FY,1,Control Systems,Control Systems - Complete Guide,Author 25,McGraw Hill,5th,978-93-100374,8,EL-1-15
+B00375,BE,Electrical Engineering,FY,1,Power Electronics,Power Electronics - Complete Guide,Author 26,McGraw Hill,1th,978-93-100375,9,EL-1-16
+B00376,BE,Electrical Engineering,FY,2,Basic Electrical,Basic Electrical - Complete Guide,Author 27,McGraw Hill,2th,978-93-100376,2,EL-1-17
+B00377,BE,Electrical Engineering,FY,2,Electrical Machines,Electrical Machines - Complete Guide,Author 28,McGraw Hill,3th,978-93-100377,3,EL-1-18
+B00378,BE,Electrical Engineering,FY,2,Power Systems,Power Systems - Complete Guide,Author 29,McGraw Hill,4th,978-93-100378,4,EL-1-19
+B00379,BE,Electrical Engineering,FY,2,Control Systems,Control Systems - Complete Guide,Author 30,McGraw Hill,5th,978-93-100379,5,EL-1-20
+B00380,BE,Electrical Engineering,FY,2,Power Electronics,Power Electronics - Complete Guide,Author 31,McGraw Hill,1th,978-93-100380,6,EL-1-1
+B00381,BE,Electrical Engineering,SY,3,Basic Electrical,Basic Electrical - Complete Guide,Author 32,McGraw Hill,2th,978-93-100381,7,EL-2-2
+B00382,BE,Electrical Engineering,SY,3,Electrical Machines,Electrical Machines - Complete Guide,Author 33,McGraw Hill,3th,978-93-100382,8,EL-2-3
+B00383,BE,Electrical Engineering,SY,3,Power Systems,Power Systems - Complete Guide,Author 34,McGraw Hill,4th,978-93-100383,9,EL-2-4
+B00384,BE,Electrical Engineering,SY,3,Control Systems,Control Systems - Complete Guide,Author 35,McGraw Hill,5th,978-93-100384,2,EL-2-5
+B00385,BE,Electrical Engineering,SY,3,Power Electronics,Power Electronics - Complete Guide,Author 36,McGraw Hill,1th,978-93-100385,3,EL-2-6
+B00386,BE,Electrical Engineering,SY,4,Basic Electrical,Basic Electrical - Complete Guide,Author 37,McGraw Hill,2th,978-93-100386,4,EL-2-7
+B00387,BE,Electrical Engineering,SY,4,Electrical Machines,Electrical Machines - Complete Guide,Author 38,McGraw Hill,3th,978-93-100387,5,EL-2-8
+B00388,BE,Electrical Engineering,SY,4,Power Systems,Power Systems - Complete Guide,Author 39,McGraw Hill,4th,978-93-100388,6,EL-2-9
+B00389,BE,Electrical Engineering,SY,4,Control Systems,Control Systems - Complete Guide,Author 40,McGraw Hill,5th,978-93-100389,7,EL-2-10
+B00390,BE,Electrical Engineering,SY,4,Power Electronics,Power Electronics - Complete Guide,Author 41,McGraw Hill,1th,978-93-100390,8,EL-2-11
+B00391,BE,Electrical Engineering,TY,5,Basic Electrical,Basic Electrical - Complete Guide,Author 42,McGraw Hill,2th,978-93-100391,9,EL-3-12
+B00392,BE,Electrical Engineering,TY,5,Electrical Machines,Electrical Machines - Complete Guide,Author 43,McGraw Hill,3th,978-93-100392,2,EL-3-13
+B00393,BE,Electrical Engineering,TY,5,Power Systems,Power Systems - Complete Guide,Author 44,McGraw Hill,4th,978-93-100393,3,EL-3-14
+B00394,BE,Electrical Engineering,TY,5,Control Systems,Control Systems - Complete Guide,Author 45,McGraw Hill,5th,978-93-100394,4,EL-3-15
+B00395,BE,Electrical Engineering,TY,5,Power Electronics,Power Electronics - Complete Guide,Author 46,McGraw Hill,1th,978-93-100395,5,EL-3-16
+B00396,BE,Electrical Engineering,TY,6,Basic Electrical,Basic Electrical - Complete Guide,Author 47,McGraw Hill,2th,978-93-100396,6,EL-3-17
+B00397,BE,Electrical Engineering,TY,6,Electrical Machines,Electrical Machines - Complete Guide,Author 48,McGraw Hill,3th,978-93-100397,7,EL-3-18
+B00398,BE,Electrical Engineering,TY,6,Power Systems,Power Systems - Complete Guide,Author 49,McGraw Hill,4th,978-93-100398,8,EL-3-19
+B00399,BE,Electrical Engineering,TY,6,Control Systems,Control Systems - Complete Guide,Author 50,McGraw Hill,5th,978-93-100399,9,EL-3-20
+B00400,BE,Electrical Engineering,TY,6,Power Electronics,Power Electronics - Complete Guide,Author 1,McGraw Hill,1th,978-93-100400,2,EL-3-1
+B00401,BE,Electrical Engineering,LY,7,Basic Electrical,Basic Electrical - Complete Guide,Author 2,McGraw Hill,2th,978-93-100401,3,EL-4-2
+B00402,BE,Electrical Engineering,LY,7,Electrical Machines,Electrical Machines - Complete Guide,Author 3,McGraw Hill,3th,978-93-100402,4,EL-4-3
+B00403,BE,Electrical Engineering,LY,7,Power Systems,Power Systems - Complete Guide,Author 4,McGraw Hill,4th,978-93-100403,5,EL-4-4
+B00404,BE,Electrical Engineering,LY,7,Control Systems,Control Systems - Complete Guide,Author 5,McGraw Hill,5th,978-93-100404,6,EL-4-5
+B00405,BE,Electrical Engineering,LY,7,Power Electronics,Power Electronics - Complete Guide,Author 6,McGraw Hill,1th,978-93-100405,7,EL-4-6
+B00406,BE,Electrical Engineering,LY,8,Basic Electrical,Basic Electrical - Complete Guide,Author 7,McGraw Hill,2th,978-93-100406,8,EL-4-7
+B00407,BE,Electrical Engineering,LY,8,Electrical Machines,Electrical Machines - Complete Guide,Author 8,McGraw Hill,3th,978-93-100407,9,EL-4-8
+B00408,BE,Electrical Engineering,LY,8,Power Systems,Power Systems - Complete Guide,Author 9,McGraw Hill,4th,978-93-100408,2,EL-4-9
+B00409,BE,Electrical Engineering,LY,8,Control Systems,Control Systems - Complete Guide,Author 10,McGraw Hill,5th,978-93-100409,3,EL-4-10
+B00410,BE,Electrical Engineering,LY,8,Power Electronics,Power Electronics - Complete Guide,Author 11,McGraw Hill,1th,978-93-100410,4,EL-4-11
+B00411,BE,Electronics & Communication,FY,1,Digital Electronics,Digital Electronics - Complete Guide,Author 12,McGraw Hill,2th,978-93-100411,5,EL-1-12
+B00412,BE,Electronics & Communication,FY,1,Microprocessors,Microprocessors - Complete Guide,Author 13,McGraw Hill,3th,978-93-100412,6,EL-1-13
+B00413,BE,Electronics & Communication,FY,1,Communication Systems,Communication Systems - Complete Guide,Author 14,McGraw Hill,4th,978-93-100413,7,EL-1-14
+B00414,BE,Electronics & Communication,FY,1,VLSI,VLSI - Complete Guide,Author 15,McGraw Hill,5th,978-93-100414,8,EL-1-15
+B00415,BE,Electronics & Communication,FY,1,Embedded Systems,Embedded Systems - Complete Guide,Author 16,McGraw Hill,1th,978-93-100415,9,EL-1-16
+B00416,BE,Electronics & Communication,FY,2,Digital Electronics,Digital Electronics - Complete Guide,Author 17,McGraw Hill,2th,978-93-100416,2,EL-1-17
+B00417,BE,Electronics & Communication,FY,2,Microprocessors,Microprocessors - Complete Guide,Author 18,McGraw Hill,3th,978-93-100417,3,EL-1-18
+B00418,BE,Electronics & Communication,FY,2,Communication Systems,Communication Systems - Complete Guide,Author 19,McGraw Hill,4th,978-93-100418,4,EL-1-19
+B00419,BE,Electronics & Communication,FY,2,VLSI,VLSI - Complete Guide,Author 20,McGraw Hill,5th,978-93-100419,5,EL-1-20
+B00420,BE,Electronics & Communication,FY,2,Embedded Systems,Embedded Systems - Complete Guide,Author 21,McGraw Hill,1th,978-93-100420,6,EL-1-1
+B00421,BE,Electronics & Communication,SY,3,Digital Electronics,Digital Electronics - Complete Guide,Author 22,McGraw Hill,2th,978-93-100421,7,EL-2-2
+B00422,BE,Electronics & Communication,SY,3,Microprocessors,Microprocessors - Complete Guide,Author 23,McGraw Hill,3th,978-93-100422,8,EL-2-3
+B00423,BE,Electronics & Communication,SY,3,Communication Systems,Communication Systems - Complete Guide,Author 24,McGraw Hill,4th,978-93-100423,9,EL-2-4
+B00424,BE,Electronics & Communication,SY,3,VLSI,VLSI - Complete Guide,Author 25,McGraw Hill,5th,978-93-100424,2,EL-2-5
+B00425,BE,Electronics & Communication,SY,3,Embedded Systems,Embedded Systems - Complete Guide,Author 26,McGraw Hill,1th,978-93-100425,3,EL-2-6
+B00426,BE,Electronics & Communication,SY,4,Digital Electronics,Digital Electronics - Complete Guide,Author 27,McGraw Hill,2th,978-93-100426,4,EL-2-7
+B00427,BE,Electronics & Communication,SY,4,Microprocessors,Microprocessors - Complete Guide,Author 28,McGraw Hill,3th,978-93-100427,5,EL-2-8
+B00428,BE,Electronics & Communication,SY,4,Communication Systems,Communication Systems - Complete Guide,Author 29,McGraw Hill,4th,978-93-100428,6,EL-2-9
+B00429,BE,Electronics & Communication,SY,4,VLSI,VLSI - Complete Guide,Author 30,McGraw Hill,5th,978-93-100429,7,EL-2-10
+B00430,BE,Electronics & Communication,SY,4,Embedded Systems,Embedded Systems - Complete Guide,Author 31,McGraw Hill,1th,978-93-100430,8,EL-2-11
+B00431,BE,Electronics & Communication,TY,5,Digital Electronics,Digital Electronics - Complete Guide,Author 32,McGraw Hill,2th,978-93-100431,9,EL-3-12
+B00432,BE,Electronics & Communication,TY,5,Microprocessors,Microprocessors - Complete Guide,Author 33,McGraw Hill,3th,978-93-100432,2,EL-3-13
+B00433,BE,Electronics & Communication,TY,5,Communication Systems,Communication Systems - Complete Guide,Author 34,McGraw Hill,4th,978-93-100433,3,EL-3-14
+B00434,BE,Electronics & Communication,TY,5,VLSI,VLSI - Complete Guide,Author 35,McGraw Hill,5th,978-93-100434,4,EL-3-15
+B00435,BE,Electronics & Communication,TY,5,Embedded Systems,Embedded Systems - Complete Guide,Author 36,McGraw Hill,1th,978-93-100435,5,EL-3-16
+B00436,BE,Electronics & Communication,TY,6,Digital Electronics,Digital Electronics - Complete Guide,Author 37,McGraw Hill,2th,978-93-100436,6,EL-3-17
+B00437,BE,Electronics & Communication,TY,6,Microprocessors,Microprocessors - Complete Guide,Author 38,McGraw Hill,3th,978-93-100437,7,EL-3-18
+B00438,BE,Electronics & Communication,TY,6,Communication Systems,Communication Systems - Complete Guide,Author 39,McGraw Hill,4th,978-93-100438,8,EL-3-19
+B00439,BE,Electronics & Communication,TY,6,VLSI,VLSI - Complete Guide,Author 40,McGraw Hill,5th,978-93-100439,9,EL-3-20
+B00440,BE,Electronics & Communication,TY,6,Embedded Systems,Embedded Systems - Complete Guide,Author 41,McGraw Hill,1th,978-93-100440,2,EL-3-1
+B00441,BE,Electronics & Communication,LY,7,Digital Electronics,Digital Electronics - Complete Guide,Author 42,McGraw Hill,2th,978-93-100441,3,EL-4-2
+B00442,BE,Electronics & Communication,LY,7,Microprocessors,Microprocessors - Complete Guide,Author 43,McGraw Hill,3th,978-93-100442,4,EL-4-3
+B00443,BE,Electronics & Communication,LY,7,Communication Systems,Communication Systems - Complete Guide,Author 44,McGraw Hill,4th,978-93-100443,5,EL-4-4
+B00444,BE,Electronics & Communication,LY,7,VLSI,VLSI - Complete Guide,Author 45,McGraw Hill,5th,978-93-100444,6,EL-4-5
+B00445,BE,Electronics & Communication,LY,7,Embedded Systems,Embedded Systems - Complete Guide,Author 46,McGraw Hill,1th,978-93-100445,7,EL-4-6
+B00446,BE,Electronics & Communication,LY,8,Digital Electronics,Digital Electronics - Complete Guide,Author 47,McGraw Hill,2th,978-93-100446,8,EL-4-7
+B00447,BE,Electronics & Communication,LY,8,Microprocessors,Microprocessors - Complete Guide,Author 48,McGraw Hill,3th,978-93-100447,9,EL-4-8
+B00448,BE,Electronics & Communication,LY,8,Communication Systems,Communication Systems - Complete Guide,Author 49,McGraw Hill,4th,978-93-100448,2,EL-4-9
+B00449,BE,Electronics & Communication,LY,8,VLSI,VLSI - Complete Guide,Author 50,McGraw Hill,5th,978-93-100449,3,EL-4-10
+B00450,BE,Electronics & Communication,LY,8,Embedded Systems,Embedded Systems - Complete Guide,Author 1,McGraw Hill,1th,978-93-100450,4,EL-4-11
+B00451,BE,Artificial Intelligence & Machine Learning,FY,1,AI Fundamentals,AI Fundamentals - Complete Guide,Author 2,McGraw Hill,2th,978-93-100451,5,AR-1-12
+B00452,BE,Artificial Intelligence & Machine Learning,FY,1,Machine Learning,Machine Learning - Complete Guide,Author 3,McGraw Hill,3th,978-93-100452,6,AR-1-13
+B00453,BE,Artificial Intelligence & Machine Learning,FY,1,Deep Learning,Deep Learning - Complete Guide,Author 4,McGraw Hill,4th,978-93-100453,7,AR-1-14
+B00454,BE,Artificial Intelligence & Machine Learning,FY,1,Computer Vision,Computer Vision - Complete Guide,Author 5,McGraw Hill,5th,978-93-100454,8,AR-1-15
+B00455,BE,Artificial Intelligence & Machine Learning,FY,1,NLP,NLP - Complete Guide,Author 6,McGraw Hill,1th,978-93-100455,9,AR-1-16
+B00456,BE,Artificial Intelligence & Machine Learning,FY,2,AI Fundamentals,AI Fundamentals - Complete Guide,Author 7,McGraw Hill,2th,978-93-100456,2,AR-1-17
+B00457,BE,Artificial Intelligence & Machine Learning,FY,2,Machine Learning,Machine Learning - Complete Guide,Author 8,McGraw Hill,3th,978-93-100457,3,AR-1-18
+B00458,BE,Artificial Intelligence & Machine Learning,FY,2,Deep Learning,Deep Learning - Complete Guide,Author 9,McGraw Hill,4th,978-93-100458,4,AR-1-19
+B00459,BE,Artificial Intelligence & Machine Learning,FY,2,Computer Vision,Computer Vision - Complete Guide,Author 10,McGraw Hill,5th,978-93-100459,5,AR-1-20
+B00460,BE,Artificial Intelligence & Machine Learning,FY,2,NLP,NLP - Complete Guide,Author 11,McGraw Hill,1th,978-93-100460,6,AR-1-1
+B00461,BE,Artificial Intelligence & Machine Learning,SY,3,AI Fundamentals,AI Fundamentals - Complete Guide,Author 12,McGraw Hill,2th,978-93-100461,7,AR-2-2
+B00462,BE,Artificial Intelligence & Machine Learning,SY,3,Machine Learning,Machine Learning - Complete Guide,Author 13,McGraw Hill,3th,978-93-100462,8,AR-2-3
+B00463,BE,Artificial Intelligence & Machine Learning,SY,3,Deep Learning,Deep Learning - Complete Guide,Author 14,McGraw Hill,4th,978-93-100463,9,AR-2-4
+B00464,BE,Artificial Intelligence & Machine Learning,SY,3,Computer Vision,Computer Vision - Complete Guide,Author 15,McGraw Hill,5th,978-93-100464,2,AR-2-5
+B00465,BE,Artificial Intelligence & Machine Learning,SY,3,NLP,NLP - Complete Guide,Author 16,McGraw Hill,1th,978-93-100465,3,AR-2-6
+B00466,BE,Artificial Intelligence & Machine Learning,SY,4,AI Fundamentals,AI Fundamentals - Complete Guide,Author 17,McGraw Hill,2th,978-93-100466,4,AR-2-7
+B00467,BE,Artificial Intelligence & Machine Learning,SY,4,Machine Learning,Machine Learning - Complete Guide,Author 18,McGraw Hill,3th,978-93-100467,5,AR-2-8
+B00468,BE,Artificial Intelligence & Machine Learning,SY,4,Deep Learning,Deep Learning - Complete Guide,Author 19,McGraw Hill,4th,978-93-100468,6,AR-2-9
+B00469,BE,Artificial Intelligence & Machine Learning,SY,4,Computer Vision,Computer Vision - Complete Guide,Author 20,McGraw Hill,5th,978-93-100469,7,AR-2-10
+B00470,BE,Artificial Intelligence & Machine Learning,SY,4,NLP,NLP - Complete Guide,Author 21,McGraw Hill,1th,978-93-100470,8,AR-2-11
+B00471,BE,Artificial Intelligence & Machine Learning,TY,5,AI Fundamentals,AI Fundamentals - Complete Guide,Author 22,McGraw Hill,2th,978-93-100471,9,AR-3-12
+B00472,BE,Artificial Intelligence & Machine Learning,TY,5,Machine Learning,Machine Learning - Complete Guide,Author 23,McGraw Hill,3th,978-93-100472,2,AR-3-13
+B00473,BE,Artificial Intelligence & Machine Learning,TY,5,Deep Learning,Deep Learning - Complete Guide,Author 24,McGraw Hill,4th,978-93-100473,3,AR-3-14
+B00474,BE,Artificial Intelligence & Machine Learning,TY,5,Computer Vision,Computer Vision - Complete Guide,Author 25,McGraw Hill,5th,978-93-100474,4,AR-3-15
+B00475,BE,Artificial Intelligence & Machine Learning,TY,5,NLP,NLP - Complete Guide,Author 26,McGraw Hill,1th,978-93-100475,5,AR-3-16
+B00476,BE,Artificial Intelligence & Machine Learning,TY,6,AI Fundamentals,AI Fundamentals - Complete Guide,Author 27,McGraw Hill,2th,978-93-100476,6,AR-3-17
+B00477,BE,Artificial Intelligence & Machine Learning,TY,6,Machine Learning,Machine Learning - Complete Guide,Author 28,McGraw Hill,3th,978-93-100477,7,AR-3-18
+B00478,BE,Artificial Intelligence & Machine Learning,TY,6,Deep Learning,Deep Learning - Complete Guide,Author 29,McGraw Hill,4th,978-93-100478,8,AR-3-19
+B00479,BE,Artificial Intelligence & Machine Learning,TY,6,Computer Vision,Computer Vision - Complete Guide,Author 30,McGraw Hill,5th,978-93-100479,9,AR-3-20
+B00480,BE,Artificial Intelligence & Machine Learning,TY,6,NLP,NLP - Complete Guide,Author 31,McGraw Hill,1th,978-93-100480,2,AR-3-1
+B00481,BE,Artificial Intelligence & Machine Learning,LY,7,AI Fundamentals,AI Fundamentals - Complete Guide,Author 32,McGraw Hill,2th,978-93-100481,3,AR-4-2
+B00482,BE,Artificial Intelligence & Machine Learning,LY,7,Machine Learning,Machine Learning - Complete Guide,Author 33,McGraw Hill,3th,978-93-100482,4,AR-4-3
+B00483,BE,Artificial Intelligence & Machine Learning,LY,7,Deep Learning,Deep Learning - Complete Guide,Author 34,McGraw Hill,4th,978-93-100483,5,AR-4-4
+B00484,BE,Artificial Intelligence & Machine Learning,LY,7,Computer Vision,Computer Vision - Complete Guide,Author 35,McGraw Hill,5th,978-93-100484,6,AR-4-5
+B00485,BE,Artificial Intelligence & Machine Learning,LY,7,NLP,NLP - Complete Guide,Author 36,McGraw Hill,1th,978-93-100485,7,AR-4-6
+B00486,BE,Artificial Intelligence & Machine Learning,LY,8,AI Fundamentals,AI Fundamentals - Complete Guide,Author 37,McGraw Hill,2th,978-93-100486,8,AR-4-7
+B00487,BE,Artificial Intelligence & Machine Learning,LY,8,Machine Learning,Machine Learning - Complete Guide,Author 38,McGraw Hill,3th,978-93-100487,9,AR-4-8
+B00488,BE,Artificial Intelligence & Machine Learning,LY,8,Deep Learning,Deep Learning - Complete Guide,Author 39,McGraw Hill,4th,978-93-100488,2,AR-4-9
+B00489,BE,Artificial Intelligence & Machine Learning,LY,8,Computer Vision,Computer Vision - Complete Guide,Author 40,McGraw Hill,5th,978-93-100489,3,AR-4-10
+B00490,BE,Artificial Intelligence & Machine Learning,LY,8,NLP,NLP - Complete Guide,Author 41,McGraw Hill,1th,978-93-100490,4,AR-4-11
+B00491,BE,Data Science,FY,1,Statistics,Statistics - Complete Guide,Author 42,McGraw Hill,2th,978-93-100491,5,DA-1-12
+B00492,BE,Data Science,FY,1,Python for DS,Python for DS - Complete Guide,Author 43,McGraw Hill,3th,978-93-100492,6,DA-1-13
+B00493,BE,Data Science,FY,1,Data Analytics,Data Analytics - Complete Guide,Author 44,McGraw Hill,4th,978-93-100493,7,DA-1-14
+B00494,BE,Data Science,FY,1,Big Data,Big Data - Complete Guide,Author 45,McGraw Hill,5th,978-93-100494,8,DA-1-15
+B00495,BE,Data Science,FY,1,Data Visualization,Data Visualization - Complete Guide,Author 46,McGraw Hill,1th,978-93-100495,9,DA-1-16
+B00496,BE,Data Science,FY,2,Statistics,Statistics - Complete Guide,Author 47,McGraw Hill,2th,978-93-100496,2,DA-1-17
+B00497,BE,Data Science,FY,2,Python for DS,Python for DS - Complete Guide,Author 48,McGraw Hill,3th,978-93-100497,3,DA-1-18
+B00498,BE,Data Science,FY,2,Data Analytics,Data Analytics - Complete Guide,Author 49,McGraw Hill,4th,978-93-100498,4,DA-1-19
+B00499,BE,Data Science,FY,2,Big Data,Big Data - Complete Guide,Author 50,McGraw Hill,5th,978-93-100499,5,DA-1-20
+B00500,BE,Data Science,FY,2,Data Visualization,Data Visualization - Complete Guide,Author 1,McGraw Hill,1th,978-93-100500,6,DA-1-1
+B00501,BE,Data Science,SY,3,Statistics,Statistics - Complete Guide,Author 2,McGraw Hill,2th,978-93-100501,7,DA-2-2
+B00502,BE,Data Science,SY,3,Python for DS,Python for DS - Complete Guide,Author 3,McGraw Hill,3th,978-93-100502,8,DA-2-3
+B00503,BE,Data Science,SY,3,Data Analytics,Data Analytics - Complete Guide,Author 4,McGraw Hill,4th,978-93-100503,9,DA-2-4
+B00504,BE,Data Science,SY,3,Big Data,Big Data - Complete Guide,Author 5,McGraw Hill,5th,978-93-100504,2,DA-2-5
+B00505,BE,Data Science,SY,3,Data Visualization,Data Visualization - Complete Guide,Author 6,McGraw Hill,1th,978-93-100505,3,DA-2-6
+B00506,BE,Data Science,SY,4,Statistics,Statistics - Complete Guide,Author 7,McGraw Hill,2th,978-93-100506,4,DA-2-7
+B00507,BE,Data Science,SY,4,Python for DS,Python for DS - Complete Guide,Author 8,McGraw Hill,3th,978-93-100507,5,DA-2-8
+B00508,BE,Data Science,SY,4,Data Analytics,Data Analytics - Complete Guide,Author 9,McGraw Hill,4th,978-93-100508,6,DA-2-9
+B00509,BE,Data Science,SY,4,Big Data,Big Data - Complete Guide,Author 10,McGraw Hill,5th,978-93-100509,7,DA-2-10
+B00510,BE,Data Science,SY,4,Data Visualization,Data Visualization - Complete Guide,Author 11,McGraw Hill,1th,978-93-100510,8,DA-2-11
+B00511,BE,Data Science,TY,5,Statistics,Statistics - Complete Guide,Author 12,McGraw Hill,2th,978-93-100511,9,DA-3-12
+B00512,BE,Data Science,TY,5,Python for DS,Python for DS - Complete Guide,Author 13,McGraw Hill,3th,978-93-100512,2,DA-3-13
+B00513,BE,Data Science,TY,5,Data Analytics,Data Analytics - Complete Guide,Author 14,McGraw Hill,4th,978-93-100513,3,DA-3-14
+B00514,BE,Data Science,TY,5,Big Data,Big Data - Complete Guide,Author 15,McGraw Hill,5th,978-93-100514,4,DA-3-15
+B00515,BE,Data Science,TY,5,Data Visualization,Data Visualization - Complete Guide,Author 16,McGraw Hill,1th,978-93-100515,5,DA-3-16
+B00516,BE,Data Science,TY,6,Statistics,Statistics - Complete Guide,Author 17,McGraw Hill,2th,978-93-100516,6,DA-3-17
+B00517,BE,Data Science,TY,6,Python for DS,Python for DS - Complete Guide,Author 18,McGraw Hill,3th,978-93-100517,7,DA-3-18
+B00518,BE,Data Science,TY,6,Data Analytics,Data Analytics - Complete Guide,Author 19,McGraw Hill,4th,978-93-100518,8,DA-3-19
+B00519,BE,Data Science,TY,6,Big Data,Big Data - Complete Guide,Author 20,McGraw Hill,5th,978-93-100519,9,DA-3-20
+B00520,BE,Data Science,TY,6,Data Visualization,Data Visualization - Complete Guide,Author 21,McGraw Hill,1th,978-93-100520,2,DA-3-1
+B00521,BE,Data Science,LY,7,Statistics,Statistics - Complete Guide,Author 22,McGraw Hill,2th,978-93-100521,3,DA-4-2
+B00522,BE,Data Science,LY,7,Python for DS,Python for DS - Complete Guide,Author 23,McGraw Hill,3th,978-93-100522,4,DA-4-3
+B00523,BE,Data Science,LY,7,Data Analytics,Data Analytics - Complete Guide,Author 24,McGraw Hill,4th,978-93-100523,5,DA-4-4
+B00524,BE,Data Science,LY,7,Big Data,Big Data - Complete Guide,Author 25,McGraw Hill,5th,978-93-100524,6,DA-4-5
+B00525,BE,Data Science,LY,7,Data Visualization,Data Visualization - Complete Guide,Author 26,McGraw Hill,1th,978-93-100525,7,DA-4-6
+B00526,BE,Data Science,LY,8,Statistics,Statistics - Complete Guide,Author 27,McGraw Hill,2th,978-93-100526,8,DA-4-7
+B00527,BE,Data Science,LY,8,Python for DS,Python for DS - Complete Guide,Author 28,McGraw Hill,3th,978-93-100527,9,DA-4-8
+B00528,BE,Data Science,LY,8,Data Analytics,Data Analytics - Complete Guide,Author 29,McGraw Hill,4th,978-93-100528,2,DA-4-9
+B00529,BE,Data Science,LY,8,Big Data,Big Data - Complete Guide,Author 30,McGraw Hill,5th,978-93-100529,3,DA-4-10
+B00530,BE,Data Science,LY,8,Data Visualization,Data Visualization - Complete Guide,Author 31,McGraw Hill,1th,978-93-100530,4,DA-4-11
+B00531,MCA,Computer Applications,FY,1,Programming in C,Programming in C - Complete Guide,Author 32,McGraw Hill,2th,978-93-100531,5,CO-1-12
+B00532,MCA,Computer Applications,FY,1,Java,Java - Complete Guide,Author 33,McGraw Hill,3th,978-93-100532,6,CO-1-13
+B00533,MCA,Computer Applications,FY,1,Python,Python - Complete Guide,Author 34,McGraw Hill,4th,978-93-100533,7,CO-1-14
+B00534,MCA,Computer Applications,FY,1,DBMS,DBMS - Complete Guide,Author 35,McGraw Hill,5th,978-93-100534,8,CO-1-15
+B00535,MCA,Computer Applications,FY,1,Software Engineering,Software Engineering - Complete Guide,Author 36,McGraw Hill,1th,978-93-100535,9,CO-1-16
+B00536,MCA,Computer Applications,FY,2,Programming in C,Programming in C - Complete Guide,Author 37,McGraw Hill,2th,978-93-100536,2,CO-1-17
+B00537,MCA,Computer Applications,FY,2,Java,Java - Complete Guide,Author 38,McGraw Hill,3th,978-93-100537,3,CO-1-18
+B00538,MCA,Computer Applications,FY,2,Python,Python - Complete Guide,Author 39,McGraw Hill,4th,978-93-100538,4,CO-1-19
+B00539,MCA,Computer Applications,FY,2,DBMS,DBMS - Complete Guide,Author 40,McGraw Hill,5th,978-93-100539,5,CO-1-20
+B00540,MCA,Computer Applications,FY,2,Software Engineering,Software Engineering - Complete Guide,Author 41,McGraw Hill,1th,978-93-100540,6,CO-1-1
+B00541,MCA,Computer Applications,SY,3,Programming in C,Programming in C - Complete Guide,Author 42,McGraw Hill,2th,978-93-100541,7,CO-2-2
+B00542,MCA,Computer Applications,SY,3,Java,Java - Complete Guide,Author 43,McGraw Hill,3th,978-93-100542,8,CO-2-3
+B00543,MCA,Computer Applications,SY,3,Python,Python - Complete Guide,Author 44,McGraw Hill,4th,978-93-100543,9,CO-2-4
+B00544,MCA,Computer Applications,SY,3,DBMS,DBMS - Complete Guide,Author 45,McGraw Hill,5th,978-93-100544,2,CO-2-5
+B00545,MCA,Computer Applications,SY,3,Software Engineering,Software Engineering - Complete Guide,Author 46,McGraw Hill,1th,978-93-100545,3,CO-2-6
+B00546,MCA,Computer Applications,SY,4,Programming in C,Programming in C - Complete Guide,Author 47,McGraw Hill,2th,978-93-100546,4,CO-2-7
+B00547,MCA,Computer Applications,SY,4,Java,Java - Complete Guide,Author 48,McGraw Hill,3th,978-93-100547,5,CO-2-8
+B00548,MCA,Computer Applications,SY,4,Python,Python - Complete Guide,Author 49,McGraw Hill,4th,978-93-100548,6,CO-2-9
+B00549,MCA,Computer Applications,SY,4,DBMS,DBMS - Complete Guide,Author 50,McGraw Hill,5th,978-93-100549,7,CO-2-10
+B00550,MCA,Computer Applications,SY,4,Software Engineering,Software Engineering - Complete Guide,Author 1,McGraw Hill,1th,978-93-100550,8,CO-2-11
+B00551,BCA,Computer Applications,FY,1,Programming in C,Programming in C - Complete Guide,Author 2,McGraw Hill,2th,978-93-100551,9,CO-1-12
+B00552,BCA,Computer Applications,FY,1,Java,Java - Complete Guide,Author 3,McGraw Hill,3th,978-93-100552,2,CO-1-13
+B00553,BCA,Computer Applications,FY,1,Python,Python - Complete Guide,Author 4,McGraw Hill,4th,978-93-100553,3,CO-1-14
+B00554,BCA,Computer Applications,FY,1,DBMS,DBMS - Complete Guide,Author 5,McGraw Hill,5th,978-93-100554,4,CO-1-15
+B00555,BCA,Computer Applications,FY,1,Software Engineering,Software Engineering - Complete Guide,Author 6,McGraw Hill,1th,978-93-100555,5,CO-1-16
+B00556,BCA,Computer Applications,FY,2,Programming in C,Programming in C - Complete Guide,Author 7,McGraw Hill,2th,978-93-100556,6,CO-1-17
+B00557,BCA,Computer Applications,FY,2,Java,Java - Complete Guide,Author 8,McGraw Hill,3th,978-93-100557,7,CO-1-18
+B00558,BCA,Computer Applications,FY,2,Python,Python - Complete Guide,Author 9,McGraw Hill,4th,978-93-100558,8,CO-1-19
+B00559,BCA,Computer Applications,FY,2,DBMS,DBMS - Complete Guide,Author 10,McGraw Hill,5th,978-93-100559,9,CO-1-20
+B00560,BCA,Computer Applications,FY,2,Software Engineering,Software Engineering - Complete Guide,Author 11,McGraw Hill,1th,978-93-100560,2,CO-1-1
+B00561,BCA,Computer Applications,SY,3,Programming in C,Programming in C - Complete Guide,Author 12,McGraw Hill,2th,978-93-100561,3,CO-2-2
+B00562,BCA,Computer Applications,SY,3,Java,Java - Complete Guide,Author 13,McGraw Hill,3th,978-93-100562,4,CO-2-3
+B00563,BCA,Computer Applications,SY,3,Python,Python - Complete Guide,Author 14,McGraw Hill,4th,978-93-100563,5,CO-2-4
+B00564,BCA,Computer Applications,SY,3,DBMS,DBMS - Complete Guide,Author 15,McGraw Hill,5th,978-93-100564,6,CO-2-5
+B00565,BCA,Computer Applications,SY,3,Software Engineering,Software Engineering - Complete Guide,Author 16,McGraw Hill,1th,978-93-100565,7,CO-2-6
+B00566,BCA,Computer Applications,SY,4,Programming in C,Programming in C - Complete Guide,Author 17,McGraw Hill,2th,978-93-100566,8,CO-2-7
+B00567,BCA,Computer Applications,SY,4,Java,Java - Complete Guide,Author 18,McGraw Hill,3th,978-93-100567,9,CO-2-8
+B00568,BCA,Computer Applications,SY,4,Python,Python - Complete Guide,Author 19,McGraw Hill,4th,978-93-100568,2,CO-2-9
+B00569,BCA,Computer Applications,SY,4,DBMS,DBMS - Complete Guide,Author 20,McGraw Hill,5th,978-93-100569,3,CO-2-10
+B00570,BCA,Computer Applications,SY,4,Software Engineering,Software Engineering - Complete Guide,Author 21,McGraw Hill,1th,978-93-100570,4,CO-2-11
+B00571,BCA,Computer Applications,TY,5,Programming in C,Programming in C - Complete Guide,Author 22,McGraw Hill,2th,978-93-100571,5,CO-3-12
+B00572,BCA,Computer Applications,TY,5,Java,Java - Complete Guide,Author 23,McGraw Hill,3th,978-93-100572,6,CO-3-13
+B00573,BCA,Computer Applications,TY,5,Python,Python - Complete Guide,Author 24,McGraw Hill,4th,978-93-100573,7,CO-3-14
+B00574,BCA,Computer Applications,TY,5,DBMS,DBMS - Complete Guide,Author 25,McGraw Hill,5th,978-93-100574,8,CO-3-15
+B00575,BCA,Computer Applications,TY,5,Software Engineering,Software Engineering - Complete Guide,Author 26,McGraw Hill,1th,978-93-100575,9,CO-3-16
+B00576,BCA,Computer Applications,TY,6,Programming in C,Programming in C - Complete Guide,Author 27,McGraw Hill,2th,978-93-100576,2,CO-3-17
+B00577,BCA,Computer Applications,TY,6,Java,Java - Complete Guide,Author 28,McGraw Hill,3th,978-93-100577,3,CO-3-18
+B00578,BCA,Computer Applications,TY,6,Python,Python - Complete Guide,Author 29,McGraw Hill,4th,978-93-100578,4,CO-3-19
+B00579,BCA,Computer Applications,TY,6,DBMS,DBMS - Complete Guide,Author 30,McGraw Hill,5th,978-93-100579,5,CO-3-20
+B00580,BCA,Computer Applications,TY,6,Software Engineering,Software Engineering - Complete Guide,Author 31,McGraw Hill,1th,978-93-100580,6,CO-3-1
+B00581,ME,Computer Engineering,FY,1,Programming Fundamentals,Programming Fundamentals - Complete Guide,Author 32,McGraw Hill,2th,978-93-100581,7,CO-1-2
+B00582,ME,Computer Engineering,FY,1,Python Programming,Python Programming - Complete Guide,Author 33,McGraw Hill,3th,978-93-100582,8,CO-1-3
+B00583,ME,Computer Engineering,FY,1,Data Structures,Data Structures - Complete Guide,Author 34,McGraw Hill,4th,978-93-100583,9,CO-1-4
+B00584,ME,Computer Engineering,FY,1,DBMS,DBMS - Complete Guide,Author 35,McGraw Hill,5th,978-93-100584,2,CO-1-5
+B00585,ME,Computer Engineering,FY,1,Computer Networks,Computer Networks - Complete Guide,Author 36,McGraw Hill,1th,978-93-100585,3,CO-1-6
+B00586,ME,Computer Engineering,FY,2,Programming Fundamentals,Programming Fundamentals - Complete Guide,Author 37,McGraw Hill,2th,978-93-100586,4,CO-1-7
+B00587,ME,Computer Engineering,FY,2,Python Programming,Python Programming - Complete Guide,Author 38,McGraw Hill,3th,978-93-100587,5,CO-1-8
+B00588,ME,Computer Engineering,FY,2,Data Structures,Data Structures - Complete Guide,Author 39,McGraw Hill,4th,978-93-100588,6,CO-1-9
+B00589,ME,Computer Engineering,FY,2,DBMS,DBMS - Complete Guide,Author 40,McGraw Hill,5th,978-93-100589,7,CO-1-10
+B00590,ME,Computer Engineering,FY,2,Computer Networks,Computer Networks - Complete Guide,Author 41,McGraw Hill,1th,978-93-100590,8,CO-1-11
+B00591,ME,Computer Engineering,SY,3,Programming Fundamentals,Programming Fundamentals - Complete Guide,Author 42,McGraw Hill,2th,978-93-100591,9,CO-2-12
+B00592,ME,Computer Engineering,SY,3,Python Programming,Python Programming - Complete Guide,Author 43,McGraw Hill,3th,978-93-100592,2,CO-2-13
+B00593,ME,Computer Engineering,SY,3,Data Structures,Data Structures - Complete Guide,Author 44,McGraw Hill,4th,978-93-100593,3,CO-2-14
+B00594,ME,Computer Engineering,SY,3,DBMS,DBMS - Complete Guide,Author 45,McGraw Hill,5th,978-93-100594,4,CO-2-15
+B00595,ME,Computer Engineering,SY,3,Computer Networks,Computer Networks - Complete Guide,Author 46,McGraw Hill,1th,978-93-100595,5,CO-2-16
+B00596,ME,Computer Engineering,SY,4,Programming Fundamentals,Programming Fundamentals - Complete Guide,Author 47,McGraw Hill,2th,978-93-100596,6,CO-2-17
+B00597,ME,Computer Engineering,SY,4,Python Programming,Python Programming - Complete Guide,Author 48,McGraw Hill,3th,978-93-100597,7,CO-2-18
+B00598,ME,Computer Engineering,SY,4,Data Structures,Data Structures - Complete Guide,Author 49,McGraw Hill,4th,978-93-100598,8,CO-2-19
+B00599,ME,Computer Engineering,SY,4,DBMS,DBMS - Complete Guide,Author 50,McGraw Hill,5th,978-93-100599,9,CO-2-20
+B00600,ME,Computer Engineering,SY,4,Computer Networks,Computer Networks - Complete Guide,Author 1,McGraw Hill,1th,978-93-100600,2,CO-2-1
+B00601,ME,Civil Engineering,FY,1,Engineering Mechanics,Engineering Mechanics - Complete Guide,Author 2,McGraw Hill,2th,978-93-100601,3,CI-1-2
+B00602,ME,Civil Engineering,FY,1,Surveying,Surveying - Complete Guide,Author 3,McGraw Hill,3th,978-93-100602,4,CI-1-3
+B00603,ME,Civil Engineering,FY,1,Concrete Technology,Concrete Technology - Complete Guide,Author 4,McGraw Hill,4th,978-93-100603,5,CI-1-4
+B00604,ME,Civil Engineering,FY,1,Transportation Engineering,Transportation Engineering - Complete Guide,Author 5,McGraw Hill,5th,978-93-100604,6,CI-1-5
+B00605,ME,Civil Engineering,FY,1,Structural Analysis,Structural Analysis - Complete Guide,Author 6,McGraw Hill,1th,978-93-100605,7,CI-1-6
+B00606,ME,Civil Engineering,FY,2,Engineering Mechanics,Engineering Mechanics - Complete Guide,Author 7,McGraw Hill,2th,978-93-100606,8,CI-1-7
+B00607,ME,Civil Engineering,FY,2,Surveying,Surveying - Complete Guide,Author 8,McGraw Hill,3th,978-93-100607,9,CI-1-8
+B00608,ME,Civil Engineering,FY,2,Concrete Technology,Concrete Technology - Complete Guide,Author 9,McGraw Hill,4th,978-93-100608,2,CI-1-9
+B00609,ME,Civil Engineering,FY,2,Transportation Engineering,Transportation Engineering - Complete Guide,Author 10,McGraw Hill,5th,978-93-100609,3,CI-1-10
+B00610,ME,Civil Engineering,FY,2,Structural Analysis,Structural Analysis - Complete Guide,Author 11,McGraw Hill,1th,978-93-100610,4,CI-1-11
+B00611,ME,Civil Engineering,SY,3,Engineering Mechanics,Engineering Mechanics - Complete Guide,Author 12,McGraw Hill,2th,978-93-100611,5,CI-2-12
+B00612,ME,Civil Engineering,SY,3,Surveying,Surveying - Complete Guide,Author 13,McGraw Hill,3th,978-93-100612,6,CI-2-13
+B00613,ME,Civil Engineering,SY,3,Concrete Technology,Concrete Technology - Complete Guide,Author 14,McGraw Hill,4th,978-93-100613,7,CI-2-14
+B00614,ME,Civil Engineering,SY,3,Transportation Engineering,Transportation Engineering - Complete Guide,Author 15,McGraw Hill,5th,978-93-100614,8,CI-2-15
+B00615,ME,Civil Engineering,SY,3,Structural Analysis,Structural Analysis - Complete Guide,Author 16,McGraw Hill,1th,978-93-100615,9,CI-2-16
+B00616,ME,Civil Engineering,SY,4,Engineering Mechanics,Engineering Mechanics - Complete Guide,Author 17,McGraw Hill,2th,978-93-100616,2,CI-2-17
+B00617,ME,Civil Engineering,SY,4,Surveying,Surveying - Complete Guide,Author 18,McGraw Hill,3th,978-93-100617,3,CI-2-18
+B00618,ME,Civil Engineering,SY,4,Concrete Technology,Concrete Technology - Complete Guide,Author 19,McGraw Hill,4th,978-93-100618,4,CI-2-19
+B00619,ME,Civil Engineering,SY,4,Transportation Engineering,Transportation Engineering - Complete Guide,Author 20,McGraw Hill,5th,978-93-100619,5,CI-2-20
+B00620,ME,Civil Engineering,SY,4,Structural Analysis,Structural Analysis - Complete Guide,Author 21,McGraw Hill,1th,978-93-100620,6,CI-2-1
+B00621,ME,Mechanical Engineering,FY,1,Engineering Drawing,Engineering Drawing - Complete Guide,Author 22,McGraw Hill,2th,978-93-100621,7,ME-1-2
+B00622,ME,Mechanical Engineering,FY,1,Thermodynamics,Thermodynamics - Complete Guide,Author 23,McGraw Hill,3th,978-93-100622,8,ME-1-3
+B00623,ME,Mechanical Engineering,FY,1,Fluid Mechanics,Fluid Mechanics - Complete Guide,Author 24,McGraw Hill,4th,978-93-100623,9,ME-1-4
+B00624,ME,Mechanical Engineering,FY,1,CAD/CAM,CAD/CAM - Complete Guide,Author 25,McGraw Hill,5th,978-93-100624,2,ME-1-5
+B00625,ME,Mechanical Engineering,FY,1,Manufacturing Technology,Manufacturing Technology - Complete Guide,Author 26,McGraw Hill,1th,978-93-100625,3,ME-1-6
+B00626,ME,Mechanical Engineering,FY,2,Engineering Drawing,Engineering Drawing - Complete Guide,Author 27,McGraw Hill,2th,978-93-100626,4,ME-1-7
+B00627,ME,Mechanical Engineering,FY,2,Thermodynamics,Thermodynamics - Complete Guide,Author 28,McGraw Hill,3th,978-93-100627,5,ME-1-8
+B00628,ME,Mechanical Engineering,FY,2,Fluid Mechanics,Fluid Mechanics - Complete Guide,Author 29,McGraw Hill,4th,978-93-100628,6,ME-1-9
+B00629,ME,Mechanical Engineering,FY,2,CAD/CAM,CAD/CAM - Complete Guide,Author 30,McGraw Hill,5th,978-93-100629,7,ME-1-10
+B00630,ME,Mechanical Engineering,FY,2,Manufacturing Technology,Manufacturing Technology - Complete Guide,Author 31,McGraw Hill,1th,978-93-100630,8,ME-1-11
+B00631,ME,Mechanical Engineering,SY,3,Engineering Drawing,Engineering Drawing - Complete Guide,Author 32,McGraw Hill,2th,978-93-100631,9,ME-2-12
+B00632,ME,Mechanical Engineering,SY,3,Thermodynamics,Thermodynamics - Complete Guide,Author 33,McGraw Hill,3th,978-93-100632,2,ME-2-13
+B00633,ME,Mechanical Engineering,SY,3,Fluid Mechanics,Fluid Mechanics - Complete Guide,Author 34,McGraw Hill,4th,978-93-100633,3,ME-2-14
+B00634,ME,Mechanical Engineering,SY,3,CAD/CAM,CAD/CAM - Complete Guide,Author 35,McGraw Hill,5th,978-93-100634,4,ME-2-15
+B00635,ME,Mechanical Engineering,SY,3,Manufacturing Technology,Manufacturing Technology - Complete Guide,Author 36,McGraw Hill,1th,978-93-100635,5,ME-2-16
+B00636,ME,Mechanical Engineering,SY,4,Engineering Drawing,Engineering Drawing - Complete Guide,Author 37,McGraw Hill,2th,978-93-100636,6,ME-2-17
+B00637,ME,Mechanical Engineering,SY,4,Thermodynamics,Thermodynamics - Complete Guide,Author 38,McGraw Hill,3th,978-93-100637,7,ME-2-18
+B00638,ME,Mechanical Engineering,SY,4,Fluid Mechanics,Fluid Mechanics - Complete Guide,Author 39,McGraw Hill,4th,978-93-100638,8,ME-2-19
+B00639,ME,Mechanical Engineering,SY,4,CAD/CAM,CAD/CAM - Complete Guide,Author 40,McGraw Hill,5th,978-93-100639,9,ME-2-20
+B00640,ME,Mechanical Engineering,SY,4,Manufacturing Technology,Manufacturing Technology - Complete Guide,Author 41,McGraw Hill,1th,978-93-100640,2,ME-2-1

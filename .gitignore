@@ -1,0 +1,22 @@
+# Environment and Secrets
+.env
+*.env
+
+# Python Bytecode and Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+
+# Databases and Local Stores
+*.db
+*.sqlite3
+instance/
+chroma_db/
+
+# Logs and OS files
+*.log
+.DS_Store
+Thumbs.db

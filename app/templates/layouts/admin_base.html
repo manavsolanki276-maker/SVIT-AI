@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Panel{% endblock %} - SVIT</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            bg: '#0B0F19',
+                            card: '#111827',
+                            border: '#1F2937',
+                            sidebar: '#090D16',
+                            purple: '#6366F1'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons & Chart.js -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-brand-bg text-gray-200 antialiased min-h-screen flex">
+
+    <!-- SIDEBAR -->
+    <aside class="w-64 bg-brand-sidebar border-r border-brand-border flex flex-col fixed inset-y-0 left-0 z-50">
+        <!-- Brand Header -->
+        <div class="p-5 border-b border-brand-border flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                <i data-lucide="graduation-cap" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <h2 class="font-bold text-white tracking-wide text-base leading-none">SVIT</h2>
+                <span class="text-[10px] text-gray-400 tracking-wider">VASAD ADMIN PANEL</span>
+            </div>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+            <div>
+                <a href="{{ url_for('admin.dashboard') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-indigo-600 text-white font-medium text-sm transition">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+
+            <div class="space-y-1">
+                <p class="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Management</p>
+                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
+                    <div class="flex items-center gap-3"><i data-lucide="users" class="w-4 h-4"></i><span>Students</span></div>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
+                </a>
+                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
+                    <div class="flex items-center gap-3"><i data-lucide="user-check" class="w-4 h-4"></i><span>Faculty</span></div>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
+                </a>
+                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
+                    <div class="flex items-center gap-3"><i data-lucide="building-2" class="w-4 h-4"></i><span>Departments</span></div>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
+                </a>
+                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
+                    <div class="flex items-center gap-3"><i data-lucide="calendar" class="w-4 h-4"></i><span>Timetable</span></div>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
+                </a>
+                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
+                    <div class="flex items-center gap-3"><i data-lucide="book-open" class="w-4 h-4"></i><span>Library</span></div>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
+                </a>
+                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
+                    <div class="flex items-center gap-3"><i data-lucide="bus" class="w-4 h-4"></i><span>Transport (Bus)</span></div>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
+                </a>
+                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
+                    <div class="flex items-center gap-3"><i data-lucide="briefcase" class="w-4 h-4"></i><span>Placement</span></div>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
+                </a>
+                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
+                    <div class="flex items-center gap-3"><i data-lucide="utensils" class="w-4 h-4"></i><span>Canteen</span></div>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
+                </a>
+                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
+                    <div class="flex items-center gap-3"><i data-lucide="trophy" class="w-4 h-4"></i><span>Sports</span></div>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
+                </a>
+                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
+                    <div class="flex items-center gap-3"><i data-lucide="party-popper" class="w-4 h-4"></i><span>Events</span></div>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
+                </a>
+                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
+                    <div class="flex items-center gap-3"><i data-lucide="megaphone" class="w-4 h-4"></i><span>Notices</span></div>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
+                </a>
+            </div>
+
+            <div class="space-y-1">
+                <p class="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">System</p>
+                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
+                    <div class="flex items-center gap-3"><i data-lucide="bot" class="w-4 h-4"></i><span>AI Chatbot</span></div>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
+                </a>
+                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
+                    <div class="flex items-center gap-3"><i data-lucide="bar-chart-3" class="w-4 h-4"></i><span>Reports & Analytics</span></div>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
+                </a>
+                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
+                    <div class="flex items-center gap-3"><i data-lucide="settings" class="w-4 h-4"></i><span>Settings</span></div>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Sidebar Profile & Logout -->
+        <div class="p-3 border-t border-brand-border space-y-2">
+            <div class="p-2.5 rounded-xl bg-gray-900/60 border border-gray-800 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 font-bold text-xs">
+                    AU
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-semibold text-white truncate">{{ current_user.username if current_user.is_authenticated else 'Admin User' }}</p>
+                    <p class="text-[10px] text-emerald-400 flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Online
+                    </p>
+                </div>
+            </div>
+            <a href="{{ url_for('admin.logout') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-red-400 hover:bg-red-500/10 text-xs font-medium transition">
+                <i data-lucide="log-out" class="w-4 h-4"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="pl-64 flex-1 flex flex-col min-w-0">
+        <!-- TOP NAVBAR -->
+        <header class="h-16 border-b border-brand-border bg-brand-sidebar/80 backdrop-blur sticky top-0 z-40 px-6 flex items-center justify-between">
+            <!-- Search Bar -->
+            <div class="relative w-80">
+                <i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                <input type="text" placeholder="Search anything... (Ctrl /)" class="w-full bg-brand-bg border border-brand-border rounded-lg pl-9 pr-4 py-1.5 text-xs text-gray-300 placeholder-gray-500 focus:outline-none focus:border-indigo-500">
+            </div>
+
+            <!-- Navbar Actions -->
+            <div class="flex items-center gap-3">
+                <button class="w-8 h-8 rounded-lg border border-brand-border bg-brand-bg text-gray-400 flex items-center justify-center hover:text-white">
+                    <i data-lucide="sun" class="w-4 h-4"></i>
+                </button>
+                <div class="relative">
+                    <button class="w-8 h-8 rounded-lg border border-brand-border bg-brand-bg text-gray-400 flex items-center justify-center hover:text-white relative">
+                        <i data-lucide="bell" class="w-4 h-4"></i>
+                        <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white font-bold text-[9px] rounded-full flex items-center justify-center">8</span>
+                    </button>
+                </div>
+                <div class="flex items-center gap-3 pl-3 border-l border-brand-border">
+                    <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold">
+                        AU
+                    </div>
+                    <div class="text-left text-xs">
+                        <p class="font-semibold text-white leading-tight">Admin User</p>
+                        <p class="text-[10px] text-gray-400">Super Admin</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENT BODY -->
+        <main class="p-6 flex-1">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

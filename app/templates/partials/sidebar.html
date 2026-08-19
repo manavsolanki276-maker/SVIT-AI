@@ -1,0 +1,167 @@
+<!-- FIXED ADMIN SIDEBAR PARTIAL -->
+<aside class="sidebar w-64 bg-[#090d16] border-r border-[#1e293b] flex flex-col fixed inset-y-0 left-0 z-50 select-none">
+    
+    <!-- BRAND LOGO HEADER -->
+    <div class="p-4 border-b border-[#1e293b] flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-600/30">
+            <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+        </div>
+        <div>
+            <h2 class="font-bold text-white text-base tracking-wide leading-none">SVIT</h2>
+            <p class="text-[9px] text-gray-400 tracking-widest mt-1">ADMIN PORTAL</p>
+        </div>
+    </div>
+
+    <!-- MAIN NAVIGATION LINKS -->
+    <nav class="flex-1 p-3 space-y-4 overflow-y-auto text-xs font-medium">
+        
+        <!-- Dashboard -->
+        <div>
+            <a href="{{ url_for('admin.dashboard') if 'admin.dashboard' in bootstrap_endpoints else '#' }}" 
+               class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition {% if request.endpoint == 'admin.dashboard' %}bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold shadow-md shadow-indigo-600/30{% else %}text-gray-300 hover:text-white hover:bg-white/5{% endif %}">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                <span>Dashboard</span>
+            </a>
+        </div>
+
+        <!-- ACADEMIC & MANAGEMENT -->
+        <div class="space-y-1">
+            <p class="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Management</p>
+
+            <!-- Students -->
+            <a href="{{ url_for('admin.students') if 'admin.students' in bootstrap_endpoints else '#' }}" 
+               class="flex items-center justify-between px-3.5 py-2 rounded-lg transition group {% if request.endpoint == 'admin.students' %}bg-white/10 text-white font-semibold{% else %}text-gray-300 hover:text-white hover:bg-white/5{% endif %}">
+                <div class="flex items-center gap-3"><i data-lucide="users" class="w-4 h-4 text-gray-400 group-hover:text-white"></i><span>Students</span></div>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600 group-hover:text-white"></i>
+            </a>
+
+            <!-- Faculty -->
+            <a href="{{ url_for('admin.faculty') if 'admin.faculty' in bootstrap_endpoints else '#' }}" 
+               class="flex items-center justify-between px-3.5 py-2 rounded-lg transition group {% if request.endpoint == 'admin.faculty' %}bg-white/10 text-white font-semibold{% else %}text-gray-300 hover:text-white hover:bg-white/5{% endif %}">
+                <div class="flex items-center gap-3"><i data-lucide="user-check" class="w-4 h-4 text-gray-400 group-hover:text-white"></i><span>Faculty</span></div>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600 group-hover:text-white"></i>
+            </a>
+
+            <!-- Departments -->
+            <a href="{{ url_for('admin.departments') if 'admin.departments' in bootstrap_endpoints else '#' }}" 
+               class="flex items-center justify-between px-3.5 py-2 rounded-lg transition group {% if request.endpoint == 'admin.departments' %}bg-white/10 text-white font-semibold{% else %}text-gray-300 hover:text-white hover:bg-white/5{% endif %}">
+                <div class="flex items-center gap-3"><i data-lucide="building-2" class="w-4 h-4 text-gray-400 group-hover:text-white"></i><span>Departments</span></div>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600 group-hover:text-white"></i>
+            </a>
+
+            <!-- Timetable -->
+            <a href="{{ url_for('admin.timetable') if 'admin.timetable' in bootstrap_endpoints else '#' }}" 
+               class="flex items-center justify-between px-3.5 py-2 rounded-lg transition group {% if request.endpoint == 'admin.timetable' %}bg-white/10 text-white font-semibold{% else %}text-gray-300 hover:text-white hover:bg-white/5{% endif %}">
+                <div class="flex items-center gap-3"><i data-lucide="calendar" class="w-4 h-4 text-gray-400 group-hover:text-white"></i><span>Timetable</span></div>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600 group-hover:text-white"></i>
+            </a>
+
+            <!-- Library -->
+            <a href="{{ url_for('admin.library') if 'admin.library' in bootstrap_endpoints else '#' }}" 
+               class="flex items-center justify-between px-3.5 py-2 rounded-lg transition group {% if request.endpoint == 'admin.library' %}bg-white/10 text-white font-semibold{% else %}text-gray-300 hover:text-white hover:bg-white/5{% endif %}">
+                <div class="flex items-center gap-3"><i data-lucide="book-open" class="w-4 h-4 text-gray-400 group-hover:text-white"></i><span>Library</span></div>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600 group-hover:text-white"></i>
+            </a>
+
+            <!-- Transport -->
+            <a href="{{ url_for('admin.transport') if 'admin.transport' in bootstrap_endpoints else '#' }}" 
+               class="flex items-center justify-between px-3.5 py-2 rounded-lg transition group {% if request.endpoint == 'admin.transport' %}bg-white/10 text-white font-semibold{% else %}text-gray-300 hover:text-white hover:bg-white/5{% endif %}">
+                <div class="flex items-center gap-3"><i data-lucide="bus" class="w-4 h-4 text-gray-400 group-hover:text-white"></i><span>Transport</span></div>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600 group-hover:text-white"></i>
+            </a>
+
+            <!-- Sports -->
+            <a href="{{ url_for('admin.sports') if 'admin.sports' in bootstrap_endpoints else '#' }}" 
+               class="flex items-center justify-between px-3.5 py-2 rounded-lg transition group {% if request.endpoint == 'admin.sports' %}bg-white/10 text-white font-semibold{% else %}text-gray-300 hover:text-white hover:bg-white/5{% endif %}">
+                <div class="flex items-center gap-3"><i data-lucide="trophy" class="w-4 h-4 text-gray-400 group-hover:text-white"></i><span>Sports</span></div>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600 group-hover:text-white"></i>
+            </a>
+
+            <!-- Events -->
+            <a href="{{ url_for('admin.events') if 'admin.events' in bootstrap_endpoints else '#' }}" 
+               class="flex items-center justify-between px-3.5 py-2 rounded-lg transition group {% if request.endpoint == 'admin.events' %}bg-white/10 text-white font-semibold{% else %}text-gray-300 hover:text-white hover:bg-white/5{% endif %}">
+                <div class="flex items-center gap-3"><i data-lucide="party-popper" class="w-4 h-4 text-gray-400 group-hover:text-white"></i><span>Events</span></div>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600 group-hover:text-white"></i>
+            </a>
+
+            <!-- Notices -->
+            <a href="{{ url_for('admin.notices') if 'admin.notices' in bootstrap_endpoints else '#' }}" 
+               class="flex items-center justify-between px-3.5 py-2 rounded-lg transition group {% if request.endpoint == 'admin.notices' %}bg-white/10 text-white font-semibold{% else %}text-gray-300 hover:text-white hover:bg-white/5{% endif %}">
+                <div class="flex items-center gap-3"><i data-lucide="megaphone" class="w-4 h-4 text-gray-400 group-hover:text-white"></i><span>Notices</span></div>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600 group-hover:text-white"></i>
+            </a>
+
+            <!-- Placement -->
+            <a href="{{ url_for('admin.placement') if 'admin.placement' in bootstrap_endpoints else '#' }}" 
+               class="flex items-center justify-between px-3.5 py-2 rounded-lg transition group {% if request.endpoint == 'admin.placement' %}bg-white/10 text-white font-semibold{% else %}text-gray-300 hover:text-white hover:bg-white/5{% endif %}">
+                <div class="flex items-center gap-3"><i data-lucide="briefcase" class="w-4 h-4 text-gray-400 group-hover:text-white"></i><span>Placement</span></div>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600 group-hover:text-white"></i>
+            </a>
+
+            <!-- Canteen -->
+            <a href="{{ url_for('admin.canteen') if 'admin.canteen' in bootstrap_endpoints else '#' }}" 
+               class="flex items-center justify-between px-3.5 py-2 rounded-lg transition group {% if request.endpoint == 'admin.canteen' %}bg-white/10 text-white font-semibold{% else %}text-gray-300 hover:text-white hover:bg-white/5{% endif %}">
+                <div class="flex items-center gap-3"><i data-lucide="utensils" class="w-4 h-4 text-gray-400 group-hover:text-white"></i><span>Canteen</span></div>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600 group-hover:text-white"></i>
+            </a>
+
+            <!-- Contact -->
+            <a href="{{ url_for('admin.contact') if 'admin.contact' in bootstrap_endpoints else '#' }}" 
+               class="flex items-center justify-between px-3.5 py-2 rounded-lg transition group {% if request.endpoint == 'admin.contact' %}bg-white/10 text-white font-semibold{% else %}text-gray-300 hover:text-white hover:bg-white/5{% endif %}">
+                <div class="flex items-center gap-3"><i data-lucide="phone-call" class="w-4 h-4 text-gray-400 group-hover:text-white"></i><span>Contact</span></div>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600 group-hover:text-white"></i>
+            </a>
+        </div>
+
+        <!-- SYSTEM & ACCOUNT -->
+        <div class="space-y-1">
+            <p class="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">System</p>
+
+            <!-- Reports -->
+            <a href="{{ url_for('admin.reports') if 'admin.reports' in bootstrap_endpoints else '#' }}" 
+               class="flex items-center justify-between px-3.5 py-2 rounded-lg transition group {% if request.endpoint == 'admin.reports' %}bg-white/10 text-white font-semibold{% else %}text-gray-300 hover:text-white hover:bg-white/5{% endif %}">
+                <div class="flex items-center gap-3"><i data-lucide="bar-chart-3" class="w-4 h-4 text-gray-400 group-hover:text-white"></i><span>Reports</span></div>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600 group-hover:text-white"></i>
+            </a>
+
+            <!-- Settings -->
+            <a href="{{ url_for('admin.settings') if 'admin.settings' in bootstrap_endpoints else '#' }}" 
+               class="flex items-center justify-between px-3.5 py-2 rounded-lg transition group {% if request.endpoint == 'admin.settings' %}bg-white/10 text-white font-semibold{% else %}text-gray-300 hover:text-white hover:bg-white/5{% endif %}">
+                <div class="flex items-center gap-3"><i data-lucide="settings" class="w-4 h-4 text-gray-400 group-hover:text-white"></i><span>Settings</span></div>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600 group-hover:text-white"></i>
+            </a>
+
+            <!-- Profile -->
+            <a href="{{ url_for('admin.profile') if 'admin.profile' in bootstrap_endpoints else '#' }}" 
+               class="flex items-center justify-between px-3.5 py-2 rounded-lg transition group {% if request.endpoint == 'admin.profile' %}bg-white/10 text-white font-semibold{% else %}text-gray-300 hover:text-white hover:bg-white/5{% endif %}">
+                <div class="flex items-center gap-3"><i data-lucide="user" class="w-4 h-4 text-gray-400 group-hover:text-white"></i><span>Profile</span></div>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600 group-hover:text-white"></i>
+            </a>
+        </div>
+    </nav>
+
+    <!-- USER FOOTER & LOGOUT -->
+    <div class="p-3 border-t border-[#1e293b] space-y-2 bg-[#060a14]">
+        <div class="p-2.5 rounded-xl bg-[#0f172a] border border-[#1e293b] flex items-center gap-3">
+            <div class="relative">
+                <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-xs uppercase">
+                    {{ (current_user.username[:2] if current_user.username else 'AD') if current_user.is_authenticated else 'AU' }}
+                </div>
+                <span class="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-[#0f172a] absolute bottom-0 right-0"></span>
+            </div>
+            <div class="min-w-0 flex-1">
+                <p class="text-xs font-semibold text-white leading-tight truncate">
+                    {{ current_user.username if current_user.is_authenticated else 'Admin User' }}
+                </p>
+                <p class="text-[10px] text-gray-400 truncate">Super Admin</p>
+            </div>
+        </div>
+
+        <!-- Logout -->
+        <a href="{{ url_for('admin.logout') if 'admin.logout' in bootstrap_endpoints else url_for('auth.logout') }}" 
+           class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-red-400 hover:bg-red-500/10 text-xs font-medium transition">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            <span>Logout</span>
+        </a>
+    </div>
+</aside>

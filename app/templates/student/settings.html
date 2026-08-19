@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Settings - SVIT AI Assistant{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="glass-panel p-4">
+                <h4 class="fw-bold mb-4"><i class="bi bi-gear-fill me-2"></i>Preferences & Settings</h4>
+                
+                <div class="setting-row">
+                    <div>
+                        <h6 class="mb-0 font-bold">Appearance Theme</h6>
+                        <small class="text-muted">Choose your preferred visual mode.</small>
+                    </div>
+                    <select class="form-select w-auto" id="settingTheme" onchange="updateSetting('theme', this.value)">
+                        <option value="light" {% if settings.theme == 'light' %}selected{% endif %}>Light Mode</option>
+                        <option value="dark" {% if settings.theme == 'dark' %}selected{% endif %}>Dark Mode</option>
+                        <option value="system" {% if settings.theme == 'system' %}selected{% endif %}>System Default</option>
+                    </select>
+                </div>
+
+                <div class="setting-row">
+                    <div>
+                        <h6 class="mb-0 font-bold">Language / ભાષા</h6>
+                        <small class="text-muted">Primary language for assistant responses.</small>
+                    </div>
+                    <select class="form-select w-auto" id="settingLang" onchange="updateSetting('language', this.value)">
+                        <option value="en" {% if settings.language == 'en' %}selected{% endif %}>English</option>
+                        <option value="gu" {% if settings.language == 'gu' %}selected{% endif %}>Gujarati (ગુજરાતી)</option>
+                        <option value="hi" {% if settings.language == 'hi' %}selected{% endif %}>Hindi (हिंदी)</option>
+                    </select>
+                </div>
+
+                <div class="setting-row">
+                    <div>
+                        <h6 class="mb-0 font-bold">Text Font Size</h6>
+                        <small class="text-muted">Adjust chat conversation text scaling.</small>
+                    </div>
+                    <select class="form-select w-auto" id="settingFont" onchange="updateSetting('font_size', this.value)">
+                        <option value="small" {% if settings.font_size == 'small' %}selected{% endif %}>Small</option>
+                        <option value="medium" {% if settings.font_size == 'medium' %}selected{% endif %}>Medium</option>
+                        <option value="large" {% if settings.font_size == 'large' %}selected{% endif %}>Large</option>
+                    </select>
+                </div>
+
+                <div class="setting-row">
+                    <div>
+                        <h6 class="mb-0 font-bold">Auto-Read Voice Output</h6>
+                        <small class="text-muted">Automatically speak AI responses using Text-to-Speech.</small>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="settingVoice" 
+                               {% if settings.auto_read_response %}checked{% endif %} 
+                               onchange="updateSetting('auto_read_response', this.checked)">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function updateSetting(key, value) {
+    if (key === 'theme') applyTheme(value);
+
+    const payload = {};
+    payload[key] = value;
+
+    try {
+        const res = await fetch('/student/settings/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.status === 'success') showToast('Preference updated.', 'success');
+    } catch(e) {
+        showToast('Failed to save setting.', 'danger');
+    }
+}
+</script>
+{% endblock %}

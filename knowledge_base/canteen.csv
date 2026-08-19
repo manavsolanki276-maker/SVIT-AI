@@ -1,0 +1,41 @@
+item_id,shop_name,category,item_name,price_inr,is_vegetarian,availability,timing,location,rating
+I001,Nescafe Corner,Beverages,Cold Coffee,70,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.2
+I002,Nescafe Corner,Beverages,Hot Coffee,40,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.3
+I003,Nescafe Corner,Beverages,Cappuccino,80,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.4
+I004,Nescafe Corner,Beverages,Mocha,90,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.5
+I005,Nescafe Corner,Beverages,Tea,20,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.6
+I006,Shiv Vadapav,Fast Food,Vadapav,25,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.7
+I007,Shiv Vadapav,Fast Food,Cheese Vadapav,40,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.8
+I008,Shiv Vadapav,Fast Food,Dabeli,30,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.9
+I009,Shiv Vadapav,Fast Food,Samosa,20,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.1
+I010,Shiv Vadapav,Fast Food,Puff,25,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.2
+I011,Pizza Hub,Pizza,Margherita Pizza,120,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.3
+I012,Pizza Hub,Pizza,Veg Loaded Pizza,180,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.4
+I013,Pizza Hub,Pizza,Cheese Pizza,160,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.5
+I014,Pizza Hub,Pizza,Garlic Bread,80,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.6
+I015,Pizza Hub,Pizza,French Fries,90,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.7
+I016,Fresh Juice Point,Beverages,Mango Juice,60,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.8
+I017,Fresh Juice Point,Beverages,Orange Juice,55,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.9
+I018,Fresh Juice Point,Beverages,Watermelon Juice,50,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.1
+I019,Fresh Juice Point,Beverages,Lassi,45,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.2
+I020,Fresh Juice Point,Beverages,Buttermilk,25,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.3
+I021,South Indian Corner,South Indian,Masala Dosa,90,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.4
+I022,South Indian Corner,South Indian,Idli,50,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.5
+I023,South Indian Corner,South Indian,Vada,40,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.6
+I024,South Indian Corner,South Indian,Uttapam,90,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.7
+I025,South Indian Corner,South Indian,Filter Coffee,35,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.8
+I026,Gujarati Snacks,Snacks,Khaman,35,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.9
+I027,Gujarati Snacks,Snacks,Fafda,50,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.1
+I028,Gujarati Snacks,Snacks,Jalebi,60,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.2
+I029,Gujarati Snacks,Snacks,Sev Usal,70,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.3
+I030,Gujarati Snacks,Snacks,Thepla,40,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.4
+I031,Sandwich Station,Fast Food,Veg Sandwich,60,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.5
+I032,Sandwich Station,Fast Food,Grilled Sandwich,90,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.6
+I033,Sandwich Station,Fast Food,Cheese Sandwich,100,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.7
+I034,Sandwich Station,Fast Food,Burger,80,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.8
+I035,Sandwich Station,Fast Food,Wrap,90,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.9
+I036,Healthy Bites,Healthy Food,Fruit Salad,80,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.1
+I037,Healthy Bites,Healthy Food,Sprouts Bowl,70,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.2
+I038,Healthy Bites,Healthy Food,Veg Salad,75,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.3
+I039,Healthy Bites,Healthy Food,Protein Shake,120,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.4
+I040,Healthy Bites,Healthy Food,Oats Bowl,90,Yes,Available,08:00 AM - 05:00 PM,SVIT Canteen Block,4.5

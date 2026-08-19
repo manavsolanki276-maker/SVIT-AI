@@ -1,0 +1,301 @@
+placement_id,company_name,program,department,job_role,package_lpa,location,drive_date,eligibility,vacancies,skills_required,registration_deadline,contact_email,status
+P001,Siemens,ME,Information Technology,Mechanical Engineer,17.9,Hyderabad,2026-10-20,"60% throughout, No active backlogs",50,"Python, SQL, DSA",2026-10-08,placement1@svit.edu.in,Upcoming
+P002,Microsoft,BCA,Data Science,Electrical Engineer,11.0,Surat,2026-04-01,"60% throughout, No active backlogs",35,"AutoCAD, Design",2026-03-26,placement2@svit.edu.in,Upcoming
+P003,Cognizant,MCA,Automobile Engineering,Software Engineer,13.7,Hyderabad,2026-11-18,"60% throughout, No active backlogs",115,"Java, OOP, DBMS",2026-11-12,placement3@svit.edu.in,Upcoming
+P004,Siemens,ME,Electrical Engineering,Business Analyst,15.9,Ahmedabad,2026-10-08,"70% throughout, No active backlogs",10,"C++, Algorithms",2026-09-30,placement4@svit.edu.in,Upcoming
+P005,IBM,MCA,Mechanical Engineering,QA Engineer,11.5,Mumbai,2026-11-16,"65% throughout, No active backlogs",103,"Java, OOP, DBMS",2026-11-12,placement5@svit.edu.in,Completed
+P006,Google,Diploma,Data Science,QA Engineer,15.3,Mumbai,2026-11-11,"60% throughout, No active backlogs",25,"Python, SQL, DSA",2026-10-28,placement6@svit.edu.in,Completed
+P007,Oracle,BCA,Information Technology,Graduate Engineer Trainee,15.2,Hyderabad,2026-03-15,"65% throughout, No active backlogs",89,"Java, OOP, DBMS",2026-03-09,placement7@svit.edu.in,Upcoming
+P008,Wipro,ME,Civil Engineering,Network Engineer,14.7,Bengaluru,2026-10-04,"60% throughout, No active backlogs",52,"Java, OOP, DBMS",2026-09-23,placement8@svit.edu.in,Upcoming
+P009,Capgemini,BE,Artificial Intelligence & Machine Learning,Electrical Engineer,5.0,Gandhinagar,2026-07-31,"60% throughout, No active backlogs",25,"Communication Skills, Aptitude",2026-07-24,placement9@svit.edu.in,Upcoming
+P010,NVIDIA,BE,Artificial Intelligence & Machine Learning,QA Engineer,12.8,Gandhinagar,2026-02-01,"60% throughout, No active backlogs",67,"Java, OOP, DBMS",2026-01-29,placement10@svit.edu.in,Registration Open
+P011,NVIDIA,ME,Data Science,Full Stack Developer,8.7,Mumbai,2026-05-11,"65% throughout, No active backlogs",74,"Python, SQL, DSA",2026-04-29,placement11@svit.edu.in,Completed
+P012,NVIDIA,BCA,Artificial Intelligence & Machine Learning,Network Engineer,10.9,Mumbai,2026-09-11,"60% throughout, No active backlogs",106,"C++, Algorithms",2026-08-31,placement12@svit.edu.in,Registration Open
+P013,IBM,MCA,Civil Engineering,Electrical Engineer,17.2,Mumbai,2026-01-26,"60% throughout, No active backlogs",116,"Python, SQL, DSA",2026-01-12,placement13@svit.edu.in,Registration Open
+P014,Larsen & Toubro,BCA,Civil Engineering,AI/ML Intern,5.0,Bengaluru,2026-09-11,"65% throughout, No active backlogs",41,"Python, SQL, DSA",2026-09-01,placement14@svit.edu.in,Completed
+P015,Wipro,MCA,Artificial Intelligence & Machine Learning,Cloud Engineer,15.4,Hyderabad,2026-03-17,"65% throughout, No active backlogs",8,"AutoCAD, Design",2026-03-09,placement15@svit.edu.in,Completed
+P016,Bosch,ME,Data Science,Data Analyst,4.9,Hyderabad,2026-10-24,"60% throughout, No active backlogs",35,"Communication Skills, Aptitude",2026-10-18,placement16@svit.edu.in,Registration Open
+P017,Adani Group,ME,Computer Engineering,Software Engineer,13.0,Bengaluru,2026-05-03,"70% throughout, No active backlogs",89,"C++, Algorithms",2026-04-26,placement17@svit.edu.in,Registration Open
+P018,Larsen & Toubro,ME,Computer Engineering,Graduate Engineer Trainee,9.2,Hyderabad,2026-11-11,"65% throughout, No active backlogs",61,"C++, Algorithms",2026-11-05,placement18@svit.edu.in,Completed
+P019,Oracle,BCA,Electronics & Communication,Civil Engineer,16.4,Pune,2026-08-07,"65% throughout, No active backlogs",86,"C++, Algorithms",2026-07-31,placement19@svit.edu.in,Registration Open
+P020,Reliance Industries,BCA,Electrical Engineering,Electrical Engineer,5.5,Hyderabad,2026-11-13,"70% throughout, No active backlogs",87,"Python, SQL, DSA",2026-11-05,placement20@svit.edu.in,Completed
+P021,Tata Consultancy Services,Diploma,Automobile Engineering,Network Engineer,16.1,Vadodara,2026-11-19,"65% throughout, No active backlogs",100,"Python, SQL, DSA",2026-11-14,placement21@svit.edu.in,Registration Open
+P022,Microsoft,Diploma,Artificial Intelligence & Machine Learning,Software Engineer,12.7,Hyderabad,2026-06-06,"60% throughout, No active backlogs",46,"AutoCAD, Design",2026-05-29,placement22@svit.edu.in,Completed
+P023,Bosch,ME,Electronics & Communication,Business Analyst,8.9,Mumbai,2026-08-16,"60% throughout, No active backlogs",68,"Python, SQL, DSA",2026-08-06,placement23@svit.edu.in,Upcoming
+P024,Accenture,BE,Information Technology,QA Engineer,10.1,Pune,2026-08-20,"60% throughout, No active backlogs",6,"Communication Skills, Aptitude",2026-08-15,placement24@svit.edu.in,Upcoming
+P025,Tata Consultancy Services,ME,Computer Engineering,Network Engineer,6.1,Surat,2026-06-30,"70% throughout, No active backlogs",80,"Python, SQL, DSA",2026-06-20,placement25@svit.edu.in,Registration Open
+P026,Wipro,BCA,Information Technology,Network Engineer,15.7,Hyderabad,2026-10-07,"65% throughout, No active backlogs",98,"AutoCAD, Design",2026-09-25,placement26@svit.edu.in,Registration Open
+P027,Reliance Industries,ME,Civil Engineering,Full Stack Developer,6.7,Surat,2026-11-04,"70% throughout, No active backlogs",51,"AutoCAD, Design",2026-10-26,placement27@svit.edu.in,Registration Open
+P028,Tata Consultancy Services,ME,Automobile Engineering,Mechanical Engineer,9.8,Mumbai,2026-04-30,"70% throughout, No active backlogs",101,"PLC, Electrical Machines",2026-04-21,placement28@svit.edu.in,Upcoming
+P029,LTIMindtree,ME,Civil Engineering,Cloud Engineer,3.9,Ahmedabad,2026-07-05,"70% throughout, No active backlogs",117,"PLC, Electrical Machines",2026-06-22,placement29@svit.edu.in,Completed
+P030,NVIDIA,MCA,Artificial Intelligence & Machine Learning,AI/ML Intern,7.5,Ahmedabad,2026-11-12,"60% throughout, No active backlogs",37,"C++, Algorithms",2026-11-07,placement30@svit.edu.in,Registration Open
+P031,Wipro,BE,Automobile Engineering,Software Engineer,7.2,Pune,2026-05-19,"60% throughout, No active backlogs",106,"PLC, Electrical Machines",2026-05-09,placement31@svit.edu.in,Registration Open
+P032,Amazon,ME,Automobile Engineering,Data Analyst,13.5,Pune,2026-07-10,"65% throughout, No active backlogs",111,"AutoCAD, Design",2026-06-25,placement32@svit.edu.in,Registration Open
+P033,Google,BE,Data Science,Civil Engineer,5.1,Hyderabad,2026-06-06,"60% throughout, No active backlogs",7,"PLC, Electrical Machines",2026-06-03,placement33@svit.edu.in,Registration Open
+P034,Google,BCA,Electrical Engineering,Full Stack Developer,9.1,Ahmedabad,2026-02-07,"60% throughout, No active backlogs",101,"Communication Skills, Aptitude",2026-01-23,placement34@svit.edu.in,Completed
+P035,Siemens,ME,Data Science,Network Engineer,8.8,Bengaluru,2026-10-03,"70% throughout, No active backlogs",112,"AutoCAD, Design",2026-09-22,placement35@svit.edu.in,Upcoming
+P036,NVIDIA,BE,Information Technology,Network Engineer,7.3,Bengaluru,2026-02-22,"65% throughout, No active backlogs",79,"C++, Algorithms",2026-02-10,placement36@svit.edu.in,Registration Open
+P037,Adani Group,BCA,Civil Engineering,Cloud Engineer,6.7,Pune,2026-08-14,"70% throughout, No active backlogs",52,"Python, SQL, DSA",2026-07-31,placement37@svit.edu.in,Registration Open
+P038,NVIDIA,Diploma,Computer Applications,Civil Engineer,10.6,Bengaluru,2026-01-17,"65% throughout, No active backlogs",67,"PLC, Electrical Machines",2026-01-04,placement38@svit.edu.in,Completed
+P039,Reliance Industries,ME,Information Technology,Mechanical Engineer,9.2,Ahmedabad,2026-10-15,"60% throughout, No active backlogs",61,"Communication Skills, Aptitude",2026-10-05,placement39@svit.edu.in,Upcoming
+P040,Google,ME,Computer Applications,Cloud Engineer,7.5,Hyderabad,2026-11-26,"65% throughout, No active backlogs",39,"Python, SQL, DSA",2026-11-15,placement40@svit.edu.in,Registration Open
+P041,Siemens,Diploma,Computer Applications,Mechanical Engineer,12.4,Vadodara,2026-11-22,"70% throughout, No active backlogs",81,"Java, OOP, DBMS",2026-11-13,placement41@svit.edu.in,Upcoming
+P042,IBM,ME,Information Technology,Full Stack Developer,11.1,Surat,2026-09-19,"70% throughout, No active backlogs",95,"C++, Algorithms",2026-09-15,placement42@svit.edu.in,Completed
+P043,Amazon,MCA,Computer Engineering,AI/ML Intern,5.7,Hyderabad,2026-01-28,"65% throughout, No active backlogs",108,"Communication Skills, Aptitude",2026-01-16,placement43@svit.edu.in,Registration Open
+P044,Amazon,Diploma,Civil Engineering,Data Analyst,7.2,Pune,2026-10-19,"65% throughout, No active backlogs",36,"AutoCAD, Design",2026-10-15,placement44@svit.edu.in,Completed
+P045,Accenture,Diploma,Mechanical Engineering,Cloud Engineer,14.8,Hyderabad,2026-04-07,"70% throughout, No active backlogs",19,"AutoCAD, Design",2026-04-03,placement45@svit.edu.in,Completed
+P046,NVIDIA,MCA,Electronics & Communication,Full Stack Developer,9.7,Mumbai,2026-02-18,"60% throughout, No active backlogs",59,"PLC, Electrical Machines",2026-02-05,placement46@svit.edu.in,Registration Open
+P047,Microsoft,BCA,Artificial Intelligence & Machine Learning,Graduate Engineer Trainee,11.3,Pune,2026-04-06,"60% throughout, No active backlogs",106,"Java, OOP, DBMS",2026-03-31,placement47@svit.edu.in,Upcoming
+P048,Capgemini,MCA,Information Technology,Electrical Engineer,11.9,Mumbai,2026-08-23,"60% throughout, No active backlogs",20,"Java, OOP, DBMS",2026-08-13,placement48@svit.edu.in,Registration Open
+P049,HCLTech,BE,Artificial Intelligence & Machine Learning,Mechanical Engineer,17.1,Hyderabad,2026-08-05,"60% throughout, No active backlogs",9,"C++, Algorithms",2026-07-25,placement49@svit.edu.in,Registration Open
+P050,Adani Group,ME,Artificial Intelligence & Machine Learning,Cloud Engineer,12.9,Gandhinagar,2026-01-19,"65% throughout, No active backlogs",50,"PLC, Electrical Machines",2026-01-16,placement50@svit.edu.in,Completed
+P051,Siemens,Diploma,Electrical Engineering,Cloud Engineer,8.8,Hyderabad,2026-05-06,"70% throughout, No active backlogs",88,"Communication Skills, Aptitude",2026-04-28,placement51@svit.edu.in,Completed
+P052,Wipro,BE,Data Science,Electrical Engineer,11.9,Pune,2026-11-06,"60% throughout, No active backlogs",73,"AutoCAD, Design",2026-11-02,placement52@svit.edu.in,Upcoming
+P053,Oracle,MCA,Artificial Intelligence & Machine Learning,Full Stack Developer,6.6,Bengaluru,2026-02-11,"65% throughout, No active backlogs",24,"Python, SQL, DSA",2026-02-01,placement53@svit.edu.in,Completed
+P054,Reliance Industries,BCA,Civil Engineering,Electrical Engineer,9.2,Gandhinagar,2026-04-23,"65% throughout, No active backlogs",36,"C++, Algorithms",2026-04-18,placement54@svit.edu.in,Upcoming
+P055,Amazon,MCA,Civil Engineering,AI/ML Intern,9.1,Bengaluru,2026-09-07,"65% throughout, No active backlogs",61,"PLC, Electrical Machines",2026-08-25,placement55@svit.edu.in,Registration Open
+P056,Reliance Industries,ME,Artificial Intelligence & Machine Learning,Cloud Engineer,6.0,Hyderabad,2026-04-26,"70% throughout, No active backlogs",102,"PLC, Electrical Machines",2026-04-20,placement56@svit.edu.in,Completed
+P057,Tata Consultancy Services,BCA,Computer Engineering,Business Analyst,15.2,Bengaluru,2026-01-26,"70% throughout, No active backlogs",107,"C++, Algorithms",2026-01-15,placement57@svit.edu.in,Completed
+P058,Adani Group,MCA,Civil Engineering,Data Analyst,3.8,Hyderabad,2026-10-03,"60% throughout, No active backlogs",117,"C++, Algorithms",2026-09-30,placement58@svit.edu.in,Registration Open
+P059,Google,BCA,Data Science,Electrical Engineer,16.8,Surat,2026-08-06,"60% throughout, No active backlogs",9,"Python, SQL, DSA",2026-08-03,placement59@svit.edu.in,Upcoming
+P060,Adani Group,Diploma,Electrical Engineering,Network Engineer,4.1,Hyderabad,2026-09-08,"70% throughout, No active backlogs",98,"PLC, Electrical Machines",2026-08-24,placement60@svit.edu.in,Upcoming
+P061,HCLTech,BCA,Mechanical Engineering,Graduate Engineer Trainee,14.4,Surat,2026-06-11,"60% throughout, No active backlogs",24,"Communication Skills, Aptitude",2026-06-03,placement61@svit.edu.in,Completed
+P062,Oracle,BCA,Computer Engineering,Electrical Engineer,17.1,Ahmedabad,2026-01-06,"70% throughout, No active backlogs",88,"Communication Skills, Aptitude",2025-12-23,placement62@svit.edu.in,Completed
+P063,IBM,BE,Electronics & Communication,QA Engineer,13.7,Gandhinagar,2026-01-31,"70% throughout, No active backlogs",73,"PLC, Electrical Machines",2026-01-20,placement63@svit.edu.in,Completed
+P064,Adani Group,ME,Civil Engineering,Network Engineer,16.0,Vadodara,2026-10-26,"65% throughout, No active backlogs",90,"AutoCAD, Design",2026-10-19,placement64@svit.edu.in,Completed
+P065,Tata Consultancy Services,MCA,Computer Engineering,Data Analyst,17.8,Mumbai,2026-09-06,"70% throughout, No active backlogs",16,"Communication Skills, Aptitude",2026-08-23,placement65@svit.edu.in,Completed
+P066,Infosys,MCA,Civil Engineering,Electrical Engineer,11.5,Pune,2026-02-04,"70% throughout, No active backlogs",68,"AutoCAD, Design",2026-01-31,placement66@svit.edu.in,Upcoming
+P067,Tata Consultancy Services,MCA,Computer Engineering,Business Analyst,5.8,Hyderabad,2026-02-27,"70% throughout, No active backlogs",71,"Python, SQL, DSA",2026-02-21,placement67@svit.edu.in,Upcoming
+P068,Amazon,MCA,Electrical Engineering,QA Engineer,16.9,Pune,2026-02-03,"60% throughout, No active backlogs",58,"Python, SQL, DSA",2026-01-31,placement68@svit.edu.in,Upcoming
+P069,Amazon,MCA,Information Technology,AI/ML Intern,11.5,Vadodara,2026-03-26,"60% throughout, No active backlogs",8,"Java, OOP, DBMS",2026-03-21,placement69@svit.edu.in,Registration Open
+P070,LTIMindtree,BCA,Electrical Engineering,Mechanical Engineer,6.3,Mumbai,2026-03-10,"70% throughout, No active backlogs",20,"Python, SQL, DSA",2026-02-28,placement70@svit.edu.in,Registration Open
+P071,Adani Group,Diploma,Computer Applications,QA Engineer,9.8,Pune,2026-07-22,"60% throughout, No active backlogs",89,"C++, Algorithms",2026-07-16,placement71@svit.edu.in,Upcoming
+P072,HCLTech,ME,Computer Applications,Mechanical Engineer,15.9,Hyderabad,2026-02-09,"60% throughout, No active backlogs",98,"Python, SQL, DSA",2026-01-31,placement72@svit.edu.in,Upcoming
+P073,Cognizant,MCA,Computer Applications,Cloud Engineer,17.4,Bengaluru,2026-10-10,"65% throughout, No active backlogs",38,"Communication Skills, Aptitude",2026-09-25,placement73@svit.edu.in,Completed
+P074,Siemens,BE,Electrical Engineering,Business Analyst,5.6,Surat,2026-05-29,"65% throughout, No active backlogs",18,"Python, SQL, DSA",2026-05-18,placement74@svit.edu.in,Completed
+P075,Capgemini,Diploma,Electrical Engineering,Mechanical Engineer,5.2,Mumbai,2026-01-28,"65% throughout, No active backlogs",46,"Communication Skills, Aptitude",2026-01-22,placement75@svit.edu.in,Registration Open
+P076,Oracle,Diploma,Computer Applications,Civil Engineer,5.4,Gandhinagar,2026-01-24,"60% throughout, No active backlogs",60,"PLC, Electrical Machines",2026-01-10,placement76@svit.edu.in,Registration Open
+P077,Reliance Industries,MCA,Automobile Engineering,Full Stack Developer,13.7,Ahmedabad,2026-01-30,"60% throughout, No active backlogs",14,"Java, OOP, DBMS",2026-01-17,placement77@svit.edu.in,Upcoming
+P078,Google,Diploma,Electrical Engineering,Business Analyst,10.6,Mumbai,2026-06-10,"60% throughout, No active backlogs",72,"Python, SQL, DSA",2026-05-28,placement78@svit.edu.in,Completed
+P079,IBM,MCA,Electronics & Communication,Mechanical Engineer,12.4,Surat,2026-02-04,"65% throughout, No active backlogs",114,"C++, Algorithms",2026-01-20,placement79@svit.edu.in,Completed
+P080,Tata Consultancy Services,Diploma,Computer Engineering,Cloud Engineer,8.3,Gandhinagar,2026-10-31,"65% throughout, No active backlogs",110,"Communication Skills, Aptitude",2026-10-17,placement80@svit.edu.in,Upcoming
+P081,Capgemini,Diploma,Automobile Engineering,Software Engineer,14.7,Mumbai,2026-05-06,"60% throughout, No active backlogs",110,"Communication Skills, Aptitude",2026-04-27,placement81@svit.edu.in,Upcoming
+P082,Adani Group,ME,Automobile Engineering,Cloud Engineer,5.9,Vadodara,2026-08-02,"70% throughout, No active backlogs",75,"Python, SQL, DSA",2026-07-21,placement82@svit.edu.in,Upcoming
+P083,NVIDIA,ME,Information Technology,Civil Engineer,9.9,Mumbai,2026-05-21,"65% throughout, No active backlogs",51,"Java, OOP, DBMS",2026-05-09,placement83@svit.edu.in,Registration Open
+P084,Capgemini,BE,Electrical Engineering,Civil Engineer,10.8,Hyderabad,2026-05-13,"60% throughout, No active backlogs",54,"Python, SQL, DSA",2026-04-28,placement84@svit.edu.in,Upcoming
+P085,Oracle,MCA,Data Science,Full Stack Developer,13.5,Gandhinagar,2026-07-04,"60% throughout, No active backlogs",60,"PLC, Electrical Machines",2026-06-24,placement85@svit.edu.in,Upcoming
+P086,Cognizant,MCA,Automobile Engineering,Electrical Engineer,14.3,Surat,2026-02-13,"70% throughout, No active backlogs",44,"Communication Skills, Aptitude",2026-02-04,placement86@svit.edu.in,Registration Open
+P087,Adani Group,ME,Electronics & Communication,Mechanical Engineer,11.3,Ahmedabad,2026-05-27,"70% throughout, No active backlogs",60,"Communication Skills, Aptitude",2026-05-24,placement87@svit.edu.in,Completed
+P088,Larsen & Toubro,BCA,Artificial Intelligence & Machine Learning,Graduate Engineer Trainee,8.6,Surat,2026-02-15,"60% throughout, No active backlogs",14,"PLC, Electrical Machines",2026-02-03,placement88@svit.edu.in,Upcoming
+P089,Wipro,MCA,Data Science,Software Engineer,9.2,Gandhinagar,2026-03-10,"65% throughout, No active backlogs",90,"Python, SQL, DSA",2026-03-04,placement89@svit.edu.in,Registration Open
+P090,Amazon,Diploma,Artificial Intelligence & Machine Learning,Cloud Engineer,6.9,Surat,2026-08-21,"70% throughout, No active backlogs",43,"AutoCAD, Design",2026-08-17,placement90@svit.edu.in,Completed
+P091,NVIDIA,Diploma,Computer Applications,Electrical Engineer,9.9,Vadodara,2026-11-12,"70% throughout, No active backlogs",91,"Java, OOP, DBMS",2026-11-08,placement91@svit.edu.in,Upcoming
+P092,Reliance Industries,BE,Computer Applications,Civil Engineer,9.8,Pune,2026-02-16,"60% throughout, No active backlogs",36,"Java, OOP, DBMS",2026-02-10,placement92@svit.edu.in,Registration Open
+P093,Accenture,BCA,Electrical Engineering,Graduate Engineer Trainee,4.1,Mumbai,2026-04-01,"65% throughout, No active backlogs",47,"C++, Algorithms",2026-03-19,placement93@svit.edu.in,Registration Open
+P094,Tech Mahindra,Diploma,Electronics & Communication,Full Stack Developer,10.8,Bengaluru,2026-09-07,"60% throughout, No active backlogs",88,"AutoCAD, Design",2026-08-24,placement94@svit.edu.in,Upcoming
+P095,Infosys,MCA,Computer Engineering,Electrical Engineer,8.8,Pune,2026-09-09,"60% throughout, No active backlogs",10,"Python, SQL, DSA",2026-08-26,placement95@svit.edu.in,Upcoming
+P096,NVIDIA,BE,Computer Engineering,Software Engineer,6.8,Mumbai,2026-07-04,"70% throughout, No active backlogs",15,"Python, SQL, DSA",2026-06-26,placement96@svit.edu.in,Completed
+P097,Microsoft,ME,Computer Applications,Cloud Engineer,17.3,Vadodara,2026-10-12,"60% throughout, No active backlogs",77,"PLC, Electrical Machines",2026-09-30,placement97@svit.edu.in,Completed
+P098,Infosys,BE,Computer Applications,Mechanical Engineer,11.1,Vadodara,2026-03-01,"65% throughout, No active backlogs",10,"Java, OOP, DBMS",2026-02-17,placement98@svit.edu.in,Registration Open
+P099,Tech Mahindra,MCA,Civil Engineering,Mechanical Engineer,5.4,Pune,2026-08-23,"70% throughout, No active backlogs",77,"PLC, Electrical Machines",2026-08-10,placement99@svit.edu.in,Upcoming
+P100,Infosys,Diploma,Mechanical Engineering,Business Analyst,6.8,Surat,2026-07-19,"60% throughout, No active backlogs",114,"Python, SQL, DSA",2026-07-11,placement100@svit.edu.in,Registration Open
+P101,Siemens,ME,Civil Engineering,Electrical Engineer,13.9,Hyderabad,2026-07-16,"70% throughout, No active backlogs",58,"AutoCAD, Design",2026-07-05,placement101@svit.edu.in,Upcoming
+P102,Reliance Industries,BE,Civil Engineering,Data Analyst,7.9,Mumbai,2026-01-06,"70% throughout, No active backlogs",11,"PLC, Electrical Machines",2025-12-24,placement102@svit.edu.in,Registration Open
+P103,IBM,Diploma,Computer Applications,Full Stack Developer,4.4,Mumbai,2026-08-04,"60% throughout, No active backlogs",58,"Communication Skills, Aptitude",2026-08-01,placement103@svit.edu.in,Upcoming
+P104,Google,BCA,Mechanical Engineering,Network Engineer,11.1,Mumbai,2026-08-12,"70% throughout, No active backlogs",112,"Communication Skills, Aptitude",2026-07-31,placement104@svit.edu.in,Completed
+P105,LTIMindtree,Diploma,Civil Engineering,Graduate Engineer Trainee,11.8,Ahmedabad,2026-10-16,"65% throughout, No active backlogs",65,"Communication Skills, Aptitude",2026-10-06,placement105@svit.edu.in,Upcoming
+P106,Oracle,Diploma,Data Science,QA Engineer,4.3,Surat,2026-02-13,"65% throughout, No active backlogs",29,"Java, OOP, DBMS",2026-01-31,placement106@svit.edu.in,Registration Open
+P107,Reliance Industries,MCA,Civil Engineering,Civil Engineer,7.4,Vadodara,2026-03-30,"60% throughout, No active backlogs",50,"AutoCAD, Design",2026-03-21,placement107@svit.edu.in,Registration Open
+P108,Reliance Industries,Diploma,Electrical Engineering,Electrical Engineer,5.1,Pune,2026-02-20,"70% throughout, No active backlogs",96,"Python, SQL, DSA",2026-02-11,placement108@svit.edu.in,Registration Open
+P109,Accenture,Diploma,Electrical Engineering,Software Engineer,17.5,Mumbai,2026-11-10,"60% throughout, No active backlogs",43,"Java, OOP, DBMS",2026-10-29,placement109@svit.edu.in,Completed
+P110,Wipro,BCA,Automobile Engineering,Graduate Engineer Trainee,12.8,Mumbai,2026-08-23,"65% throughout, No active backlogs",82,"Java, OOP, DBMS",2026-08-17,placement110@svit.edu.in,Registration Open
+P111,Oracle,MCA,Electronics & Communication,Electrical Engineer,16.3,Gandhinagar,2026-11-16,"60% throughout, No active backlogs",101,"PLC, Electrical Machines",2026-11-03,placement111@svit.edu.in,Completed
+P112,Cognizant,ME,Computer Engineering,Cloud Engineer,5.0,Hyderabad,2026-01-26,"70% throughout, No active backlogs",87,"PLC, Electrical Machines",2026-01-20,placement112@svit.edu.in,Upcoming
+P113,Siemens,BCA,Computer Applications,Mechanical Engineer,7.5,Mumbai,2026-11-09,"60% throughout, No active backlogs",87,"Communication Skills, Aptitude",2026-10-29,placement113@svit.edu.in,Upcoming
+P114,IBM,MCA,Civil Engineering,Graduate Engineer Trainee,13.4,Vadodara,2026-02-13,"60% throughout, No active backlogs",56,"Python, SQL, DSA",2026-01-30,placement114@svit.edu.in,Upcoming
+P115,Tech Mahindra,MCA,Civil Engineering,Civil Engineer,11.8,Pune,2026-10-30,"65% throughout, No active backlogs",83,"Communication Skills, Aptitude",2026-10-24,placement115@svit.edu.in,Registration Open
+P116,Accenture,Diploma,Electrical Engineering,Electrical Engineer,3.9,Bengaluru,2026-02-23,"60% throughout, No active backlogs",6,"AutoCAD, Design",2026-02-14,placement116@svit.edu.in,Completed
+P117,Wipro,BE,Artificial Intelligence & Machine Learning,Graduate Engineer Trainee,10.9,Vadodara,2026-11-17,"65% throughout, No active backlogs",84,"AutoCAD, Design",2026-11-07,placement117@svit.edu.in,Registration Open
+P118,Tata Consultancy Services,Diploma,Civil Engineering,Software Engineer,3.8,Ahmedabad,2026-06-19,"70% throughout, No active backlogs",96,"AutoCAD, Design",2026-06-05,placement118@svit.edu.in,Upcoming
+P119,Bosch,MCA,Mechanical Engineering,Network Engineer,4.1,Ahmedabad,2026-01-19,"70% throughout, No active backlogs",68,"Python, SQL, DSA",2026-01-12,placement119@svit.edu.in,Upcoming
+P120,Capgemini,ME,Mechanical Engineering,Software Engineer,14.3,Gandhinagar,2026-02-04,"65% throughout, No active backlogs",108,"Python, SQL, DSA",2026-01-27,placement120@svit.edu.in,Registration Open
+P121,Adani Group,MCA,Electronics & Communication,Civil Engineer,10.9,Hyderabad,2026-04-29,"60% throughout, No active backlogs",51,"PLC, Electrical Machines",2026-04-24,placement121@svit.edu.in,Registration Open
+P122,Siemens,Diploma,Artificial Intelligence & Machine Learning,Graduate Engineer Trainee,4.9,Gandhinagar,2026-06-24,"60% throughout, No active backlogs",62,"Communication Skills, Aptitude",2026-06-13,placement122@svit.edu.in,Upcoming
+P123,LTIMindtree,Diploma,Automobile Engineering,Mechanical Engineer,10.8,Ahmedabad,2026-11-02,"70% throughout, No active backlogs",84,"Communication Skills, Aptitude",2026-10-26,placement123@svit.edu.in,Upcoming
+P124,Wipro,ME,Electronics & Communication,Graduate Engineer Trainee,4.1,Pune,2026-01-30,"60% throughout, No active backlogs",83,"Communication Skills, Aptitude",2026-01-19,placement124@svit.edu.in,Registration Open
+P125,Wipro,BE,Electronics & Communication,QA Engineer,9.2,Vadodara,2026-03-08,"70% throughout, No active backlogs",74,"Python, SQL, DSA",2026-02-25,placement125@svit.edu.in,Registration Open
+P126,Amazon,Diploma,Information Technology,Data Analyst,12.2,Mumbai,2026-09-07,"65% throughout, No active backlogs",96,"PLC, Electrical Machines",2026-08-24,placement126@svit.edu.in,Completed
+P127,Larsen & Toubro,BCA,Civil Engineering,Electrical Engineer,8.2,Hyderabad,2026-04-30,"65% throughout, No active backlogs",46,"Java, OOP, DBMS",2026-04-27,placement127@svit.edu.in,Completed
+P128,Siemens,Diploma,Mechanical Engineering,QA Engineer,10.9,Gandhinagar,2026-11-13,"70% throughout, No active backlogs",51,"PLC, Electrical Machines",2026-11-10,placement128@svit.edu.in,Completed
+P129,IBM,BCA,Mechanical Engineering,QA Engineer,11.4,Surat,2026-04-23,"70% throughout, No active backlogs",65,"Communication Skills, Aptitude",2026-04-13,placement129@svit.edu.in,Registration Open
+P130,Tech Mahindra,ME,Data Science,Graduate Engineer Trainee,8.0,Mumbai,2026-09-08,"65% throughout, No active backlogs",26,"PLC, Electrical Machines",2026-09-03,placement130@svit.edu.in,Completed
+P131,Google,Diploma,Information Technology,Graduate Engineer Trainee,8.2,Mumbai,2026-09-26,"70% throughout, No active backlogs",18,"AutoCAD, Design",2026-09-22,placement131@svit.edu.in,Registration Open
+P132,Oracle,MCA,Electronics & Communication,AI/ML Intern,11.8,Mumbai,2026-04-13,"70% throughout, No active backlogs",119,"C++, Algorithms",2026-04-01,placement132@svit.edu.in,Upcoming
+P133,Larsen & Toubro,BCA,Electrical Engineering,QA Engineer,17.4,Ahmedabad,2026-07-31,"65% throughout, No active backlogs",57,"AutoCAD, Design",2026-07-17,placement133@svit.edu.in,Registration Open
+P134,Tech Mahindra,Diploma,Automobile Engineering,Business Analyst,10.5,Gandhinagar,2026-08-01,"60% throughout, No active backlogs",104,"Java, OOP, DBMS",2026-07-23,placement134@svit.edu.in,Upcoming
+P135,Oracle,MCA,Information Technology,Cloud Engineer,14.0,Mumbai,2026-08-20,"70% throughout, No active backlogs",15,"PLC, Electrical Machines",2026-08-12,placement135@svit.edu.in,Registration Open
+P136,Infosys,BE,Electronics & Communication,Network Engineer,4.7,Surat,2026-04-27,"70% throughout, No active backlogs",116,"AutoCAD, Design",2026-04-19,placement136@svit.edu.in,Upcoming
+P137,NVIDIA,BCA,Computer Engineering,Cloud Engineer,8.3,Surat,2026-08-27,"60% throughout, No active backlogs",104,"Python, SQL, DSA",2026-08-14,placement137@svit.edu.in,Upcoming
+P138,NVIDIA,MCA,Computer Applications,Electrical Engineer,3.6,Ahmedabad,2026-01-03,"70% throughout, No active backlogs",10,"Python, SQL, DSA",2025-12-25,placement138@svit.edu.in,Completed
+P139,Google,Diploma,Information Technology,Mechanical Engineer,7.5,Surat,2026-08-11,"70% throughout, No active backlogs",94,"C++, Algorithms",2026-07-30,placement139@svit.edu.in,Registration Open
+P140,LTIMindtree,ME,Computer Applications,Full Stack Developer,17.5,Gandhinagar,2026-06-30,"65% throughout, No active backlogs",35,"Python, SQL, DSA",2026-06-16,placement140@svit.edu.in,Upcoming
+P141,Microsoft,Diploma,Computer Applications,Cloud Engineer,11.4,Gandhinagar,2026-05-18,"70% throughout, No active backlogs",49,"Java, OOP, DBMS",2026-05-13,placement141@svit.edu.in,Registration Open
+P142,HCLTech,ME,Civil Engineering,Graduate Engineer Trainee,7.8,Surat,2026-05-30,"65% throughout, No active backlogs",118,"PLC, Electrical Machines",2026-05-26,placement142@svit.edu.in,Upcoming
+P143,Infosys,BE,Mechanical Engineering,Software Engineer,7.4,Mumbai,2026-01-09,"65% throughout, No active backlogs",87,"Communication Skills, Aptitude",2025-12-30,placement143@svit.edu.in,Registration Open
+P144,Amazon,BE,Civil Engineering,QA Engineer,5.8,Surat,2026-11-05,"60% throughout, No active backlogs",46,"C++, Algorithms",2026-10-26,placement144@svit.edu.in,Upcoming
+P145,Accenture,Diploma,Civil Engineering,Mechanical Engineer,10.5,Surat,2026-11-21,"60% throughout, No active backlogs",55,"C++, Algorithms",2026-11-07,placement145@svit.edu.in,Registration Open
+P146,Adani Group,BCA,Data Science,Civil Engineer,4.3,Ahmedabad,2026-08-25,"60% throughout, No active backlogs",65,"C++, Algorithms",2026-08-18,placement146@svit.edu.in,Registration Open
+P147,Larsen & Toubro,BE,Electrical Engineering,Civil Engineer,8.8,Mumbai,2026-08-02,"60% throughout, No active backlogs",76,"Python, SQL, DSA",2026-07-28,placement147@svit.edu.in,Upcoming
+P148,Wipro,BCA,Information Technology,Network Engineer,14.1,Ahmedabad,2026-05-13,"60% throughout, No active backlogs",31,"PLC, Electrical Machines",2026-05-04,placement148@svit.edu.in,Completed
+P149,Infosys,BE,Information Technology,Business Analyst,3.2,Ahmedabad,2026-02-12,"60% throughout, No active backlogs",74,"PLC, Electrical Machines",2026-01-29,placement149@svit.edu.in,Upcoming
+P150,Larsen & Toubro,BE,Mechanical Engineering,Electrical Engineer,13.2,Bengaluru,2026-09-28,"65% throughout, No active backlogs",100,"C++, Algorithms",2026-09-24,placement150@svit.edu.in,Completed
+P151,Larsen & Toubro,MCA,Information Technology,Business Analyst,6.2,Vadodara,2026-06-11,"60% throughout, No active backlogs",33,"AutoCAD, Design",2026-06-08,placement151@svit.edu.in,Upcoming
+P152,Infosys,BCA,Mechanical Engineering,Cloud Engineer,9.7,Ahmedabad,2026-01-07,"60% throughout, No active backlogs",33,"Communication Skills, Aptitude",2025-12-24,placement152@svit.edu.in,Completed
+P153,Oracle,Diploma,Civil Engineering,Full Stack Developer,17.9,Hyderabad,2026-06-18,"60% throughout, No active backlogs",84,"PLC, Electrical Machines",2026-06-15,placement153@svit.edu.in,Completed
+P154,Amazon,ME,Computer Engineering,Full Stack Developer,4.9,Vadodara,2026-04-04,"70% throughout, No active backlogs",45,"Java, OOP, DBMS",2026-03-27,placement154@svit.edu.in,Upcoming
+P155,HCLTech,BCA,Mechanical Engineering,Cloud Engineer,12.9,Pune,2026-04-07,"60% throughout, No active backlogs",36,"Communication Skills, Aptitude",2026-03-29,placement155@svit.edu.in,Completed
+P156,Cognizant,BCA,Electrical Engineering,Data Analyst,11.0,Gandhinagar,2026-03-14,"60% throughout, No active backlogs",47,"AutoCAD, Design",2026-03-03,placement156@svit.edu.in,Upcoming
+P157,Siemens,MCA,Electrical Engineering,QA Engineer,13.7,Surat,2026-06-04,"65% throughout, No active backlogs",55,"AutoCAD, Design",2026-05-30,placement157@svit.edu.in,Registration Open
+P158,Tata Consultancy Services,BE,Automobile Engineering,Cloud Engineer,14.7,Mumbai,2026-11-15,"60% throughout, No active backlogs",91,"Java, OOP, DBMS",2026-11-06,placement158@svit.edu.in,Upcoming
+P159,Google,Diploma,Automobile Engineering,Business Analyst,17.0,Ahmedabad,2026-09-30,"60% throughout, No active backlogs",120,"PLC, Electrical Machines",2026-09-25,placement159@svit.edu.in,Completed
+P160,Tech Mahindra,BE,Automobile Engineering,Full Stack Developer,14.3,Ahmedabad,2026-09-25,"70% throughout, No active backlogs",8,"Communication Skills, Aptitude",2026-09-15,placement160@svit.edu.in,Registration Open
+P161,IBM,Diploma,Automobile Engineering,Full Stack Developer,6.9,Mumbai,2026-05-08,"60% throughout, No active backlogs",33,"C++, Algorithms",2026-04-27,placement161@svit.edu.in,Registration Open
+P162,Capgemini,MCA,Automobile Engineering,Mechanical Engineer,10.5,Gandhinagar,2026-09-18,"65% throughout, No active backlogs",86,"PLC, Electrical Machines",2026-09-03,placement162@svit.edu.in,Completed
+P163,Google,BCA,Automobile Engineering,Data Analyst,16.3,Surat,2026-03-29,"60% throughout, No active backlogs",93,"C++, Algorithms",2026-03-15,placement163@svit.edu.in,Registration Open
+P164,Amazon,BE,Electrical Engineering,AI/ML Intern,13.6,Bengaluru,2026-06-11,"65% throughout, No active backlogs",48,"C++, Algorithms",2026-05-27,placement164@svit.edu.in,Registration Open
+P165,Larsen & Toubro,Diploma,Civil Engineering,Graduate Engineer Trainee,9.6,Mumbai,2026-10-29,"65% throughout, No active backlogs",120,"Java, OOP, DBMS",2026-10-26,placement165@svit.edu.in,Registration Open
+P166,Siemens,BE,Electrical Engineering,AI/ML Intern,5.7,Bengaluru,2026-01-14,"60% throughout, No active backlogs",52,"Communication Skills, Aptitude",2026-01-07,placement166@svit.edu.in,Completed
+P167,Adani Group,MCA,Civil Engineering,QA Engineer,15.3,Ahmedabad,2026-10-05,"70% throughout, No active backlogs",104,"Python, SQL, DSA",2026-09-29,placement167@svit.edu.in,Upcoming
+P168,IBM,MCA,Electrical Engineering,Civil Engineer,15.8,Gandhinagar,2026-08-08,"60% throughout, No active backlogs",65,"PLC, Electrical Machines",2026-08-01,placement168@svit.edu.in,Completed
+P169,Microsoft,BE,Artificial Intelligence & Machine Learning,Data Analyst,10.5,Vadodara,2026-06-19,"70% throughout, No active backlogs",60,"C++, Algorithms",2026-06-16,placement169@svit.edu.in,Completed
+P170,Tech Mahindra,ME,Electronics & Communication,QA Engineer,14.2,Vadodara,2026-04-06,"70% throughout, No active backlogs",115,"Java, OOP, DBMS",2026-03-25,placement170@svit.edu.in,Completed
+P171,Capgemini,MCA,Electrical Engineering,QA Engineer,13.4,Gandhinagar,2026-04-03,"70% throughout, No active backlogs",89,"C++, Algorithms",2026-03-19,placement171@svit.edu.in,Upcoming
+P172,HCLTech,Diploma,Artificial Intelligence & Machine Learning,Full Stack Developer,13.7,Hyderabad,2026-09-28,"60% throughout, No active backlogs",39,"Java, OOP, DBMS",2026-09-20,placement172@svit.edu.in,Upcoming
+P173,Capgemini,ME,Automobile Engineering,Data Analyst,14.4,Bengaluru,2026-01-25,"65% throughout, No active backlogs",118,"Python, SQL, DSA",2026-01-20,placement173@svit.edu.in,Registration Open
+P174,Infosys,BE,Automobile Engineering,AI/ML Intern,11.4,Vadodara,2026-02-27,"70% throughout, No active backlogs",104,"AutoCAD, Design",2026-02-13,placement174@svit.edu.in,Completed
+P175,Infosys,BE,Electrical Engineering,AI/ML Intern,3.9,Vadodara,2026-05-03,"60% throughout, No active backlogs",33,"Python, SQL, DSA",2026-04-18,placement175@svit.edu.in,Upcoming
+P176,NVIDIA,BE,Information Technology,Cloud Engineer,13.2,Hyderabad,2026-11-05,"70% throughout, No active backlogs",106,"Java, OOP, DBMS",2026-10-24,placement176@svit.edu.in,Completed
+P177,Reliance Industries,MCA,Civil Engineering,QA Engineer,17.4,Vadodara,2026-03-08,"60% throughout, No active backlogs",98,"Java, OOP, DBMS",2026-02-27,placement177@svit.edu.in,Upcoming
+P178,LTIMindtree,MCA,Computer Applications,Cloud Engineer,7.7,Gandhinagar,2026-06-29,"60% throughout, No active backlogs",21,"AutoCAD, Design",2026-06-19,placement178@svit.edu.in,Completed
+P179,Bosch,MCA,Data Science,Mechanical Engineer,13.2,Gandhinagar,2026-08-26,"60% throughout, No active backlogs",68,"PLC, Electrical Machines",2026-08-11,placement179@svit.edu.in,Registration Open
+P180,HCLTech,ME,Civil Engineering,Network Engineer,12.7,Hyderabad,2026-01-09,"60% throughout, No active backlogs",60,"Communication Skills, Aptitude",2025-12-31,placement180@svit.edu.in,Upcoming
+P181,HCLTech,Diploma,Information Technology,Cloud Engineer,13.8,Ahmedabad,2026-09-13,"60% throughout, No active backlogs",88,"Communication Skills, Aptitude",2026-09-03,placement181@svit.edu.in,Upcoming
+P182,Reliance Industries,MCA,Civil Engineering,Civil Engineer,17.7,Hyderabad,2026-11-07,"70% throughout, No active backlogs",59,"Python, SQL, DSA",2026-11-04,placement182@svit.edu.in,Completed
+P183,Tata Consultancy Services,BE,Electronics & Communication,Mechanical Engineer,17.2,Hyderabad,2026-06-06,"65% throughout, No active backlogs",38,"PLC, Electrical Machines",2026-05-23,placement183@svit.edu.in,Registration Open
+P184,Adani Group,MCA,Mechanical Engineering,Mechanical Engineer,12.0,Pune,2026-02-28,"65% throughout, No active backlogs",45,"Python, SQL, DSA",2026-02-13,placement184@svit.edu.in,Upcoming
+P185,Tech Mahindra,BE,Computer Engineering,Electrical Engineer,9.0,Surat,2026-04-13,"65% throughout, No active backlogs",90,"Communication Skills, Aptitude",2026-03-29,placement185@svit.edu.in,Completed
+P186,Oracle,MCA,Mechanical Engineering,AI/ML Intern,4.6,Surat,2026-03-06,"70% throughout, No active backlogs",106,"AutoCAD, Design",2026-02-22,placement186@svit.edu.in,Completed
+P187,Accenture,BE,Computer Applications,Civil Engineer,12.1,Hyderabad,2026-07-17,"70% throughout, No active backlogs",76,"Communication Skills, Aptitude",2026-07-02,placement187@svit.edu.in,Registration Open
+P188,NVIDIA,MCA,Mechanical Engineering,Graduate Engineer Trainee,16.7,Hyderabad,2026-06-08,"60% throughout, No active backlogs",88,"PLC, Electrical Machines",2026-05-25,placement188@svit.edu.in,Registration Open
+P189,Capgemini,Diploma,Artificial Intelligence & Machine Learning,Cloud Engineer,7.3,Gandhinagar,2026-05-30,"65% throughout, No active backlogs",23,"C++, Algorithms",2026-05-15,placement189@svit.edu.in,Upcoming
+P190,Accenture,MCA,Electronics & Communication,Data Analyst,12.2,Mumbai,2026-06-12,"70% throughout, No active backlogs",16,"Communication Skills, Aptitude",2026-05-28,placement190@svit.edu.in,Completed
+P191,Amazon,MCA,Computer Applications,Data Analyst,5.6,Gandhinagar,2026-03-16,"65% throughout, No active backlogs",80,"AutoCAD, Design",2026-03-04,placement191@svit.edu.in,Completed
+P192,Siemens,Diploma,Artificial Intelligence & Machine Learning,QA Engineer,13.4,Mumbai,2026-01-16,"70% throughout, No active backlogs",86,"C++, Algorithms",2026-01-06,placement192@svit.edu.in,Registration Open
+P193,Oracle,BCA,Automobile Engineering,Business Analyst,13.6,Hyderabad,2026-02-18,"70% throughout, No active backlogs",19,"Python, SQL, DSA",2026-02-03,placement193@svit.edu.in,Registration Open
+P194,Infosys,MCA,Data Science,Cloud Engineer,14.2,Bengaluru,2026-11-09,"60% throughout, No active backlogs",107,"Python, SQL, DSA",2026-10-25,placement194@svit.edu.in,Registration Open
+P195,Accenture,BE,Electrical Engineering,AI/ML Intern,16.0,Vadodara,2026-06-09,"70% throughout, No active backlogs",67,"C++, Algorithms",2026-05-28,placement195@svit.edu.in,Completed
+P196,Microsoft,MCA,Computer Engineering,Network Engineer,4.7,Bengaluru,2026-02-09,"70% throughout, No active backlogs",90,"AutoCAD, Design",2026-01-29,placement196@svit.edu.in,Registration Open
+P197,NVIDIA,Diploma,Information Technology,Network Engineer,9.7,Ahmedabad,2026-02-10,"70% throughout, No active backlogs",85,"AutoCAD, Design",2026-02-03,placement197@svit.edu.in,Registration Open
+P198,Siemens,ME,Data Science,Full Stack Developer,10.9,Hyderabad,2026-08-29,"65% throughout, No active backlogs",112,"C++, Algorithms",2026-08-18,placement198@svit.edu.in,Registration Open
+P199,Infosys,BE,Information Technology,Cloud Engineer,14.0,Bengaluru,2026-02-07,"60% throughout, No active backlogs",44,"Python, SQL, DSA",2026-01-30,placement199@svit.edu.in,Registration Open
+P200,Microsoft,Diploma,Electronics & Communication,Electrical Engineer,13.0,Gandhinagar,2026-03-13,"60% throughout, No active backlogs",22,"Java, OOP, DBMS",2026-02-26,placement200@svit.edu.in,Registration Open
+P201,Accenture,BE,Civil Engineering,AI/ML Intern,6.8,Pune,2026-02-10,"60% throughout, No active backlogs",99,"Communication Skills, Aptitude",2026-01-28,placement201@svit.edu.in,Completed
+P202,HCLTech,Diploma,Data Science,Electrical Engineer,14.0,Mumbai,2026-09-06,"60% throughout, No active backlogs",61,"AutoCAD, Design",2026-08-31,placement202@svit.edu.in,Registration Open
+P203,Wipro,BE,Civil Engineering,QA Engineer,10.3,Vadodara,2026-01-31,"60% throughout, No active backlogs",102,"PLC, Electrical Machines",2026-01-28,placement203@svit.edu.in,Registration Open
+P204,Oracle,BCA,Information Technology,Full Stack Developer,16.1,Gandhinagar,2026-07-12,"70% throughout, No active backlogs",105,"C++, Algorithms",2026-07-07,placement204@svit.edu.in,Registration Open
+P205,Tech Mahindra,MCA,Artificial Intelligence & Machine Learning,Full Stack Developer,9.0,Hyderabad,2026-02-23,"70% throughout, No active backlogs",80,"AutoCAD, Design",2026-02-19,placement205@svit.edu.in,Upcoming
+P206,Infosys,Diploma,Mechanical Engineering,Graduate Engineer Trainee,13.3,Mumbai,2026-09-15,"60% throughout, No active backlogs",92,"C++, Algorithms",2026-09-03,placement206@svit.edu.in,Upcoming
+P207,Cognizant,BE,Electronics & Communication,AI/ML Intern,11.3,Gandhinagar,2026-10-10,"70% throughout, No active backlogs",28,"AutoCAD, Design",2026-10-04,placement207@svit.edu.in,Upcoming
+P208,HCLTech,BCA,Computer Applications,Civil Engineer,10.9,Gandhinagar,2026-06-29,"60% throughout, No active backlogs",38,"C++, Algorithms",2026-06-20,placement208@svit.edu.in,Registration Open
+P209,Google,MCA,Electronics & Communication,Mechanical Engineer,8.8,Gandhinagar,2026-01-18,"70% throughout, No active backlogs",16,"Communication Skills, Aptitude",2026-01-15,placement209@svit.edu.in,Completed
+P210,Infosys,MCA,Artificial Intelligence & Machine Learning,Civil Engineer,17.1,Pune,2026-02-16,"70% throughout, No active backlogs",35,"Java, OOP, DBMS",2026-02-02,placement210@svit.edu.in,Upcoming
+P211,Wipro,MCA,Electronics & Communication,Network Engineer,17.1,Ahmedabad,2026-03-03,"60% throughout, No active backlogs",67,"AutoCAD, Design",2026-02-28,placement211@svit.edu.in,Upcoming
+P212,Tata Consultancy Services,BE,Artificial Intelligence & Machine Learning,AI/ML Intern,12.0,Gandhinagar,2026-08-28,"65% throughout, No active backlogs",45,"Java, OOP, DBMS",2026-08-19,placement212@svit.edu.in,Completed
+P213,Microsoft,MCA,Computer Applications,Full Stack Developer,5.3,Surat,2026-05-09,"60% throughout, No active backlogs",82,"Communication Skills, Aptitude",2026-05-02,placement213@svit.edu.in,Registration Open
+P214,NVIDIA,ME,Data Science,Civil Engineer,14.4,Pune,2026-10-16,"60% throughout, No active backlogs",15,"Python, SQL, DSA",2026-10-11,placement214@svit.edu.in,Registration Open
+P215,Google,BE,Automobile Engineering,Network Engineer,9.8,Mumbai,2026-08-23,"65% throughout, No active backlogs",10,"Java, OOP, DBMS",2026-08-13,placement215@svit.edu.in,Completed
+P216,Siemens,BE,Artificial Intelligence & Machine Learning,Cloud Engineer,11.9,Ahmedabad,2026-04-08,"70% throughout, No active backlogs",38,"Python, SQL, DSA",2026-04-03,placement216@svit.edu.in,Completed
+P217,Bosch,ME,Computer Applications,Mechanical Engineer,9.8,Vadodara,2026-04-06,"70% throughout, No active backlogs",103,"Python, SQL, DSA",2026-04-03,placement217@svit.edu.in,Completed
+P218,Tech Mahindra,BE,Information Technology,QA Engineer,17.8,Bengaluru,2026-10-04,"65% throughout, No active backlogs",9,"Java, OOP, DBMS",2026-09-30,placement218@svit.edu.in,Upcoming
+P219,IBM,BE,Electronics & Communication,Data Analyst,16.1,Ahmedabad,2026-02-20,"70% throughout, No active backlogs",37,"PLC, Electrical Machines",2026-02-11,placement219@svit.edu.in,Completed
+P220,Adani Group,MCA,Automobile Engineering,QA Engineer,6.4,Vadodara,2026-10-13,"65% throughout, No active backlogs",63,"PLC, Electrical Machines",2026-10-01,placement220@svit.edu.in,Completed
+P221,HCLTech,BCA,Mechanical Engineering,Full Stack Developer,17.7,Bengaluru,2026-08-07,"60% throughout, No active backlogs",51,"C++, Algorithms",2026-07-24,placement221@svit.edu.in,Registration Open
+P222,Bosch,BCA,Electronics & Communication,Electrical Engineer,3.9,Vadodara,2026-10-09,"60% throughout, No active backlogs",6,"Communication Skills, Aptitude",2026-10-06,placement222@svit.edu.in,Registration Open
+P223,Tata Consultancy Services,Diploma,Information Technology,Network Engineer,11.0,Gandhinagar,2026-04-22,"60% throughout, No active backlogs",53,"C++, Algorithms",2026-04-09,placement223@svit.edu.in,Upcoming
+P224,Cognizant,BCA,Electronics & Communication,Mechanical Engineer,6.0,Pune,2026-05-16,"65% throughout, No active backlogs",116,"C++, Algorithms",2026-05-06,placement224@svit.edu.in,Registration Open
+P225,Tech Mahindra,MCA,Mechanical Engineering,Full Stack Developer,9.8,Pune,2026-11-04,"65% throughout, No active backlogs",51,"C++, Algorithms",2026-10-26,placement225@svit.edu.in,Upcoming
+P226,Microsoft,BE,Civil Engineering,QA Engineer,9.4,Ahmedabad,2026-03-12,"65% throughout, No active backlogs",79,"C++, Algorithms",2026-02-25,placement226@svit.edu.in,Registration Open
+P227,Accenture,Diploma,Civil Engineering,Civil Engineer,13.2,Bengaluru,2026-07-05,"70% throughout, No active backlogs",48,"Communication Skills, Aptitude",2026-06-22,placement227@svit.edu.in,Completed
+P228,HCLTech,BCA,Civil Engineering,Mechanical Engineer,14.4,Vadodara,2026-10-15,"65% throughout, No active backlogs",24,"C++, Algorithms",2026-10-02,placement228@svit.edu.in,Completed
+P229,LTIMindtree,BE,Electronics & Communication,Full Stack Developer,15.5,Mumbai,2026-06-19,"65% throughout, No active backlogs",84,"AutoCAD, Design",2026-06-12,placement229@svit.edu.in,Registration Open
+P230,Accenture,BCA,Computer Applications,Full Stack Developer,13.7,Pune,2026-10-18,"70% throughout, No active backlogs",35,"Java, OOP, DBMS",2026-10-08,placement230@svit.edu.in,Upcoming
+P231,Accenture,ME,Electronics & Communication,Full Stack Developer,3.9,Ahmedabad,2026-08-31,"60% throughout, No active backlogs",35,"C++, Algorithms",2026-08-26,placement231@svit.edu.in,Completed
+P232,Siemens,BE,Information Technology,Business Analyst,14.8,Vadodara,2026-07-15,"60% throughout, No active backlogs",84,"C++, Algorithms",2026-07-08,placement232@svit.edu.in,Completed
+P233,Accenture,ME,Information Technology,Mechanical Engineer,15.8,Mumbai,2026-10-07,"70% throughout, No active backlogs",118,"PLC, Electrical Machines",2026-10-02,placement233@svit.edu.in,Upcoming
+P234,Tata Consultancy Services,BE,Artificial Intelligence & Machine Learning,Cloud Engineer,14.3,Hyderabad,2026-06-27,"60% throughout, No active backlogs",87,"C++, Algorithms",2026-06-23,placement234@svit.edu.in,Registration Open
+P235,Infosys,BE,Data Science,Business Analyst,4.5,Pune,2026-06-01,"60% throughout, No active backlogs",66,"Python, SQL, DSA",2026-05-17,placement235@svit.edu.in,Completed
+P236,Infosys,MCA,Information Technology,Electrical Engineer,14.8,Ahmedabad,2026-05-06,"70% throughout, No active backlogs",19,"C++, Algorithms",2026-04-30,placement236@svit.edu.in,Registration Open
+P237,Google,ME,Computer Applications,Electrical Engineer,7.5,Ahmedabad,2026-10-10,"65% throughout, No active backlogs",90,"C++, Algorithms",2026-09-26,placement237@svit.edu.in,Registration Open
+P238,NVIDIA,ME,Data Science,Full Stack Developer,12.6,Bengaluru,2026-03-03,"70% throughout, No active backlogs",92,"Communication Skills, Aptitude",2026-02-17,placement238@svit.edu.in,Upcoming
+P239,Infosys,ME,Computer Applications,Data Analyst,17.9,Ahmedabad,2026-10-14,"65% throughout, No active backlogs",11,"Java, OOP, DBMS",2026-10-02,placement239@svit.edu.in,Registration Open
+P240,Tech Mahindra,BE,Computer Applications,Full Stack Developer,9.5,Vadodara,2026-06-14,"65% throughout, No active backlogs",99,"Python, SQL, DSA",2026-06-02,placement240@svit.edu.in,Completed
+P241,Google,BE,Data Science,AI/ML Intern,10.2,Vadodara,2026-09-28,"70% throughout, No active backlogs",111,"Java, OOP, DBMS",2026-09-20,placement241@svit.edu.in,Registration Open
+P242,LTIMindtree,MCA,Data Science,Data Analyst,8.9,Vadodara,2026-07-04,"70% throughout, No active backlogs",8,"Communication Skills, Aptitude",2026-07-01,placement242@svit.edu.in,Completed
+P243,Capgemini,Diploma,Computer Applications,Network Engineer,8.2,Ahmedabad,2026-11-25,"70% throughout, No active backlogs",63,"C++, Algorithms",2026-11-22,placement243@svit.edu.in,Completed
+P244,HCLTech,ME,Computer Applications,AI/ML Intern,13.4,Pune,2026-02-16,"65% throughout, No active backlogs",8,"Java, OOP, DBMS",2026-02-11,placement244@svit.edu.in,Completed
+P245,IBM,ME,Computer Applications,Business Analyst,5.2,Bengaluru,2026-02-20,"60% throughout, No active backlogs",52,"Java, OOP, DBMS",2026-02-11,placement245@svit.edu.in,Registration Open
+P246,Reliance Industries,MCA,Computer Engineering,Software Engineer,12.7,Ahmedabad,2026-10-05,"70% throughout, No active backlogs",64,"C++, Algorithms",2026-09-28,placement246@svit.edu.in,Upcoming
+P247,Tech Mahindra,BCA,Computer Engineering,Business Analyst,17.0,Gandhinagar,2026-11-07,"60% throughout, No active backlogs",44,"PLC, Electrical Machines",2026-11-04,placement247@svit.edu.in,Completed
+P248,Capgemini,Diploma,Electronics & Communication,Data Analyst,4.7,Surat,2026-09-22,"70% throughout, No active backlogs",67,"AutoCAD, Design",2026-09-09,placement248@svit.edu.in,Upcoming
+P249,Cognizant,ME,Automobile Engineering,AI/ML Intern,10.6,Ahmedabad,2026-08-18,"65% throughout, No active backlogs",76,"Java, OOP, DBMS",2026-08-09,placement249@svit.edu.in,Completed
+P250,Capgemini,BCA,Data Science,Cloud Engineer,13.2,Vadodara,2026-06-06,"70% throughout, No active backlogs",82,"AutoCAD, Design",2026-06-02,placement250@svit.edu.in,Registration Open
+P251,LTIMindtree,MCA,Electrical Engineering,Software Engineer,6.7,Mumbai,2026-03-28,"65% throughout, No active backlogs",14,"C++, Algorithms",2026-03-16,placement251@svit.edu.in,Registration Open
+P252,Siemens,BE,Data Science,Graduate Engineer Trainee,5.8,Vadodara,2026-01-18,"65% throughout, No active backlogs",21,"AutoCAD, Design",2026-01-09,placement252@svit.edu.in,Registration Open
+P253,Infosys,BE,Information Technology,Software Engineer,12.7,Gandhinagar,2026-10-15,"70% throughout, No active backlogs",73,"Java, OOP, DBMS",2026-10-10,placement253@svit.edu.in,Completed
+P254,Google,BCA,Computer Engineering,Data Analyst,17.1,Surat,2026-11-02,"65% throughout, No active backlogs",43,"AutoCAD, Design",2026-10-24,placement254@svit.edu.in,Completed
+P255,Tech Mahindra,Diploma,Civil Engineering,Cloud Engineer,9.8,Surat,2026-03-16,"60% throughout, No active backlogs",89,"Java, OOP, DBMS",2026-03-05,placement255@svit.edu.in,Registration Open
+P256,NVIDIA,MCA,Information Technology,QA Engineer,6.6,Vadodara,2026-02-25,"60% throughout, No active backlogs",93,"Java, OOP, DBMS",2026-02-20,placement256@svit.edu.in,Completed
+P257,Siemens,Diploma,Data Science,Data Analyst,16.9,Ahmedabad,2026-04-10,"60% throughout, No active backlogs",118,"Python, SQL, DSA",2026-04-01,placement257@svit.edu.in,Registration Open
+P258,Larsen & Toubro,BE,Computer Engineering,QA Engineer,3.8,Bengaluru,2026-04-05,"70% throughout, No active backlogs",112,"Java, OOP, DBMS",2026-03-22,placement258@svit.edu.in,Upcoming
+P259,Google,Diploma,Data Science,Electrical Engineer,6.3,Ahmedabad,2026-10-05,"60% throughout, No active backlogs",44,"Python, SQL, DSA",2026-09-29,placement259@svit.edu.in,Upcoming
+P260,HCLTech,MCA,Electrical Engineering,QA Engineer,10.1,Ahmedabad,2026-02-09,"60% throughout, No active backlogs",62,"Communication Skills, Aptitude",2026-01-27,placement260@svit.edu.in,Registration Open
+P261,Accenture,ME,Automobile Engineering,AI/ML Intern,14.7,Mumbai,2026-11-26,"60% throughout, No active backlogs",10,"C++, Algorithms",2026-11-22,placement261@svit.edu.in,Upcoming
+P262,IBM,BCA,Artificial Intelligence & Machine Learning,Mechanical Engineer,13.9,Vadodara,2026-04-04,"60% throughout, No active backlogs",87,"Java, OOP, DBMS",2026-03-21,placement262@svit.edu.in,Completed
+P263,Adani Group,Diploma,Electrical Engineering,Full Stack Developer,3.6,Ahmedabad,2026-11-18,"65% throughout, No active backlogs",117,"AutoCAD, Design",2026-11-07,placement263@svit.edu.in,Upcoming
+P264,Tech Mahindra,BE,Computer Engineering,Full Stack Developer,12.7,Vadodara,2026-11-27,"60% throughout, No active backlogs",30,"Java, OOP, DBMS",2026-11-19,placement264@svit.edu.in,Registration Open
+P265,Capgemini,ME,Civil Engineering,Civil Engineer,9.7,Ahmedabad,2026-02-14,"70% throughout, No active backlogs",94,"C++, Algorithms",2026-02-08,placement265@svit.edu.in,Registration Open
+P266,Infosys,BE,Computer Applications,Full Stack Developer,11.7,Mumbai,2026-04-20,"60% throughout, No active backlogs",15,"Communication Skills, Aptitude",2026-04-14,placement266@svit.edu.in,Upcoming
+P267,Cognizant,Diploma,Computer Applications,Data Analyst,14.2,Surat,2026-01-14,"70% throughout, No active backlogs",61,"PLC, Electrical Machines",2026-01-01,placement267@svit.edu.in,Completed
+P268,Cognizant,Diploma,Automobile Engineering,Mechanical Engineer,10.2,Hyderabad,2026-07-05,"70% throughout, No active backlogs",39,"PLC, Electrical Machines",2026-06-27,placement268@svit.edu.in,Registration Open
+P269,LTIMindtree,Diploma,Electrical Engineering,QA Engineer,8.8,Mumbai,2026-01-17,"65% throughout, No active backlogs",100,"Python, SQL, DSA",2026-01-11,placement269@svit.edu.in,Upcoming
+P270,Oracle,BE,Information Technology,Business Analyst,16.9,Vadodara,2026-07-03,"70% throughout, No active backlogs",7,"AutoCAD, Design",2026-06-18,placement270@svit.edu.in,Completed
+P271,Capgemini,ME,Civil Engineering,Network Engineer,10.5,Surat,2026-10-07,"60% throughout, No active backlogs",101,"AutoCAD, Design",2026-09-30,placement271@svit.edu.in,Completed
+P272,Adani Group,BE,Computer Engineering,Electrical Engineer,8.7,Hyderabad,2026-09-02,"65% throughout, No active backlogs",61,"C++, Algorithms",2026-08-18,placement272@svit.edu.in,Upcoming
+P273,Oracle,Diploma,Automobile Engineering,Data Analyst,10.6,Pune,2026-07-31,"65% throughout, No active backlogs",15,"Communication Skills, Aptitude",2026-07-26,placement273@svit.edu.in,Completed
+P274,Accenture,BCA,Electronics & Communication,Civil Engineer,4.5,Bengaluru,2026-04-02,"60% throughout, No active backlogs",11,"Java, OOP, DBMS",2026-03-20,placement274@svit.edu.in,Registration Open
+P275,HCLTech,BE,Computer Engineering,AI/ML Intern,13.6,Pune,2026-10-14,"65% throughout, No active backlogs",83,"Java, OOP, DBMS",2026-10-07,placement275@svit.edu.in,Upcoming
+P276,HCLTech,MCA,Information Technology,Full Stack Developer,16.8,Vadodara,2026-11-11,"60% throughout, No active backlogs",66,"PLC, Electrical Machines",2026-10-30,placement276@svit.edu.in,Upcoming
+P277,Siemens,ME,Data Science,AI/ML Intern,3.6,Pune,2026-08-27,"70% throughout, No active backlogs",19,"Java, OOP, DBMS",2026-08-24,placement277@svit.edu.in,Completed
+P278,Reliance Industries,BE,Civil Engineering,QA Engineer,8.5,Gandhinagar,2026-11-26,"65% throughout, No active backlogs",104,"Communication Skills, Aptitude",2026-11-21,placement278@svit.edu.in,Upcoming
+P279,NVIDIA,Diploma,Information Technology,QA Engineer,10.2,Hyderabad,2026-03-10,"65% throughout, No active backlogs",87,"C++, Algorithms",2026-03-01,placement279@svit.edu.in,Registration Open
+P280,Wipro,BCA,Mechanical Engineering,QA Engineer,16.8,Pune,2026-11-14,"70% throughout, No active backlogs",10,"Java, OOP, DBMS",2026-11-08,placement280@svit.edu.in,Upcoming
+P281,Tata Consultancy Services,ME,Civil Engineering,Civil Engineer,4.8,Vadodara,2026-09-13,"70% throughout, No active backlogs",13,"Python, SQL, DSA",2026-08-29,placement281@svit.edu.in,Upcoming
+P282,Tech Mahindra,ME,Electrical Engineering,Civil Engineer,7.7,Pune,2026-07-31,"70% throughout, No active backlogs",36,"AutoCAD, Design",2026-07-16,placement282@svit.edu.in,Upcoming
+P283,Tata Consultancy Services,BE,Data Science,Civil Engineer,14.9,Pune,2026-07-06,"65% throughout, No active backlogs",47,"Python, SQL, DSA",2026-06-30,placement283@svit.edu.in,Upcoming
+P284,HCLTech,BCA,Electronics & Communication,Electrical Engineer,14.8,Hyderabad,2026-09-16,"70% throughout, No active backlogs",56,"C++, Algorithms",2026-09-05,placement284@svit.edu.in,Upcoming
+P285,Oracle,ME,Data Science,Data Analyst,12.4,Hyderabad,2026-10-31,"65% throughout, No active backlogs",90,"Java, OOP, DBMS",2026-10-25,placement285@svit.edu.in,Upcoming
+P286,Reliance Industries,ME,Electronics & Communication,Full Stack Developer,8.4,Surat,2026-01-27,"60% throughout, No active backlogs",46,"PLC, Electrical Machines",2026-01-22,placement286@svit.edu.in,Upcoming
+P287,NVIDIA,ME,Computer Engineering,QA Engineer,12.0,Vadodara,2026-06-13,"60% throughout, No active backlogs",92,"AutoCAD, Design",2026-06-05,placement287@svit.edu.in,Completed
+P288,Amazon,Diploma,Information Technology,QA Engineer,8.6,Pune,2026-11-06,"65% throughout, No active backlogs",16,"Python, SQL, DSA",2026-10-23,placement288@svit.edu.in,Registration Open
+P289,Google,MCA,Electronics & Communication,QA Engineer,3.7,Gandhinagar,2026-09-25,"70% throughout, No active backlogs",23,"Python, SQL, DSA",2026-09-11,placement289@svit.edu.in,Completed
+P290,Tata Consultancy Services,BCA,Computer Applications,Civil Engineer,11.6,Ahmedabad,2026-02-25,"70% throughout, No active backlogs",119,"C++, Algorithms",2026-02-11,placement290@svit.edu.in,Upcoming
+P291,Reliance Industries,BE,Automobile Engineering,Software Engineer,5.7,Ahmedabad,2026-02-24,"65% throughout, No active backlogs",37,"PLC, Electrical Machines",2026-02-19,placement291@svit.edu.in,Registration Open
+P292,Adani Group,ME,Artificial Intelligence & Machine Learning,Civil Engineer,11.8,Hyderabad,2026-02-24,"70% throughout, No active backlogs",56,"Communication Skills, Aptitude",2026-02-16,placement292@svit.edu.in,Registration Open
+P293,IBM,Diploma,Electronics & Communication,AI/ML Intern,6.2,Mumbai,2026-04-08,"60% throughout, No active backlogs",78,"Java, OOP, DBMS",2026-03-27,placement293@svit.edu.in,Upcoming
+P294,Siemens,Diploma,Electrical Engineering,Data Analyst,6.1,Vadodara,2026-06-14,"65% throughout, No active backlogs",59,"AutoCAD, Design",2026-06-04,placement294@svit.edu.in,Completed
+P295,Wipro,BCA,Data Science,Mechanical Engineer,9.8,Ahmedabad,2026-07-15,"70% throughout, No active backlogs",42,"AutoCAD, Design",2026-07-09,placement295@svit.edu.in,Completed
+P296,Google,ME,Computer Applications,Full Stack Developer,15.6,Gandhinagar,2026-06-11,"70% throughout, No active backlogs",49,"AutoCAD, Design",2026-06-06,placement296@svit.edu.in,Upcoming
+P297,Tech Mahindra,BE,Civil Engineering,Graduate Engineer Trainee,7.3,Surat,2026-10-30,"70% throughout, No active backlogs",104,"C++, Algorithms",2026-10-23,placement297@svit.edu.in,Upcoming
+P298,Wipro,ME,Information Technology,Software Engineer,17.9,Mumbai,2026-09-18,"60% throughout, No active backlogs",42,"PLC, Electrical Machines",2026-09-10,placement298@svit.edu.in,Upcoming
+P299,LTIMindtree,MCA,Data Science,Mechanical Engineer,3.8,Hyderabad,2026-03-21,"65% throughout, No active backlogs",112,"Java, OOP, DBMS",2026-03-06,placement299@svit.edu.in,Registration Open
+P300,Tata Consultancy Services,Diploma,Artificial Intelligence & Machine Learning,Software Engineer,4.1,Vadodara,2026-10-13,"70% throughout, No active backlogs",79,"AutoCAD, Design",2026-10-06,placement300@svit.edu.in,Registration Open
