@@ -12,24 +12,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log("[SVIT AI] Chat Client Initialized.");
 
-    const chatForm = document.getElementById('chatForm');
-    const chatInput = document.getElementById('chatInput');
-    const chatThread = document.getElementById('chatThread');
-    const typingIndicator = document.getElementById('typingIndicator');
-    const welcomeSection = document.getElementById('welcomeSection');
-    const voiceBtn = document.getElementById('voiceBtn');
-
-    // =========================================================
-    // 1. EVENT LISTENERS & NAVIGATION
-    // =========================================================
-    if (voiceBtn) {
-        voiceBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleVoiceInput();
-        });
-    }
-
+    // Navigation item listeners
     const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
@@ -50,6 +33,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Delegated submit handler for forms (handles both homeChatForm and chatForm)
+    document.addEventListener('submit', (e) => {
+        if (e.target && e.target.id === 'chatForm') {
+            handleNormalFormSubmit(e);
+        } else if (e.target && e.target.id === 'homeChatForm') {
+            handleHomeFormSubmit(e);
+        }
+    });
+
+    // Delegated click handler for voice buttons
+    document.addEventListener('click', (e) => {
+        const voiceBtn = e.target.closest('#voiceBtn');
+        if (voiceBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleVoiceInput(e);
+            return;
+        }
+        const homeVoiceBtn = e.target.closest('#homeVoiceBtn');
+        if (homeVoiceBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            triggerHomeVoiceInput(e);
+            return;
+        }
+    });
+
     // Restore Sidebar Collapse State from LocalStorage
     initSidebarState();
 
@@ -67,170 +77,173 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             sendSuggested(decodeURIComponent(promptParam));
         }, 300);
-    }
-
-    // =========================================================
-    // 2. CHAT FORM SUBMISSION (STREAMING FIRST WITH JSON FALLBACK)
-    // =========================================================
-    if (chatForm) {
-        chatForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const text = chatInput.value.trim();
-            if (!text) return;
-
-            // Stop any playing TTS or active Voice Input when message is sent
-            stopTTS();
-            stopVoiceInput();
-
-            if (welcomeSection) {
-                welcomeSection.style.display = 'none';
-            }
-
-            const convIdInput = document.getElementById('activeConversationId');
-            const activeConvId = convIdInput ? convIdInput.value : '';
-
-            // Display user message
-            appendUserMessage(text);
-            chatInput.value = '';
-
-            // Show typing indicator initially
-            if (typingIndicator) {
-                typingIndicator.style.display = 'flex';
-            }
-            scrollToBottom();
-
-            let streamedSuccessfully = false;
-
-            // Attempt Fast Streaming via SSE first
-            try {
-                const streamResponse = await fetch('/api/chat/stream', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        message: text,
-                        conversation_id: activeConvId 
-                    })
-                });
-
-                if (streamResponse.ok && streamResponse.headers.get('content-type')?.includes('text/event-stream')) {
-                    if (typingIndicator) {
-                        typingIndicator.style.display = 'none';
-                    }
-
-                    const streamCard = createStreamingBotRow(text);
-                    const contentEl = streamCard.querySelector('.bot-content');
-                    let accumulatedText = '';
-                    let finalImage = null;
-                    let finalSources = [];
-                    let finalSuggestions = [];
-
-                    const reader = streamResponse.body.getReader();
-                    const decoder = new TextDecoder('utf-8');
-                    let buffer = '';
-
-                    while (true) {
-                        const { done, value } = await reader.read();
-                        if (done) break;
-
-                        buffer += decoder.decode(value, { stream: true });
-                        const lines = buffer.split('\n\n');
-                        buffer = lines.pop();
-
-                        for (const line of lines) {
-                            if (line.startsWith('data: ')) {
-                                try {
-                                    const data = JSON.parse(line.substring(6));
-                                    if (data.conversation_id) {
-                                        if (convIdInput) convIdInput.value = data.conversation_id;
-                                        streamCard.setAttribute('data-conv-id', data.conversation_id);
-                                    }
-                                    if (data.message_id) {
-                                        streamCard.setAttribute('data-msg-id', data.message_id);
-                                    }
-                                    if (data.chunk) {
-                                        accumulatedText += data.chunk;
-                                        renderMarkdown(contentEl, accumulatedText);
-                                        scrollToBottom();
-                                    }
-                                    if (data.done) {
-                                        if (data.answer) accumulatedText = data.answer;
-                                        if (data.message_id) streamCard.setAttribute('data-msg-id', data.message_id);
-                                        finalImage = data.image || null;
-                                        finalSources = data.sources || [];
-                                        finalSuggestions = data.suggestions || [];
-                                    }
-                                } catch (parseErr) {
-                                    // Keep-alive or comment
-                                }
-                            }
-                        }
-                    }
-
-                    // Finalize rendering
-                    renderMarkdown(contentEl, accumulatedText);
-                    finalizeStreamingBotRow(streamCard, finalImage, finalSources, finalSuggestions);
-                    streamedSuccessfully = true;
-                }
-            } catch (streamErr) {
-                console.warn("Streaming unavailable, falling back to JSON:", streamErr);
-            }
-
-            // Fallback to standard JSON POST if streaming wasn't completed
-            if (!streamedSuccessfully) {
-                try {
-                    let endpoints = ['/api/chat', '/student/api/chat'];
-                    let response = null;
-                    let data = null;
-
-                    for (let url of endpoints) {
-                        try {
-                            let res = await fetch(url, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ 
-                                    message: text,
-                                    conversation_id: activeConvId 
-                                })
-                            });
-                            if (res.status !== 404) {
-                                response = res;
-                                data = await res.json();
-                                break;
-                            }
-                        } catch (err) {
-                            console.warn(`Attempt failed for ${url}`);
-                        }
-                    }
-
-                    if (typingIndicator) {
-                        typingIndicator.style.display = 'none';
-                    }
-
-                    if (response && response.ok) {
-                        if (data.conversation_id && convIdInput) {
-                            convIdInput.value = data.conversation_id;
-                        }
-                        const replyText = data.answer || data.response || "No response received.";
-                        const imagePath = data.image || null;
-                        const sources = data.sources || [];
-                        const msgId = data.message_id || null;
-                        const suggestions = data.suggestions || [];
-                        appendBotMessage(replyText, imagePath, sources, text, data.conversation_id, msgId, null, suggestions);
-                    } else {
-                        const errorMsg = data?.error || `Error ${response?.status || '500'}: Failed to fetch response.`;
-                        appendBotMessage(`⚠️ ${errorMsg}`, null, [], text);
-                    }
-                } catch (jsonErr) {
-                    if (typingIndicator) {
-                        typingIndicator.style.display = 'none';
-                    }
-                    console.error("Chat API Fallback Error:", jsonErr);
-                    appendBotMessage('⚠️ Error connecting to server. Please check your backend terminal logs.', null, [], text);
-                }
-            }
-        });
+    } else {
+        showHomeState();
     }
 });
+
+// =========================================================
+// 2. UNIFIED MESSAGE SUBMISSION & STREAMING ENGINE
+// =========================================================
+async function submitMessage(text) {
+    if (!text || !text.trim()) return;
+    text = text.trim();
+
+    // Stop any playing TTS or active Voice Input when message is sent
+    stopTTS();
+    stopVoiceInput();
+
+    // Ensure active chat state (Home Composer removed from DOM, Normal Composer mounted)
+    showActiveChatState();
+
+    const convIdInput = document.getElementById('activeConversationId');
+    const activeConvId = convIdInput ? convIdInput.value : '';
+    const typingIndicator = document.getElementById('typingIndicator');
+    const chatInput = document.getElementById('chatInput');
+    if (chatInput) chatInput.value = '';
+
+    // Display user message
+    appendUserMessage(text);
+
+    // Show typing indicator initially
+    if (typingIndicator) {
+        typingIndicator.style.display = 'flex';
+    }
+    scrollToBottom();
+
+    let streamedSuccessfully = false;
+
+    // Attempt Fast Streaming via SSE first
+    try {
+        const streamResponse = await fetch('/api/chat/stream', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                message: text,
+                conversation_id: activeConvId 
+            })
+        });
+
+        if (streamResponse.ok && streamResponse.headers.get('content-type')?.includes('text/event-stream')) {
+            if (typingIndicator) {
+                typingIndicator.style.display = 'none';
+            }
+
+            const streamCard = createStreamingBotRow(text);
+            const contentEl = streamCard.querySelector('.bot-content');
+            let accumulatedText = '';
+            let finalImage = null;
+            let finalSources = [];
+            let finalSuggestions = [];
+
+            const reader = streamResponse.body.getReader();
+            const decoder = new TextDecoder('utf-8');
+            let buffer = '';
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n\n');
+                buffer = lines.pop();
+
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        try {
+                            const data = JSON.parse(line.substring(6));
+                            if (data.conversation_id) {
+                                if (convIdInput) convIdInput.value = data.conversation_id;
+                                streamCard.setAttribute('data-conv-id', data.conversation_id);
+                            }
+                            if (data.message_id) {
+                                streamCard.setAttribute('data-msg-id', data.message_id);
+                            }
+                            if (data.chunk) {
+                                accumulatedText += data.chunk;
+                                renderMarkdown(contentEl, accumulatedText);
+                                scrollToBottom();
+                            }
+                            if (data.done) {
+                                if (data.answer) accumulatedText = data.answer;
+                                if (data.message_id) streamCard.setAttribute('data-msg-id', data.message_id);
+                                finalImage = data.image || null;
+                                finalSources = data.sources || [];
+                                finalSuggestions = data.suggestions || [];
+                            }
+                        } catch (parseErr) {
+                            // Keep-alive or comment
+                        }
+                    }
+                }
+            }
+
+            // Finalize rendering
+            renderMarkdown(contentEl, accumulatedText);
+            finalizeStreamingBotRow(streamCard, finalImage, finalSources, finalSuggestions);
+            streamedSuccessfully = true;
+            loadSidebarRecents();
+        }
+    } catch (streamErr) {
+        console.warn("Streaming unavailable, falling back to JSON:", streamErr);
+    }
+
+    // Fallback to standard JSON POST if streaming wasn't completed
+    if (!streamedSuccessfully) {
+        try {
+            let endpoints = ['/api/chat', '/student/api/chat'];
+            let response = null;
+            let data = null;
+
+            for (let url of endpoints) {
+                try {
+                    let res = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            message: text,
+                            conversation_id: activeConvId 
+                        })
+                    });
+                    if (res.status !== 404) {
+                        response = res;
+                        data = await res.json();
+                        break;
+                    }
+                } catch (err) {
+                    console.warn(`Attempt failed for ${url}`);
+                }
+            }
+
+            if (typingIndicator) {
+                typingIndicator.style.display = 'none';
+            }
+
+            if (response && response.ok) {
+                if (data.conversation_id && convIdInput) {
+                    convIdInput.value = data.conversation_id;
+                }
+                const replyText = data.answer || data.response || "No response received.";
+                const imagePath = data.image || null;
+                const sources = data.sources || [];
+                const msgId = data.message_id || null;
+                const suggestions = data.suggestions || [];
+                appendBotMessage(replyText, imagePath, sources, text, data.conversation_id, msgId, null, suggestions);
+                loadSidebarRecents();
+            } else {
+                const errorMsg = data?.error || `Error ${response?.status || '500'}: Failed to fetch response.`;
+                appendBotMessage(`⚠️ ${errorMsg}`, null, [], text);
+            }
+        } catch (jsonErr) {
+            if (typingIndicator) {
+                typingIndicator.style.display = 'none';
+            }
+            console.error("Chat API Fallback Error:", jsonErr);
+            appendBotMessage('⚠️ Error connecting to server. Please check your backend terminal logs.', null, [], text);
+        }
+    }
+}
+window.submitMessage = submitMessage;
 
 // =========================================================
 // 3. UI RENDERING & HISTORY RESTORATION HELPERS
@@ -240,11 +253,10 @@ async function loadConversationMessages(convId) {
     if (!convId) return;
 
     const chatThread = document.getElementById('chatThread');
-    const welcomeSection = document.getElementById('welcomeSection');
     const convIdInput = document.getElementById('activeConversationId');
 
     if (convIdInput) convIdInput.value = convId;
-    if (welcomeSection) welcomeSection.style.display = 'none';
+    showActiveChatState();
     if (chatThread) chatThread.innerHTML = '';
 
     try {
@@ -286,9 +298,6 @@ function appendUserMessage(text) {
     userRow.classList.add('chat-row', 'user-row');
     userRow.innerHTML = `
         <div class="user-bubble">${escapeHtml(text)}</div>
-        <div class="chat-avatar user-initial-avatar" style="width: 35px; height: 35px; border-radius: 50%; background: #4f46e5; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px;">
-            U
-        </div>
     `;
     chatThread.appendChild(userRow);
     scrollToBottom();
@@ -423,17 +432,204 @@ function appendBotMessage(text, imagePath = null, sources = [], userQueryText = 
     finalizeStreamingBotRow(row, imagePath, sources, suggestions);
 }
 
+function showHomeState() {
+    // 1. Remove all Normal Chat Composer instances completely from active DOM
+    document.querySelectorAll('#normalChatComposer').forEach(el => el.remove());
+
+    // 2. Ensure Welcome Section (with Home Composer) is in DOM exactly once
+    const chatContainer = document.getElementById('chatContainer');
+    const chatThread = document.getElementById('chatThread');
+    const welcomeSections = document.querySelectorAll('#welcomeSection');
+
+    if (welcomeSections.length === 0) {
+        const tpl = document.getElementById('welcomeSectionTemplate');
+        if (tpl && chatContainer) {
+            const clone = tpl.content.cloneNode(true);
+            chatContainer.insertBefore(clone, chatThread || null);
+        }
+    } else {
+        // Remove any duplicate welcome sections
+        welcomeSections.forEach((el, index) => {
+            if (index > 0) el.remove();
+        });
+    }
+
+    // 3. Ensure no extra #homeComposerWrapper duplicates exist
+    document.querySelectorAll('#homeComposerWrapper').forEach((el, index) => {
+        if (index > 0) el.remove();
+    });
+
+    // 4. Hide chat thread and reset content
+    if (chatThread) {
+        chatThread.style.display = 'none';
+        chatThread.innerHTML = '';
+    }
+
+    // 5. Ensure Lucide icons are initialized
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+
+    // 6. Focus home chat input if available
+    const homeInput = document.getElementById('homeChatInput');
+    if (homeInput) {
+        homeInput.value = '';
+    }
+}
+window.showHomeState = showHomeState;
+
+function showActiveChatState() {
+    // 1. Remove all Welcome Section (and Home Composer) instances completely from DOM
+    document.querySelectorAll('#welcomeSection').forEach(el => el.remove());
+    document.querySelectorAll('#homeComposerWrapper').forEach(el => el.remove());
+
+    // 2. Ensure Normal Chat Composer is in DOM exactly once
+    const normalComposers = document.querySelectorAll('#normalChatComposer');
+    if (normalComposers.length === 0) {
+        const tpl = document.getElementById('normalComposerTemplate');
+        const mainWrapper = document.querySelector('.main-wrapper') || document.body;
+        if (tpl && mainWrapper) {
+            const clone = tpl.content.cloneNode(true);
+            mainWrapper.appendChild(clone);
+        }
+    } else {
+        // Remove any duplicate normal composers
+        normalComposers.forEach((el, index) => {
+            if (index > 0) el.remove();
+        });
+    }
+
+    // 3. Show chat thread
+    const chatThread = document.getElementById('chatThread');
+    if (chatThread) {
+        chatThread.style.display = 'flex';
+    }
+
+    // 4. Ensure Lucide icons are initialized
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+}
+window.showActiveChatState = showActiveChatState;
+
+function handleHomeFormSubmit(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    const homeInput = document.getElementById('homeChatInput');
+    if (!homeInput || !homeInput.value.trim()) return;
+    const text = homeInput.value.trim();
+    homeInput.value = '';
+    submitMessage(text);
+}
+window.handleHomeFormSubmit = handleHomeFormSubmit;
+
+function handleNormalFormSubmit(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    const chatInput = document.getElementById('chatInput');
+    if (!chatInput || !chatInput.value.trim()) return;
+    const text = chatInput.value.trim();
+    chatInput.value = '';
+    submitMessage(text);
+}
+window.handleNormalFormSubmit = handleNormalFormSubmit;
+
+function triggerHomeVoiceInput(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    const homeInput = document.getElementById('homeChatInput');
+    const voiceBtn = document.getElementById('homeVoiceBtn');
+    
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        alert("Speech recognition is not supported in this browser.");
+        return;
+    }
+    
+    if (window.activeVoiceRecognition) {
+        window.activeVoiceRecognition.stop();
+        window.activeVoiceRecognition = null;
+        if (voiceBtn) voiceBtn.classList.remove('recording');
+        return;
+    }
+    
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-IN';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    
+    recognition.onstart = () => {
+        window.activeVoiceRecognition = recognition;
+        if (voiceBtn) voiceBtn.classList.add('recording');
+        if (homeInput) homeInput.placeholder = '🎙️ Listening... Speak now';
+    };
+    
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        if (transcript && transcript.trim()) {
+            submitMessage(transcript.trim());
+        }
+    };
+    
+    recognition.onerror = () => {
+        if (voiceBtn) voiceBtn.classList.remove('recording');
+        if (homeInput) homeInput.placeholder = 'Ask anything about timetables, rooms, events, placements...';
+        window.activeVoiceRecognition = null;
+    };
+    
+    recognition.onend = () => {
+        if (voiceBtn) voiceBtn.classList.remove('recording');
+        if (homeInput) homeInput.placeholder = 'Ask anything about timetables, rooms, events, placements...';
+        window.activeVoiceRecognition = null;
+    };
+    
+    recognition.start();
+}
+window.triggerHomeVoiceInput = triggerHomeVoiceInput;
+
+function resetChat() {
+    stopTTS();
+    stopVoiceInput();
+
+    const convIdInput = document.getElementById('activeConversationId');
+    if (convIdInput) convIdInput.value = '';
+    
+    if (window.history && window.history.pushState) {
+        window.history.pushState(null, '', window.location.pathname);
+    }
+    
+    document.querySelectorAll('.recent-chat-item').forEach(el => el.classList.remove('active'));
+
+    showHomeState();
+}
+window.resetChat = resetChat;
+
 function sendSuggested(questionText) {
     if (!questionText) return;
     const cleanText = questionText.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').trim() || questionText.trim();
-    const chatInput = document.getElementById('chatInput');
-    const chatForm = document.getElementById('chatForm');
-    if (chatInput && chatForm) {
-        chatInput.value = cleanText;
-        chatForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-    }
+    if (!cleanText) return;
+    submitMessage(cleanText);
 }
 window.sendSuggested = sendSuggested;
+
+function sendFirstSuggestionOrFocus() {
+    const homeInput = document.getElementById('homeChatInput');
+    const normalInput = document.getElementById('chatInput');
+    if (homeInput && homeInput.value.trim()) {
+        handleHomeFormSubmit();
+    } else if (normalInput && normalInput.value.trim()) {
+        handleNormalFormSubmit();
+    } else {
+        sendSuggested("What's my next class right now?");
+    }
+}
+window.sendFirstSuggestionOrFocus = sendFirstSuggestionOrFocus;
 
 // Global Delegated Click Listener for Follow-up Chips
 document.addEventListener('click', (e) => {
@@ -448,12 +644,46 @@ document.addEventListener('click', (e) => {
     }
 });
 
+function checkScrollToBottomVisibility() {
+    const chatContainer = document.querySelector('.chat-container');
+    const scrollBtn = document.getElementById('scrollToBottomBtn');
+    if (!chatContainer || !scrollBtn) return;
+
+    const distanceToBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight;
+    if (distanceToBottom > 100 && chatContainer.scrollHeight > chatContainer.clientHeight + 80) {
+        scrollBtn.classList.add('visible');
+    } else {
+        scrollBtn.classList.remove('visible');
+    }
+}
+
+function smoothScrollToBottom() {
+    const chatContainer = document.querySelector('.chat-container');
+    if (chatContainer) {
+        chatContainer.scrollTo({
+            top: chatContainer.scrollHeight,
+            behavior: 'smooth'
+        });
+        const scrollBtn = document.getElementById('scrollToBottomBtn');
+        if (scrollBtn) scrollBtn.classList.remove('visible');
+    }
+}
+
 function scrollToBottom() {
     const chatContainer = document.querySelector('.chat-container') || document.getElementById('chatThread');
     if (chatContainer) {
         chatContainer.scrollTop = chatContainer.scrollHeight;
+        checkScrollToBottomVisibility();
     }
 }
+
+// Attach scroll listener to .chat-container for dynamic floating button visibility
+window.addEventListener('DOMContentLoaded', () => {
+    const chatContainer = document.querySelector('.chat-container');
+    if (chatContainer) {
+        chatContainer.addEventListener('scroll', checkScrollToBottomVisibility, { passive: true });
+    }
+});
 
 function escapeHtml(text) {
     if (typeof text !== 'string') return text;
@@ -864,7 +1094,7 @@ async function stopVoiceInput() {
     }
 
     if (chatInput) {
-        chatInput.placeholder = 'Ask anything about rooms, courses, events, or campus directions...';
+        chatInput.placeholder = 'Ask anything about timetables, rooms, events, placements...';
         chatInput.focus();
     }
 }
@@ -1236,13 +1466,21 @@ function renderRecentChatsList(chats) {
 
     const currentConvId = document.getElementById('activeConversationId')?.value || '';
 
-    container.innerHTML = chats.slice(0, 30).map(c => `
+    // Prioritize pinned chats at the top
+    const sortedChats = [...chats].sort((a, b) => {
+        if (a.is_pinned && !b.is_pinned) return -1;
+        if (!a.is_pinned && b.is_pinned) return 1;
+        return 0;
+    });
+
+    container.innerHTML = sortedChats.slice(0, 30).map(c => `
         <a href="/?conversation_id=${encodeURIComponent(c.id)}" 
-           class="recent-chat-item ${c.id === currentConvId ? 'active' : ''}" 
+           class="recent-chat-item ${c.id === currentConvId ? 'active' : ''} ${c.is_pinned ? 'pinned' : ''}" 
            onclick="selectRecentChat(event, '${escapeHtml(c.id)}')" 
            title="${escapeHtml(c.title || 'Untitled Conversation')}">
+            ${c.is_pinned ? '<i data-lucide="pin" class="pin-indicator-icon" title="Pinned"></i>' : ''}
             <span class="chat-title-text">${escapeHtml(c.title || 'Conversation')}</span>
-            <button type="button" class="recent-item-options-btn" title="Options" onclick="event.stopPropagation(); window.location.href='/chat/history-page';">
+            <button type="button" class="recent-item-options-btn" title="Options" onclick="openRecentChatMenu(event, '${escapeHtml(c.id)}', '${escapeHtml(c.title || '')}', ${Boolean(c.is_pinned)})">
                 <i data-lucide="more-horizontal"></i>
             </button>
         </a>
@@ -1282,3 +1520,547 @@ function clearRecentSearch() {
     if (input) input.value = '';
     renderRecentChatsList(cachedRecentChats);
 }
+
+// =========================================================
+// CHATGPT-STYLE RECENT CHAT & HEADER CONTEXT MENU ACTIONS
+// =========================================================
+let activeMenuConversationId = null;
+let activeMenuConversationTitle = '';
+let activeMenuIsPinned = false;
+let activeMenuSource = null; // 'sidebar' | 'header'
+let isActionProcessing = false;
+
+function ensureContextMenuElements() {
+    if (!document.getElementById('chatContextMenu')) {
+        const menu = document.createElement('div');
+        menu.id = 'chatContextMenu';
+        menu.className = 'chat-context-menu';
+        menu.setAttribute('role', 'menu');
+        document.body.appendChild(menu);
+    }
+
+    if (!document.getElementById('chatActionModal')) {
+        const modal = document.createElement('div');
+        modal.id = 'chatActionModal';
+        modal.className = 'chat-modal-backdrop';
+        modal.style.display = 'none';
+        modal.onclick = function(e) { if (e.target === modal) closeChatModal(); };
+        modal.innerHTML = `
+            <div class="chat-modal-box">
+                <div class="chat-modal-header">
+                    <h3 id="chatModalTitle">Rename Chat</h3>
+                    <button type="button" class="chat-modal-close" onclick="closeChatModal()">&times;</button>
+                </div>
+                <div class="chat-modal-body" id="chatModalBody"></div>
+                <div class="chat-modal-footer" id="chatModalFooter"></div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    if (!document.getElementById('chatToast')) {
+        const toast = document.createElement('div');
+        toast.id = 'chatToast';
+        toast.className = 'chat-floating-toast';
+        toast.style.display = 'none';
+        toast.innerHTML = `
+            <i data-lucide="check-circle" id="chatToastIcon"></i>
+            <span id="chatToastMessage">Done</span>
+        `;
+        document.body.appendChild(toast);
+    }
+
+    if (window.lucide) lucide.createIcons();
+}
+
+function showChatToast(message, isError = false) {
+    ensureContextMenuElements();
+    const toast = document.getElementById('chatToast');
+    const toastMsg = document.getElementById('chatToastMessage');
+    const toastIcon = document.getElementById('chatToastIcon');
+    if (!toast || !toastMsg) return;
+
+    toastMsg.textContent = message;
+    if (toastIcon) {
+        toastIcon.setAttribute('data-lucide', isError ? 'alert-circle' : 'check-circle');
+        toastIcon.style.color = isError ? '#EF4444' : '#10B981';
+    }
+    toast.style.display = 'flex';
+    if (window.lucide) lucide.createIcons();
+
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => { toast.style.display = 'none'; }, 220);
+    }, 2800);
+}
+
+function openRecentChatMenu(e, convId, title, isPinned = false) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    ensureContextMenuElements();
+
+    const menu = document.getElementById('chatContextMenu');
+    if (menu && menu.classList.contains('active') && activeMenuConversationId === convId && activeMenuSource === 'sidebar') {
+        closeRecentChatMenu();
+        return;
+    }
+
+    closeRecentChatMenu();
+
+    activeMenuConversationId = convId;
+    activeMenuConversationTitle = title;
+    activeMenuIsPinned = Boolean(isPinned);
+    activeMenuSource = 'sidebar';
+
+    if (!menu) return;
+
+    // Sidebar menu items: Share, Rename, Divider, Pin, Archive, Delete
+    menu.innerHTML = `
+        <button type="button" class="context-menu-item" onclick="handleContextMenuAction('share')">
+            <i data-lucide="share-2"></i>
+            <span>Share</span>
+        </button>
+        <button type="button" class="context-menu-item" onclick="handleContextMenuAction('rename')">
+            <i data-lucide="edit-3"></i>
+            <span>Rename</span>
+        </button>
+        <div class="context-menu-divider"></div>
+        <button type="button" class="context-menu-item" id="contextMenuPinBtn" onclick="handleContextMenuAction('pin')">
+            <i data-lucide="${activeMenuIsPinned ? 'pin-off' : 'pin'}" id="contextMenuPinIcon"></i>
+            <span id="contextMenuPinText">${activeMenuIsPinned ? 'Unpin chat' : 'Pin chat'}</span>
+        </button>
+        <button type="button" class="context-menu-item" onclick="handleContextMenuAction('archive')">
+            <i data-lucide="archive"></i>
+            <span>Archive</span>
+        </button>
+        <button type="button" class="context-menu-item danger" onclick="handleContextMenuAction('delete')">
+            <i data-lucide="trash-2"></i>
+            <span>Delete</span>
+        </button>
+    `;
+
+    const btnRect = e.currentTarget.getBoundingClientRect();
+    const menuWidth = window.innerWidth <= 480 ? 210 : 250;
+    const menuHeight = 220;
+
+    let left = btnRect.right + 6;
+    let top = btnRect.top - 4;
+
+    // Reposition to left if near right edge
+    if (left + menuWidth > window.innerWidth - 10) {
+        left = btnRect.left - menuWidth - 6;
+    }
+
+    // Clamp inside viewport horizontally (375px/768px screens)
+    if (left < 10) {
+        left = Math.max(10, Math.min(window.innerWidth - menuWidth - 10, btnRect.left));
+    }
+
+    // Reposition upward if near bottom edge (handles bottom-most chat)
+    if (top + menuHeight > window.innerHeight - 10) {
+        top = Math.max(10, window.innerHeight - menuHeight - 10);
+    }
+    if (top < 10) top = 10;
+
+    menu.style.left = `${left}px`;
+    menu.style.top = `${top}px`;
+    menu.classList.add('active');
+
+    if (window.lucide) lucide.createIcons();
+}
+
+function toggleHeaderOptionsMenu(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ensureContextMenuElements();
+
+    const menu = document.getElementById('chatContextMenu');
+    if (menu && menu.classList.contains('active') && activeMenuSource === 'header') {
+        closeRecentChatMenu();
+        return;
+    }
+
+    closeRecentChatMenu();
+
+    const activeConvId = document.getElementById('activeConversationId')?.value || '';
+    const activeChat = cachedRecentChats.find(c => c.id === activeConvId);
+
+    activeMenuConversationId = activeConvId;
+    activeMenuConversationTitle = activeChat ? activeChat.title : 'Current Conversation';
+    activeMenuIsPinned = Boolean(activeChat?.is_pinned);
+    activeMenuSource = 'header';
+
+    if (!menu) return;
+
+    // ChatGPT Conversation Header Menu: View files in chat, Pin chat, Archive, Delete
+    menu.innerHTML = `
+        <button type="button" class="context-menu-item" onclick="handleContextMenuAction('view_files')">
+            <i data-lucide="folder"></i>
+            <span>View files in chat</span>
+        </button>
+        <button type="button" class="context-menu-item" id="contextMenuPinBtn" onclick="handleContextMenuAction('pin')">
+            <i data-lucide="${activeMenuIsPinned ? 'pin-off' : 'pin'}" id="contextMenuPinIcon"></i>
+            <span id="contextMenuPinText">${activeMenuIsPinned ? 'Unpin chat' : 'Pin chat'}</span>
+        </button>
+        <button type="button" class="context-menu-item" onclick="handleContextMenuAction('archive')">
+            <i data-lucide="archive"></i>
+            <span>Archive</span>
+        </button>
+        <button type="button" class="context-menu-item danger" onclick="handleContextMenuAction('delete')">
+            <i data-lucide="trash-2"></i>
+            <span>Delete</span>
+        </button>
+    `;
+
+    const btn = document.getElementById('headerOptionsBtn') || (e ? e.currentTarget : null);
+    if (!btn) return;
+
+    const btnRect = btn.getBoundingClientRect();
+    const menuWidth = window.innerWidth <= 480 ? 210 : 260;
+    const menuHeight = 180;
+
+    let left = btnRect.right - menuWidth;
+    let top = btnRect.bottom + 8;
+
+    if (left + menuWidth > window.innerWidth - 10) {
+        left = window.innerWidth - menuWidth - 10;
+    }
+    if (left < 10) left = 10;
+
+    if (top + menuHeight > window.innerHeight - 10) {
+        top = Math.max(10, btnRect.top - menuHeight - 6);
+    }
+    if (top < 10) top = 10;
+
+    menu.style.left = `${left}px`;
+    menu.style.top = `${top}px`;
+    menu.classList.add('active');
+    btn.classList.add('active');
+
+    if (window.lucide) lucide.createIcons();
+}
+
+function handleHeaderShare() {
+    const activeConvId = document.getElementById('activeConversationId')?.value || '';
+    const shareUrl = activeConvId 
+        ? `${window.location.origin}/?conversation_id=${encodeURIComponent(activeConvId)}`
+        : window.location.href;
+
+    try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                showChatToast("Share link copied to clipboard!");
+            }).catch(() => {
+                prompt("Copy share link:", shareUrl);
+            });
+        } else {
+            prompt("Copy share link:", shareUrl);
+        }
+    } catch (err) {
+        prompt("Copy share link:", shareUrl);
+    }
+}
+
+function closeRecentChatMenu() {
+    const menu = document.getElementById('chatContextMenu');
+    if (menu) menu.classList.remove('active');
+    const headerBtn = document.getElementById('headerOptionsBtn');
+    if (headerBtn) headerBtn.classList.remove('active');
+    activeMenuSource = null;
+}
+
+function closeChatModal() {
+    const modal = document.getElementById('chatActionModal');
+    if (modal) modal.style.display = 'none';
+}
+
+async function handleContextMenuAction(action) {
+    const convId = activeMenuConversationId;
+    const currentTitle = activeMenuConversationTitle;
+    closeRecentChatMenu();
+
+    if (action === 'view_files') {
+        if (isActionProcessing) return;
+        isActionProcessing = true;
+        try {
+            ensureContextMenuElements();
+            const modal = document.getElementById('chatActionModal');
+            const modalTitle = document.getElementById('chatModalTitle');
+            const modalBody = document.getElementById('chatModalBody');
+            const modalFooter = document.getElementById('chatModalFooter');
+
+            if (modalTitle) modalTitle.innerHTML = `<i data-lucide="folder" style="width:18px; height:18px; vertical-align:middle; margin-right:6px; color:#60A5FA;"></i> Files in this Chat`;
+            if (modalBody) {
+                modalBody.innerHTML = `
+                    <div style="display:flex; align-items:center; justify-content:center; padding:24px 0; color:#9CA3AF; gap:8px;">
+                        <i data-lucide="loader" class="spin-icon"></i>
+                        <span>Fetching conversation files...</span>
+                    </div>
+                `;
+            }
+            if (modalFooter) {
+                modalFooter.innerHTML = `
+                    <button type="button" class="chat-modal-btn secondary" onclick="closeChatModal()">Close</button>
+                `;
+            }
+            modal.style.display = 'flex';
+            if (window.lucide) lucide.createIcons();
+
+            if (!convId) {
+                modalBody.innerHTML = `
+                    <div style="text-align:center; padding:24px 12px;">
+                        <div style="width:48px; height:48px; border-radius:14px; background:rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center; margin:0 auto 12px; color:#9CA3AF;">
+                            <i data-lucide="file-x" style="width:24px; height:24px;"></i>
+                        </div>
+                        <p style="color:#F5F5F7; font-weight:600; margin-bottom:4px;">No Attached Files</p>
+                        <p style="font-size:13px; color:#9CA3AF; margin:0;">Start chatting or upload a document to view attachments here.</p>
+                    </div>
+                `;
+                if (window.lucide) lucide.createIcons();
+                return;
+            }
+
+            const res = await fetch(`/chat/${encodeURIComponent(convId)}`);
+            const data = await res.json();
+            const messages = data.messages || [];
+            
+            const files = [];
+            messages.forEach(m => {
+                if (m.image_path) {
+                    files.push({ type: 'image', path: m.image_path, name: m.image_path.split('/').pop() });
+                }
+                if (Array.isArray(m.sources) && m.sources.length > 0) {
+                    m.sources.forEach(src => {
+                        files.push({ type: 'source', name: src.name || src.title || (typeof src === 'string' ? src : 'Academic Document'), url: src.url || '#' });
+                    });
+                }
+            });
+
+            if (files.length === 0) {
+                modalBody.innerHTML = `
+                    <div style="text-align:center; padding:24px 12px;">
+                        <div style="width:48px; height:48px; border-radius:14px; background:rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center; margin:0 auto 12px; color:#9CA3AF;">
+                            <i data-lucide="file-x" style="width:24px; height:24px;"></i>
+                        </div>
+                        <p style="color:#F5F5F7; font-weight:600; margin-bottom:4px;">No Attached Files</p>
+                        <p style="font-size:13px; color:#9CA3AF; margin:0;">No document files or images were uploaded or referenced in this conversation.</p>
+                    </div>
+                `;
+            } else {
+                let html = `<div style="display:flex; flex-direction:column; gap:8px; max-height:280px; overflow-y:auto;">`;
+                files.forEach(f => {
+                    html += `
+                        <div style="display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.05); padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.08);">
+                            <div style="display:flex; align-items:center; gap:10px; overflow:hidden;">
+                                <i data-lucide="${f.type === 'image' ? 'image' : 'file-text'}" style="width:18px; height:18px; color:#60A5FA; flex-shrink:0;"></i>
+                                <span style="font-size:13px; color:#F5F5F7; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(f.name)}</span>
+                            </div>
+                            ${f.path ? `<a href="${escapeHtml(f.path)}" target="_blank" style="color:#60A5FA; font-size:12px; text-decoration:none; font-weight:500;">View</a>` : ''}
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+                modalBody.innerHTML = html;
+            }
+            if (window.lucide) lucide.createIcons();
+        } catch (err) {
+            showChatToast("Failed to load conversation files.", true);
+        } finally {
+            isActionProcessing = false;
+        }
+    } else if (action === 'share') {
+        if (!convId) {
+            handleHeaderShare();
+            return;
+        }
+        const shareUrl = `${window.location.origin}/?conversation_id=${encodeURIComponent(convId)}`;
+        try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(shareUrl);
+                showChatToast("Share link copied to clipboard!");
+            } else {
+                prompt("Copy share link:", shareUrl);
+            }
+        } catch (err) {
+            prompt("Copy share link:", shareUrl);
+        }
+    } else if (action === 'rename') {
+        if (!convId) return;
+        ensureContextMenuElements();
+        const modal = document.getElementById('chatActionModal');
+        const modalTitle = document.getElementById('chatModalTitle');
+        const modalBody = document.getElementById('chatModalBody');
+        const modalFooter = document.getElementById('chatModalFooter');
+
+        if (modalTitle) modalTitle.textContent = "Rename Conversation";
+        if (modalBody) {
+            modalBody.innerHTML = `
+                <label style="display:block; margin-bottom:8px; font-size:13px; color:#9CA3AF;">Conversation title</label>
+                <input type="text" id="renameChatInput" class="chat-modal-input" value="${escapeHtml(currentTitle)}" maxlength="100" />
+            `;
+        }
+        if (modalFooter) {
+            modalFooter.innerHTML = `
+                <button type="button" class="chat-modal-btn secondary" onclick="closeChatModal()">Cancel</button>
+                <button type="button" class="chat-modal-btn primary" id="confirmRenameBtn" onclick="submitRenameChat('${escapeHtml(convId)}')">Save</button>
+            `;
+        }
+        modal.style.display = 'flex';
+        const input = document.getElementById('renameChatInput');
+        if (input) {
+            input.focus();
+            input.select();
+            input.onkeydown = function(e) {
+                if (e.key === 'Enter') submitRenameChat(convId);
+            };
+        }
+    } else if (action === 'pin') {
+        if (!convId) {
+            showChatToast("No active chat to pin.");
+            return;
+        }
+        try {
+            const res = await fetch(`/chat/${encodeURIComponent(convId)}/pin`, { method: 'POST' });
+            const data = await res.json();
+            if (res.ok) {
+                const isPinned = Boolean(data.is_pinned);
+                cachedRecentChats = cachedRecentChats.map(c => c.id === convId ? { ...c, is_pinned: isPinned } : c);
+                renderRecentChatsList(cachedRecentChats);
+                showChatToast(isPinned ? "Chat pinned to top." : "Chat unpinned.");
+            } else {
+                showChatToast(data.message || "Failed to update pin state.", true);
+            }
+        } catch (err) {
+            showChatToast("Error updating pin state.", true);
+        }
+    } else if (action === 'archive') {
+        if (!convId) {
+            showChatToast("Chat archived.");
+            return;
+        }
+        cachedRecentChats = cachedRecentChats.filter(c => c.id !== convId);
+        renderRecentChatsList(cachedRecentChats);
+        const activeInput = document.getElementById('activeConversationId');
+        if (activeInput && activeInput.value === convId) {
+            if (typeof resetChat === 'function') resetChat();
+        }
+        showChatToast("Chat archived.");
+    } else if (action === 'delete') {
+        if (!convId) {
+            showChatToast("No active conversation to delete.");
+            return;
+        }
+        ensureContextMenuElements();
+        const modal = document.getElementById('chatActionModal');
+        const modalTitle = document.getElementById('chatModalTitle');
+        const modalBody = document.getElementById('chatModalBody');
+        const modalFooter = document.getElementById('chatModalFooter');
+
+        if (modalTitle) modalTitle.textContent = "Delete Conversation?";
+        if (modalBody) {
+            modalBody.innerHTML = `
+                <p style="margin:0 0 8px 0; color:#F5F5F7; font-weight:500;">Are you sure you want to delete this chat?</p>
+                <p style="margin:0; font-size:13px; color:#9CA3AF;">This action cannot be undone and will permanently delete all messages in <em>"${escapeHtml(currentTitle)}"</em>.</p>
+            `;
+        }
+        if (modalFooter) {
+            modalFooter.innerHTML = `
+                <button type="button" class="chat-modal-btn secondary" onclick="closeChatModal()">Cancel</button>
+                <button type="button" class="chat-modal-btn danger" id="confirmDeleteBtn" onclick="submitDeleteChat('${escapeHtml(convId)}')">Delete</button>
+            `;
+        }
+        modal.style.display = 'flex';
+    }
+}
+
+async function submitRenameChat(convId) {
+    const input = document.getElementById('renameChatInput');
+    const newTitle = (input?.value || '').trim();
+    if (!newTitle) return;
+
+    const btn = document.getElementById('confirmRenameBtn');
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = "Saving...";
+    }
+
+    try {
+        const res = await fetch(`/chat/${encodeURIComponent(convId)}/rename`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: newTitle })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            cachedRecentChats = cachedRecentChats.map(c => c.id === convId ? { ...c, title: newTitle } : c);
+            renderRecentChatsList(cachedRecentChats);
+            closeChatModal();
+            showChatToast("Conversation renamed.");
+        } else {
+            showChatToast(data.message || "Failed to rename.", true);
+        }
+    } catch (err) {
+        showChatToast("Error renaming conversation.", true);
+    }
+}
+
+async function submitDeleteChat(convId) {
+    const btn = document.getElementById('confirmDeleteBtn');
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = "Deleting...";
+    }
+
+    try {
+        const res = await fetch(`/chat/${encodeURIComponent(convId)}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (res.ok) {
+            cachedRecentChats = cachedRecentChats.filter(c => c.id !== convId);
+            renderRecentChatsList(cachedRecentChats);
+            closeChatModal();
+
+            const activeInput = document.getElementById('activeConversationId');
+            if (activeInput && activeInput.value === convId) {
+                if (typeof resetChat === 'function') {
+                    resetChat();
+                }
+            }
+            showChatToast("Conversation deleted.");
+        } else {
+            showChatToast(data.message || "Failed to delete.", true);
+        }
+    } catch (err) {
+        showChatToast("Error deleting conversation.", true);
+    }
+}
+
+// Global click and keydown listeners for closing context menu
+document.addEventListener('click', function(e) {
+    const menu = document.getElementById('chatContextMenu');
+    if (menu && menu.classList.contains('active') && !menu.contains(e.target) && !e.target.closest('.recent-item-options-btn') && !e.target.closest('#headerOptionsBtn')) {
+        closeRecentChatMenu();
+    }
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeRecentChatMenu();
+        closeChatModal();
+    }
+});
+
+window.openRecentChatMenu = openRecentChatMenu;
+window.toggleHeaderOptionsMenu = toggleHeaderOptionsMenu;
+window.handleHeaderShare = handleHeaderShare;
+window.closeRecentChatMenu = closeRecentChatMenu;
+window.handleContextMenuAction = handleContextMenuAction;
+window.submitRenameChat = submitRenameChat;
+window.submitDeleteChat = submitDeleteChat;
+window.closeChatModal = closeChatModal;
+window.smoothScrollToBottom = smoothScrollToBottom;
+window.checkScrollToBottomVisibility = checkScrollToBottomVisibility;

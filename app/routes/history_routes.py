@@ -40,7 +40,7 @@ def history_page():
 # =========================================================
 @history_bp.route('/history', methods=['GET'])
 def get_chat_history():
-    """Retrieves and groups user chat conversations chronologically."""
+    """Retrieves and groups user chat conversations chronologically with pinned chats first."""
     student_id = get_real_student_id()
     search_q = request.args.get('search', '').strip().lower()
     query = ChatConversation.query.filter_by(student_id=student_id)
@@ -48,7 +48,10 @@ def get_chat_history():
     if search_q:
         query = query.filter(ChatConversation.title.ilike(f"%{search_q}%"))
 
-    conversations = query.order_by(ChatConversation.updated_at.desc()).all()
+    conversations = query.order_by(
+        ChatConversation.is_pinned.desc(), 
+        ChatConversation.updated_at.desc()
+    ).all()
 
     # Fetch set of bookmarked conversation IDs for quick lookup
     saved_ids = set(
@@ -74,6 +77,7 @@ def get_chat_history():
         data = c.to_dict() if hasattr(c, 'to_dict') else {
             "id": c.id, 
             "title": c.title, 
+            "is_pinned": bool(getattr(c, 'is_pinned', False)),
             "updated_at": c.updated_at.isoformat() if c.updated_at else None
         }
         # Explicitly pass bookmarked status for frontend UI rendering
@@ -127,7 +131,6 @@ def clear_all_history():
         conv_ids = [c.id for c in user_conversations]
 
         if conv_ids:
-            # Delete child references first
             SavedConversation.query.filter(SavedConversation.conversation_id.in_(conv_ids)).delete(synchronize_session=False)
             ChatMessage.query.filter(ChatMessage.conversation_id.in_(conv_ids)).delete(synchronize_session=False)
             ChatConversation.query.filter(ChatConversation.id.in_(conv_ids)).delete(synchronize_session=False)
@@ -212,7 +215,6 @@ def get_conversation(conversation_id):
             "sources": [],
             "feedback": getattr(m, 'feedback', None)
         }
-        # Secondary fallback from ChatFeedback table if not on ChatMessage
         if not m_dict.get('feedback') and m.sender == 'assistant':
             fb = ChatFeedback.query.filter_by(message_id=m.id).order_by(ChatFeedback.id.desc()).first()
             if not fb:
@@ -231,15 +233,13 @@ def get_conversation(conversation_id):
 
 @history_bp.route('/<string:conversation_id>', methods=['DELETE'])
 def delete_conversation(conversation_id):
-    """Deletes a chat conversation along with its saved bookmark references."""
+    """Deletes a single chat conversation along with its messages and saved bookmarks."""
     student_id = get_real_student_id()
     conv = ChatConversation.query.filter_by(id=conversation_id, student_id=student_id).first_or_404()
 
     try:
-        # Remove any bookmarked entries and messages first
         SavedConversation.query.filter_by(conversation_id=conv.id).delete()
         ChatMessage.query.filter_by(conversation_id=conv.id).delete()
-        
         db.session.delete(conv)
         db.session.commit()
         return jsonify({"status": "success", "message": "Conversation deleted successfully."})
@@ -248,13 +248,13 @@ def delete_conversation(conversation_id):
         return jsonify({"status": "error", "message": f"Failed to delete conversation: {str(e)}"}), 500
 
 
-@history_bp.route('/<string:conversation_id>/rename', methods=['PATCH'])
+@history_bp.route('/<string:conversation_id>/rename', methods=['PATCH', 'POST'])
 def rename_conversation(conversation_id):
     """Renames an existing chat conversation."""
     student_id = get_real_student_id()
     conv = ChatConversation.query.filter_by(id=conversation_id, student_id=student_id).first_or_404()
-    data = request.get_json() or {}
-    new_title = data.get('title', '').strip()
+    data = request.get_json(silent=True) or request.form or {}
+    new_title = str(data.get('title', '')).strip()
     
     if not new_title:
         return jsonify({"status": "error", "message": "Title cannot be empty."}), 400
@@ -262,8 +262,11 @@ def rename_conversation(conversation_id):
     try:
         conv.title = new_title
         db.session.commit()
-        conv_dict = conv.to_dict() if hasattr(conv, 'to_dict') else {"id": conv.id, "title": conv.title}
-        return jsonify({"status": "success", "conversation": conv_dict})
+        return jsonify({
+            "status": "success", 
+            "message": "Conversation renamed successfully.",
+            "conversation": conv.to_dict()
+        })
     except Exception as e:
         db.session.rollback()
         return jsonify({"status": "error", "message": f"Failed to rename conversation: {str(e)}"}), 500
@@ -289,3 +292,25 @@ def toggle_save_conversation(conversation_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"status": "error", "message": f"Failed to toggle save state: {str(e)}"}), 500
+
+
+@history_bp.route('/<string:conversation_id>/pin', methods=['POST'])
+@history_bp.route('/<string:conversation_id>/toggle-pin', methods=['POST'])
+def toggle_pin_conversation(conversation_id):
+    """Permanently toggles the pinned status of a conversation in the database."""
+    student_id = get_real_student_id()
+    conv = ChatConversation.query.filter_by(id=conversation_id, student_id=student_id).first_or_404()
+
+    try:
+        conv.is_pinned = not bool(conv.is_pinned)
+        db.session.commit()
+        action_msg = "Conversation pinned to top." if conv.is_pinned else "Conversation unpinned."
+        return jsonify({
+            "status": "success",
+            "is_pinned": conv.is_pinned,
+            "message": action_msg,
+            "conversation": conv.to_dict()
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"status": "error", "message": f"Failed to toggle pin state: {str(e)}"}), 500

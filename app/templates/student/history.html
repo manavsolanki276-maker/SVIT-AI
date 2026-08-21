@@ -95,6 +95,25 @@
         .dropdown-item.danger-item:hover {
             background-color: #fef2f2;
         }
+
+        .user-name-badge-top {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: #f1f5f9;
+            color: #1e293b;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+        }
+
+        .user-name-badge-top:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
     </style>
 </head>
 <body>
@@ -102,7 +121,9 @@
     <!-- Top Navigation Header Bar -->
     <header class="top-navbar">
         <a href="{{ url_for('student.chat') if 'student.chat' in bootstrap_endpoints else '/' }}" class="portal-brand">
-            <i data-lucide="graduation-cap"></i>
+            <div class="brand-icon-sm">
+                <img src="{{ url_for('static', filename='logo/svit logo u.png') }}" alt="SVIT Logo" class="portal-logo-img">
+            </div>
             <span>SVIT AI Assistant</span>
         </a>
 
@@ -114,7 +135,9 @@
             <button class="icon-btn-top" title="Help">
                 <i data-lucide="help-circle" style="width: 20px; height: 20px;"></i>
             </button>
-            <img src="https://api.dicebear.com/7.x/bottts/svg?seed={{ current_user.enrollment_no or current_user.enrollment_number or current_user.name or 'SVIT_User' }}&backgroundColor=b6e3f4,c0aede,d1d4f9" alt="User" class="user-avatar-top" onclick="window.location.href='/student/profile/'" style="cursor: pointer;" title="My Profile">
+            <a href="/student/profile/" class="user-name-badge-top" title="My Profile">
+                <span>{{ current_user.full_name or current_user.name or 'Student' }}</span>
+            </a>
         </div>
     </header>
 

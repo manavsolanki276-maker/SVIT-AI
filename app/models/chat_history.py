@@ -15,6 +15,7 @@ class ChatConversation(db.Model):
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
     title = db.Column(db.String(255), nullable=False, default="New Conversation")
+    is_pinned = db.Column(db.Boolean, default=False, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -27,6 +28,7 @@ class ChatConversation(db.Model):
             "id": self.id,
             "student_id": self.student_id,
             "title": self.title,
+            "is_pinned": bool(self.is_pinned),
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
             "is_saved": self.saved_ref is not None,

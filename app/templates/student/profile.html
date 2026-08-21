@@ -14,6 +14,17 @@
             margin: 0 auto;
             width: 100%;
             overflow-y: auto;
+            flex: 1;
+        }
+        @media (max-width: 768px) {
+            .profile-container {
+                padding: 60px 16px 32px 16px;
+            }
+        }
+        @media (max-width: 375px) {
+            .profile-container {
+                padding: 56px 12px 24px 12px;
+            }
         }
         .profile-card {
             background: #ffffff;
@@ -34,24 +45,7 @@
         .profile-user-intro {
             display: flex;
             align-items: center;
-            gap: 20px;
-        }
-        .profile-avatar-large {
-            width: 84px;
-            height: 84px;
-            border-radius: 50%;
-            background: #f8fafc;
-            border: 3px solid #e0e7ff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.12);
-        }
-        .profile-avatar-large img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
+            gap: 12px;
         }
         .profile-title-info h2 {
             margin: 0 0 6px 0;
@@ -215,7 +209,7 @@
             <div class="sidebar-header">
                 <a href="/" class="sidebar-brand" title="SVIT AI Assistant">
                     <div class="brand-icon">
-                        <i data-lucide="bot"></i>
+                        <img src="{{ url_for('static', filename='logo/svit logo u.png') }}" alt="SVIT Logo" class="brand-logo-img">
                     </div>
                     <div class="brand-info">
                         <h3>SVIT AI</h3>
@@ -229,13 +223,26 @@
                 </div>
             </div>
 
-            <!-- 2. Main Navigation: New Chat Only -->
+            <!-- 2. Main Navigation: New Chat & Collapsed Icon Rail -->
             <div class="sidebar-main-nav">
                 <!-- + New Chat Button -->
                 <a href="/" class="nav-item new-chat-btn" title="Start New Chat">
                     <i data-lucide="plus"></i>
                     <span>New Chat</span>
                 </a>
+
+                <!-- Collapsed Icon Rail Navigation (ChatGPT Style) -->
+                <div class="sidebar-rail-nav" id="sidebarRailNav">
+                    <button type="button" class="rail-icon-btn" id="railSearchBtn" title="Search Chats" onclick="window.location.href='/chat/history-page';">
+                        <i data-lucide="search"></i>
+                    </button>
+                    <a href="/" class="rail-icon-btn" id="railChatBtn" title="Chat">
+                        <i data-lucide="message-square"></i>
+                    </a>
+                    <a href="/chat/history-page" class="rail-icon-btn" id="railHistoryBtn" title="Chat History">
+                        <i data-lucide="history"></i>
+                    </a>
+                </div>
             </div>
 
             <!-- 3. Recents Section (Clean, Scrollable with Subtle Divider) -->
@@ -254,9 +261,9 @@
             <!-- 4. Sidebar Bottom: Student User Card & Logout -->
             <div class="sidebar-footer">
                 <a href="/student/profile/" class="sidebar-user-card" title="My Profile">
-                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed={{ s_enroll or s_name or 'SVIT_Agent' }}&backgroundColor=b6e3f4,c0aede,d1d4f9" 
-                         alt="Student Avatar" 
-                         class="sidebar-user-avatar">
+                    <div class="sidebar-collapsed-user-icon">
+                        <i data-lucide="user"></i>
+                    </div>
                     <div class="sidebar-user-info">
                         <span class="user-display-name">{{ s_name }}</span>
                         <span class="user-program-badge">{{ (s_prog ~ ' • ' if s_prog else '') ~ (s_dept or 'Computer Engineering') }}</span>
@@ -270,37 +277,10 @@
 
         <!-- Main Content Area -->
         <div class="main-wrapper">
-            <!-- Top Navigation Header -->
-            <header class="top-header">
-                <div class="header-logo">
-                    <!-- Mobile Hamburger Button -->
-                    <button type="button" class="hamburger-btn" id="mobileSidebarToggle" onclick="toggleMobileSidebar()" title="Toggle Menu">
-                        <i data-lucide="menu"></i>
-                    </button>
-                    <div class="logo-box">
-                        <i data-lucide="user"></i>
-                    </div>
-                    <h2>My Profile</h2>
-                </div>
-
-                <div class="header-user-actions">
-                    <div class="user-profile" onclick="window.location.href='/student/profile/'" style="cursor: pointer;">
-                        <div class="user-details">
-                            <span class="user-name" id="topHeaderFullName">{{ s_name }}</span>
-                            <span class="user-dept" id="topHeaderDept">{{ s_prog }} {{ s_dept }}</span>
-                        </div>
-                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed={{ s_enroll or s_name }}&backgroundColor=b6e3f4,c0aede,d1d4f9" 
-                             alt="Avatar" 
-                             class="user-avatar"
-                             id="topHeaderAvatar">
-                    </div>
-
-                    <a href="/auth/logout" class="btn-top-logout">
-                        <i data-lucide="log-out"></i>
-                        <span>Logout</span>
-                    </a>
-                </div>
-            </header>
+            <!-- Floating Mobile Sidebar Toggle Button -->
+            <button type="button" class="mobile-floating-toggle" id="mobileSidebarToggle" onclick="toggleMobileSidebar()" title="Toggle Menu">
+                <i data-lucide="menu"></i>
+            </button>
 
             <!-- Profile View & Edit Content -->
             <main class="profile-container">
@@ -313,9 +293,6 @@
                 <div class="profile-card">
                     <div class="profile-header-box">
                         <div class="profile-user-intro">
-                            <div class="profile-avatar-large">
-                                <img src="https://api.dicebear.com/7.x/bottts/svg?seed={{ s_enroll or s_name }}&backgroundColor=b6e3f4,c0aede,d1d4f9" alt="Profile Bot" id="profileCardAvatar">
-                            </div>
                             <div class="profile-title-info">
                                 <h2 id="headerFullName">{{ s_name }}</h2>
                                 <p id="headerDeptSem"><span id="headerProgText">{{ s_prog }}</span> &bull; <span id="headerDeptText">{{ s_dept }}</span> &bull; Semester {{ s_sem }} (Div {{ s_div }})</p>
@@ -639,15 +616,21 @@
                 const data = await res.json();
                 const grouped = data?.history || {};
                 let allChats = [];
-                ['today', 'yesterday', 'last_7_days', 'last_month', 'older'].forEach(k => {
+                ['pinned', 'today', 'yesterday', 'last_7_days', 'last_month', 'older'].forEach(k => {
                     if (Array.isArray(grouped[k])) allChats = allChats.concat(grouped[k]);
                 });
                 if (!allChats || allChats.length === 0) {
                     container.innerHTML = `<div class="recents-empty">No chats yet</div>`;
                     return;
                 }
-                container.innerHTML = allChats.slice(0, 30).map(c => `
-                    <a href="/?conversation_id=${encodeURIComponent(c.id)}" class="recent-chat-item" title="${c.title || 'Conversation'}">
+                const sortedChats = [...allChats].sort((a, b) => {
+                    if (a.is_pinned && !b.is_pinned) return -1;
+                    if (!a.is_pinned && b.is_pinned) return 1;
+                    return 0;
+                });
+                container.innerHTML = sortedChats.slice(0, 30).map(c => `
+                    <a href="/?conversation_id=${encodeURIComponent(c.id)}" class="recent-chat-item ${c.is_pinned ? 'pinned' : ''}" title="${c.title || 'Conversation'}">
+                        ${c.is_pinned ? '<i data-lucide="pin" class="pin-indicator-icon" title="Pinned"></i>' : ''}
                         <span class="chat-title-text">${c.title || 'Conversation'}</span>
                         <button type="button" class="recent-item-options-btn" title="Options" onclick="event.stopPropagation(); window.location.href='/chat/history-page';">
                             <i data-lucide="more-horizontal"></i>

@@ -171,7 +171,7 @@
             <div class="sidebar-header">
                 <a href="/" class="sidebar-brand" title="SVIT AI Assistant">
                     <div class="brand-icon">
-                        <i data-lucide="bot"></i>
+                        <img src="{{ url_for('static', filename='logo/svit logo u.png') }}" alt="SVIT Logo" class="brand-logo-img">
                     </div>
                     <div class="brand-info">
                         <h3>SVIT AI</h3>
@@ -188,13 +188,26 @@
                 </div>
             </div>
 
-            <!-- 2. Main Navigation: New Chat Only -->
+            <!-- 2. Main Navigation: New Chat & Collapsed Icon Rail -->
             <div class="sidebar-main-nav">
                 <!-- + New Chat (ChatGPT Style Primary Button) -->
                 <a href="#" class="nav-item new-chat-btn" id="newChatBtn" onclick="resetChat(); return false;" title="Start New Chat">
                     <i data-lucide="plus"></i>
                     <span>New Chat</span>
                 </a>
+
+                <!-- Collapsed Icon Rail Navigation (ChatGPT Style) -->
+                <div class="sidebar-rail-nav" id="sidebarRailNav">
+                    <button type="button" class="rail-icon-btn" id="railSearchBtn" title="Search Chats" onclick="toggleSidebarSearch()">
+                        <i data-lucide="search"></i>
+                    </button>
+                    <a href="/" class="rail-icon-btn active" id="railChatBtn" title="Chat">
+                        <i data-lucide="message-square"></i>
+                    </a>
+                    <a href="/chat/history-page" class="rail-icon-btn" id="railHistoryBtn" title="Chat History">
+                        <i data-lucide="history"></i>
+                    </a>
+                </div>
 
                 <!-- Collapsible Search Filter Box -->
                 <div class="sidebar-search-box" id="sidebarSearchBox" style="display: none;">
@@ -220,9 +233,9 @@
             <!-- 4. Sidebar Bottom: Student User Card & Logout -->
             <div class="sidebar-footer">
                 <a href="/student/profile/" class="sidebar-user-card" title="View & Edit Profile">
-                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed={{ current_user.enrollment_no or current_user.enrollment_number or current_user.id or 'SVIT_Agent' }}&backgroundColor=b6e3f4,c0aede,d1d4f9" 
-                         alt="Student Avatar" 
-                         class="sidebar-user-avatar">
+                    <div class="sidebar-collapsed-user-icon">
+                        <i data-lucide="user"></i>
+                    </div>
                     <div class="sidebar-user-info">
                         <span class="user-display-name">{{ current_user.full_name or current_user.name or 'Student User' }}</span>
                         <span class="user-program-badge">{{ (current_user.program ~ ' • ' if (current_user and current_user.program) else '') ~ (current_user.department if current_user else 'Computer Engineering') }}</span>
@@ -236,170 +249,186 @@
 
         <!-- Main Content Area -->
         <div class="main-wrapper">
-            
-            <!-- Top Navigation Header -->
-            <header class="top-header">
-                <div class="header-logo">
-                    <!-- Mobile Hamburger Button -->
-                    <button type="button" class="hamburger-btn" id="mobileSidebarToggle" onclick="toggleMobileSidebar()" title="Toggle Menu">
-                        <i data-lucide="menu"></i>
-                    </button>
-                    <div class="logo-box">
-                        <i data-lucide="graduation-cap"></i>
-                    </div>
-                    <h2>SVIT AI Assistant</h2>
-                </div>
+            <!-- Floating Mobile Sidebar Toggle Button -->
+            <button type="button" class="mobile-floating-toggle" id="mobileSidebarToggle" onclick="toggleMobileSidebar()" title="Toggle Menu">
+                <i data-lucide="menu"></i>
+            </button>
 
-                <div class="header-user-actions">
-                    <!-- Export Chat Dropdown -->
-                    <div class="export-dropdown-wrapper">
-                        <button class="icon-btn" id="exportChatBtn" title="Export Conversation" onclick="toggleExportMenu(event)">
-                            <i data-lucide="download"></i>
-                        </button>
-                        <div class="export-menu" id="exportMenu">
-                            <button type="button" class="export-menu-item" onclick="exportChatAsMarkdown()">
-                                <i data-lucide="file-text" style="width: 15px; height: 15px; color: #4f46e5;"></i>
-                                <span>Export Markdown (.md)</span>
-                            </button>
-                            <button type="button" class="export-menu-item" onclick="exportChatAsPDF()">
-                                <i data-lucide="printer" style="width: 15px; height: 15px; color: #059669;"></i>
-                                <span>Print / Save as PDF</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <button class="icon-btn position-relative" id="notifBellBtn" title="Notifications">
-                        <i data-lucide="bell"></i>
-                        <span id="notifBadge" class="notification-badge" style="display: none;">0</span>
-                    </button>
-                    
-                    <!-- User Profile with AI Agent Icon Avatar -->
-                    <div class="user-profile" onclick="window.location.href='/student/profile/';" style="cursor: pointer;">
-                        <div class="user-details">
-                            <span class="user-name">{{ current_user.full_name or current_user.name or 'Student User' }}</span>
-                            <span class="user-dept">{{ (current_user.program ~ ' ' if (current_user and current_user.program) else '') ~ (current_user.department if current_user else 'Computer Engineering') }}</span>
-                        </div>
-                        <!-- Random AI Agent Avatar Icon based on student ID -->
-                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed={{ current_user.enrollment_no or current_user.enrollment_number or current_user.id or 'SVIT_Agent' }}&backgroundColor=b6e3f4,c0aede,d1d4f9" 
-                             alt="AI Agent Avatar" 
-                             class="user-avatar">
-                    </div>
-
-                    <a href="/auth/logout" class="btn-top-logout">
-                        <i data-lucide="log-out"></i>
-                        <span>Logout</span>
-                    </a>
-                </div>
-            </header>
+            <!-- ChatGPT-Style Conversation Top-Right Header Controls -->
+            <div class="chat-top-header-controls" id="chatTopHeaderControls">
+                <button type="button" class="chat-header-btn share-btn" id="headerShareBtn" onclick="handleHeaderShare()" title="Share">
+                    <i data-lucide="share-2"></i>
+                    <span>Share</span>
+                </button>
+                <button type="button" class="chat-header-btn options-btn" id="headerOptionsBtn" onclick="toggleHeaderOptionsMenu(event)" title="More options">
+                    <i data-lucide="more-horizontal"></i>
+                </button>
+            </div>
 
             <!-- Chat & Dashboard Body -->
-            <main class="chat-container">
+            {% set has_active_conv = (request.args.get('conversation_id') is not none and request.args.get('conversation_id') != '') %}
+            <input type="hidden" id="activeConversationId" value="{{ request.args.get('conversation_id', '') }}">
+
+            <main class="chat-container" id="chatContainer">
                 
-                <!-- Welcome Banner & Prompt Cards -->
-                <div class="welcome-section" id="welcomeSection">
-                    <div class="greeting-pill">
-                        <i data-lucide="sparkles"></i>
-                        <span>Hello, {{ (current_user.full_name or current_user.name or 'Student').split(' ')[0] }}!</span>
-                    </div>
-                    <h1 class="welcome-title">How can I help you today?</h1>
-                    <p class="welcome-subtitle">Ask me anything about your college, from timetables and room locations to placement reports and announcements.</p>
+                <!-- Modern Student Chat Landing Home (ChatGPT + University AI Style) -->
+                {% if not has_active_conv %}
+                <div class="welcome-section student-home-container" id="welcomeSection">
+                    
+                    <!-- Ambient Hero Background Glow -->
+                    <div class="hero-ambient-glow" aria-hidden="true"></div>
 
-                    <!-- Quick Cards Grid -->
-                    <div class="cards-grid">
-                        <div class="prompt-card" onclick="sendSuggested('Where is my next class right now?')" style="border: 1px solid #c7d2fe; background: linear-gradient(135deg, #ffffff 0%, #f5f3ff 100%);">
-                            <div class="card-icon icon-purple">
-                                <i data-lucide="clock"></i>
+                    <!-- 1. Hero Section -->
+                    <div class="student-home-hero">
+                        <div class="student-home-hero-left">
+                            <div class="greeting-pill student-home-greeting">
+                                <i data-lucide="sparkles"></i>
+                                <span>Hello, {{ current_user.full_name or current_user.name or 'Student' }}!</span>
                             </div>
-                            <div class="card-content">
-                                <h4>Next Class Now 📍</h4>
-                                <p>Live ongoing & next lecture room</p>
+                            <h1 class="student-home-title">
+                                <span class="title-dark">Your Campus.</span><br>
+                                <span class="title-gradient">Your AI Assistant.</span>
+                            </h1>
+                            <p class="student-home-desc">
+                                Ask anything about your college — timetables, rooms, events, placements and more.
+                            </p>
+                            <div class="student-home-tagline">
+                                <i data-lucide="zap" style="width: 14px; height: 14px;"></i>
+                                <span>Smart answers. Instantly.</span>
                             </div>
                         </div>
-
-                        <div class="prompt-card" onclick="sendSuggested('Show today\'s timetable')">
-                            <div class="card-icon icon-purple">
-                                <i data-lucide="calendar"></i>
-                            </div>
-                            <div class="card-content">
-                                <h4>Timetable</h4>
-                                <p>Check full lecture schedule</p>
-                            </div>
-                        </div>
-
-                        <div class="prompt-card" onclick="sendSuggested('Where is Diploma Room 202?')">
-                            <div class="card-icon icon-green">
-                                <i data-lucide="map-pin"></i>
-                            </div>
-                            <div class="card-content">
-                                <h4>Navigation</h4>
-                                <p>Find rooms, labs & department maps</p>
-                            </div>
-                        </div>
-
-                        <div class="prompt-card" onclick="sendSuggested('Where is the Reading Room?')">
-                            <div class="card-icon icon-orange">
-                                <i data-lucide="book-open"></i>
-                            </div>
-                            <div class="card-content">
-                                <h4>Library & Admin</h4>
-                                <p>Library, reading room & offices</p>
-                            </div>
-                        </div>
-
-                        <div class="prompt-card" onclick="sendSuggested('Show latest college notices and announcements')">
-                            <div class="card-icon icon-red">
-                                <i data-lucide="megaphone"></i>
-                            </div>
-                            <div class="card-content">
-                                <h4>Notices</h4>
-                                <p>Important announcements</p>
-                            </div>
-                        </div>
-
-                        <div class="prompt-card" onclick="sendSuggested('Upcoming events and workshops')">
-                            <div class="card-icon icon-purple-light">
-                                <i data-lucide="calendar-days"></i>
-                            </div>
-                            <div class="card-content">
-                                <h4>Events</h4>
-                                <p>Workshops & technical fests</p>
-                            </div>
-                        </div>
-
-                        <div class="prompt-card" onclick="sendSuggested('Tell me about placement drives and stats')">
-                            <div class="card-icon icon-teal">
-                                <i data-lucide="briefcase"></i>
-                            </div>
-                            <div class="card-content">
-                                <h4>Placements</h4>
-                                <p>Job drives & salary statistics</p>
-                            </div>
-                        </div>
-
-                        <div class="prompt-card" onclick="sendSuggested('Where is the sports court?')">
-                            <div class="card-icon icon-brown">
-                                <i data-lucide="trophy"></i>
-                            </div>
-                            <div class="card-content">
-                                <h4>Sports Ground</h4>
-                                <p>Courts, pavilion & grounds</p>
-                            </div>
-                        </div>
-
-                        <div class="prompt-card" onclick="sendSuggested('College administration contact details')">
-                            <div class="card-icon icon-pink">
-                                <i data-lucide="phone"></i>
-                            </div>
-                            <div class="card-content">
-                                <h4>Contact</h4>
-                                <p>Department & admin contacts</p>
+                        <div class="student-home-hero-visual" aria-hidden="true">
+                            <div class="ambient-orb-outer">
+                                <div class="ambient-orb-core">
+                                    <i data-lucide="graduation-cap"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- 2. Home Page Centered Composer (Visible ONLY on New/Empty Chat State) -->
+                    <div class="student-home-composer" id="homeComposerWrapper">
+                        <form id="homeChatForm" class="home-input-box" onsubmit="handleHomeFormSubmit(event)">
+                            <input type="text" placeholder="Ask anything about timetables, rooms, events, placements..." id="homeChatInput" autocomplete="off" required>
+                            <button type="button" class="voice-btn" id="homeVoiceBtn" onclick="triggerHomeVoiceInput(event)" title="Voice Input (Speech-to-Text)">
+                                <i data-lucide="mic"></i>
+                            </button>
+                            <button type="submit" class="send-btn" id="homeSendBtn" title="Send Message">
+                                <i data-lucide="send"></i>
+                            </button>
+                        </form>
+
+                        <!-- Suggestion Chips directly below the composer input -->
+                        <div class="home-prompt-chips">
+                            <span class="home-prompt-chips-label"><i data-lucide="sparkles"></i> Try asking:</span>
+                            <div class="prompt-chips-wrapper">
+                                <button type="button" class="student-home-chip" onclick="sendSuggested('What is my next class right now?')">
+                                    <i data-lucide="clock" class="chip-icon"></i>
+                                    <span>What's my next class?</span>
+                                </button>
+                                <button type="button" class="student-home-chip" onclick="sendSuggested('Where is the library and reading room located?')">
+                                    <i data-lucide="map-pin" class="chip-icon"></i>
+                                    <span>Where is the library?</span>
+                                </button>
+                                <button type="button" class="student-home-chip" onclick="sendSuggested('What are the upcoming events and workshops?')">
+                                    <i data-lucide="calendar" class="chip-icon"></i>
+                                    <span>Upcoming events</span>
+                                </button>
+                                <button type="button" class="student-home-chip" onclick="sendSuggested('Show college placement statistics and records')">
+                                    <i data-lucide="briefcase" class="chip-icon"></i>
+                                    <span>Placement stats</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <p class="disclaimer-text">SVIT AI Assistant provides official campus layout & academic information. Please verify notice deadlines with official department boards.</p>
+                    </div>
+
+                    <!-- 3. Explore SVIT: 6 Compact Mini-Cards -->
+                    <div class="student-home-explore">
+                        <div class="explore-section-title">EXPLORE SVIT</div>
+                        <div class="explore-cards-grid">
+                            
+                            <!-- Card 1: Classes -->
+                            <div class="explore-card card-classes" onclick="sendSuggested('Show my timetable and schedule for today')" tabindex="0" role="button" aria-label="Classes - Timetables, today's schedule & rooms">
+                                <div class="explore-card-icon-wrap icon-purple">
+                                    <i data-lucide="calendar"></i>
+                                </div>
+                                <div class="explore-card-title">Classes</div>
+                                <div class="explore-card-desc">Timetables, today's schedule &amp; rooms</div>
+                                <div class="explore-card-arrow">
+                                    <i data-lucide="arrow-right"></i>
+                                </div>
+                            </div>
+
+                            <!-- Card 2: Campus Guide -->
+                            <div class="explore-card card-guide" onclick="sendSuggested('Where is the library, labs and department buildings located?')" tabindex="0" role="button" aria-label="Campus Guide - Find labs, departments & important places">
+                                <div class="explore-card-icon-wrap icon-blue">
+                                    <i data-lucide="map-pin"></i>
+                                </div>
+                                <div class="explore-card-title">Campus Guide</div>
+                                <div class="explore-card-desc">Find labs, departments &amp; important places</div>
+                                <div class="explore-card-arrow">
+                                    <i data-lucide="arrow-right"></i>
+                                </div>
+                            </div>
+
+                            <!-- Card 3: Notices & Alerts -->
+                            <div class="explore-card card-notices" onclick="sendSuggested('What are the latest college notices and announcements?')" tabindex="0" role="button" aria-label="Notices & Alerts - Latest announcements from your college">
+                                <div class="explore-card-icon-wrap icon-red">
+                                    <i data-lucide="bell"></i>
+                                </div>
+                                <div class="explore-card-title">Notices &amp; Alerts</div>
+                                <div class="explore-card-desc">Latest announcements from your college</div>
+                                <div class="explore-card-arrow">
+                                    <i data-lucide="arrow-right"></i>
+                                </div>
+                            </div>
+
+                            <!-- Card 4: Events -->
+                            <div class="explore-card card-events" onclick="sendSuggested('What are the upcoming technical events, workshops and fests?')" tabindex="0" role="button" aria-label="Events - Workshops, fests & important dates">
+                                <div class="explore-card-icon-wrap icon-violet">
+                                    <i data-lucide="sparkles"></i>
+                                </div>
+                                <div class="explore-card-title">Events</div>
+                                <div class="explore-card-desc">Workshops, fests &amp; important dates</div>
+                                <div class="explore-card-arrow">
+                                    <i data-lucide="arrow-right"></i>
+                                </div>
+                            </div>
+
+                            <!-- Card 5: Placements -->
+                            <div class="explore-card card-placements" onclick="sendSuggested('Show placement drives, salary statistics & opportunities')" tabindex="0" role="button" aria-label="Placements - Job drives, stats & opportunities">
+                                <div class="explore-card-icon-wrap icon-green">
+                                    <i data-lucide="briefcase"></i>
+                                </div>
+                                <div class="explore-card-title">Placements</div>
+                                <div class="explore-card-desc">Job drives, stats &amp; opportunities</div>
+                                <div class="explore-card-arrow">
+                                    <i data-lucide="arrow-right"></i>
+                                </div>
+                            </div>
+
+                            <!-- Card 6: Connect -->
+                            <div class="explore-card card-connect" onclick="sendSuggested('Show department heads, faculty and administration contact details')" tabindex="0" role="button" aria-label="Connect - Departments, faculty & admin contacts">
+                                <div class="explore-card-icon-wrap icon-pink">
+                                    <i data-lucide="users"></i>
+                                </div>
+                                <div class="explore-card-title">Connect</div>
+                                <div class="explore-card-desc">Departments, faculty &amp; admin contacts</div>
+                                <div class="explore-card-arrow">
+                                    <i data-lucide="arrow-right"></i>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
                 </div>
+                {% endif %}
 
                 <!-- Live Chat Conversation Thread -->
-                <div class="chat-thread" id="chatThread">
+                <div class="chat-thread" id="chatThread" style="display: {{ 'flex' if has_active_conv else 'none' }};">
                     <!-- Dynamic chat messages append here -->
                 </div>
 
@@ -413,51 +442,173 @@
                     </div>
                 </div>
 
-                <!-- Input Dock Area -->
-                <div class="chat-input-wrapper">
-                    <form id="chatForm" class="input-box">
-                        <input type="hidden" id="activeConversationId" value="">
-                        <button type="button" class="attachment-btn" title="Attach file">
-                            <i data-lucide="paperclip"></i>
-                        </button>
-                        <input type="text" placeholder="Ask anything about rooms, courses, events, or campus directions..." id="chatInput" autocomplete="off" required>
-                        <button type="button" class="voice-btn" id="voiceBtn" title="Voice Input (Speech-to-Text)">
-                            <i data-lucide="mic"></i>
-                        </button>
-                        <button type="submit" class="send-btn" title="Send Message">
-                            <i data-lucide="send"></i>
-                        </button>
-                    </form>
-                    <p class="disclaimer-text">SVIT AI Assistant provides official campus layout & academic information. Please verify notice deadlines with official department boards.</p>
-                </div>
-
             </main>
+
+            <!-- Fixed/Sticky Normal Chat Composer Dock (Visible ONLY on Active Conversation State) -->
+            {% if has_active_conv %}
+            <div class="chat-input-wrapper student-chat-composer" id="normalChatComposer">
+                <!-- Floating Scroll To Bottom Button (ChatGPT Style) -->
+                <button type="button" class="scroll-to-bottom-btn" id="scrollToBottomBtn" onclick="smoothScrollToBottom()" title="Scroll to bottom">
+                    <i data-lucide="arrow-down"></i>
+                </button>
+
+                <form id="chatForm" class="input-box" onsubmit="handleNormalFormSubmit(event)">
+                    <input type="text" placeholder="Ask anything about timetables, rooms, events, placements..." id="chatInput" autocomplete="off" required>
+                    <button type="button" class="voice-btn" id="voiceBtn" onclick="toggleVoiceInput(event)" title="Voice Input (Speech-to-Text)">
+                        <i data-lucide="mic"></i>
+                    </button>
+                    <button type="submit" class="send-btn" id="sendBtn" title="Send Message">
+                        <i data-lucide="send"></i>
+                    </button>
+                </form>
+                <p class="disclaimer-text">SVIT AI Assistant provides official campus layout & academic information. Please verify notice deadlines with official department boards.</p>
+            </div>
+            {% endif %}
         </div>
     </div>
+
+    <!-- Templates for Dynamic State Transitions -->
+    <template id="welcomeSectionTemplate">
+        <div class="welcome-section student-home-container" id="welcomeSection">
+            <!-- Ambient Hero Background Glow -->
+            <div class="hero-ambient-glow" aria-hidden="true"></div>
+
+            <!-- 1. Hero Section -->
+            <div class="student-home-hero">
+                <div class="student-home-hero-left">
+                    <div class="greeting-pill student-home-greeting">
+                        <i data-lucide="sparkles"></i>
+                        <span>Hello, {{ current_user.full_name or current_user.name or 'Student' }}!</span>
+                    </div>
+                    <h1 class="student-home-title">
+                        <span class="title-dark">Your Campus.</span><br>
+                        <span class="title-gradient">Your AI Assistant.</span>
+                    </h1>
+                    <p class="student-home-desc">
+                        Ask anything about your college — timetables, rooms, events, placements and more.
+                    </p>
+                    <div class="student-home-tagline">
+                        <i data-lucide="zap" style="width: 14px; height: 14px;"></i>
+                        <span>Smart answers. Instantly.</span>
+                    </div>
+                </div>
+                <div class="student-home-hero-visual" aria-hidden="true">
+                    <div class="ambient-orb-outer">
+                        <div class="ambient-orb-core">
+                            <i data-lucide="graduation-cap"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Home Page Centered Composer (Visible ONLY on New/Empty Chat State) -->
+            <div class="student-home-composer" id="homeComposerWrapper">
+                <form id="homeChatForm" class="home-input-box" onsubmit="handleHomeFormSubmit(event)">
+                    <input type="text" placeholder="Ask anything about timetables, rooms, events, placements..." id="homeChatInput" autocomplete="off" required>
+                    <button type="button" class="voice-btn" id="homeVoiceBtn" onclick="triggerHomeVoiceInput(event)" title="Voice Input (Speech-to-Text)">
+                        <i data-lucide="mic"></i>
+                    </button>
+                    <button type="submit" class="send-btn" id="homeSendBtn" title="Send Message">
+                        <i data-lucide="send"></i>
+                    </button>
+                </form>
+
+                <!-- Suggestion Chips directly below the composer input -->
+                <div class="home-prompt-chips">
+                    <span class="home-prompt-chips-label"><i data-lucide="sparkles"></i> Try asking:</span>
+                    <div class="prompt-chips-wrapper">
+                        <button type="button" class="student-home-chip" onclick="sendSuggested('What is my next class right now?')">
+                            <i data-lucide="clock" class="chip-icon"></i>
+                            <span>What's my next class?</span>
+                        </button>
+                        <button type="button" class="student-home-chip" onclick="sendSuggested('Where is the library and reading room located?')">
+                            <i data-lucide="map-pin" class="chip-icon"></i>
+                            <span>Where is the library?</span>
+                        </button>
+                        <button type="button" class="student-home-chip" onclick="sendSuggested('What are the upcoming events and workshops?')">
+                            <i data-lucide="calendar" class="chip-icon"></i>
+                            <span>Upcoming events</span>
+                        </button>
+                        <button type="button" class="student-home-chip" onclick="sendSuggested('Show college placement statistics and records')">
+                            <i data-lucide="briefcase" class="chip-icon"></i>
+                            <span>Placement stats</span>
+                        </button>
+                    </div>
+                </div>
+
+                <p class="disclaimer-text">SVIT AI Assistant provides official campus layout & academic information. Please verify notice deadlines with official department boards.</p>
+            </div>
+
+            <!-- 3. Explore SVIT: 6 Compact Mini-Cards -->
+            <div class="student-home-explore">
+                <div class="explore-section-title">EXPLORE SVIT</div>
+                <div class="explore-cards-grid">
+                    <div class="explore-card card-classes" onclick="sendSuggested('Show my timetable and schedule for today')" tabindex="0" role="button" aria-label="Classes - Timetables, today's schedule & rooms">
+                        <div class="explore-card-icon-wrap icon-purple"><i data-lucide="calendar"></i></div>
+                        <div class="explore-card-title">Classes</div>
+                        <div class="explore-card-desc">Timetables, today's schedule &amp; rooms</div>
+                        <div class="explore-card-arrow"><i data-lucide="arrow-right"></i></div>
+                    </div>
+                    <div class="explore-card card-guide" onclick="sendSuggested('Where is the library, labs and department buildings located?')" tabindex="0" role="button" aria-label="Campus Guide - Find labs, departments & important places">
+                        <div class="explore-card-icon-wrap icon-blue"><i data-lucide="map-pin"></i></div>
+                        <div class="explore-card-title">Campus Guide</div>
+                        <div class="explore-card-desc">Find labs, departments &amp; important places</div>
+                        <div class="explore-card-arrow"><i data-lucide="arrow-right"></i></div>
+                    </div>
+                    <div class="explore-card card-notices" onclick="sendSuggested('What are the latest college notices and announcements?')" tabindex="0" role="button" aria-label="Notices & Alerts - Latest announcements from your college">
+                        <div class="explore-card-icon-wrap icon-red"><i data-lucide="bell"></i></div>
+                        <div class="explore-card-title">Notices &amp; Alerts</div>
+                        <div class="explore-card-desc">Latest announcements from your college</div>
+                        <div class="explore-card-arrow"><i data-lucide="arrow-right"></i></div>
+                    </div>
+                    <div class="explore-card card-events" onclick="sendSuggested('What are the upcoming technical events, workshops and fests?')" tabindex="0" role="button" aria-label="Events - Workshops, fests & important dates">
+                        <div class="explore-card-icon-wrap icon-violet"><i data-lucide="sparkles"></i></div>
+                        <div class="explore-card-title">Events</div>
+                        <div class="explore-card-desc">Workshops, fests &amp; important dates</div>
+                        <div class="explore-card-arrow"><i data-lucide="arrow-right"></i></div>
+                    </div>
+                    <div class="explore-card card-placements" onclick="sendSuggested('Show placement drives, salary statistics & opportunities')" tabindex="0" role="button" aria-label="Placements - Job drives, stats & opportunities">
+                        <div class="explore-card-icon-wrap icon-green"><i data-lucide="briefcase"></i></div>
+                        <div class="explore-card-title">Placements</div>
+                        <div class="explore-card-desc">Job drives, stats &amp; opportunities</div>
+                        <div class="explore-card-arrow"><i data-lucide="arrow-right"></i></div>
+                    </div>
+                    <div class="explore-card card-connect" onclick="sendSuggested('Show department heads, faculty and administration contact details')" tabindex="0" role="button" aria-label="Connect - Departments, faculty & admin contacts">
+                        <div class="explore-card-icon-wrap icon-pink"><i data-lucide="users"></i></div>
+                        <div class="explore-card-title">Connect</div>
+                        <div class="explore-card-desc">Departments, faculty &amp; admin contacts</div>
+                        <div class="explore-card-arrow"><i data-lucide="arrow-right"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="normalComposerTemplate">
+        <div class="chat-input-wrapper student-chat-composer" id="normalChatComposer">
+            <!-- Floating Scroll To Bottom Button (ChatGPT Style) -->
+            <button type="button" class="scroll-to-bottom-btn" id="scrollToBottomBtn" onclick="smoothScrollToBottom()" title="Scroll to bottom">
+                <i data-lucide="arrow-down"></i>
+            </button>
+
+            <form id="chatForm" class="input-box" onsubmit="handleNormalFormSubmit(event)">
+                <input type="text" placeholder="Ask anything about timetables, rooms, events, placements..." id="chatInput" autocomplete="off" required>
+                <button type="button" class="voice-btn" id="voiceBtn" onclick="toggleVoiceInput(event)" title="Voice Input (Speech-to-Text)">
+                    <i data-lucide="mic"></i>
+                </button>
+                <button type="submit" class="send-btn" id="sendBtn" title="Send Message">
+                    <i data-lucide="send"></i>
+                </button>
+            </form>
+            <p class="disclaimer-text">SVIT AI Assistant provides official campus layout & academic information. Please verify notice deadlines with official department boards.</p>
+        </div>
+    </template>
 
     <!-- Script Imports with Cache Busting -->
     <script src="{{ url_for('static', filename='js/student/chat.js') }}?v={{ range(1000, 99999) | random }}"></script>
     <script>
         if (window.lucide) {
             lucide.createIcons();
-        }
-
-        function resetChat() {
-            const chatThread = document.getElementById('chatThread');
-            const welcomeSection = document.getElementById('welcomeSection');
-            const convIdInput = document.getElementById('activeConversationId');
-            if (chatThread) chatThread.innerHTML = '';
-            if (welcomeSection) welcomeSection.style.display = 'block';
-            if (convIdInput) convIdInput.value = '';
-        }
-
-        function sendSuggested(promptText) {
-            const chatInput = document.getElementById('chatInput');
-            const chatForm = document.getElementById('chatForm');
-            if (chatInput && chatForm) {
-                chatInput.value = promptText;
-                chatForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-            }
         }
     </script>
 </body>

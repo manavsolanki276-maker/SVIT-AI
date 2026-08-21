@@ -30,15 +30,24 @@
             margin-bottom: 28px;
         }
         .onboarding-icon {
-            width: 56px;
-            height: 56px;
-            background: #eef2ff;
-            color: #4f46e5;
+            width: 60px;
+            height: 60px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 16px auto;
+            padding: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        .onboarding-logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
         }
         .onboarding-header h2 {
             margin: 0 0 8px 0;
@@ -121,7 +130,7 @@
             
             <div class="onboarding-header">
                 <div class="onboarding-icon">
-                    <i data-lucide="sparkles" style="width: 28px; height: 28px;"></i>
+                    <img src="{{ url_for('static', filename='logo/svit logo u.png') }}" alt="SVIT Logo" class="onboarding-logo-img">
                 </div>
                 <h2>Complete Your Student Profile</h2>
                 <p>Select your program and academic details to automatically personalize your timetables and AI responses.</p>
