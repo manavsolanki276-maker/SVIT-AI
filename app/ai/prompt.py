@@ -25,8 +25,7 @@ CRITICAL CONTENT INSTRUCTIONS:
 CATEGORY_RULES = {
     "timetable": """
 FORMATTING RULES FOR TIMETABLE / SCHEDULE:
-- ALWAYS begin with a clean header greeting on its own line:
-  Here is your schedule for today ([Day, DD Month YYYY]):
+- ALWAYS begin with a clean header greeting on its own line mentioning the target day/date from CONTEXT (e.g. "Here is your schedule for today (Friday, 21 August 2026):" or "Here is your schedule for tomorrow (Saturday, 22 August 2026):"):
 - Output strictly using Markdown table format:
   | Time | Subject | Room |
   | :--- | :--- | :--- |
@@ -125,22 +124,29 @@ def get_dynamic_system_prompt(
     student_section = ""
     if user_profile:
         name = user_profile.get('full_name') or 'Student'
+        program = user_profile.get('program') or 'BE'
         dept = user_profile.get('department') or 'General'
         sem = user_profile.get('semester') or 'N/A'
         div = user_profile.get('division') or 'N/A'
         batch = user_profile.get('batch') or 'N/A'
+        enrollment = user_profile.get('enrollment_no') or 'N/A'
         
         student_section = f"""
 LOGGED-IN STUDENT PROFILE:
 - Student Name: {name}
+- Program / Course: {program}
 - Department: {dept}
-- Semester: {sem}
-- Division: {div}
+- Semester: Semester {sem}
+- Division: Division {div}
 - Batch: {batch}
+- Enrollment Number: {enrollment}
 
 PERSONALIZATION INSTRUCTIONS:
 - You are answering {name}.
-- Automatically personalize responses (timetables, HOD, notices) to {name}'s Department ({dept}), Semester ({sem}), and Division ({div}) unless {name} asks for a different department.
+- {name} is enrolled in the "{program}" program under the "{dept}" department.
+- When asked about their program, course, department, semester, or division, use the EXACT profile information above.
+- NEVER state that {name} is in B.E. if their program is "{program}" (e.g. Diploma, ME, BCA, MCA).
+- Automatically personalize responses (timetables, HOD, notices, room directions) to {name}'s Program ({program}), Department ({dept}), Semester ({sem}), and Division ({div}).
 """
 
     category_rule = CATEGORY_RULES.get(intent_category, CATEGORY_RULES["general"])

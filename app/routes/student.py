@@ -14,114 +14,23 @@ rag_pipeline = RAGPipeline()
 
 
 # =========================================================
-# 1. FIRST-TIME PROFILE ONBOARDING
+# 1. FIRST-TIME PROFILE ONBOARDING & VIEW REDIRECTS
 # =========================================================
 @student_bp.route('/complete-profile', methods=['GET', 'POST'])
 @student_bp.route('/complete_profile', methods=['GET', 'POST'])
 @login_required
 def complete_profile():
-    # If the student already completed their profile, send them to chat
-    is_complete = getattr(current_user, 'is_profile_complete', getattr(current_user, 'is_profile_completed', True))
-    if is_complete:
-        return redirect(url_for('student.chat'))
-
-    if request.method == 'POST':
-        full_name = request.form.get('full_name')
-        department = request.form.get('department')
-        semester = request.form.get('semester')
-        batch = request.form.get('batch')
-        phone = request.form.get('phone') or request.form.get('mobile_no')
-        gender = request.form.get('gender')
-
-        if full_name:
-            if hasattr(current_user, 'full_name'):
-                current_user.full_name = full_name
-            elif hasattr(current_user, 'name'):
-                current_user.name = full_name
-                
-        if department and hasattr(current_user, 'department'):
-            current_user.department = department
-            
-        if semester and hasattr(current_user, 'semester'):
-            try:
-                current_user.semester = int(semester)
-            except ValueError:
-                current_user.semester = semester
-
-        if batch and hasattr(current_user, 'batch'):
-            current_user.batch = batch
-
-        if phone:
-            if hasattr(current_user, 'phone'):
-                current_user.phone = phone
-            elif hasattr(current_user, 'contact'):
-                current_user.contact = phone
-
-        if gender and hasattr(current_user, 'gender'):
-            current_user.gender = gender
-
-        # Mark onboarding as complete
-        if hasattr(current_user, 'is_profile_complete'):
-            current_user.is_profile_complete = True
-        if hasattr(current_user, 'is_profile_completed'):
-            current_user.is_profile_completed = True
-
-        db.session.commit()
-        flash('Profile setup completed successfully!', 'success')
-
-        return redirect(url_for('student.chat'))
-
-    return render_template('student/complete_profile.html', user=current_user)
+    return redirect('/student/profile/complete')
 
 
-# =========================================================
-# 2. STUDENT PROFILE VIEW & EDIT
-# =========================================================
 @student_bp.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
-    """ Dedicated view/edit profile route """
-    if request.method == 'POST':
-        full_name = request.form.get('full_name')
-        department = request.form.get('department')
-        semester = request.form.get('semester')
-        phone = request.form.get('phone')
-        gender = request.form.get('gender')
-
-        if full_name:
-            if hasattr(current_user, 'full_name'):
-                current_user.full_name = full_name
-            elif hasattr(current_user, 'name'):
-                current_user.name = full_name
-
-        if department and hasattr(current_user, 'department'):
-            current_user.department = department
-
-        if semester and hasattr(current_user, 'semester'):
-            try:
-                current_user.semester = int(semester)
-            except ValueError:
-                current_user.semester = semester
-
-        if phone:
-            if hasattr(current_user, 'phone'):
-                current_user.phone = phone
-            elif hasattr(current_user, 'contact'):
-                current_user.contact = phone
-
-        if gender and hasattr(current_user, 'gender'):
-            current_user.gender = gender
-
-        db.session.commit()
-        flash('Profile updated successfully!', 'success')
-        return redirect(url_for('student.profile'))
-
-    # ✅ FIXED: Now correctly renders profile.html
-    return render_template('student/profile.html', user=current_user)
+    return redirect('/student/profile/')
 
 
 # =========================================================
-# 3. AI CHAT DASHBOARD
+# 2. AI CHAT DASHBOARD
 # =========================================================
 @student_bp.route('/chat')
 @login_required
@@ -129,7 +38,7 @@ def chat():
     """ Renders the main student chat dashboard UI """
     is_complete = getattr(current_user, 'is_profile_complete', getattr(current_user, 'is_profile_completed', True))
     if not is_complete:
-        return redirect(url_for('student.complete_profile'))
+        return redirect('/student/profile/complete')
 
     return render_template('student/chat.html')
 
@@ -176,13 +85,15 @@ def chat_api():
         )
         db.session.add(user_msg_db)
 
-        # 3. Extract user profile and call the RAG pipeline
-        user_profile = {
+        # 3. Extract fresh user profile and call the RAG pipeline
+        from app.routes.chat import get_current_student_profile
+        user_profile = get_current_student_profile() or {
             "full_name": getattr(current_user, 'full_name', getattr(current_user, 'name', 'Student')),
-            "department": getattr(current_user, 'department', ''),
-            "semester": getattr(current_user, 'semester', None),
-            "division": getattr(current_user, 'division', ''),
-            "batch": getattr(current_user, 'batch', ''),
+            "program": getattr(current_user, 'program', 'BE'),
+            "department": getattr(current_user, 'department', 'Computer Engineering'),
+            "semester": getattr(current_user, 'semester', 3),
+            "division": getattr(current_user, 'division', 'A'),
+            "batch": getattr(current_user, 'batch', 'A1'),
             "enrollment_no": getattr(current_user, 'enrollment_no', getattr(current_user, 'enrollment_number', ''))
         }
         session_id = f"user_{current_user.id}"

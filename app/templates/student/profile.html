@@ -10,7 +10,7 @@
     <style>
         .profile-container {
             padding: 32px;
-            max-width: 900px;
+            max-width: 960px;
             margin: 0 auto;
             width: 100%;
             overflow-y: auto;
@@ -26,20 +26,27 @@
         .profile-header-box {
             display: flex;
             align-items: center;
-            gap: 24px;
+            justify-content: space-between;
             padding-bottom: 24px;
             border-bottom: 1px solid #f1f5f9;
             margin-bottom: 24px;
         }
+        .profile-user-intro {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
         .profile-avatar-large {
-            width: 80px;
-            height: 80px;
+            width: 84px;
+            height: 84px;
             border-radius: 50%;
             background: #f8fafc;
-            border: 2px solid #e2e8f0;
+            border: 3px solid #e0e7ff;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.12);
         }
         .profile-avatar-large img {
             width: 100%;
@@ -48,14 +55,66 @@
         }
         .profile-title-info h2 {
             margin: 0 0 6px 0;
-            font-size: 1.5rem;
+            font-size: 1.55rem;
             color: #0f172a;
+            font-weight: 700;
         }
         .profile-title-info p {
             margin: 0;
             color: #64748b;
             font-size: 0.95rem;
         }
+        .profile-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #dcfce7;
+            color: #166534;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        /* Stats / Info chips */
+        .info-chips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .info-chip-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .info-chip-card .chip-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            font-weight: 600;
+        }
+        .info-chip-card .chip-value {
+            font-size: 1.05rem;
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .section-heading {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .form-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -66,31 +125,35 @@
             flex-direction: column;
             gap: 8px;
         }
+        .form-group.full-width {
+            grid-column: span 2;
+        }
         .form-group label {
             font-size: 0.88rem;
             font-weight: 600;
             color: #334155;
         }
         .form-group input, .form-group select {
-            padding: 10px 14px;
+            padding: 11px 14px;
             border: 1px solid #cbd5e1;
             border-radius: 8px;
             font-size: 0.95rem;
             background: #ffffff;
             color: #1e293b;
             outline: none;
-            transition: border-color 0.2s;
+            transition: all 0.2s ease;
         }
         .form-group input:focus, .form-group select:focus {
             border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
         .form-group input[readonly] {
-            background: #f8fafc;
+            background: #f1f5f9;
             color: #64748b;
             cursor: not-allowed;
         }
         .profile-btn-row {
-            margin-top: 24px;
+            margin-top: 28px;
             display: flex;
             justify-content: flex-end;
             gap: 12px;
@@ -99,7 +162,7 @@
             background: #4f46e5;
             color: #ffffff;
             border: none;
-            padding: 10px 24px;
+            padding: 12px 28px;
             border-radius: 8px;
             font-size: 0.95rem;
             font-weight: 600;
@@ -107,7 +170,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: background 0.2s;
+            transition: background 0.2s ease;
         }
         .btn-save:hover {
             background: #4338ca;
@@ -117,64 +180,90 @@
             cursor: not-allowed;
         }
         .alert-success {
-            padding: 12px 16px;
+            padding: 14px 18px;
             background: #dcfce7;
             color: #166534;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             display: none;
+            border: 1px solid #86efac;
+            font-weight: 500;
         }
     </style>
 </head>
 <body>
     {# Prioritize explicit route context variables, then fallback to student/current_user objects #}
     {% set u = student or user or current_user %}
-    {% set s_name = full_name or (u.full_name if u else '') or (u.name if u else '') or '' %}
+    {% set s_name = full_name or (u.full_name if u else '') or (u.name if u else '') or 'Student User' %}
+    {% set s_email = email or (u.email if u else '') or '' %}
     {% set s_phone = phone or (u.phone if u else '') or (u.mobile_no if u else '') or (u.contact if u else '') or '' %}
-    {% set s_enroll = enrollment or (u.enrollment_no if u else '') or (u.enrollment_number if u else '') or (u.student_id if u else '') or '210010116001' %}
+    {% set s_enroll = enrollment or (u.enrollment_no if u else '') or (u.enrollment_number if u else '') or (u.student_id if u else '') or '' %}
+    {% set s_prog = program or (u.program if u else 'BE') or 'BE' %}
     {% set s_dept = department or (u.department if u else '') or 'Computer Engineering' %}
-    {% set s_sem = semester or (u.semester if u else 1) or 1 %}
+    {% set s_sem = semester or (u.semester if u else 3) or 3 %}
+    {% set s_div = division or (u.division if u else 'A') or 'A' %}
+    {% set s_batch = batch or (u.batch if u else 'A1') or 'A1' %}
     {% set s_gender = gender or (u.gender if u else 'Male') or 'Male' %}
 
     <div class="portal-layout">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="sidebar-brand">
-                <div class="brand-icon">
-                    <i data-lucide="bot"></i>
-                </div>
-                <div class="brand-info">
-                    <h3>SVIT AI Assistant</h3>
-                    <span>Your Smart College Companion</span>
+        <!-- Mobile Sidebar Backdrop Overlay -->
+        <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleMobileSidebar()"></div>
+
+        <!-- Modern ChatGPT-Style Dark Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <!-- 1. Top Header: Logo + Title + Collapse/Search Icons -->
+            <div class="sidebar-header">
+                <a href="/" class="sidebar-brand" title="SVIT AI Assistant">
+                    <div class="brand-icon">
+                        <i data-lucide="bot"></i>
+                    </div>
+                    <div class="brand-info">
+                        <h3>SVIT AI</h3>
+                        <span>Assistant</span>
+                    </div>
+                </a>
+                <div class="sidebar-header-actions">
+                    <button type="button" class="sidebar-icon-btn" id="sidebarCollapseBtn" title="Collapse Sidebar" onclick="toggleSidebarCollapse()">
+                        <i data-lucide="panel-left-close"></i>
+                    </button>
                 </div>
             </div>
 
-            <nav class="sidebar-nav">
-                <a href="/" class="nav-item">
-                    <i data-lucide="bot"></i>
-                    <span>AI Assistant</span>
-                </a>
-
-                <a href="/" class="nav-item">
-                    <i data-lucide="plus-square"></i>
+            <!-- 2. Main Navigation: New Chat Only -->
+            <div class="sidebar-main-nav">
+                <!-- + New Chat Button -->
+                <a href="/" class="nav-item new-chat-btn" title="Start New Chat">
+                    <i data-lucide="plus"></i>
                     <span>New Chat</span>
                 </a>
+            </div>
 
-                <a href="/chat/history-page" class="nav-item">
-                    <i data-lucide="history"></i>
-                    <span>Chat History</span>
-                </a>
+            <!-- 3. Recents Section (Clean, Scrollable with Subtle Divider) -->
+            <div class="sidebar-recents-section">
+                <div class="recents-header">
+                    <span>Recents</span>
+                </div>
+                <div class="recents-list" id="sidebarRecentList">
+                    <div class="recents-loading">
+                        <i data-lucide="loader" class="spin-icon"></i>
+                        <span>Loading chats...</span>
+                    </div>
+                </div>
+            </div>
 
-                <a href="/student/profile/" class="nav-item active">
-                    <i data-lucide="user"></i>
-                    <span>My Profile</span>
-                </a>
-            </nav>
-
+            <!-- 4. Sidebar Bottom: Student User Card & Logout -->
             <div class="sidebar-footer">
-                <a href="/auth/logout" class="nav-item logout">
+                <a href="/student/profile/" class="sidebar-user-card" title="My Profile">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed={{ s_enroll or s_name or 'SVIT_Agent' }}&backgroundColor=b6e3f4,c0aede,d1d4f9" 
+                         alt="Student Avatar" 
+                         class="sidebar-user-avatar">
+                    <div class="sidebar-user-info">
+                        <span class="user-display-name">{{ s_name }}</span>
+                        <span class="user-program-badge">{{ (s_prog ~ ' • ' if s_prog else '') ~ (s_dept or 'Computer Engineering') }}</span>
+                    </div>
+                </a>
+                <a href="/auth/logout" class="sidebar-logout-btn" title="Logout">
                     <i data-lucide="log-out"></i>
-                    <span>Logout</span>
                 </a>
             </div>
         </aside>
@@ -184,6 +273,10 @@
             <!-- Top Navigation Header -->
             <header class="top-header">
                 <div class="header-logo">
+                    <!-- Mobile Hamburger Button -->
+                    <button type="button" class="hamburger-btn" id="mobileSidebarToggle" onclick="toggleMobileSidebar()" title="Toggle Menu">
+                        <i data-lucide="menu"></i>
+                    </button>
                     <div class="logo-box">
                         <i data-lucide="user"></i>
                     </div>
@@ -191,14 +284,15 @@
                 </div>
 
                 <div class="header-user-actions">
-                    <div class="user-profile">
+                    <div class="user-profile" onclick="window.location.href='/student/profile/'" style="cursor: pointer;">
                         <div class="user-details">
-                            <span class="user-name" id="topHeaderFullName">{{ s_name or 'Student User' }}</span>
-                            <span class="user-dept" id="topHeaderDept">{{ s_dept }}</span>
+                            <span class="user-name" id="topHeaderFullName">{{ s_name }}</span>
+                            <span class="user-dept" id="topHeaderDept">{{ s_prog }} {{ s_dept }}</span>
                         </div>
-                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed={{ s_enroll }}&backgroundColor=b6e3f4,c0aede,d1d4f9" 
+                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed={{ s_enroll or s_name }}&backgroundColor=b6e3f4,c0aede,d1d4f9" 
                              alt="Avatar" 
-                             class="user-avatar">
+                             class="user-avatar"
+                             id="topHeaderAvatar">
                     </div>
 
                     <a href="/auth/logout" class="btn-top-logout">
@@ -211,18 +305,56 @@
             <!-- Profile View & Edit Content -->
             <main class="profile-container">
                 <div id="saveSuccessAlert" class="alert-success">
-                    ✅ Profile details updated and saved successfully!
+                    <i data-lucide="check-circle" style="display: inline-block; vertical-align: middle; margin-right: 6px;"></i>
+                    <span>Profile details updated and saved successfully! Personalization active.</span>
                 </div>
 
+                <!-- Profile Summary Card -->
                 <div class="profile-card">
                     <div class="profile-header-box">
-                        <div class="profile-avatar-large">
-                            <img src="https://api.dicebear.com/7.x/bottts/svg?seed={{ s_enroll }}&backgroundColor=b6e3f4,c0aede,d1d4f9" alt="Profile Bot">
+                        <div class="profile-user-intro">
+                            <div class="profile-avatar-large">
+                                <img src="https://api.dicebear.com/7.x/bottts/svg?seed={{ s_enroll or s_name }}&backgroundColor=b6e3f4,c0aede,d1d4f9" alt="Profile Bot" id="profileCardAvatar">
+                            </div>
+                            <div class="profile-title-info">
+                                <h2 id="headerFullName">{{ s_name }}</h2>
+                                <p id="headerDeptSem"><span id="headerProgText">{{ s_prog }}</span> &bull; <span id="headerDeptText">{{ s_dept }}</span> &bull; Semester {{ s_sem }} (Div {{ s_div }})</p>
+                            </div>
                         </div>
-                        <div class="profile-title-info">
-                            <h2 id="headerFullName">{{ s_name or 'Student User' }}</h2>
-                            <p id="headerDeptSem">{{ s_dept }} &bull; Semester {{ s_sem }}</p>
+                        <div class="profile-status-badge">
+                            <i data-lucide="check" style="width: 14px; height: 14px;"></i>
+                            <span>Profile Active</span>
                         </div>
+                    </div>
+
+                    <!-- Quick Overview Chips -->
+                    <div class="info-chips-grid">
+                        <div class="info-chip-card">
+                            <span class="chip-label">Program / Course</span>
+                            <span class="chip-value" id="badgeProg">{{ s_prog }}</span>
+                        </div>
+                        <div class="info-chip-card">
+                            <span class="chip-label">Enrollment No</span>
+                            <span class="chip-value" id="badgeEnroll">{{ s_enroll or 'N/A' }}</span>
+                        </div>
+                        <div class="info-chip-card">
+                            <span class="chip-label">Department</span>
+                            <span class="chip-value" id="badgeDept">{{ s_dept }}</span>
+                        </div>
+                        <div class="info-chip-card">
+                            <span class="chip-label">Semester & Division</span>
+                            <span class="chip-value" id="badgeSemDiv">Sem {{ s_sem }} - Div {{ s_div }}</span>
+                        </div>
+                        <div class="info-chip-card">
+                            <span class="chip-label">Batch</span>
+                            <span class="chip-value" id="badgeBatch">{{ s_batch }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Edit Profile Form -->
+                    <div class="section-heading">
+                        <i data-lucide="edit-3" style="width: 20px; height: 20px; color: #4f46e5;"></i>
+                        <span>Edit Profile Information</span>
                     </div>
 
                     <form id="profileEditForm">
@@ -233,18 +365,50 @@
                             </div>
 
                             <div class="form-group">
-                                <label>Enrollment Number</label>
+                                <label>Enrollment Number (Read-only)</label>
                                 <input type="text" value="{{ s_enroll }}" readonly>
                             </div>
 
+                            <!-- Program Dropdown -->
                             <div class="form-group">
-                                <label>Department</label>
-                                <input type="text" id="departmentDisplay" value="{{ s_dept }}" readonly>
+                                <label for="program">Program / Course</label>
+                                <select id="program" name="program" required onchange="filterDepartments()">
+                                    <option value="BE" {% if s_prog == 'BE' %}selected{% endif %}>BE (Bachelor of Engineering)</option>
+                                    <option value="Diploma" {% if s_prog == 'Diploma' %}selected{% endif %}>Diploma</option>
+                                    <option value="ME" {% if s_prog == 'ME' %}selected{% endif %}>ME (Master of Engineering)</option>
+                                    <option value="BCA" {% if s_prog == 'BCA' %}selected{% endif %}>BCA (Bachelor of Computer Applications)</option>
+                                    <option value="MCA" {% if s_prog == 'MCA' %}selected{% endif %}>MCA (Master of Computer Applications)</option>
+                                </select>
+                            </div>
+
+                            <!-- Filtered Department Dropdown -->
+                            <div class="form-group">
+                                <label for="department">Department</label>
+                                <select id="department" name="department" required data-initial="{{ s_dept }}">
+                                    <!-- Populated dynamically via filterDepartments() -->
+                                </select>
                             </div>
 
                             <div class="form-group">
                                 <label for="semester">Semester</label>
-                                <input type="number" id="semester" name="semester" min="1" max="8" value="{{ s_sem }}">
+                                <select id="semester" name="semester" required>
+                                    {% for sem in range(1, 9) %}
+                                        <option value="{{ sem }}" {% if s_sem|int == sem %}selected{% endif %}>Semester {{ sem }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="division">Division</label>
+                                <select id="division" name="division" required>
+                                    <option value="A" {% if s_div == 'A' %}selected{% endif %}>Division A</option>
+                                    <option value="B" {% if s_div == 'B' %}selected{% endif %}>Division B</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="batch">Batch</label>
+                                <input type="text" id="batch" name="batch" value="{{ s_batch }}" placeholder="e.g. A1, A2, B1, B2" required>
                             </div>
 
                             <div class="form-group">
@@ -252,7 +416,7 @@
                                 <input type="tel" id="phone" name="phone" value="{{ s_phone }}" placeholder="Enter mobile number">
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group full-width">
                                 <label for="gender">Gender</label>
                                 <select id="gender" name="gender">
                                     <option value="Male" {% if s_gender == 'Male' %}selected{% endif %}>Male</option>
@@ -278,22 +442,95 @@
             lucide.createIcons();
         }
 
+        // Program to Department Mapping
+        const programDepartments = {
+            "Diploma": [
+                "Computer Engineering",
+                "Civil Engineering",
+                "Mechanical Engineering",
+                "Electrical Engineering",
+                "Information Technology",
+                "Electronics & Communication",
+                "Automobile Engineering"
+            ],
+            "BE": [
+                "Computer Engineering",
+                "Information Technology",
+                "Civil Engineering",
+                "Mechanical Engineering",
+                "Electrical Engineering",
+                "Electronics & Communication",
+                "Artificial Intelligence & Machine Learning",
+                "Data Science"
+            ],
+            "ME": [
+                "Computer Engineering",
+                "Civil Engineering",
+                "Mechanical Engineering"
+            ],
+            "BCA": [
+                "Computer Applications"
+            ],
+            "MCA": [
+                "Computer Applications"
+            ]
+        };
+
+        function filterDepartments() {
+            const programSelect = document.getElementById('program');
+            const deptSelect = document.getElementById('department');
+            const selectedProgram = programSelect.value;
+            const currentSelectedDept = deptSelect.value || deptSelect.getAttribute('data-initial') || '';
+
+            const depts = programDepartments[selectedProgram] || programDepartments["BE"];
+            deptSelect.innerHTML = '';
+
+            let foundMatch = false;
+            depts.forEach(dept => {
+                const opt = document.createElement('option');
+                opt.value = dept;
+                opt.textContent = dept;
+                if (dept === currentSelectedDept) {
+                    opt.selected = true;
+                    foundMatch = true;
+                }
+                deptSelect.appendChild(opt);
+            });
+
+            if (!foundMatch && depts.length > 0) {
+                deptSelect.selectedIndex = 0;
+            }
+        }
+
+        // Initialize department filtering on load
+        document.addEventListener('DOMContentLoaded', () => {
+            filterDepartments();
+        });
+
         // Handle AJAX Profile Update
         document.getElementById('profileEditForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const btnSave = document.getElementById('btnSave');
             btnSave.disabled = true;
-            btnSave.querySelector('span').innerText = 'Saving...';
+            btnSave.querySelector('span').innerText = 'Saving Changes...';
 
             const fullNameVal = document.getElementById('full_name').value.trim();
-            const semesterVal = document.getElementById('semester').value.trim();
+            const programVal = document.getElementById('program').value;
+            const deptVal = document.getElementById('department').value;
+            const semesterVal = document.getElementById('semester').value;
+            const divisionVal = document.getElementById('division').value;
+            const batchVal = document.getElementById('batch').value.trim().toUpperCase();
             const phoneVal = document.getElementById('phone').value.trim();
             const genderVal = document.getElementById('gender').value;
 
             const payload = {
                 full_name: fullNameVal,
+                program: programVal,
+                department: deptVal,
                 semester: semesterVal,
+                division: divisionVal,
+                batch: batchVal,
                 phone: phoneVal,
                 gender: genderVal
             };
@@ -306,18 +543,36 @@
                 });
                 const data = await res.json();
                 
-                if (res.ok) {
+                if (res.ok && data.status === 'success') {
                     // Update header texts across the entire interface immediately
                     document.getElementById('headerFullName').innerText = fullNameVal;
-                    const deptVal = document.getElementById('departmentDisplay').value;
-                    document.getElementById('headerDeptSem').innerText = `${deptVal} • Semester ${semesterVal || '1'}`;
+                    document.getElementById('headerProgText').innerText = programVal;
+                    document.getElementById('headerDeptText').innerText = deptVal;
+                    document.getElementById('headerDeptSem').innerText = `${programVal} • ${deptVal} • Semester ${semesterVal} (Div ${divisionVal})`;
                     
                     const topHeaderName = document.getElementById('topHeaderFullName');
                     if (topHeaderName) topHeaderName.innerText = fullNameVal;
 
+                    const topHeaderDept = document.getElementById('topHeaderDept');
+                    if (topHeaderDept) topHeaderDept.innerText = `${programVal} ${deptVal}`;
+
+                    // Update badges
+                    const badgeProg = document.getElementById('badgeProg');
+                    if (badgeProg) badgeProg.innerText = programVal;
+
+                    const badgeDept = document.getElementById('badgeDept');
+                    if (badgeDept) badgeDept.innerText = deptVal;
+
+                    const badgeSemDiv = document.getElementById('badgeSemDiv');
+                    if (badgeSemDiv) badgeSemDiv.innerText = `Sem ${semesterVal} - Div ${divisionVal}`;
+
+                    const badgeBatch = document.getElementById('badgeBatch');
+                    if (badgeBatch) badgeBatch.innerText = batchVal;
+
                     const alertBox = document.getElementById('saveSuccessAlert');
                     alertBox.style.display = 'block';
-                    setTimeout(() => { alertBox.style.display = 'none'; }, 3000);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    setTimeout(() => { alertBox.style.display = 'none'; }, 4000);
                 } else {
                     alert(data.message || 'Error updating profile');
                 }
@@ -330,6 +585,81 @@
                 if (window.lucide) lucide.createIcons();
             }
         });
+
+        // Sidebar Interaction Functions
+        function toggleSidebarCollapse() {
+            const sidebar = document.getElementById('sidebar');
+            if (!sidebar) return;
+            const isNowCollapsed = sidebar.classList.toggle('collapsed');
+            localStorage.setItem('svit_sidebar_collapsed', isNowCollapsed);
+            const btn = document.getElementById('sidebarCollapseBtn');
+            if (btn) {
+                btn.innerHTML = isNowCollapsed ? `<i data-lucide="panel-left-open"></i>` : `<i data-lucide="panel-left-close"></i>`;
+                if (window.lucide) lucide.createIcons();
+            }
+        }
+
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            if (!sidebar) return;
+            const isOpen = sidebar.classList.toggle('mobile-open');
+            if (backdrop) backdrop.classList.toggle('active', isOpen);
+        }
+
+        function toggleSidebarMoreAccordion(e) {
+            if (e) e.stopPropagation();
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar && sidebar.classList.contains('collapsed')) {
+                toggleSidebarCollapse();
+            }
+            const moreContent = document.getElementById('sidebarMoreContent');
+            const moreBtn = document.getElementById('sidebarMoreBtn');
+            if (moreContent) {
+                const isShown = moreContent.classList.toggle('show');
+                if (moreBtn) moreBtn.classList.toggle('open', isShown);
+            }
+        }
+        window.toggleSidebarMoreAccordion = toggleSidebarMoreAccordion;
+        window.toggleSidebarMoreMenu = toggleSidebarMoreAccordion;
+
+        // Initialize sidebar state and recents
+        if (localStorage.getItem('svit_sidebar_collapsed') === 'true' && window.innerWidth > 768) {
+            document.getElementById('sidebar')?.classList.add('collapsed');
+            const btn = document.getElementById('sidebarCollapseBtn');
+            if (btn) btn.innerHTML = `<i data-lucide="panel-left-open"></i>`;
+        }
+
+        async function loadProfileSidebarRecents() {
+            const container = document.getElementById('sidebarRecentList');
+            if (!container) return;
+            try {
+                const res = await fetch('/chat/history');
+                if (!res.ok) { container.innerHTML = `<div class="recents-empty">No recent chats</div>`; return; }
+                const data = await res.json();
+                const grouped = data?.history || {};
+                let allChats = [];
+                ['today', 'yesterday', 'last_7_days', 'last_month', 'older'].forEach(k => {
+                    if (Array.isArray(grouped[k])) allChats = allChats.concat(grouped[k]);
+                });
+                if (!allChats || allChats.length === 0) {
+                    container.innerHTML = `<div class="recents-empty">No chats yet</div>`;
+                    return;
+                }
+                container.innerHTML = allChats.slice(0, 30).map(c => `
+                    <a href="/?conversation_id=${encodeURIComponent(c.id)}" class="recent-chat-item" title="${c.title || 'Conversation'}">
+                        <span class="chat-title-text">${c.title || 'Conversation'}</span>
+                        <button type="button" class="recent-item-options-btn" title="Options" onclick="event.stopPropagation(); window.location.href='/chat/history-page';">
+                            <i data-lucide="more-horizontal"></i>
+                        </button>
+                    </a>
+                `).join('');
+                if (window.lucide) lucide.createIcons();
+            } catch (err) {
+                container.innerHTML = `<div class="recents-empty">No recent chats</div>`;
+            }
+        }
+        loadProfileSidebarRecents();
     </script>
 </body>
 </html>

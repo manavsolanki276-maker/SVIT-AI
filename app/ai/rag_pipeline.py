@@ -33,6 +33,7 @@ from app.ai.data_processor import (
     process_events_context,
     resolve_day_and_date,
     generate_followup_suggestions,
+    resolve_student_profile_query,
     MAP_LOOKUP,
 )
 
@@ -349,6 +350,25 @@ class RAGPipeline:
                 }
 
         # ---------------------------------------------------------
+        # STEP 0.2: FAST-PATH DIRECT PROFILE QUERY RESOLUTION (0ms)
+        # ---------------------------------------------------------
+        profile_ans = resolve_student_profile_query(question, user_profile=user_profile)
+        if profile_ans:
+            memory_manager.add_message(session_id, "user", question)
+            memory_manager.add_message(session_id, "assistant", profile_ans)
+            suggestions = [
+                "Show today's timetable 📅",
+                "Where is my next class right now? 📍",
+                "Who is my HOD? 👨‍🏫"
+            ]
+            return {
+                "answer": profile_ans,
+                "image": None,
+                "sources": ["student_profile.db"],
+                "suggestions": suggestions
+            }
+
+        # ---------------------------------------------------------
         # STEP 0.5: FAST-PATH "NEXT CLASS NOW" REAL-TIME ANALYZER (0ms)
         # ---------------------------------------------------------
         if any(re.search(p, clean_q) for p in NEXT_CLASS_PATTERNS):
@@ -383,7 +403,11 @@ class RAGPipeline:
         # ---------------------------------------------------------
         # STEP 2: CACHED QUERY LOOKUP (Profile-Aware)
         # ---------------------------------------------------------
-        prof_key = f"{user_profile.get('department')}_{user_profile.get('semester')}_{user_profile.get('division')}" if user_profile else "none"
+        prof_key = (
+            f"{user_profile.get('program')}_{user_profile.get('department')}_"
+            f"{user_profile.get('semester')}_{user_profile.get('division')}_"
+            f"{user_profile.get('batch')}"
+        ) if user_profile else "none"
         cache_key = f"{clean_q}_{prof_key}_{top_k}"
         if cache_key in _RESPONSE_CACHE:
             cached_res = _RESPONSE_CACHE[cache_key]
@@ -465,6 +489,26 @@ class RAGPipeline:
                 yield {"chunk": reply, "done": False}
                 yield {"done": True, "answer": reply, "image": None, "sources": ["SVIT Assistant Greeting"], "suggestions": suggestions}
                 return
+
+        # 1.2 Fast Direct Student Profile Query Resolution
+        profile_ans = resolve_student_profile_query(question, user_profile=user_profile)
+        if profile_ans:
+            memory_manager.add_message(session_id, "user", question)
+            memory_manager.add_message(session_id, "assistant", profile_ans)
+            suggestions = [
+                "Show today's timetable 📅",
+                "Where is my next class right now? 📍",
+                "Who is my HOD? 👨‍🏫"
+            ]
+            yield {"chunk": profile_ans, "done": False}
+            yield {
+                "done": True,
+                "answer": profile_ans,
+                "image": None,
+                "sources": ["student_profile.db"],
+                "suggestions": suggestions
+            }
+            return
 
         # 1.5 Fast Next Class Real-time Interception
         if any(re.search(p, clean_q) for p in NEXT_CLASS_PATTERNS):

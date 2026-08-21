@@ -302,9 +302,14 @@ def process_next_class_context(query: str, user_profile: dict = None) -> Tuple[s
             ["timetable.csv"]
         )
 
-    if dept_col:
-        dept_keyword = prof_dept.split()[0].lower()
-        matched_df = matched_df[matched_df[dept_col].str.lower().str.contains(dept_keyword, na=False)]
+    if dept_col and prof_dept:
+        prof_dept_clean = prof_dept.strip().lower()
+        dept_match_df = matched_df[matched_df[dept_col].str.lower().str.strip() == prof_dept_clean]
+        if not dept_match_df.empty:
+            matched_df = dept_match_df
+        else:
+            dept_keyword = prof_dept.split()[0].lower()
+            matched_df = matched_df[matched_df[dept_col].str.lower().str.contains(dept_keyword, na=False)]
 
     if sem_col and target_sem:
         matched_df = matched_df[matched_df[sem_col].astype(str).str.contains(str(target_sem), na=False)]
@@ -434,11 +439,12 @@ def process_timetable_context(docs: list, query: str, user_profile: dict = None)
     prof_div = str(user_profile.get("division") or "A").strip().upper()
     prof_name = user_profile.get("full_name") or "Student"
 
-    # 1. Program Extraction from Query or Profile
-    is_diploma = "diploma" in msg or "diploma" in prof_dept.lower()
-    is_be = any(k in msg for k in ["be", "b.e", "btech", "b.tech", "degree"]) or ("be" in prof_dept.lower() and not is_diploma)
-    is_bca = "bca" in msg or "bca" in prof_dept.lower()
-    is_mca = "mca" in msg or "mca" in prof_dept.lower()
+    prof_prog = (user_profile.get("program") or "").strip()
+    is_diploma = "diploma" in msg or "diploma" in prof_prog.lower() or "diploma" in prof_dept.lower()
+    is_be = any(k in msg for k in ["be", "b.e", "btech", "b.tech", "degree"]) or prof_prog.upper() == "BE"
+    is_me = any(k in msg for k in ["me", "m.e", "mtech", "m.tech", "master"]) or prof_prog.upper() == "ME"
+    is_bca = "bca" in msg or prof_prog.upper() == "BCA"
+    is_mca = "mca" in msg or prof_prog.upper() == "MCA"
 
     # 2. Division Extraction (Explicit Query Override > Profile > Default 'A')
     div_match = re.search(r'\b(?:division|div|sec|section)[\s\-:]*([a-c])\b|\b([a-c])\s*(?:division|div|sec|section)\b', msg, re.IGNORECASE)
@@ -463,16 +469,16 @@ def process_timetable_context(docs: list, query: str, user_profile: dict = None)
     target_subject = subj_match.group(1).strip() if subj_match else None
 
     dept_map = {
-        "computer engineering": r"computer engineering|computer|\bce\b|\bco\b|\bcse\b",
-        "civil": r"\bcivil\b|\bcivil engineering\b",
-        "artificial intelligence": r"artificial intelligence|\bai\b|\baiml\b",
-        "data science": r"data science|\bds\b",
-        "automobile": r"automobile|auto",
-        "computer applications": r"computer applications|\bbca\b|\bmca\b",
-        "electrical": r"electrical|\bee\b",
-        "electronics": r"electronics|communication|\bec\b",
+        "computer engineering": r"computer engineering|\bce\b|\bco\b|\bcse\b",
+        "civil engineering": r"\bcivil\b|\bcivil engineering\b",
+        "mechanical engineering": r"mechanical|mech",
+        "electrical engineering": r"electrical|\bee\b",
         "information technology": r"information technology|\bit\b",
-        "mechanical": r"mechanical|mech"
+        "electronics & communication": r"electronics|communication|\bec\b",
+        "automobile engineering": r"automobile|auto",
+        "artificial intelligence & machine learning": r"artificial intelligence|machine learning|\bai\b|\baiml\b",
+        "data science": r"data science|\bds\b",
+        "computer applications": r"computer applications|\bbca\b|\bmca\b"
     }
 
     # 6. Department Extraction (Query Override > Profile)
@@ -537,14 +543,22 @@ def process_timetable_context(docs: list, query: str, user_profile: dict = None)
                     matched_df = temp_df
 
             # 3. Program filter
-            if prog_col and is_be and not matched_df.empty:
-                temp_df = matched_df[matched_df[prog_col].str.lower().str.contains("be|b.e|btech|degree", regex=True, na=False)]
-                if not temp_df.empty:
-                    matched_df = temp_df
-            elif prog_col and is_diploma and not matched_df.empty:
-                temp_df = matched_df[matched_df[prog_col].str.lower().str.contains("diploma", regex=True, na=False)]
-                if not temp_df.empty:
-                    matched_df = temp_df
+            if prog_col and not matched_df.empty:
+                if is_be:
+                    temp_df = matched_df[matched_df[prog_col].str.upper() == "BE"]
+                    if not temp_df.empty: matched_df = temp_df
+                elif is_diploma:
+                    temp_df = matched_df[matched_df[prog_col].str.lower().str.contains("diploma", na=False)]
+                    if not temp_df.empty: matched_df = temp_df
+                elif is_me:
+                    temp_df = matched_df[matched_df[prog_col].str.upper() == "ME"]
+                    if not temp_df.empty: matched_df = temp_df
+                elif is_bca:
+                    temp_df = matched_df[matched_df[prog_col].str.upper() == "BCA"]
+                    if not temp_df.empty: matched_df = temp_df
+                elif is_mca:
+                    temp_df = matched_df[matched_df[prog_col].str.upper() == "MCA"]
+                    if not temp_df.empty: matched_df = temp_df
 
             # 4. Year filter
             if year_col and target_year and not matched_df.empty:
@@ -959,6 +973,83 @@ def generate_followup_suggestions(query: str, intent_category: str = "general", 
             "Show today's timetable 📅",
             "Top placement companies & packages 💼"
         ]
+
+
+def resolve_student_profile_query(query: str, user_profile: dict = None) -> Optional[str]:
+    """
+    Directly answers student-specific profile queries from the authenticated session
+    to prevent generic FAQ or knowledge-base overrides.
+    """
+    if not user_profile:
+        return None
+
+    q = query.lower().strip()
+    
+    # Exclude questions about college in general (e.g. "what courses does svit offer" or "list all departments")
+    if any(k in q for k in ["svit offer", "all department", "all course", "list of course", "available course", "branches in svit", "courses in svit"]):
+        return None
+
+    has_self_ref = any(k in q for k in ["my", "i ", "i am", "am i", "me", "profile", "who am i", "mine"])
+    
+    is_asking_dept_and_course = ("department" in q or "dept" in q or "branch" in q) and ("course" in q or "program" in q or "stream" in q)
+    is_asking_course = any(k in q for k in ["my course", "my program", "which course", "what course", "which program", "what program", "my degree", "my diploma"]) or (has_self_ref and any(k in q for k in ["course name", "program name"]))
+    is_asking_dept = any(k in q for k in ["my department", "my dept", "my branch", "which department", "what department", "what is my department", "which dept"]) or (has_self_ref and "department" in q)
+    is_asking_sem = any(k in q for k in ["my semester", "my sem", "which semester", "what semester", "what is my semester", "which sem"])
+    is_asking_div = any(k in q for k in ["my division", "my div", "my section", "which division", "what division", "what is my division", "which div"])
+    is_asking_batch = any(k in q for k in ["my batch", "which batch", "what is my batch", "what batch"])
+    is_asking_enrollment = any(k in q for k in ["my enrollment", "my enrollment number", "my roll number", "my id", "my student id"])
+    is_asking_full_profile = any(k in q for k in ["who am i", "my profile", "my details", "about me", "my info", "my information", "show my profile", "what is my name", "what are my details"])
+
+    if not (is_asking_dept_and_course or is_asking_course or is_asking_dept or is_asking_sem or is_asking_div or is_asking_batch or is_asking_enrollment or is_asking_full_profile):
+        return None
+
+    prog = user_profile.get("program") or "BE"
+    dept = user_profile.get("department") or "Computer Engineering"
+    sem = user_profile.get("semester") or "3"
+    div = user_profile.get("division") or "A"
+    batch = user_profile.get("batch") or "A1"
+    name = user_profile.get("full_name") or "Student"
+    enroll = user_profile.get("enrollment_no") or ""
+
+    if is_asking_dept_and_course:
+        return (
+            f"According to your student profile, here are your registered details:\n"
+            f"* 🎓 **Program / Course:** {prog}\n"
+            f"* 🏢 **Department:** {dept}\n"
+            f"* 📅 **Semester:** Semester {sem}\n"
+            f"* 🏷️ **Division & Batch:** Division {div} (Batch {batch})"
+        )
+
+    if is_asking_course:
+        return f"According to your student profile, your Program / Course is **{prog}** (in the **{dept}** department)."
+
+    if is_asking_dept:
+        return f"According to your student profile, your Department is **{dept}** (Program: **{prog}**, Semester {sem})."
+
+    if is_asking_sem:
+        return f"According to your student profile, you are currently in **Semester {sem}** ({prog} {dept}, Division {div})."
+
+    if is_asking_div:
+        return f"According to your student profile, you are in **Division {div}** (Batch: {batch}, {prog} {dept} Sem {sem})."
+
+    if is_asking_batch:
+        return f"According to your student profile, your Batch is **{batch}** (Division {div}, {prog} {dept} Sem {sem})."
+
+    if is_asking_enrollment:
+        return f"Your registered Enrollment Number is **{enroll}** ({name}, {prog} {dept})."
+
+    if is_asking_full_profile:
+        return (
+            f"Here are your registered student profile details:\n"
+            f"* 👤 **Full Name:** {name}\n"
+            f"* 🆔 **Enrollment Number:** {enroll or 'N/A'}\n"
+            f"* 🎓 **Program / Course:** {prog}\n"
+            f"* 🏢 **Department:** {dept}\n"
+            f"* 📅 **Semester:** Semester {sem}\n"
+            f"* 🏷️ **Division & Batch:** Division {div} (Batch {batch})"
+        )
+
+    return None
 
 
 # Run initial preloading on import

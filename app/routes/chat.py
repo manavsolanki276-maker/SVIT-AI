@@ -63,6 +63,7 @@ def get_current_student_profile():
         except Exception:
             pass
 
+    program = getattr(target, 'program', '') or 'BE'
     full_name = getattr(target, 'full_name', getattr(target, 'name', 'Student')) or 'Student'
     department = getattr(target, 'department', '') or 'Computer Engineering'
     semester = getattr(target, 'semester', None) or 3
@@ -80,6 +81,7 @@ def get_current_student_profile():
 
     return {
         "full_name": full_name,
+        "program": program,
         "department": department,
         "semester": semester,
         "division": division.strip().upper(),

@@ -13,6 +13,7 @@ class Student(UserMixin, db.Model):
     
     # Profile Info
     full_name = db.Column(db.String(100), nullable=True)
+    program = db.Column(db.String(50), nullable=True)
     department = db.Column(db.String(100), nullable=True)
     semester = db.Column(db.Integer, nullable=True)
     division = db.Column(db.String(10), nullable=True)

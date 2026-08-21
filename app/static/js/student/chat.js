@@ -43,18 +43,30 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Close export dropdown when clicking outside
-    window.addEventListener('click', () => {
+    window.addEventListener('click', (e) => {
         const menu = document.getElementById('exportMenu');
-        if (menu && menu.style.display !== 'none') {
+        if (menu && menu.style.display !== 'none' && !e.target.closest('.export-dropdown-wrapper')) {
             menu.style.display = 'none';
         }
     });
 
-    // Check if a specific conversation was requested via URL query param
+    // Restore Sidebar Collapse State from LocalStorage
+    initSidebarState();
+
+    // Load Recent Conversations in Sidebar
+    loadSidebarRecents();
+
+    // Check if a specific conversation or prompt was requested via URL query params
     const urlParams = new URLSearchParams(window.location.search);
     const convIdParam = urlParams.get('conversation_id');
+    const promptParam = urlParams.get('prompt');
+
     if (convIdParam) {
         loadConversationMessages(convIdParam);
+    } else if (promptParam) {
+        setTimeout(() => {
+            sendSuggested(decodeURIComponent(promptParam));
+        }, 300);
     }
 
     // =========================================================
@@ -378,7 +390,7 @@ function finalizeStreamingBotRow(botRow, imagePath = null, sources = [], suggest
             suggSlot.innerHTML = `
                 <div class="followup-chips-container">
                     ${suggestions.map(s => `
-                        <button type="button" class="followup-chip" onclick="sendSuggested('${escapeHtml(s)}')">
+                        <button type="button" class="followup-chip" data-suggestion="${encodeURIComponent(s)}">
                             <i data-lucide="sparkles" style="width: 12px; height: 12px; color: #6366f1;"></i>
                             <span>${escapeHtml(s)}</span>
                         </button>
@@ -412,14 +424,29 @@ function appendBotMessage(text, imagePath = null, sources = [], userQueryText = 
 }
 
 function sendSuggested(questionText) {
-    const cleanText = questionText.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').trim();
+    if (!questionText) return;
+    const cleanText = questionText.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').trim() || questionText.trim();
     const chatInput = document.getElementById('chatInput');
     const chatForm = document.getElementById('chatForm');
     if (chatInput && chatForm) {
-        chatInput.value = cleanText || questionText;
+        chatInput.value = cleanText;
         chatForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
     }
 }
+window.sendSuggested = sendSuggested;
+
+// Global Delegated Click Listener for Follow-up Chips
+document.addEventListener('click', (e) => {
+    const chip = e.target.closest('.followup-chip');
+    if (chip) {
+        e.preventDefault();
+        const raw = chip.getAttribute('data-suggestion');
+        const text = raw ? decodeURIComponent(raw) : chip.querySelector('span')?.textContent;
+        if (text) {
+            sendSuggested(text);
+        }
+    }
+});
 
 function scrollToBottom() {
     const chatContainer = document.querySelector('.chat-container') || document.getElementById('chatThread');
@@ -430,7 +457,12 @@ function scrollToBottom() {
 
 function escapeHtml(text) {
     if (typeof text !== 'string') return text;
-    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
 }
 
 function copyText(button) {
@@ -1072,4 +1104,181 @@ function exportChatAsPDF() {
 
     // Trigger browser print formatted as PDF
     window.print();
+}
+
+// =========================================================
+// 8. CHATGPT SIDEBAR COLLAPSE, RECENTS & ACTION HANDLERS
+// =========================================================
+
+let cachedRecentChats = [];
+
+function initSidebarState() {
+    const sidebar = document.getElementById('sidebar');
+    const isCollapsed = localStorage.getItem('svit_sidebar_collapsed') === 'true';
+    if (sidebar && isCollapsed && window.innerWidth > 768) {
+        sidebar.classList.add('collapsed');
+        updateCollapseIcon(true);
+    }
+}
+
+function toggleSidebarCollapse() {
+    const sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
+    const isNowCollapsed = sidebar.classList.toggle('collapsed');
+    localStorage.setItem('svit_sidebar_collapsed', isNowCollapsed);
+    updateCollapseIcon(isNowCollapsed);
+}
+
+function updateCollapseIcon(isCollapsed) {
+    const collapseBtn = document.getElementById('sidebarCollapseBtn');
+    if (collapseBtn) {
+        collapseBtn.innerHTML = isCollapsed ? `<i data-lucide="panel-left-open"></i>` : `<i data-lucide="panel-left-close"></i>`;
+        collapseBtn.title = isCollapsed ? "Expand Sidebar" : "Collapse Sidebar";
+        if (window.lucide) lucide.createIcons();
+    }
+}
+
+function toggleMobileSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    if (!sidebar) return;
+    const isOpen = sidebar.classList.toggle('mobile-open');
+    if (backdrop) {
+        backdrop.classList.toggle('active', isOpen);
+    }
+}
+
+function toggleSidebarSearch() {
+    const searchBox = document.getElementById('sidebarSearchBox');
+    const searchInput = document.getElementById('recentSearchInput');
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar && sidebar.classList.contains('collapsed')) {
+        toggleSidebarCollapse();
+    }
+    if (searchBox) {
+        const isHidden = searchBox.style.display === 'none' || !searchBox.style.display;
+        searchBox.style.display = isHidden ? 'flex' : 'none';
+        if (isHidden && searchInput) {
+            searchInput.focus();
+        } else if (!isHidden && searchInput) {
+            clearRecentSearch();
+        }
+    }
+}
+
+function toggleSidebarMoreAccordion(e) {
+    if (e) e.stopPropagation();
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar && sidebar.classList.contains('collapsed')) {
+        toggleSidebarCollapse();
+    }
+    const moreContent = document.getElementById('sidebarMoreContent');
+    const moreBtn = document.getElementById('sidebarMoreBtn');
+    if (moreContent) {
+        const isShown = moreContent.classList.toggle('show');
+        if (moreBtn) moreBtn.classList.toggle('open', isShown);
+    }
+}
+window.toggleSidebarMoreAccordion = toggleSidebarMoreAccordion;
+window.toggleSidebarMoreMenu = toggleSidebarMoreAccordion;
+
+function triggerSidebarAction(prompt) {
+    // Close mobile drawer if open
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar && sidebar.classList.contains('mobile-open')) {
+        toggleMobileSidebar();
+    }
+
+    if (window.location.pathname === '/' || window.location.pathname === '/student/' || window.location.pathname.endsWith('/chat')) {
+        sendSuggested(prompt);
+    } else {
+        window.location.href = '/?prompt=' + encodeURIComponent(prompt);
+    }
+}
+window.triggerSidebarAction = triggerSidebarAction;
+
+async function loadSidebarRecents() {
+    const container = document.getElementById('sidebarRecentList');
+    if (!container) return;
+
+    try {
+        const res = await fetch('/chat/history');
+        if (!res.ok) {
+            container.innerHTML = `<div class="recents-empty">No recent chats</div>`;
+            return;
+        }
+        const data = await res.json();
+        const grouped = data?.history || {};
+        
+        let allChats = [];
+        ['today', 'yesterday', 'last_7_days', 'last_month', 'older'].forEach(key => {
+            if (Array.isArray(grouped[key])) {
+                allChats = allChats.concat(grouped[key]);
+            }
+        });
+
+        cachedRecentChats = allChats;
+        renderRecentChatsList(allChats);
+    } catch (err) {
+        console.warn("[Sidebar] Error loading recent chats:", err);
+        container.innerHTML = `<div class="recents-empty">No recent chats</div>`;
+    }
+}
+
+function renderRecentChatsList(chats) {
+    const container = document.getElementById('sidebarRecentList');
+    if (!container) return;
+
+    if (!chats || chats.length === 0) {
+        container.innerHTML = `<div class="recents-empty">No chats yet</div>`;
+        return;
+    }
+
+    const currentConvId = document.getElementById('activeConversationId')?.value || '';
+
+    container.innerHTML = chats.slice(0, 30).map(c => `
+        <a href="/?conversation_id=${encodeURIComponent(c.id)}" 
+           class="recent-chat-item ${c.id === currentConvId ? 'active' : ''}" 
+           onclick="selectRecentChat(event, '${escapeHtml(c.id)}')" 
+           title="${escapeHtml(c.title || 'Untitled Conversation')}">
+            <span class="chat-title-text">${escapeHtml(c.title || 'Conversation')}</span>
+            <button type="button" class="recent-item-options-btn" title="Options" onclick="event.stopPropagation(); window.location.href='/chat/history-page';">
+                <i data-lucide="more-horizontal"></i>
+            </button>
+        </a>
+    `).join('');
+
+    if (window.lucide) lucide.createIcons();
+}
+
+function selectRecentChat(e, convId) {
+    if (window.location.pathname === '/' || window.location.pathname === '/student/' || window.location.pathname.endsWith('/chat')) {
+        e.preventDefault();
+        loadConversationMessages(convId);
+        // Highlight active item
+        document.querySelectorAll('.recent-chat-item').forEach(el => el.classList.remove('active'));
+        e.currentTarget?.classList.add('active');
+        // Close mobile drawer if open
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar && sidebar.classList.contains('mobile-open')) {
+            toggleMobileSidebar();
+        }
+        window.history.pushState(null, '', `/?conversation_id=${encodeURIComponent(convId)}`);
+    }
+}
+
+function filterRecentConversations(query) {
+    const q = (query || '').toLowerCase().trim();
+    if (!q) {
+        renderRecentChatsList(cachedRecentChats);
+        return;
+    }
+    const filtered = cachedRecentChats.filter(c => (c.title || '').toLowerCase().includes(q));
+    renderRecentChatsList(filtered);
+}
+
+function clearRecentSearch() {
+    const input = document.getElementById('recentSearchInput');
+    if (input) input.value = '';
+    renderRecentChatsList(cachedRecentChats);
 }

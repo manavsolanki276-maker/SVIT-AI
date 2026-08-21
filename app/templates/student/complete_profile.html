@@ -19,15 +19,15 @@
         .onboarding-card {
             background: #ffffff;
             width: 100%;
-            max-width: 650px;
+            max-width: 680px;
             border-radius: 16px;
             border: 1px solid #e2e8f0;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
-            padding: 40px;
+            padding: 36px 40px;
         }
         .onboarding-header {
             text-align: center;
-            margin-bottom: 32px;
+            margin-bottom: 28px;
         }
         .onboarding-icon {
             width: 56px;
@@ -54,7 +54,7 @@
         .form-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 18px;
+            gap: 16px;
         }
         .form-group {
             display: flex;
@@ -103,6 +103,15 @@
         .btn-submit-onboarding:hover {
             background: #4338ca;
         }
+        .error-banner {
+            padding: 12px 16px;
+            background: #fee2e2;
+            color: #991b1b;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            border: 1px solid #fecaca;
+        }
     </style>
 </head>
 <body>
@@ -115,36 +124,51 @@
                     <i data-lucide="sparkles" style="width: 28px; height: 28px;"></i>
                 </div>
                 <h2>Complete Your Student Profile</h2>
-                <p>Please enter your academic details to personalize your AI assistant.</p>
+                <p>Select your program and academic details to automatically personalize your timetables and AI responses.</p>
             </div>
+
+            {% if error %}
+            <div class="error-banner">
+                ⚠️ {{ error }}
+            </div>
+            {% endif %}
 
             <form method="POST" action="/student/profile/complete">
                 <div class="form-grid">
                     
                     <div class="form-group full-width">
-                        <label>Full Name</label>
-                        <input type="text" name="full_name" value="{{ current_user.full_name or current_user.name or '' }}" placeholder="e.g. John Doe" required>
+                        <label for="full_name">Full Name</label>
+                        <input type="text" id="full_name" name="full_name" value="{{ current_user.full_name or current_user.name or '' }}" placeholder="e.g. Manav Solanki" required>
                     </div>
 
-                    <div class="form-group">
-                        <label>Enrollment Number</label>
-                        <input type="text" name="enrollment_no" value="{{ current_user.enrollment_no or '' }}" placeholder="e.g. 210410107001" required>
+                    <div class="form-group full-width">
+                        <label for="enrollment_no">Enrollment Number</label>
+                        <input type="text" id="enrollment_no" name="enrollment_no" value="{{ current_user.enrollment_no or current_user.enrollment_number or '' }}" placeholder="e.g. 210410107001" required>
                     </div>
 
+                    <!-- Program / Course Field -->
                     <div class="form-group">
-                        <label>Department</label>
-                        <select name="department" required>
-                            <option value="Computer Engineering" {% if current_user and current_user.department == 'Computer Engineering' %}selected{% endif %}>Computer Engineering</option>
-                            <option value="Information Technology" {% if current_user and current_user.department == 'Information Technology' %}selected{% endif %}>Information Technology</option>
-                            <option value="Mechanical Engineering" {% if current_user and current_user.department == 'Mechanical Engineering' %}selected{% endif %}>Mechanical Engineering</option>
-                            <option value="Civil Engineering" {% if current_user and current_user.department == 'Civil Engineering' %}selected{% endif %}>Civil Engineering</option>
-                            <option value="Electrical Engineering" {% if current_user and current_user.department == 'Electrical Engineering' %}selected{% endif %}>Electrical Engineering</option>
+                        <label for="program">Program / Course</label>
+                        <select id="program" name="program" required onchange="filterDepartments()">
+                            <option value="BE" {% if not current_user or current_user.program == 'BE' %}selected{% endif %}>BE (Bachelor of Engineering)</option>
+                            <option value="Diploma" {% if current_user and current_user.program == 'Diploma' %}selected{% endif %}>Diploma</option>
+                            <option value="ME" {% if current_user and current_user.program == 'ME' %}selected{% endif %}>ME (Master of Engineering)</option>
+                            <option value="BCA" {% if current_user and current_user.program == 'BCA' %}selected{% endif %}>BCA (Bachelor of Computer Applications)</option>
+                            <option value="MCA" {% if current_user and current_user.program == 'MCA' %}selected{% endif %}>MCA (Master of Computer Applications)</option>
+                        </select>
+                    </div>
+
+                    <!-- Filtered Department Field -->
+                    <div class="form-group">
+                        <label for="department">Department</label>
+                        <select id="department" name="department" required data-initial="{{ current_user.department or '' }}">
+                            <!-- Populated dynamically via filterDepartments() -->
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label>Semester</label>
-                        <select name="semester" required>
+                        <label for="semester">Semester</label>
+                        <select id="semester" name="semester" required>
                             {% for sem in range(1, 9) %}
                                 <option value="{{ sem }}" {% if current_user and current_user.semester == sem %}selected{% endif %}>Semester {{ sem }}</option>
                             {% endfor %}
@@ -152,13 +176,26 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Phone / Mobile</label>
-                        <input type="tel" name="phone" value="{{ current_user.phone or current_user.contact or '' }}" placeholder="e.g. 9876543210" required>
+                        <label for="division">Division</label>
+                        <select id="division" name="division" required>
+                            <option value="A" {% if current_user and current_user.division == 'A' %}selected{% endif %}>Division A</option>
+                            <option value="B" {% if current_user and current_user.division == 'B' %}selected{% endif %}>Division B</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="batch">Batch</label>
+                        <input type="text" id="batch" name="batch" value="{{ current_user.batch or 'A1' }}" placeholder="e.g. A1, A2, B1, B2" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone / Mobile</label>
+                        <input type="tel" id="phone" name="phone" value="{{ current_user.phone or current_user.contact or '' }}" placeholder="e.g. 9876543210" required>
                     </div>
 
                     <div class="form-group full-width">
-                        <label>Gender</label>
-                        <select name="gender" required>
+                        <label for="gender">Gender</label>
+                        <select id="gender" name="gender" required>
                             <option value="Male" {% if current_user and current_user.gender == 'Male' %}selected{% endif %}>Male</option>
                             <option value="Female" {% if current_user and current_user.gender == 'Female' %}selected{% endif %}>Female</option>
                             <option value="Other" {% if current_user and current_user.gender == 'Other' %}selected{% endif %}>Other</option>
@@ -168,7 +205,7 @@
                 </div>
 
                 <button type="submit" class="btn-submit-onboarding">
-                    <span>Save & Get Started</span>
+                    <span>Save & Go to Chatbot</span>
                     <i data-lucide="arrow-right"></i>
                 </button>
             </form>
@@ -180,6 +217,71 @@
         if (window.lucide) {
             lucide.createIcons();
         }
+
+        // Program to Department Mapping
+        const programDepartments = {
+            "Diploma": [
+                "Computer Engineering",
+                "Civil Engineering",
+                "Mechanical Engineering",
+                "Electrical Engineering",
+                "Information Technology",
+                "Electronics & Communication",
+                "Automobile Engineering"
+            ],
+            "BE": [
+                "Computer Engineering",
+                "Information Technology",
+                "Civil Engineering",
+                "Mechanical Engineering",
+                "Electrical Engineering",
+                "Electronics & Communication",
+                "Artificial Intelligence & Machine Learning",
+                "Data Science"
+            ],
+            "ME": [
+                "Computer Engineering",
+                "Civil Engineering",
+                "Mechanical Engineering"
+            ],
+            "BCA": [
+                "Computer Applications"
+            ],
+            "MCA": [
+                "Computer Applications"
+            ]
+        };
+
+        function filterDepartments() {
+            const programSelect = document.getElementById('program');
+            const deptSelect = document.getElementById('department');
+            const selectedProgram = programSelect.value;
+            const currentSelectedDept = deptSelect.value || deptSelect.getAttribute('data-initial') || '';
+
+            const depts = programDepartments[selectedProgram] || programDepartments["BE"];
+            deptSelect.innerHTML = '';
+
+            let foundMatch = false;
+            depts.forEach(dept => {
+                const opt = document.createElement('option');
+                opt.value = dept;
+                opt.textContent = dept;
+                if (dept === currentSelectedDept) {
+                    opt.selected = true;
+                    foundMatch = true;
+                }
+                deptSelect.appendChild(opt);
+            });
+
+            if (!foundMatch && depts.length > 0) {
+                deptSelect.selectedIndex = 0;
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            filterDepartments();
+        });
     </script>
 </body>
 </html>
