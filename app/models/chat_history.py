@@ -1,6 +1,7 @@
 """
 chat_history.py
-SQLAlchemy models for Chat Sessions, Messages, and Saved/Bookmarked Conversations.
+SQLAlchemy models for Chat Sessions, Messages, Saved/Bookmarked Conversations,
+and User Thumbs Up/Down Response Feedback.
 """
 import json
 import uuid
@@ -42,6 +43,7 @@ class ChatMessage(db.Model):
     content = db.Column(db.Text, nullable=False)
     image_path = db.Column(db.String(255), nullable=True)
     sources = db.Column(db.Text, nullable=True)  # JSON string array
+    feedback = db.Column(db.String(10), nullable=True)  # 'like' or 'dislike'
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def to_dict(self):
@@ -60,6 +62,7 @@ class ChatMessage(db.Model):
             "text": self.content,  # Compatibility alias
             "image_path": self.image_path,
             "sources": parsed_sources,
+            "feedback": self.feedback,
             "created_at": self.created_at.isoformat() if self.created_at else None
         }
 
@@ -80,4 +83,31 @@ class SavedConversation(db.Model):
             "student_id": self.student_id,
             "conversation_id": self.conversation_id,
             "saved_at": self.saved_at.isoformat() if self.saved_at else None
+        }
+
+
+class ChatFeedback(db.Model):
+    __tablename__ = 'chat_feedbacks'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    message_id = db.Column(db.Integer, nullable=True)
+    conversation_id = db.Column(db.String(36), nullable=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=True)
+    rating = db.Column(db.String(10), nullable=False)  # 'like' or 'dislike'
+    query_text = db.Column(db.Text, nullable=True)
+    response_text = db.Column(db.Text, nullable=True)
+    comment = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "message_id": self.message_id,
+            "conversation_id": self.conversation_id,
+            "student_id": self.student_id,
+            "rating": self.rating,
+            "query_text": self.query_text,
+            "response_text": self.response_text,
+            "comment": self.comment,
+            "created_at": self.created_at.isoformat() if self.created_at else None
         }

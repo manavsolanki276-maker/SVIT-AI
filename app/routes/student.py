@@ -176,11 +176,20 @@ def chat_api():
         )
         db.session.add(user_msg_db)
 
-        # 3. Call the RAG pipeline
+        # 3. Extract user profile and call the RAG pipeline
+        user_profile = {
+            "full_name": getattr(current_user, 'full_name', getattr(current_user, 'name', 'Student')),
+            "department": getattr(current_user, 'department', ''),
+            "semester": getattr(current_user, 'semester', None),
+            "division": getattr(current_user, 'division', ''),
+            "batch": getattr(current_user, 'batch', ''),
+            "enrollment_no": getattr(current_user, 'enrollment_no', getattr(current_user, 'enrollment_number', ''))
+        }
         session_id = f"user_{current_user.id}"
         result = rag_pipeline.answer_question(
             question=user_message,
-            session_id=session_id
+            session_id=session_id,
+            user_profile=user_profile
         )
 
         bot_answer = result.get('answer', '')
@@ -206,5 +215,5 @@ def chat_api():
         }), 200
 
     except Exception as e:
-        print(f"❌ Error in RAG Pipeline route: {e}")
+        print(f"[Error] Error in RAG Pipeline route: {e}")
         return jsonify({'error': 'Failed to process response. Please try again.'}), 500

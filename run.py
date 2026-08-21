@@ -28,6 +28,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
     'sqlite:///' + os.path.join(APP_DIR, 'svit_assistant.db')
 )
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 # Initialize SQLAlchemy with App Context
 db.init_app(app)
@@ -56,6 +57,9 @@ class ActiveUser(UserMixin):
         self.id = user_id
         self.full_name = "Manav Solanki"
         self.department = "Computer Engineering"
+        self.semester = 3
+        self.division = "A"
+        self.batch = "A1"
         self.avatar_url = None
         self.is_admin = False
         self.is_profile_complete = True

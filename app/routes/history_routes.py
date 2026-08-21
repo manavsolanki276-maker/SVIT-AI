@@ -193,13 +193,34 @@ def clear_history_range():
 # =========================================================
 @history_bp.route('/<string:conversation_id>', methods=['GET'])
 def get_conversation(conversation_id):
-    """Fetches full message thread for a specific conversation."""
+    """Fetches full message thread for a specific conversation including saved feedback."""
     student_id = get_real_student_id()
     conv = ChatConversation.query.filter_by(id=conversation_id, student_id=student_id).first_or_404()
     messages = ChatMessage.query.filter_by(conversation_id=conv.id).order_by(ChatMessage.created_at.asc()).all()
     
     conv_dict = conv.to_dict() if hasattr(conv, 'to_dict') else {"id": conv.id, "title": conv.title}
-    msg_list = [m.to_dict() if hasattr(m, 'to_dict') else {"sender": m.sender, "text": getattr(m, 'content', getattr(m, 'text', ''))} for m in messages]
+    
+    from app.models.chat_history import ChatFeedback
+    msg_list = []
+    for m in messages:
+        m_dict = m.to_dict() if hasattr(m, 'to_dict') else {
+            "id": m.id,
+            "conversation_id": m.conversation_id,
+            "sender": m.sender,
+            "content": getattr(m, 'content', getattr(m, 'text', '')),
+            "image_path": getattr(m, 'image_path', None),
+            "sources": [],
+            "feedback": getattr(m, 'feedback', None)
+        }
+        # Secondary fallback from ChatFeedback table if not on ChatMessage
+        if not m_dict.get('feedback') and m.sender == 'assistant':
+            fb = ChatFeedback.query.filter_by(message_id=m.id).order_by(ChatFeedback.id.desc()).first()
+            if not fb:
+                fb = ChatFeedback.query.filter_by(conversation_id=conv.id, response_text=m.content).order_by(ChatFeedback.id.desc()).first()
+            if fb:
+                m_dict['feedback'] = fb.rating
+                
+        msg_list.append(m_dict)
 
     return jsonify({
         "status": "success",

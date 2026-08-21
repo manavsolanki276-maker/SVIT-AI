@@ -32,6 +32,7 @@ def create_app():
         'sqlite:///' + os.path.join(base_dir, 'svit_assistant.db')
     )
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
     # Ensure static upload folders exist
     profile_upload_path = os.path.join(app.root_path, 'static', 'profile_images')
