@@ -47,14 +47,22 @@ def decode_audio_to_16khz_mono(audio_bytes: bytes) -> np.ndarray:
             audio = audio.mean(axis=1)
 
         if sample_rate != 16000 and len(audio) > 0:
-            import scipy.signal as signal
             target_samples = int(len(audio) * 16000 / sample_rate)
-            audio = signal.resample(audio, target_samples)
+            try:
+                import scipy.signal as signal
+                audio = signal.resample(audio, target_samples)
+            except Exception:
+                audio = np.interp(
+                    np.linspace(0, len(audio), target_samples, endpoint=False),
+                    np.arange(len(audio)),
+                    audio
+                )
 
         return audio.astype(np.float32)
 
     except Exception as sf_err:
         pass
+
 
     # 2. Fallback to standard library wave module
     try:
