@@ -19,44 +19,13 @@ from app import create_app
 app = create_app()
 
 
-class VercelEntrypointPathFix:
-    """
-    WSGI Middleware to ensure proper request routing on Vercel Serverless environment.
-    When Vercel rewrites routes to /api/index.py, it provides the original requested path
-    in HTTP_X_MATCHED_PATH (or HTTP_X_VERCEL_MATCHED_PATH). This middleware restores the
-    intended PATH_INFO so Flask routes properly, while normalizing entrypoint paths to '/'.
-    """
-    def __init__(self, wsgi_app):
-        self.wsgi_app = wsgi_app
-
-    def __call__(self, environ, start_response):
-        matched_path = (
-            environ.get('HTTP_X_MATCHED_PATH') or
-            environ.get('HTTP_X_VERCEL_MATCHED_PATH') or
-            environ.get('HTTP_X_FORWARDED_PATH') or
-            environ.get('HTTP_X_ORIGINAL_URI')
-        )
-        if matched_path:
-            path_only = matched_path.split('?', 1)[0]
-            if path_only in ('/api/index.py', '/api/index', '/api', '/api/'):
-                environ['PATH_INFO'] = '/'
-            else:
-                environ['PATH_INFO'] = path_only
-        else:
-            path_info = environ.get('PATH_INFO', '')
-            if path_info in ('/api/index.py', '/api/index', '/api', '/api/'):
-                environ['PATH_INFO'] = '/'
-        return self.wsgi_app(environ, start_response)
-
-
-
 # Apply ProxyFix for Vercel reverse proxy headers (HTTPS, host, client IP)
-# and VercelEntrypointPathFix for entrypoint path normalization
 app.wsgi_app = ProxyFix(
-    VercelEntrypointPathFix(app.wsgi_app),
+    app.wsgi_app,
     x_for=1,
     x_proto=1,
     x_host=1,
-    x_prefix=1
+    x_prefix=0
 )
+
 
