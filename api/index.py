@@ -12,41 +12,37 @@ if os.environ.get('VERCEL') or os.environ.get('AWS_LAMBDA_FUNCTION_NAME'):
     os.environ.setdefault('TRANSFORMERS_CACHE', '/tmp/huggingface')
     os.environ.setdefault('TORCH_HOME', '/tmp/torch')
 
+from werkzeug.middleware.proxy_fix import ProxyFix
 from app import create_app
 
 # Top-level WSGI application variable for Vercel Python runtime
 app = create_app()
 
 
-class VercelPathFix:
+class VercelEntrypointPathFix:
     """
     WSGI Middleware to ensure proper request routing on Vercel Serverless environment.
-    Vercel rewrites routes to the serverless function (e.g. /api/index), passing the
-    original client path in `x-vercel-matched-path` (or `x-matched-path`).
-    This middleware normalizes PATH_INFO so Flask's URL routing matches the intended route.
+    Normalizes PATH_INFO only if the raw invocation path is the serverless entrypoint itself
+    (e.g., /api/index, /api/index.py), while preserving all actual application routes
+    (e.g., /auth/student/login, /student/chat, /api/chat).
     """
     def __init__(self, wsgi_app):
         self.wsgi_app = wsgi_app
 
     def __call__(self, environ, start_response):
-        matched_path = (
-            environ.get('HTTP_X_VERCEL_MATCHED_PATH') or 
-            environ.get('HTTP_X_MATCHED_PATH') or 
-            environ.get('x-vercel-matched-path') or 
-            environ.get('x-matched-path')
-        )
-        if matched_path:
-            path = matched_path.split('?')[0]
-            if path in ('/api/index.py', '/api/index', '/api', '/api/'):
-                environ['PATH_INFO'] = '/'
-            elif path:
-                environ['PATH_INFO'] = path
-        else:
-            path_info = environ.get('PATH_INFO', '')
-            if path_info in ('/api/index.py', '/api/index', '/api', '/api/'):
-                environ['PATH_INFO'] = '/'
+        path_info = environ.get('PATH_INFO', '')
+        if path_info in ('/api/index.py', '/api/index', '/api', '/api/'):
+            environ['PATH_INFO'] = '/'
         return self.wsgi_app(environ, start_response)
 
 
-# Wrap Flask's WSGI application with the Vercel path fix middleware
-app.wsgi_app = VercelPathFix(app.wsgi_app)
+# Apply ProxyFix for Vercel reverse proxy headers (HTTPS, host, client IP)
+# and VercelEntrypointPathFix for entrypoint path normalization
+app.wsgi_app = ProxyFix(
+    VercelEntrypointPathFix(app.wsgi_app),
+    x_for=1,
+    x_proto=1,
+    x_host=1,
+    x_prefix=1
+)
+
