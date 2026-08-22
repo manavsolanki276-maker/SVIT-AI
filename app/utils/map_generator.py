@@ -7,14 +7,6 @@ BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 IMAGE_PATH = os.path.join(BASE_DIR, "knowledge_base", "svit_drone_campus_map.png")
 OUTPUT_DIR = os.path.join(BASE_DIR, "static", "navigation_maps")
 
-# Ensure output directory exists
-os.makedirs(OUTPUT_DIR, exist_ok=True)
-
-base_image = cv2.imread(IMAGE_PATH)
-
-if base_image is None:
-    raise FileNotFoundError(f"❌ Could not find drone map at: {IMAGE_PATH}")
-
 MAIN_ENTRANCE = (500, 1800)
 
 DESTINATIONS = {
@@ -45,6 +37,11 @@ DESTINATIONS = {
 }
 
 def generate_all_maps():
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    base_image = cv2.imread(IMAGE_PATH)
+    if base_image is None:
+        raise FileNotFoundError(f"❌ Could not find drone map at: {IMAGE_PATH}")
+
     for destination_name, path_points in DESTINATIONS.items():
         img = base_image.copy()
         

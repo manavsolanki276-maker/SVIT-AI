@@ -15,15 +15,9 @@ from app.models.chat_history import ChatConversation, ChatMessage
 chat_bp = Blueprint('chat', __name__)
 
 # ---------------------------------------------------------
-# Global RAG Instance Initialization (Runs ONCE at App Startup)
+# Global RAG Instance Placeholder (Lazy-loaded on demand)
 # ---------------------------------------------------------
 rag_instance = None
-try:
-    from app.ai.rag_pipeline import get_rag_pipeline
-    rag_instance = get_rag_pipeline()
-    print("[Chat] Fast RAG Pipeline initialized successfully in chat.py")
-except Exception as err:
-    print(f"[Chat] Note: Could not pre-initialize RAG Pipeline in chat.py: {err}")
 
 
 def get_real_student_id():

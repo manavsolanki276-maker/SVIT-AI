@@ -27,16 +27,35 @@ def create_app():
 
     # Database setup
     base_dir = os.path.abspath(os.path.dirname(__file__))
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
-        'DATABASE_URL', 
-        'sqlite:///' + os.path.join(base_dir, 'svit_assistant.db')
-    )
+    db_url = os.environ.get('DATABASE_URL')
+    if db_url:
+        if db_url.startswith('postgres://'):
+            db_url = db_url.replace('postgres://', 'postgresql://', 1)
+        app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+    elif os.environ.get('VERCEL') or os.environ.get('AWS_LAMBDA_FUNCTION_NAME'):
+        import tempfile
+        tmp_dir = tempfile.gettempdir()
+        tmp_db = os.path.join(tmp_dir, 'svit_assistant.db')
+        src_db = os.path.join(base_dir, 'svit_assistant.db')
+        if not os.path.exists(tmp_db) and os.path.exists(src_db):
+            try:
+                import shutil
+                shutil.copy2(src_db, tmp_db)
+            except Exception:
+                pass
+        app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{tmp_db}'
+    else:
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(base_dir, 'svit_assistant.db')
+
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
-    # Ensure static upload folders exist
+    # Ensure static upload folders exist safely
     profile_upload_path = os.path.join(app.root_path, 'static', 'profile_images')
-    os.makedirs(profile_upload_path, exist_ok=True)
+    try:
+        os.makedirs(profile_upload_path, exist_ok=True)
+    except OSError:
+        pass
 
     # =========================================================
     # 2. EXTENSION INITIALIZATION
@@ -168,6 +187,9 @@ def create_app():
         except ImportError as e:
             logger.warning(f"Secondary models registration notice: {e}")
 
-        db.create_all()
+        try:
+            db.create_all()
+        except Exception as db_err:
+            logger.warning(f"Database table initialization notice: {db_err}")
 
     return app

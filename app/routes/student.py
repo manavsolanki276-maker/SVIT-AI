@@ -5,12 +5,8 @@ from flask_login import login_required, current_user
 
 from app.extensions import db
 from app.models.chat_history import ChatConversation, ChatMessage
-from app.ai.rag_pipeline import RAGPipeline
 
 student_bp = Blueprint('student', __name__, url_prefix='/student')
-
-# Initialize RAG Pipeline Instance
-rag_pipeline = RAGPipeline()
 
 
 # =========================================================
@@ -97,7 +93,9 @@ def chat_api():
             "enrollment_no": getattr(current_user, 'enrollment_no', getattr(current_user, 'enrollment_number', ''))
         }
         session_id = f"user_{current_user.id}"
-        result = rag_pipeline.answer_question(
+        from app.ai.rag_pipeline import get_rag_pipeline
+        rag = get_rag_pipeline()
+        result = rag.answer_question(
             question=user_message,
             session_id=session_id,
             user_profile=user_profile

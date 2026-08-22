@@ -83,44 +83,53 @@ def route_query_sources(user_message: str) -> list[tuple[str, float]]:
 class RAGPipeline:
     def __init__(self, force_rebuild: bool = False):
         print("[RAG] Initializing Optimized Tiered RAG Pipeline with Student Personalization...")
+        self.force_rebuild = force_rebuild
+        self._vector_store = None
+        self._llm = None
 
-        project_root = os.path.abspath(
-            os.path.join(os.path.dirname(__file__), "..", "..")
-        )
-        chroma_dir = os.path.join(project_root, "chroma_db")
-
-        # Build or Load ChromaDB Store
-        if force_rebuild or not os.path.exists(chroma_dir):
-            raw_docs = load_csv_knowledge_base()
-            chunks = chunk_documents(raw_docs)
-            self.vector_store = build_or_load_vector_store(
-                chunks,
-                force_rebuild=True
+    @property
+    def vector_store(self):
+        if self._vector_store is None:
+            project_root = os.path.abspath(
+                os.path.join(os.path.dirname(__file__), "..", "..")
             )
-        else:
-            self.vector_store = build_or_load_vector_store()
+            chroma_dir = os.path.join(project_root, "chroma_db")
 
-        # Read OpenRouter API Key & Model settings
-        api_key = os.getenv("OPENROUTER_API_KEY")
-        model_name = os.getenv("OPENROUTER_MODEL", "meta-llama/llama-3.3-70b-instruct")
+            # Build or Load ChromaDB Store
+            if self.force_rebuild or not os.path.exists(chroma_dir):
+                raw_docs = load_csv_knowledge_base()
+                chunks = chunk_documents(raw_docs)
+                self._vector_store = build_or_load_vector_store(
+                    chunks,
+                    force_rebuild=True
+                )
+            else:
+                self._vector_store = build_or_load_vector_store()
+        return self._vector_store
 
-        if not api_key:
-            raise ValueError("[Error] OPENROUTER_API_KEY not found in .env file.")
+    @property
+    def llm(self):
+        if self._llm is None:
+            api_key = os.getenv("OPENROUTER_API_KEY")
+            model_name = os.getenv("OPENROUTER_MODEL", "meta-llama/llama-3.3-70b-instruct")
 
-        print(f"[RAG] Using OpenRouter Model: {model_name}")
+            if not api_key:
+                raise ValueError("[Error] OPENROUTER_API_KEY environment variable is not configured.")
 
-        # Initialize OpenRouter Client with fast token budget
-        self.llm = ChatOpenAI(
-            model_name=model_name,
-            openai_api_key=api_key,
-            openai_api_base="https://openrouter.ai/api/v1",
-            temperature=0.1,
-            max_tokens=768,
-            default_headers={
-                "HTTP-Referer": "http://localhost:3000",
-                "X-Title": "SVIT AI Assistant",
-            }
-        )
+            print(f"[RAG] Using OpenRouter Model: {model_name}")
+
+            self._llm = ChatOpenAI(
+                model_name=model_name,
+                openai_api_key=api_key,
+                openai_api_base="https://openrouter.ai/api/v1",
+                temperature=0.1,
+                max_tokens=768,
+                default_headers={
+                    "HTTP-Referer": "https://svit-ai.vercel.app",
+                    "X-Title": "SVIT AI Assistant",
+                }
+            )
+        return self._llm
 
     def _prepare_rag_context(
         self, 

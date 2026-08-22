@@ -4,7 +4,7 @@ Campus Notification Center API Endpoints.
 """
 from flask import Blueprint, jsonify, request
 from flask_login import login_required, current_user
-from app import db
+from app.extensions import db
 from app.models.notification import Notification
 
 notification_bp = Blueprint('notifications', __name__, url_prefix='/notifications')

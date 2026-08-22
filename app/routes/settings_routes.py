@@ -4,7 +4,7 @@ User Preferences and Settings Management Blueprint.
 """
 from flask import Blueprint, render_template, request, jsonify
 from flask_login import login_required, current_user
-from app import db
+from app.extensions import db
 from app.models.user_settings import UserSettings
 
 settings_bp = Blueprint('settings', __name__, url_prefix='/student/settings')
