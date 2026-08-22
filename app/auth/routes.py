@@ -49,15 +49,15 @@ def login():
 
         # --- STUDENT LOGIN PATH ---
         if role == 'student':
-            student = Student.query.filter(
-                (Student.enrollment_no == identifier) | (Student.email == identifier)
-            ).first()
-
-            print(f"--> STUDENT FOUND: {student}")
+            from app.database.mongo_models import MongoStudent
+            student = MongoStudent.find_by_identifier(identifier)
+            if not student and Student:
+                student = Student.query.filter(
+                    (Student.enrollment_no == identifier) | (Student.email == identifier)
+                ).first()
 
             if student and student.check_password(password):
                 login_user(student, remember=True)
-                print(f"--> PROFILE COMPLETE FLAG: {student.is_profile_complete}")
 
                 # Handle redirected URL target
                 next_page = request.args.get('next')
@@ -66,11 +66,9 @@ def login():
 
                 if not getattr(student, 'is_profile_complete', True):
                     if 'student.complete_profile' in current_app.view_functions:
-                        print("--> REDIRECTING TO: student.complete_profile")
                         return redirect(url_for('student.complete_profile'))
 
                 if 'student.chat' in current_app.view_functions:
-                    print("--> REDIRECTING TO: student.chat")
                     return redirect(url_for('student.chat'))
                 return redirect('/')
 
@@ -78,16 +76,18 @@ def login():
 
         # --- ADMIN LOGIN PATH ---
         elif role == 'admin':
-            admin = Admin.query.filter(
-                (Admin.username == identifier) | (Admin.email == identifier)
-            ).first()
-
-            print(f"--> ADMIN FOUND: {admin}")
+            from app.database.mongo_models import MongoAdmin
+            admin = MongoAdmin.find_by_identifier(identifier)
+            if not admin and Admin:
+                admin = Admin.query.filter(
+                    (Admin.username == identifier) | (Admin.email == identifier)
+                ).first()
 
             if admin and admin.check_password(password):
                 login_user(admin, remember=True)
 
                 next_page = request.args.get('next')
+
                 if next_page and is_safe_url(next_page):
                     return redirect(next_page)
 

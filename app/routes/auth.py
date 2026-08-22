@@ -59,12 +59,14 @@ def student_login():
         # ----------------------------------------------------
         # ADMIN LOGIN FLOW
         # ----------------------------------------------------
-        if role == 'admin' and Admin:
-            admin_user = None
-            if hasattr(Admin, 'username'):
-                admin_user = Admin.query.filter_by(username=identifier).first()
-            if not admin_user and hasattr(Admin, 'email'):
-                admin_user = Admin.query.filter_by(email=identifier).first()
+        if role == 'admin':
+            from app.database.mongo_models import MongoAdmin
+            admin_user = MongoAdmin.find_by_identifier(identifier)
+            if not admin_user and Admin:
+                if hasattr(Admin, 'username'):
+                    admin_user = Admin.query.filter_by(username=identifier).first()
+                if not admin_user and hasattr(Admin, 'email'):
+                    admin_user = Admin.query.filter_by(email=identifier).first()
 
             if admin_user and hasattr(admin_user, 'check_password') and admin_user.check_password(password):
                 login_user(admin_user, remember=remember)
@@ -73,8 +75,10 @@ def student_login():
         # ----------------------------------------------------
         # STUDENT LOGIN FLOW
         # ----------------------------------------------------
-        student_user = None
-        if Student:
+        from app.database.mongo_models import MongoStudent
+        student_user = MongoStudent.find_by_identifier(identifier)
+
+        if not student_user and Student:
             # Query by Email
             if '@' in identifier and hasattr(Student, 'email'):
                 student_user = Student.query.filter_by(email=identifier).first()
@@ -97,6 +101,7 @@ def student_login():
             return redirect('/')
 
         flash('Invalid credentials. Please check your username/email and password.', 'error')
+
 
     return render_template('auth/login.html')
 

@@ -9,10 +9,10 @@ import re
 from typing import Dict, Any, List, Optional, Generator, Tuple
 from collections import OrderedDict
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
 
 # Load environment variables
 load_dotenv()
+
 
 from app.ai.config import INTENT_CONFIG
 from app.ai.loader import load_csv_knowledge_base
@@ -118,6 +118,7 @@ class RAGPipeline:
 
             print(f"[RAG] Using OpenRouter Model: {model_name}")
 
+            from langchain_openai import ChatOpenAI
             self._llm = ChatOpenAI(
                 model_name=model_name,
                 openai_api_key=api_key,
@@ -130,6 +131,7 @@ class RAGPipeline:
                 }
             )
         return self._llm
+
 
     def _prepare_rag_context(
         self, 

@@ -24,9 +24,12 @@ def login():
         password = request.form.get('password')
         remember = True if request.form.get('remember') else False
 
-        admin = Admin.query.filter(
-            (Admin.username == identifier) | (Admin.email == identifier)
-        ).first()
+        from app.database.mongo_models import MongoAdmin
+        admin = MongoAdmin.find_by_identifier(identifier)
+        if not admin and Admin:
+            admin = Admin.query.filter(
+                (Admin.username == identifier) | (Admin.email == identifier)
+            ).first()
 
         if admin and admin.check_password(password):
             # remember=True preserves session across browser restarts
@@ -36,6 +39,7 @@ def login():
             flash('Invalid admin credentials.', 'error')
 
     return render_template('auth/login.html')
+
 
 
 @admin_bp.route('/dev-login')

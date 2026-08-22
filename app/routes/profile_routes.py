@@ -24,13 +24,36 @@ profile_bp = Blueprint('profile', __name__, url_prefix='/student/profile')
 
 
 def get_fresh_student():
-    """Fetches the active student record directly from the database to ensure fresh state."""
+    """Fetches the active student record directly from the database (MongoDB or SQLite) to ensure fresh state."""
     if not current_user.is_authenticated:
         return None
 
+    from app.database.mongo_models import MongoStudent
+    
+    # 1. Try by ID from MongoDB
+    raw_id = getattr(current_user, 'id', None)
+    if raw_id:
+        int_id = str(raw_id).split('_')[-1]
+        mongo_user = MongoStudent.get_by_id(int_id)
+        if mongo_user:
+            return mongo_user
+
+    # 2. Try by Enrollment Number from MongoDB
+    enrollment = getattr(current_user, 'enrollment_no', getattr(current_user, 'enrollment_number', None))
+    if enrollment:
+        mongo_user = MongoStudent.find_by_identifier(enrollment)
+        if mongo_user:
+            return mongo_user
+
+    # 3. Try by Email from MongoDB
+    email = getattr(current_user, 'email', None)
+    if email:
+        mongo_user = MongoStudent.find_by_identifier(email)
+        if mongo_user:
+            return mongo_user
+
+    # SQLite fallback
     if Student:
-        # 1. By ID (handle 'student_1' format or integer)
-        raw_id = getattr(current_user, 'id', None)
         if raw_id:
             try:
                 int_id = int(str(raw_id).split('_')[-1])
@@ -40,21 +63,18 @@ def get_fresh_student():
             except (ValueError, TypeError):
                 pass
 
-        # 2. By Enrollment Number
-        enrollment = getattr(current_user, 'enrollment_no', getattr(current_user, 'enrollment_number', None))
         if enrollment:
             db_user = Student.query.filter_by(enrollment_no=enrollment).first()
             if db_user:
                 return db_user
 
-        # 3. By Email
-        email = getattr(current_user, 'email', None)
         if email:
             db_user = Student.query.filter_by(email=email).first()
             if db_user:
                 return db_user
 
     return current_user
+
 
 
 # =========================================================
@@ -168,15 +188,43 @@ def complete_profile():
             if hasattr(target, 'is_profile_complete'):
                 target.is_profile_complete = True
 
-            db.session.add(target)
-            db.session.commit()
+            # Save to MongoDB
+            try:
+                from app.database.mongo_models import MongoStudent
+                profile_dict = {
+                    "full_name": getattr(target, 'full_name', getattr(target, 'name', '')),
+                    "name": getattr(target, 'full_name', getattr(target, 'name', '')),
+                    "enrollment_no": getattr(target, 'enrollment_no', ''),
+                    "program": getattr(target, 'program', ''),
+                    "department": getattr(target, 'department', ''),
+                    "semester": getattr(target, 'semester', 1),
+                    "division": getattr(target, 'division', 'A'),
+                    "batch": getattr(target, 'batch', 'A1'),
+                    "phone": getattr(target, 'phone', getattr(target, 'mobile_no', '')),
+                    "gender": getattr(target, 'gender', ''),
+                    "is_profile_complete": True,
+                    "is_profile_completed": True,
+                }
+                MongoStudent.save_or_update(profile_dict)
+            except Exception as mongo_err:
+                pass
+
+            try:
+                db.session.add(target)
+                db.session.commit()
+            except Exception:
+                pass
 
             flash('Profile setup completed successfully! Welcome to SVIT AI Assistant.', 'success')
             return redirect('/')
 
         except Exception as e:
-            db.session.rollback()
+            try:
+                db.session.rollback()
+            except Exception:
+                pass
             print(f"[Error] Completing student profile: {e}")
+
             return render_template('student/complete_profile.html', user=student, student=student, error="Failed to save profile. Please try again.")
 
     return render_template('student/complete_profile.html', user=student, student=student)
@@ -256,10 +304,35 @@ def update_profile():
         if hasattr(target, 'is_profile_complete'):
             target.is_profile_complete = True
 
-        db.session.add(target)
-        db.session.commit()
+        # Save to MongoDB
+        try:
+            from app.database.mongo_models import MongoStudent
+            profile_dict = {
+                "full_name": full_name or getattr(target, 'full_name', getattr(target, 'name', '')),
+                "name": full_name or getattr(target, 'full_name', getattr(target, 'name', '')),
+                "enrollment_no": getattr(target, 'enrollment_no', ''),
+                "program": program or getattr(target, 'program', ''),
+                "department": department or getattr(target, 'department', ''),
+                "semester": int(semester) if str(semester).isdigit() else getattr(target, 'semester', 1),
+                "division": division or getattr(target, 'division', 'A'),
+                "batch": batch or getattr(target, 'batch', 'A1'),
+                "phone": phone or getattr(target, 'phone', getattr(target, 'mobile_no', '')),
+                "gender": gender or getattr(target, 'gender', ''),
+                "is_profile_complete": True,
+                "is_profile_completed": True,
+            }
+            MongoStudent.save_or_update(profile_dict)
+        except Exception:
+            pass
+
+        try:
+            db.session.add(target)
+            db.session.commit()
+        except Exception:
+            pass
 
         return jsonify({
+
             "status": "success",
             "message": "Profile updated successfully.",
             "data": {

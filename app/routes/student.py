@@ -55,31 +55,45 @@ def chat_api():
 
     try:
         # 1. Fetch or create conversation session
-        if conversation_id:
-            conv = ChatConversation.query.filter_by(
-                id=conversation_id, 
-                student_id=current_user.id
-            ).first()
-        else:
+        raw_uid = getattr(current_user, 'id', 1)
+        uid_str = str(raw_uid).split('_', 1)[1] if str(raw_uid).startswith('student_') else str(raw_uid)
+        conv_id = conversation_id or str(uuid.uuid4())
+        title_snippet = user_message[:30] + "..." if len(user_message) > 30 else user_message
+
+        # MongoDB persistence
+        try:
+            from app.database.mongo_models import MongoChatService
+            MongoChatService.save_or_update_conversation(conv_id, uid_str, title_snippet)
+            MongoChatService.save_message(conv_id, 'user', user_message)
+        except Exception:
+            pass
+
+        # SQLite persistence
+        try:
             conv = None
+            if conversation_id:
+                conv = ChatConversation.query.filter_by(id=conversation_id).first()
+            if not conv:
+                conv = ChatConversation(
+                    id=conv_id, 
+                    student_id=int(uid_str) if str(uid_str).isdigit() else 1, 
+                    title=title_snippet
+                )
+                db.session.add(conv)
+                db.session.commit()
 
-        if not conv:
-            title_snippet = user_message[:30] + "..." if len(user_message) > 30 else user_message
-            conv = ChatConversation(
-                id=str(uuid.uuid4()), 
-                student_id=current_user.id, 
-                title=title_snippet
+            user_msg_db = ChatMessage(
+                conversation_id=conv.id, 
+                sender='user', 
+                content=user_message
             )
-            db.session.add(conv)
+            db.session.add(user_msg_db)
             db.session.commit()
-
-        # 2. Log user message
-        user_msg_db = ChatMessage(
-            conversation_id=conv.id, 
-            sender='user', 
-            content=user_message
-        )
-        db.session.add(user_msg_db)
+        except Exception:
+            try:
+                db.session.rollback()
+            except Exception:
+                pass
 
         # 3. Extract fresh user profile and call the RAG pipeline
         from app.routes.chat import get_current_student_profile
@@ -92,7 +106,7 @@ def chat_api():
             "batch": getattr(current_user, 'batch', 'A1'),
             "enrollment_no": getattr(current_user, 'enrollment_no', getattr(current_user, 'enrollment_number', ''))
         }
-        session_id = f"user_{current_user.id}"
+        session_id = f"user_{uid_str}"
         from app.ai.rag_pipeline import get_rag_pipeline
         rag = get_rag_pipeline()
         result = rag.answer_question(
@@ -105,23 +119,37 @@ def chat_api():
         map_image = result.get('image')
         sources = result.get('sources', [])
 
-        # 4. Log assistant message & metadata
-        bot_msg_db = ChatMessage(
-            conversation_id=conv.id,
-            sender='assistant',
-            content=bot_answer,
-            image_path=map_image,
-            sources=json.dumps(sources)
-        )
-        db.session.add(bot_msg_db)
-        db.session.commit()
+        # 4. Log assistant message & metadata in MongoDB
+        try:
+            from app.database.mongo_models import MongoChatService
+            MongoChatService.save_message(conv_id, 'assistant', bot_answer, image_path=map_image, sources=sources)
+        except Exception:
+            pass
+
+        # Log in SQLite
+        try:
+            bot_msg_db = ChatMessage(
+                conversation_id=conv_id,
+                sender='assistant',
+                content=bot_answer,
+                image_path=map_image,
+                sources=json.dumps(sources)
+            )
+            db.session.add(bot_msg_db)
+            db.session.commit()
+        except Exception:
+            try:
+                db.session.rollback()
+            except Exception:
+                pass
 
         return jsonify({
-            'conversation_id': conv.id,
+            'conversation_id': conv_id,
             'answer': bot_answer,
             'image': map_image,
             'sources': sources
         }), 200
+
 
     except Exception as e:
         print(f"[Error] Error in RAG Pipeline route: {e}")

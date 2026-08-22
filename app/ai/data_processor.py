@@ -103,11 +103,29 @@ _DF_CACHE: Dict[str, pd.DataFrame] = {}
 
 def get_cached_dataframe(filename: str) -> Optional[pd.DataFrame]:
     """
-    Returns an in-memory cached copy of a knowledge base CSV DataFrame.
+    Returns an in-memory cached copy of a knowledge base dataset DataFrame.
+    Checks MongoDB Atlas first, then falls back to local CSV files.
     """
     if filename in _DF_CACHE:
         return _DF_CACHE[filename]
 
+    # 1. Try loading from MongoDB Atlas collection first
+    try:
+        from app.database.mongodb import get_collection
+        coll_name = filename.replace('.csv', '').lower().replace(' ', '_')
+        coll = get_collection(coll_name)
+        if coll is not None:
+            docs = list(coll.find({}, {'_id': 0}))
+            if docs and len(docs) > 0:
+                df = pd.DataFrame(docs).fillna("")
+                for col in df.columns:
+                    df[col] = df[col].astype(str).str.strip()
+                _DF_CACHE[filename] = df
+                return df
+    except Exception as e:
+        pass
+
+    # 2. Fallback to local CSV files
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
     
     possible_paths = [
@@ -132,6 +150,7 @@ def get_cached_dataframe(filename: str) -> Optional[pd.DataFrame]:
                 return None
 
     return None
+
 
 
 def preload_all_dataframes() -> None:
@@ -1050,7 +1069,3 @@ def resolve_student_profile_query(query: str, user_profile: dict = None) -> Opti
         )
 
     return None
-
-
-# Run initial preloading on import
-preload_all_dataframes()

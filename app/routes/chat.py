@@ -4,10 +4,14 @@ API endpoints for student chat queries with Student Profile Personalization,
 Server-Sent Events (SSE) streaming, and high-speed in-memory cached responses.
 """
 import os
+import re
 import json
+import uuid
 from datetime import datetime
 from flask import Blueprint, request, jsonify, current_app, Response, stream_with_context
 from flask_login import current_user
+
+
 
 from app.extensions import db
 from app.models.chat_history import ChatConversation, ChatMessage
@@ -32,21 +36,31 @@ def get_real_student_id():
 
 
 def get_current_student_profile():
-    """Extracts a structured profile dictionary for the active student."""
+    """Extracts a structured profile dictionary for the active student from MongoDB or SQLite."""
     if not current_user or not getattr(current_user, 'is_authenticated', False):
         return None
 
     target = current_user
     real_id = get_real_student_id()
 
-    # Query fresh student DB record if available
+    # 1. Try fetching fresh student from MongoDB
     try:
-        from app.database.models import Student
-        db_student = Student.query.get(real_id)
-        if db_student:
-            target = db_student
+        from app.database.mongo_models import MongoStudent
+        m_student = MongoStudent.get_by_id(real_id)
+        if m_student:
+            target = m_student
     except Exception:
         pass
+
+    # 2. Query fresh student DB record from SQLite if target is still current_user
+    if target == current_user:
+        try:
+            from app.database.models import Student
+            db_student = Student.query.get(real_id)
+            if db_student:
+                target = db_student
+        except Exception:
+            pass
 
     if target == current_user:
         try:
@@ -56,6 +70,7 @@ def get_current_student_profile():
                 target = db_student
         except Exception:
             pass
+
 
     program = getattr(target, 'program', '') or 'BE'
     full_name = getattr(target, 'full_name', getattr(target, 'name', 'Student')) or 'Student'
@@ -184,20 +199,30 @@ def handle_chat_stream():
     user_profile = get_current_student_profile()
 
     # Pre-resolve or create conversation session
+    conv_id = conversation_id or str(uuid.uuid4())
+    title_summary = user_text[:35].strip() + ("..." if len(user_text) > 35 else "")
+
+    # Save to MongoDB
+    try:
+        from app.database.mongo_models import MongoChatService
+        MongoChatService.save_or_update_conversation(conv_id, student_id, title_summary)
+        MongoChatService.save_message(conv_id, 'user', user_text)
+    except Exception as mongo_err:
+        pass
+
+    # Save to SQLite if available
     try:
         conversation = None
         if conversation_id:
-            conversation = ChatConversation.query.filter_by(id=conversation_id, student_id=student_id).first()
+            conversation = ChatConversation.query.filter_by(id=conversation_id).first()
 
         if not conversation:
-            title_summary = user_text[:35].strip() + ("..." if len(user_text) > 35 else "")
-            conversation = ChatConversation(student_id=student_id, title=title_summary)
+            conversation = ChatConversation(id=conv_id, student_id=int(student_id) if str(student_id).isdigit() else 1, title=title_summary)
             db.session.add(conversation)
             db.session.flush()
 
         conv_id = conversation.id
 
-        # Save user message to database
         user_msg = ChatMessage(
             conversation_id=conv_id,
             sender='user',
@@ -205,11 +230,11 @@ def handle_chat_stream():
         )
         db.session.add(user_msg)
         db.session.commit()
-
     except Exception as e:
-        db.session.rollback()
-        print(f"[Error] Failed to initialize conversation for streaming: {e}")
-        conv_id = conversation_id or "temp_conv"
+        try:
+            db.session.rollback()
+        except Exception:
+            pass
 
     app_instance = current_app._get_current_object()
 
@@ -247,21 +272,36 @@ def handle_chat_stream():
                 if not os.path.exists(full_img_path):
                     final_image = None
 
-            # Persist assistant response in DB
-            with app_instance.app_context():
-                bot_msg = ChatMessage(
-                    conversation_id=conv_id,
-                    sender='assistant',
-                    content=full_answer,
-                    image_path=final_image,
-                    sources=json.dumps(final_sources)
+            # Persist assistant response to MongoDB
+            saved_msg_id = "msg_" + str(uuid.uuid4())[:8]
+            try:
+                from app.database.mongo_models import MongoChatService
+                mongo_msg_id = MongoChatService.save_message(
+                    conv_id, 'assistant', full_answer, image_path=final_image, sources=final_sources
                 )
-                db.session.add(bot_msg)
-                conv_record = ChatConversation.query.get(conv_id)
-                if conv_record:
-                    conv_record.updated_at = datetime.now()
-                db.session.commit()
-                saved_msg_id = bot_msg.id
+                if mongo_msg_id:
+                    saved_msg_id = mongo_msg_id
+            except Exception:
+                pass
+
+            # Persist assistant response in SQLite if available
+            try:
+                with app_instance.app_context():
+                    bot_msg = ChatMessage(
+                        conversation_id=conv_id,
+                        sender='assistant',
+                        content=full_answer,
+                        image_path=final_image,
+                        sources=json.dumps(final_sources)
+                    )
+                    db.session.add(bot_msg)
+                    conv_record = ChatConversation.query.get(conv_id)
+                    if conv_record:
+                        conv_record.updated_at = datetime.now()
+                    db.session.commit()
+                    saved_msg_id = bot_msg.id
+            except Exception:
+                pass
 
             yield f"data: {json.dumps({'done': True, 'conversation_id': conv_id, 'message_id': saved_msg_id, 'answer': full_answer, 'image': final_image, 'sources': final_sources, 'suggestions': final_suggestions})}\n\n"
 
@@ -287,60 +327,89 @@ def handle_chat():
     student_id = get_real_student_id()
     user_profile = get_current_student_profile()
 
+    conv_id = conversation_id or str(uuid.uuid4())
+    title_summary = user_text[:35].strip() + ("..." if len(user_text) > 35 else "")
+
+    # Save to MongoDB
+    try:
+        from app.database.mongo_models import MongoChatService
+        MongoChatService.save_or_update_conversation(conv_id, student_id, title_summary)
+        MongoChatService.save_message(conv_id, 'user', user_text)
+    except Exception:
+        pass
+
+    # Save to SQLite if available
     try:
         conversation = None
         if conversation_id:
-            conversation = ChatConversation.query.filter_by(id=conversation_id, student_id=student_id).first()
+            conversation = ChatConversation.query.filter_by(id=conversation_id).first()
 
         if not conversation:
-            title_summary = user_text[:35].strip() + ("..." if len(user_text) > 35 else "")
-            conversation = ChatConversation(student_id=student_id, title=title_summary)
+            conversation = ChatConversation(id=conv_id, student_id=int(student_id) if str(student_id).isdigit() else 1, title=title_summary)
             db.session.add(conversation)
             db.session.flush()
 
-        # Save User Message
+        conv_id = conversation.id
+
         user_msg = ChatMessage(
-            conversation_id=conversation.id,
+            conversation_id=conv_id,
             sender='user',
             content=user_text
         )
         db.session.add(user_msg)
+        db.session.commit()
+    except Exception:
+        try:
+            db.session.rollback()
+        except Exception:
+            pass
 
-        # Generate AI Answer with user profile
-        session_key = f"student_{student_id}_conv_{conversation.id}"
-        ai_response_text, image_path, sources_list, suggestions_list = generate_campus_response(
-            user_text, 
-            session_id=session_key,
-            user_profile=user_profile
-        )
+    # Generate AI Answer with user profile
+    session_key = f"student_{student_id}_conv_{conv_id}"
+    ai_response_text, image_path, sources_list, suggestions_list = generate_campus_response(
+        user_text, 
+        session_id=session_key,
+        user_profile=user_profile
+    )
 
-        # Save Assistant Message
+    # Save Assistant Message to MongoDB
+    bot_msg_id = "msg_" + str(uuid.uuid4())[:8]
+    try:
+        from app.database.mongo_models import MongoChatService
+        m_id = MongoChatService.save_message(conv_id, 'assistant', ai_response_text, image_path=image_path, sources=sources_list)
+        if m_id:
+            bot_msg_id = m_id
+    except Exception:
+        pass
+
+    # Save to SQLite
+    try:
         bot_msg = ChatMessage(
-            conversation_id=conversation.id,
+            conversation_id=conv_id,
             sender='assistant',
             content=ai_response_text,
             image_path=image_path,
             sources=json.dumps(sources_list)
         )
         db.session.add(bot_msg)
-        conversation.updated_at = datetime.now()
+        conv_record = ChatConversation.query.get(conv_id)
+        if conv_record:
+            conv_record.updated_at = datetime.now()
         db.session.commit()
+        bot_msg_id = bot_msg.id
+    except Exception:
+        pass
 
-        return jsonify({
-            "status": "success",
-            "conversation_id": conversation.id,
-            "message_id": bot_msg.id,
-            "answer": ai_response_text,
-            "response": ai_response_text,
-            "image": image_path,
-            "sources": sources_list,
-            "suggestions": suggestions_list
-        })
-
-    except Exception as e:
-        db.session.rollback()
-        print(f"[Error] Error in /api/chat: {str(e)}")
-        return jsonify({"status": "error", "message": "Internal server error saving chat."}), 500
+    return jsonify({
+        "status": "success",
+        "conversation_id": conv_id,
+        "message_id": bot_msg_id,
+        "answer": ai_response_text,
+        "response": ai_response_text,
+        "image": image_path,
+        "sources": sources_list,
+        "suggestions": suggestions_list
+    })
 
 
 # =========================================================
@@ -352,7 +421,7 @@ def handle_chat():
 def handle_feedback():
     """
     Records student Thumbs Up / Thumbs Down feedback ratings and persists to both
-    ChatMessage and ChatFeedback models.
+    MongoDB and SQLite.
     """
     data = request.get_json(silent=True) or request.form or {}
     raw_rating = str(data.get('rating', '')).strip().lower()
@@ -374,10 +443,27 @@ def handle_feedback():
     except Exception:
         student_id = None
 
+    # 1. Save to MongoDB
+    feedback_id = "fb_" + str(uuid.uuid4())[:8]
+    try:
+        from app.database.mongo_models import MongoChatService
+        m_fb_id = MongoChatService.save_feedback(
+            conversation_id=conversation_id,
+            message_id=message_id,
+            student_id=student_id,
+            rating=normalized_rating,
+            query_text=query_text,
+            response_text=response_text,
+            comment=comment
+        )
+        if m_fb_id:
+            feedback_id = m_fb_id
+    except Exception:
+        pass
+
+    # 2. Save to SQLite
     try:
         from app.models.chat_history import ChatFeedback, ChatMessage
-        
-        # 1. Update ChatMessage feedback column if message_id or conversation_id provided
         target_msg = None
         if message_id:
             try:
@@ -395,11 +481,10 @@ def handle_feedback():
             target_msg.feedback = normalized_rating
             message_id = target_msg.id
 
-        # 2. Record in ChatFeedback audit table
         feedback = ChatFeedback(
-            message_id=message_id,
+            message_id=int(message_id) if str(message_id).isdigit() else None,
             conversation_id=conversation_id,
-            student_id=student_id,
+            student_id=int(student_id) if str(student_id).isdigit() else None,
             rating=normalized_rating,
             query_text=query_text,
             response_text=response_text,
@@ -407,23 +492,22 @@ def handle_feedback():
         )
         db.session.add(feedback)
         db.session.commit()
+        feedback_id = feedback.id
+    except Exception:
+        pass
 
-        return jsonify({
-            "status": "success",
-            "message": f"Feedback recorded successfully ({normalized_rating}).",
-            "feedback_id": feedback.id,
-            "message_id": message_id,
-            "rating": normalized_rating
-        }), 200
-
-    except Exception as e:
-        db.session.rollback()
-        print(f"[Error] Error saving feedback: {e}")
-        return jsonify({"status": "error", "message": f"Failed to record feedback: {str(e)}"}), 500
+    return jsonify({
+        "status": "success",
+        "message": f"Feedback recorded successfully ({normalized_rating}).",
+        "feedback_id": feedback_id,
+        "message_id": message_id,
+        "rating": normalized_rating
+    }), 200
 
 
 # =========================================================
 # 4. HUGGING FACE WHISPER SPEECH-TO-TEXT ENDPOINT
+
 # =========================================================
 @chat_bp.route('/api/speech-to-text', methods=['POST'])
 @chat_bp.route('/student/api/speech-to-text', methods=['POST'])

@@ -39,15 +39,3 @@ class Student(UserMixin, db.Model):
     @property
     def is_admin(self):
         return False
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    user_str = str(user_id)
-    if user_str.startswith('student_'):
-        real_id = int(user_str.split('_')[1])
-        return Student.query.get(real_id)
-    try:
-        return Student.query.get(int(user_id))
-    except (ValueError, TypeError):
-        return None

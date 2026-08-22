@@ -6,8 +6,8 @@ Uses openai/whisper-tiny with lazy-loading and multi-format in-memory audio deco
 import io
 import wave
 import numpy as np
-import scipy.signal as signal
 from typing import Optional
+
 
 _processor = None
 _model = None
@@ -47,6 +47,7 @@ def decode_audio_to_16khz_mono(audio_bytes: bytes) -> np.ndarray:
             audio = audio.mean(axis=1)
 
         if sample_rate != 16000 and len(audio) > 0:
+            import scipy.signal as signal
             target_samples = int(len(audio) * 16000 / sample_rate)
             audio = signal.resample(audio, target_samples)
 
@@ -77,8 +78,10 @@ def decode_audio_to_16khz_mono(audio_bytes: bytes) -> np.ndarray:
             audio = audio.reshape(-1, n_channels).mean(axis=1)
 
         if framerate != 16000 and len(audio) > 0:
+            import scipy.signal as signal
             target_samples = int(len(audio) * 16000 / framerate)
             audio = signal.resample(audio, target_samples)
+
 
         return audio.astype(np.float32)
 

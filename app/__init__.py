@@ -68,6 +68,7 @@ def create_app():
 
     # Import User models for login loader
     from app.database.models import Admin, Student
+    from app.database.mongo_models import MongoStudent, MongoAdmin
 
     # =========================================================
     # 3. FLASK-LOGIN USER LOADER Callback
@@ -76,17 +77,33 @@ def create_app():
     def load_user(user_id):
         user_str = str(user_id)
         if user_str.startswith('admin_'):
-            real_id = int(user_str.split('_')[1])
-            return Admin.query.get(real_id)
+            real_id = user_str.split('_', 1)[1]
+            admin = MongoAdmin.get_by_id(real_id)
+            if admin:
+                return admin
+            try:
+                return Admin.query.get(int(real_id))
+            except Exception:
+                return None
         elif user_str.startswith('student_'):
-            real_id = int(user_str.split('_')[1])
-            return Student.query.get(real_id)
+            real_id = user_str.split('_', 1)[1]
+            student = MongoStudent.get_by_id(real_id)
+            if student:
+                return student
+            try:
+                return Student.query.get(int(real_id))
+            except Exception:
+                return None
         
         # Fallback for legacy raw IDs
+        mongo_user = MongoStudent.get_by_id(user_id) or MongoAdmin.get_by_id(user_id)
+        if mongo_user:
+            return mongo_user
         try:
             return Student.query.get(int(user_id)) or Admin.query.get(int(user_id))
         except (ValueError, TypeError):
             return None
+
 
     # =========================================================
     # 4. BLUEPRINT REGISTRATIONS

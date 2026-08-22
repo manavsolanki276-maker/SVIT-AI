@@ -68,13 +68,18 @@ class ActiveUser(UserMixin):
 def load_user(user_id):
     user_str = str(user_id)
     try:
+        from app.database.mongo_models import MongoStudent, MongoAdmin
         if user_str.startswith('admin_'):
-            from app.database.models import Admin
-            return Admin.query.get(int(user_str.split('_')[1]))
+            real_id = user_str.split('_', 1)[1]
+            return MongoAdmin.get_by_id(real_id) or Admin.query.get(int(real_id))
         elif user_str.startswith('student_'):
-            from app.database.models import Student
-            return Student.query.get(int(user_str.split('_')[1]))
+            real_id = user_str.split('_', 1)[1]
+            return MongoStudent.get_by_id(real_id) or Student.query.get(int(real_id))
         
+        m_user = MongoStudent.get_by_id(user_id) or MongoAdmin.get_by_id(user_id)
+        if m_user:
+            return m_user
+
         from app.database.models import Student, Admin
         return Student.query.get(int(user_id)) or Admin.query.get(int(user_id))
     except Exception:
@@ -82,6 +87,7 @@ def load_user(user_id):
     
     # Fallback user so chatbot endpoints work seamlessly during dev testing
     return ActiveUser(user_id)
+
 
 # 4. Register All Blueprints (Prevent Duplicate Registrations)
 try:
