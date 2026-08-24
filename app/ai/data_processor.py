@@ -549,8 +549,9 @@ def process_timetable_context(docs: list, query: str, user_profile: dict = None)
             prog_col = col_map.get("program")
             subj_col = col_map.get("subject")
 
-            # 1. Day filter
-            if day_col and not any(k in msg for k in ["who teaches", "faculty for", "professor for", "where is", "location", "how to reach"]):
+            # 1. Day filter (don't restrict to single day if searching for a specific subject, faculty, or room)
+            has_subject_or_room_query = any(k in msg for k in ["who teaches", "faculty for", "professor for", "where is", "location", "how to reach", "which room", "what room", "room for", "room is my", "class in", "teaches", "lecture in"])
+            if day_col and not has_subject_or_room_query:
                 matched_df = df[df[day_col].str.lower().str.startswith(target_day[:3].lower(), na=False)].copy()
             else:
                 matched_df = df.copy()
@@ -705,13 +706,40 @@ def process_notice_context(docs: list, query: str, user_profile: dict = None) ->
 
 
 def process_faculty_context(docs: list, query: str, user_profile: dict = None) -> str:
-    """Parses department and faculty details, automatically defaulting to student's department for HOD queries."""
+    """Parses department and faculty details, querying faculty.csv for subject teachers and departments.csv for HODs."""
     cleaned_query = query.replace('"', '').replace("'", "").strip().lower()
     faculty_blocks = []
 
     user_profile = user_profile or {}
     prof_dept = user_profile.get("department") or "Computer Engineering"
 
+    # 1. Search faculty.csv for specific subjects or faculty names
+    try:
+        df_fac = get_cached_dataframe("faculty.csv")
+        if df_fac is not None and not df_fac.empty:
+            matched_facs = []
+            for idx, row in df_fac.iterrows():
+                subj = str(row.get('subject', '')).lower()
+                name = str(row.get('full_name', '')).lower()
+                desig = str(row.get('designation', ''))
+                dept = str(row.get('department', ''))
+                cabin = str(row.get('cabin', ''))
+                email = str(row.get('email', ''))
+                phone = str(row.get('phone', ''))
+
+                is_subj_match = subj and (subj in cleaned_query or any(w in cleaned_query for w in subj.split() if len(w) > 3))
+                is_name_match = name and any(part in cleaned_query for part in name.split() if len(part) > 3)
+
+                if is_subj_match or is_name_match:
+                    f_str = f"faculty.csv (Row {idx + 2}): Full Name: {row.get('full_name')} | Designation: {desig} | Department: {dept} | Subject: {row.get('subject')} | Cabin: {cabin} | Email: {email} | Phone: {phone}"
+                    matched_facs.append(f_str)
+
+            if matched_facs:
+                faculty_blocks.extend(matched_facs[:8])
+    except Exception as e:
+        print(f"[Error] faculty.csv search error: {e}")
+
+    # 2. Search departments.csv for HODs and department details
     try:
         df = get_cached_dataframe("departments.csv")
         if df is not None and not df.empty:
@@ -1003,21 +1031,60 @@ def resolve_student_profile_query(query: str, user_profile: dict = None) -> Opti
         return None
 
     q = query.lower().strip()
-    
-    # Exclude questions about college in general (e.g. "what courses does svit offer" or "list all departments")
-    if any(k in q for k in ["svit offer", "all department", "all course", "list of course", "available course", "branches in svit", "courses in svit"]):
+
+    # 1. Strictly EXCLUDE questions about locations / navigation / buildings
+    nav_check_words = [
+        "where", "location", "locate", "building", "block", "how to reach", 
+        "directions", "direction", "map", "take me", "route", "way to", 
+        "find", "visit", "go to", "situated", "kaha", "kahan", "kidhar"
+    ]
+    if any(re.search(r'\b' + re.escape(k) + r'\b', q) for k in nav_check_words):
         return None
 
-    has_self_ref = any(k in q for k in ["my", "i ", "i am", "am i", "me", "profile", "who am i", "mine"])
+    # 2. Exclude questions about college offerings in general
+    if any(k in q for k in [
+        "svit offer", "all department", "all course", "list of course", 
+        "available course", "available department", "branches in svit", 
+        "courses in svit", "departments are available", "courses are available", 
+        "what departments are", "what courses are"
+    ]):
+        return None
+
+    # 3. Whole-word self-reference detection
+    has_self_ref = bool(re.search(r'\b(my|i|i am|am i|who am i|mine|profile)\b', q))
+
+    # Precise question intent discriminators
+    is_asking_dept_and_course = has_self_ref and bool(re.search(r'\b(department|dept|branch)\b', q)) and bool(re.search(r'\b(course|program|stream)\b', q))
     
-    is_asking_dept_and_course = ("department" in q or "dept" in q or "branch" in q) and ("course" in q or "program" in q or "stream" in q)
-    is_asking_course = any(k in q for k in ["my course", "my program", "which course", "what course", "which program", "what program", "my degree", "my diploma"]) or (has_self_ref and any(k in q for k in ["course name", "program name"]))
-    is_asking_dept = any(k in q for k in ["my department", "my dept", "my branch", "which department", "what department", "what is my department", "which dept"]) or (has_self_ref and "department" in q)
-    is_asking_sem = any(k in q for k in ["my semester", "my sem", "which semester", "what semester", "what is my semester", "which sem"])
-    is_asking_div = any(k in q for k in ["my division", "my div", "my section", "which division", "what division", "what is my division", "which div"])
-    is_asking_batch = any(k in q for k in ["my batch", "which batch", "what is my batch", "what batch"])
-    is_asking_enrollment = any(k in q for k in ["my enrollment", "my enrollment number", "my roll number", "my id", "my student id"])
-    is_asking_full_profile = any(k in q for k in ["who am i", "my profile", "my details", "about me", "my info", "my information", "show my profile", "what is my name", "what are my details"])
+    is_asking_course = (
+        bool(re.search(r'\b(what is my program|what is my course|which course am i in|which program am i in|what program am i in|what course am i in|my program|my course|my degree|my diploma)\b', q)) or
+        (has_self_ref and bool(re.search(r'\b(course name|program name)\b', q)))
+    )
+
+    is_asking_dept = (
+        bool(re.search(r'\b(what is my department|what is my dept|what is my branch|which department am i in|which dept am i in|what department am i in|tell me my department|show my department)\b', q)) or
+        (has_self_ref and bool(re.search(r'\b(my department|my dept|my branch)\b', q)))
+    )
+
+    is_asking_sem = (
+        bool(re.search(r'\b(what is my semester|what is my sem|which semester am i in|which sem am i in|what semester am i in|my semester|my sem)\b', q))
+    )
+
+    is_asking_div = (
+        bool(re.search(r'\b(what is my division|what is my div|which division am i in|what division am i in|my division|my div|my section)\b', q))
+    )
+
+    is_asking_batch = (
+        bool(re.search(r'\b(what is my batch|which batch am i in|what batch am i in|my batch)\b', q))
+    )
+
+    is_asking_enrollment = (
+        bool(re.search(r'\b(what is my enrollment|what is my roll number|what is my id|my enrollment|my roll number|my id|my student id)\b', q))
+    )
+
+    is_asking_full_profile = (
+        bool(re.search(r'\b(who am i|my profile|my details|about me|my info|my information|show my profile|what is my name|what are my details|student profile information)\b', q))
+    )
 
     if not (is_asking_dept_and_course or is_asking_course or is_asking_dept or is_asking_sem or is_asking_div or is_asking_batch or is_asking_enrollment or is_asking_full_profile):
         return None

@@ -28,60 +28,80 @@ STANDARD_ACADEMIC_FLOORS = {
 NAVIGATION = {
     "diploma": {
         "display_name": "Diploma Building",
+        "building": "Diploma Building (Blocks A–G)",
+        "zone": "Near Diploma Canteen and Architecture Block",
         "image": "diploma dep.jpeg",
         "aliases": ["diploma", "diploma department", "diploma block", "diploma building", "polytechnic"],
         "floors": STANDARD_ACADEMIC_FLOORS
     },
     "computer engineering": {
         "display_name": "Computer Engineering Department",
+        "building": "Computer Engineering Block",
+        "zone": "North Wing, Near Central Garden",
         "image": "Computer dep.jpeg",
         "aliases": ["computer engineering", "computer department", "computer", "ce", "comp"],
         "floors": STANDARD_ACADEMIC_FLOORS
     },
     "information technology": {
         "display_name": "Information Technology Department",
+        "building": "Information Technology Block",
+        "zone": "North-East Wing, Adjacent to Computer Block",
         "image": "IT dep.jpeg",
         "aliases": ["information technology", "it department", "it block", "it"],
         "floors": STANDARD_ACADEMIC_FLOORS
     },
     "mechanical engineering": {
         "display_name": "Mechanical Engineering Department",
+        "building": "Mechanical Engineering Block",
+        "zone": "West Wing, Near Workshop",
         "image": "Mechanical dep.jpeg",
         "aliases": ["mechanical engineering", "mechanical department", "mechanical", "mech"],
         "floors": STANDARD_ACADEMIC_FLOORS
     },
     "civil engineering": {
         "display_name": "Civil Engineering Department",
+        "building": "Civil Engineering Block",
+        "zone": "North-West Wing, Opposite Computer Block",
         "image": "Civil dep.jpeg",
         "aliases": ["civil engineering", "civil department", "civil"],
         "floors": STANDARD_ACADEMIC_FLOORS
     },
     "electrical engineering": {
         "display_name": "Electrical Engineering Department",
+        "building": "Electrical Engineering Block",
+        "zone": "South-West Wing, Near Mechanical Block",
         "image": "Electrical dep.jpeg",
         "aliases": ["electrical engineering", "electrical department", "electrical", "ee"],
         "floors": STANDARD_ACADEMIC_FLOORS
     },
     "electronics & communication": {
         "display_name": "Electronics & Communication Department",
+        "building": "Electronics & Communication Block",
+        "zone": "East Wing, Near IT Block",
         "image": "E&C dep.jpeg",
-        "aliases": ["electronics & communication", "electronics and communication", "e&c", "ec", "electronics"],
+        "aliases": ["electronics & communication", "electronics and communication", "e&c", "ec", "electronics", "electronics engineering"],
         "floors": STANDARD_ACADEMIC_FLOORS
     },
     "aeronautical engineering": {
         "display_name": "Aeronautical Engineering Department",
+        "building": "Aeronautical Engineering Block",
+        "zone": "Engineering Complex",
         "image": "Aero dep.jpeg",
         "aliases": ["aeronautical engineering", "aeronautical department", "aero department", "aero", "aeronautical"],
         "floors": STANDARD_ACADEMIC_FLOORS
     },
     "mca & bca": {
         "display_name": "MCA & BCA Department",
+        "building": "LCMCA Block",
+        "zone": "Academic Complex",
         "image": "MCA&BCA.jpeg",
-        "aliases": ["mca & bca", "mca and bca", "mca", "bca"],
+        "aliases": ["mca & bca", "mca and bca", "mca", "bca", "computer applications"],
         "floors": STANDARD_ACADEMIC_FLOORS
     },
     "architecture": {
         "display_name": "Architecture Department",
+        "building": "Architecture Block",
+        "zone": "South-East Wing, Near Diploma Canteen",
         "image": "SVIT with all dep.jpeg",
         "aliases": ["architecture", "b.arch", "arch"],
         "floors": STANDARD_ACADEMIC_FLOORS

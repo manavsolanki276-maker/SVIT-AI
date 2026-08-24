@@ -45,21 +45,21 @@ FAST_GREETINGS = [
     (r"^(good morning)\b", "Good morning{name_suffix}! ☀️ How can I assist you with SVIT academics or campus information today?"),
     (r"^(good afternoon)\b", "Good afternoon{name_suffix}! 🌤️ How can I help you today?"),
     (r"^(good evening)\b", "Good evening{name_suffix}! 🌙 How can I assist you with your SVIT queries?"),
-    (r"^(who are you|what is your name|what can you do|what are you|help)\b", "I am the **SVIT AI Assistant**, designed to assist students and faculty at Sardar Vallabhbhai Patel Institute of Technology (SVIT), Vasad.\n\nI can help you with:\n* 📅 **Timetables & Class Schedules**\n* 📍 **'Next Class Now' Real-time Status**\n* 📢 **Exam Notices & Deadlines**\n* 👨‍🏫 **Faculty & HOD Details**\n* 🗺️ **Interactive Campus Maps & Room Navigation**\n* 💼 **Placements & Packages**\n* 🚌 **Bus Routes & Transportation**\n* 🍔 **Canteen & Campus Amenities**"),
+    (r".*(who are you|what is your name|what can you do|what are you|help me|what information can svit ai help|what information can you help|how can you help|what can svit ai help)\b", "I am the **SVIT AI Assistant**, designed to assist students and faculty at Sardar Vallabhbhai Patel Institute of Technology (SVIT), Vasad.\n\nI can help you with:\n* 📅 **Timetables & Class Schedules**\n* 📍 **'Next Class Now' Real-time Status**\n* 📢 **Exam Notices & Deadlines**\n* 👨‍🏫 **Faculty & HOD Details**\n* 🗺️ **Interactive Campus Maps & Room Navigation**\n* 💼 **Placements & Packages**\n* 🚌 **Bus Routes & Transportation**\n* 🍔 **Canteen & Campus Amenities**"),
     (r"^(thank you|thanks|thx|thank you so much)\b", "You're very welcome{name_suffix}! 😊 Feel free to ask if you need any other help with SVIT academics or campus details."),
     (r"^(bye|goodbye|see you)\b", "Goodbye{name_suffix}! Have a great day ahead! 🚀")
 ]
 
 # Patterns for Real-Time "Next Class Now"
 NEXT_CLASS_PATTERNS = [
-    r'\b(?:next|current|upcoming)\s*(?:class|lecture|session|period|lab|room)\b',
+    r'\b(?:next|current|upcoming)\s*(?:class|lecture|session|period|lab|room|subject)\b',
     r'\bwhere\s*(?:do|should|can)\s*i\s*go\b',
-    r'\bwhere\s*is\s*my\s*(?:next\s*)?class\b',
+    r'\bwhere\s*is\s*my\s*(?:next\s*)?(?:class|subject|lecture)\b',
     r'\bwhat\s*class\s*(?:do\s*i\s*have\s*)?(?:right\s*)?now\b',
     r'\bclass\s*(?:right\s*)?now\b',
     r'\bwhat\s*is\s*next\b',
     r'\bwhere\s*to\s*go\s*now\b',
-    r'\bwhere\s*is\s*my\s*next\s*class\b',
+    r'\bwhere\s*is\s*my\s*next\s*(?:class|lecture|subject)\b',
     r'\bwhere\s*is\s*my\s*lecture\b'
 ]
 
@@ -170,8 +170,7 @@ class RAGPipeline:
             'timing', 'timings', 'slot', 'slots', 'period', 'periods',
             'today', 'tomorrow', 'yesterday',
             'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
-            'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun',
-            'who teaches', 'faculty for', 'professor for', 'teacher for', 'subject for'
+            'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'
         ]
 
         notice_keywords = [
@@ -180,6 +179,8 @@ class RAGPipeline:
         ]
 
         faculty_keywords = [
+            'faculty', 'professor', 'teacher', 'prof', 'dr.',
+            'who teaches', 'faculty for', 'professor for', 'teacher for', 'teaches',
             'hod', 'head of department', 'cabin', 'faculty detail',
             'registrar', 'student section', 'contact number', 'phone number', 'email address'
         ]
@@ -427,6 +428,368 @@ class RAGPipeline:
             memory_manager.add_message(session_id, "assistant", cached_res["answer"])
             return cached_res
 
+    def _format_context_as_direct_answer(
+        self, 
+        question: str, 
+        context: str, 
+        intent_category: str, 
+        user_profile: dict = None
+    ) -> str:
+        """
+        Builds a clean, structured direct Markdown answer with compact mobile cards
+        from extracted RAG context when external LLM is unavailable or unconfigured.
+        """
+        if not context or 'NO_DATA' in context or 'NO_CLASSES' in context or 'NO_NOTICES_FOUND' in context or 'NO_FACULTY_DETAILS_FOUND' in context:
+            if intent_category == 'timetable':
+                return "### 📅 Timetable & Schedule\n\nNo classes are currently scheduled for the selected day or semester. Please check your department notice board for special lab batch allocations."
+            elif intent_category == 'placement':
+                return "### 💼 SVIT Placement Opportunities\n\nNo matching placement records found. Please check with the Training & Placement Cell (T&P) for current drive schedules."
+            elif intent_category == 'faculty':
+                return "### 👨‍🏫 Faculty Information\n\nNo specific faculty record found for your search. Please ask for the faculty name or visit the Department Head office."
+            else:
+                return (
+                    f"Thank you for asking about **\"{question}\"**!\n\n"
+                    "I am the **SVIT AI Assistant**. I could not find a specific record in the local database for this query. "
+                    "For official academic details, please consult your department coordinator or the student section."
+                )
+
+        # 1. TIMETABLE FORMATTING (Structured Compact Cards)
+        if intent_category == 'timetable':
+            lines = context.split('\n')
+            target_m = re.search(r'PERSONALIZED_STUDENT_SCHEDULE:\s*(.+)', context)
+            date_m = re.search(r'HEADER_DATE:\s*(.+)', context)
+            
+            header_parts = ["### 📅 Class Schedule & Timetable\n"]
+            if target_m:
+                header_parts.append(f"🎯 **Target:** {target_m.group(1).strip()}")
+            if date_m:
+                header_parts.append(f"📆 **Date:** {date_m.group(1).strip()}\n")
+                
+            entries = []
+            for line in lines:
+                if 'Time:' in line and 'Subject:' in line:
+                    time_m = re.search(r'Time:\s*([^|]+)', line)
+                    subj_m = re.search(r'Subject:\s*([^|]+)', line)
+                    fac_m = re.search(r'Faculty:\s*([^|]+)', line)
+                    room_m = re.search(r'Room:\s*([^|]+)', line)
+                    prog_m = re.search(r'Program:\s*([^|]+)', line)
+                    dept_m = re.search(r'Department:\s*([^|]+)', line)
+                    sem_m = re.search(r'Sem:\s*([^|]+)', line)
+                    div_m = re.search(r'Div:\s*([^|]+)', line)
+                    
+                    t_str = time_m.group(1).strip() if time_m else 'N/A'
+                    s_str = subj_m.group(1).strip() if subj_m else 'N/A'
+                    f_str = fac_m.group(1).strip() if fac_m else 'N/A'
+                    r_str = room_m.group(1).strip() if room_m else 'N/A'
+                    p_str = prog_m.group(1).strip() if prog_m else ''
+                    d_str = dept_m.group(1).strip() if dept_m else ''
+                    sem_str = sem_m.group(1).strip() if sem_m else ''
+                    div_str = div_m.group(1).strip() if div_m else ''
+                    
+                    meta_tags = []
+                    if d_str and d_str != 'N/A': meta_tags.append(d_str)
+                    if p_str and p_str != 'N/A': meta_tags.append(f"Prog: {p_str}")
+                    if sem_str and sem_str != 'N/A': meta_tags.append(f"Sem {sem_str}")
+                    if div_str and div_str != 'N/A': meta_tags.append(f"Div {div_str}")
+                    meta_str = f" *({', '.join(meta_tags)})*" if meta_tags else ""
+                    
+                    card = (
+                        f"* 🕐 **{t_str}** — **{s_str}**\n"
+                        f"  * 👨‍🏫 **Faculty:** {f_str}\n"
+                        f"  * 📍 **Room / Lab:** **{r_str}**{meta_str}"
+                    )
+                    entries.append(card)
+                    
+            if entries:
+                header_parts.append("\n\n".join(entries))
+                return "\n".join(header_parts)
+            
+            clean_ctx = re.sub(r'HEADER_DATE:.*?\n|TARGET_DAY:.*?\n|NAVIGATION_MAP_URL:.*?\n|\[Source:.*?\]', '', context)
+            return f"### 📅 Class Schedule & Timetable\n\n{clean_ctx.strip()}"
+
+        # 2. EVENTS FORMATTING (Structured Compact Cards)
+        elif intent_category == 'events':
+            entries = []
+            lines = context.split('\n')
+            for line in lines:
+                if 'Event:' in line and 'Venue:' in line:
+                    ev_m = re.search(r'Event:\s*([^|]+)', line)
+                    date_m = re.search(r'Date:\s*([^|]+)', line)
+                    venue_m = re.search(r'Venue:\s*([^|]+)', line)
+                    desc_m = re.search(r'Description:\s*([^|]+)', line)
+                    
+                    ev_str = ev_m.group(1).strip() if ev_m else 'College Event'
+                    d_str = date_m.group(1).strip() if date_m else 'TBA'
+                    v_str = venue_m.group(1).strip() if venue_m else 'Campus'
+                    desc_str = desc_m.group(1).strip() if desc_m else ''
+                    
+                    card = (
+                        f"* 🎪 **{ev_str}**\n"
+                        f"  * 📅 **Date & Time:** {d_str}\n"
+                        f"  * 📍 **Venue:** **{v_str}**\n"
+                        f"  * 📝 **Description:** {desc_str}"
+                    )
+                    entries.append(card)
+                    
+            if entries:
+                return "### 📢 Upcoming SVIT Events & Workshops\n\n" + "\n\n".join(entries)
+                
+            clean_ctx = re.sub(r'HEADER_EVENT_LIST:\s*|\[Source:.*?\]', '', context)
+            return f"### 📢 Upcoming SVIT Events & Workshops\n\n{clean_ctx.strip()}"
+
+        # 3. FACULTY FORMATTING (Structured Compact Cards)
+        elif intent_category == 'faculty':
+            entries = []
+            blocks = [b.strip() for b in context.split('---') if b.strip()]
+            for block in blocks:
+                name_m = re.search(r'Full Name:\s*([^|\n]+)|HOD / Faculty:\s*([^|\n]+)', block)
+                dept_m = re.search(r'Department:\s*([^|\n]+)', block)
+                desig_m = re.search(r'Designation:\s*([^|\n]+)', block)
+                subj_m = re.search(r'Subject:\s*([^|\n]+)', block)
+                cabin_m = re.search(r'Cabin:\s*([^|\n]+)|Building/Cabin:\s*([^|\n]+)', block)
+                email_m = re.search(r'Email:\s*([^|\n]+)', block)
+                phone_m = re.search(r'Phone:\s*([^|\n]+)', block)
+                prog_m = re.search(r'Program:\s*([^|\n]+)', block)
+                
+                name = (name_m.group(1) or name_m.group(2)).strip() if name_m else None
+                if not name:
+                    continue
+                dept = dept_m.group(1).strip() if dept_m else ''
+                desig = desig_m.group(1).strip() if desig_m else ''
+                subj = subj_m.group(1).strip() if subj_m else ''
+                cabin = (cabin_m.group(1) or cabin_m.group(2)).strip() if cabin_m else ''
+                email = email_m.group(1).strip() if email_m else ''
+                phone = phone_m.group(1).strip() if phone_m else ''
+                prog = prog_m.group(1).strip() if prog_m else ''
+                
+                desig_badge = f" *({desig})*" if desig else ""
+                dept_info = f"{dept} ({prog})" if (dept and prog) else (dept or prog)
+                
+                card_lines = [f"* 👤 **{name}**{desig_badge}"]
+                if dept_info: card_lines.append(f"  * 🏛️ **Department:** {dept_info}")
+                if subj: card_lines.append(f"  * 📖 **Subject:** {subj}")
+                if cabin and cabin != 'N/A': card_lines.append(f"  * 📍 **Cabin / Office:** **{cabin}**")
+                if email and email != 'N/A': card_lines.append(f"  * ✉️ **Email:** `{email}`")
+                if phone and phone != 'N/A': card_lines.append(f"  * 📞 **Contact:** {phone}")
+                
+                entries.append("\n".join(card_lines))
+                
+            if entries:
+                return "### 👨‍🏫 Faculty & Department Details\n\n" + "\n\n".join(entries)
+                
+            clean_ctx = re.sub(r'NAVIGATION_MAP_URL:.*?\n|departments\.csv \(Row \d+\):\s*', '', context)
+            return f"### 👨‍🏫 Faculty & Department Details\n\n{clean_ctx.strip()}"
+
+        # 4. PLACEMENTS FORMATTING (Macro Stats + Compact Company Cards)
+        elif intent_category == 'placement':
+            peak_m = re.search(r'Highest Package:\s*([^\n]+)', context)
+            avg_m = re.search(r'Average Package:\s*([^\n]+)', context)
+            rec_m = re.search(r'Top Recruiting Companies:\s*([^\n]+)', context)
+            
+            header_lines = ["### 💼 SVIT Placement Drives & Statistics\n"]
+            if peak_m and avg_m:
+                header_lines.append(f"📊 **Highest Package:** {peak_m.group(1).strip()} &nbsp;|&nbsp; 📈 **Average Package:** {avg_m.group(1).strip()}")
+            if rec_m:
+                header_lines.append(f"🏢 **Top Recruiters:** {rec_m.group(1).strip()}\n")
+                
+            drives = []
+            lines = context.split('\n')
+            for line in lines:
+                if 'Company:' in line and 'Package:' in line:
+                    comp_m = re.search(r'Company:\s*([^|]+)', line)
+                    pkg_m = re.search(r'Package:\s*([^|]+)', line)
+                    dept_m = re.search(r'Department:\s*([^|]+)|Dept:\s*([^|]+)', line)
+                    status_m = re.search(r'Status:\s*([^|]+)', line)
+                    
+                    c_str = comp_m.group(1).strip() if comp_m else 'Company'
+                    pk_str = pkg_m.group(1).strip() if pkg_m else 'N/A'
+                    d_str = (dept_m.group(1) or dept_m.group(2)).strip() if dept_m else ''
+                    st_str = status_m.group(1).strip() if status_m else 'Active'
+                    
+                    card = (
+                        f"* 💼 **{c_str}** — **₹{pk_str}**\n"
+                        f"  * 🎓 **Eligible Depts:** {d_str}\n"
+                        f"  * 📋 **Drive Status:** {st_str}"
+                    )
+                    drives.append(card)
+                    
+            if drives:
+                header_lines.append("#### 🏢 Active & Upcoming Recruitment Drives\n")
+                header_lines.append("\n\n".join(drives))
+                return "\n".join(header_lines)
+                
+            clean_ctx = re.sub(r'\[Source:.*?\]', '', context)
+            return f"### 💼 SVIT Placement Drives & Statistics\n\n{clean_ctx.strip()}"
+
+        # 5. NOTICES FORMATTING (Structured Notice Cards)
+        elif intent_category == 'notices':
+            entries = []
+            lines = context.split('\n')
+            for line in lines:
+                if 'Notice Title:' in line:
+                    t_m = re.search(r'Notice Title:\s*([^|]+)', line)
+                    d_m = re.search(r'Date:\s*([^|]+)', line)
+                    det_m = re.search(r'Details:\s*([^|]+)', line)
+                    tgt_m = re.search(r'Target Dept/Sem:\s*([^|]+)', line)
+                    
+                    t_str = t_m.group(1).strip() if t_m else 'Official Notice'
+                    d_str = d_m.group(1).strip() if d_m else ''
+                    det_str = det_m.group(1).strip() if det_m else ''
+                    tgt_str = tgt_m.group(1).strip() if tgt_m else 'All Students'
+                    
+                    date_badge = f" *({d_str})*" if d_str and d_str != 'N/A' else ""
+                    card = (
+                        f"* 📌 **{t_str}**{date_badge}\n"
+                        f"  * 📝 **Details:** {det_str}\n"
+                        f"  * 🎯 **Applicable to:** {tgt_str}"
+                    )
+                    entries.append(card)
+                    
+            if entries:
+                return "### 📌 Official Notices & Circulars\n\n" + "\n\n".join(entries)
+                
+            clean_ctx = re.sub(r'HEADER_NOTICE_LIST:\s*|\[Source:.*?\]', '', context)
+            return f"### 📌 Official Notices & Circulars\n\n{clean_ctx.strip()}"
+
+        # 6. GENERAL / FAQ / DEFAULT FORMATTING
+        else:
+            blocks = [b.strip() for b in context.split('---') if b.strip()]
+            if blocks:
+                clean_blocks = []
+                for b in blocks[:3]:
+                    clean_b = re.sub(r'\[Source:.*?\]', '', b).strip()
+                    if clean_b:
+                        clean_blocks.append(clean_b)
+                return f"### ℹ️ SVIT Campus Information\n\n" + "\n\n---\n\n".join(clean_blocks)
+            return f"### ℹ️ SVIT Campus Information\n\n{context.strip()}"
+
+    def answer_question(
+        self, 
+        question: str, 
+        session_id: str = "default_user", 
+        top_k: int = 8,
+        filter_dict: dict = None,
+        user_profile: dict = None
+    ) -> dict:
+        """
+        Executes personalized RAG workflow:
+        1. Fast Greeting Interception (0ms)
+        2. Fast Next Class Real-time Interception (0ms)
+        3. Fast Spatial Navigation Interception (0ms)
+        4. Response Cache Lookup
+        5. In-Memory Context Processing with student defaults
+        6. Category-Trimmed Prompt with Student Metadata + OpenRouter LLM (or robust direct context fallback)
+        """
+        clean_q = question.strip().lower()
+        user_name = user_profile.get('full_name') if user_profile else ""
+        first_name = user_name.split()[0] if user_name else ""
+        name_suffix = f" {first_name}" if first_name else ""
+
+        # ---------------------------------------------------------
+        # STEP 0: FAST-PATH GREETING & SMALL TALK (0ms)
+        # ---------------------------------------------------------
+        for pattern, reply_tmpl in FAST_GREETINGS:
+            if re.search(pattern, clean_q):
+                reply = reply_tmpl.format(name_suffix=name_suffix)
+                memory_manager.add_message(session_id, "user", question)
+                memory_manager.add_message(session_id, "assistant", reply)
+                suggestions = generate_followup_suggestions(question, "general", reply, user_profile=user_profile)
+                return {
+                    "answer": reply,
+                    "image": None,
+                    "sources": ["SVIT Assistant Greeting"],
+                    "suggestions": suggestions
+                }
+
+        # ---------------------------------------------------------
+        # STEP 0.1: RESOLVE "MY DEPARTMENT" LOCATION
+        # ---------------------------------------------------------
+        user_dept = user_profile.get("department") if user_profile else None
+        is_my_dept_location = bool(re.search(r'\b(where|location|locate|find|building|block|reach|direction|directions|how to go|how to reach|way to|kaha|kahan|kidhar)\b', clean_q)) and bool(re.search(r'\b(my department|my dept|my branch|my building)\b', clean_q))
+        if is_my_dept_location and user_dept:
+            nav_result = find_location(f"where is {user_dept} department")
+            if nav_result:
+                nav_image_path = f"navigation_maps/{nav_result['image']}"
+                dept_bldg = nav_result.get("formatted_text", "")
+                ans_text = f"📍 **{user_dept}** (Your Registered Department)\n\n" + dept_bldg.replace(f"📍 **{nav_result['department']}**\n\n", "")
+                memory_manager.add_message(session_id, "user", question)
+                memory_manager.add_message(session_id, "assistant", ans_text)
+                suggestions = generate_followup_suggestions(question, "navigation", ans_text, user_profile=user_profile)
+                return {
+                    "answer": ans_text,
+                    "image": nav_image_path,
+                    "sources": ["departments.csv", "campus_info.csv", "student_profile.db"],
+                    "navigation": nav_result,
+                    "suggestions": suggestions
+                }
+
+        # ---------------------------------------------------------
+        # STEP 0.2: FAST DIRECT STUDENT PROFILE RESOLUTION
+        # ---------------------------------------------------------
+        profile_ans = resolve_student_profile_query(question, user_profile=user_profile)
+        if profile_ans:
+            memory_manager.add_message(session_id, "user", question)
+            memory_manager.add_message(session_id, "assistant", profile_ans)
+            suggestions = [
+                "Show today's timetable 📅",
+                "Where is my next class right now? 📍",
+                "Who is my HOD? 👨‍🏫"
+            ]
+            return {
+                "answer": profile_ans,
+                "image": None,
+                "sources": ["student_profile.db"],
+                "suggestions": suggestions
+            }
+
+        # ---------------------------------------------------------
+        # STEP 0.5: FAST NEXT CLASS REAL-TIME INTERCEPTION (0ms)
+        # ---------------------------------------------------------
+        if any(re.search(p, clean_q) for p in NEXT_CLASS_PATTERNS):
+            ans_text, nav_map, srcs = process_next_class_context(question, user_profile=user_profile)
+            memory_manager.add_message(session_id, "user", question)
+            memory_manager.add_message(session_id, "assistant", ans_text)
+            suggestions = generate_followup_suggestions(question, "timetable", ans_text, user_profile=user_profile)
+            return {
+                "answer": ans_text,
+                "image": nav_map,
+                "sources": srcs,
+                "suggestions": suggestions
+            }
+
+        # ---------------------------------------------------------
+        # STEP 1: FAST SPATIAL NAVIGATION LOOKUP (0ms)
+        # ---------------------------------------------------------
+        nav_result = find_location(question)
+        if nav_result:
+            nav_image_path = f"navigation_maps/{nav_result['image']}"
+            memory_manager.add_message(session_id, "user", question)
+            memory_manager.add_message(session_id, "assistant", nav_result["formatted_text"])
+            suggestions = generate_followup_suggestions(question, "navigation", nav_result["formatted_text"], user_profile=user_profile)
+            return {
+                "answer": nav_result["formatted_text"],
+                "image": nav_image_path,
+                "sources": ["SVIT Navigation Directory"],
+                "navigation": nav_result,
+                "suggestions": suggestions
+            }
+
+        # ---------------------------------------------------------
+        # STEP 2: CACHED QUERY LOOKUP (Profile-Aware)
+        # ---------------------------------------------------------
+        prof_key = (
+            f"{user_profile.get('program')}_{user_profile.get('department')}_"
+            f"{user_profile.get('semester')}_{user_profile.get('division')}_"
+            f"{user_profile.get('batch')}"
+        ) if user_profile else "none"
+        cache_key = f"{clean_q}_{prof_key}_{top_k}"
+        if cache_key in _RESPONSE_CACHE:
+            cached_res = _RESPONSE_CACHE[cache_key]
+            _RESPONSE_CACHE.move_to_end(cache_key)
+            memory_manager.add_message(session_id, "user", question)
+            memory_manager.add_message(session_id, "assistant", cached_res["answer"])
+            return cached_res
+
         # ---------------------------------------------------------
         # STEP 3: PREPARE CONTEXT & DYNAMIC PROMPT WITH PROFILE
         # ---------------------------------------------------------
@@ -447,13 +810,15 @@ class RAGPipeline:
         )
 
         # ---------------------------------------------------------
-        # STEP 4: LLM INFERENCE
+        # STEP 4: LLM INFERENCE OR DIRECT CONTEXT FORMATTING
         # ---------------------------------------------------------
-        response = self.llm.invoke(prompt)
-        answer = response.content
-
-        # Strip hallucinated markdown image tags
-        answer = re.sub(r'!\[.*?\]\(.*?\)', '', answer).strip()
+        try:
+            response = self.llm.invoke(prompt)
+            answer = response.content
+            answer = re.sub(r'!\[.*?\]\(.*?\)', '', answer).strip()
+        except Exception as e:
+            print(f"[RAG] LLM inference fallback ({e}) -> using formatted knowledge base context.")
+            answer = self._format_context_as_direct_answer(question, context, intent_category, user_profile=user_profile)
 
         # Save to session memory
         memory_manager.add_message(session_id, "user", question)
@@ -499,6 +864,22 @@ class RAGPipeline:
                 suggestions = generate_followup_suggestions(question, "general", reply, user_profile=user_profile)
                 yield {"chunk": reply, "done": False}
                 yield {"done": True, "answer": reply, "image": None, "sources": ["SVIT Assistant Greeting"], "suggestions": suggestions}
+                return
+
+        # 1.1 Fast "My Department" Location Resolution
+        user_dept = user_profile.get("department") if user_profile else None
+        is_my_dept_location = bool(re.search(r'\b(where|location|locate|find|building|block|reach|direction|directions|how to go|how to reach|way to|kaha|kahan|kidhar)\b', clean_q)) and bool(re.search(r'\b(my department|my dept|my branch|my building)\b', clean_q))
+        if is_my_dept_location and user_dept:
+            nav_result = find_location(f"where is {user_dept} department")
+            if nav_result:
+                nav_image_path = f"navigation_maps/{nav_result['image']}"
+                dept_bldg = nav_result.get("formatted_text", "")
+                ans_text = f"📍 **{user_dept}** (Your Registered Department)\n\n" + dept_bldg.replace(f"📍 **{nav_result['department']}**\n\n", "")
+                memory_manager.add_message(session_id, "user", question)
+                memory_manager.add_message(session_id, "assistant", ans_text)
+                suggestions = generate_followup_suggestions(question, "navigation", ans_text, user_profile=user_profile)
+                yield {"chunk": ans_text, "done": False}
+                yield {"done": True, "answer": ans_text, "image": nav_image_path, "sources": ["departments.csv", "campus_info.csv", "student_profile.db"], "suggestions": suggestions}
                 return
 
         # 1.2 Fast Direct Student Profile Query Resolution
@@ -558,7 +939,7 @@ class RAGPipeline:
             user_profile=user_profile
         )
 
-        # 4. Stream LLM tokens live
+        # 4. Stream LLM tokens live or yield direct formatted knowledge answer
         accumulated_chunks = []
         try:
             for chunk in self.llm.stream(prompt):
@@ -570,21 +951,22 @@ class RAGPipeline:
             full_answer = "".join(accumulated_chunks)
             full_answer = re.sub(r'!\[.*?\]\(.*?\)', '', full_answer).strip()
 
-            memory_manager.add_message(session_id, "user", question)
-            memory_manager.add_message(session_id, "assistant", full_answer)
-            suggestions = generate_followup_suggestions(question, intent_category, full_answer, user_profile=user_profile)
-
-            yield {
-                "done": True,
-                "answer": full_answer,
-                "image": map_image,
-                "sources": sources,
-                "suggestions": suggestions
-            }
-
         except Exception as e:
-            print(f"[Error] Error during streaming: {e}")
-            yield {"done": True, "error": str(e)}
+            print(f"[RAG] Streaming LLM fallback ({e}) -> yielding direct formatted knowledge answer.")
+            full_answer = self._format_context_as_direct_answer(question, context, intent_category, user_profile=user_profile)
+            yield {"chunk": full_answer, "done": False}
+
+        memory_manager.add_message(session_id, "user", question)
+        memory_manager.add_message(session_id, "assistant", full_answer)
+        suggestions = generate_followup_suggestions(question, intent_category, full_answer, user_profile=user_profile)
+
+        yield {
+            "done": True,
+            "answer": full_answer,
+            "image": map_image,
+            "sources": sources,
+            "suggestions": suggestions
+        }
 
     def query(self, question: str, session_id: str = "default_user", **kwargs) -> dict:
         return self.answer_question(question, session_id=session_id, **kwargs)
