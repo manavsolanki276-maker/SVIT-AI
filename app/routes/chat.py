@@ -256,14 +256,26 @@ def handle_chat_stream():
             ):
                 if not packet.get("done", False):
                     chunk_str = packet.get("chunk", "")
-                    full_answer += chunk_str
-                    yield f"data: {json.dumps({'chunk': chunk_str, 'conversation_id': conv_id})}\n\n"
+                    if chunk_str:
+                        full_answer += chunk_str
+                        yield f"data: {json.dumps({'chunk': chunk_str, 'conversation_id': conv_id})}\n\n"
                 else:
                     final_image = packet.get("image")
                     final_sources = packet.get("sources", [])
                     final_suggestions = packet.get("suggestions", [])
                     if packet.get("answer"):
                         full_answer = packet.get("answer")
+
+            # Guaranteed safety fallback if stream yielded no tokens
+            if not full_answer or not full_answer.strip():
+                fallback_ans, fallback_img, fallback_src, fallback_sug = generate_campus_response(
+                    user_text, session_id=session_key, user_profile=user_profile
+                )
+                full_answer = fallback_ans
+                final_image = fallback_img or final_image
+                final_sources = fallback_src or final_sources
+                final_suggestions = fallback_sug or final_suggestions
+                yield f"data: {json.dumps({'chunk': full_answer, 'conversation_id': conv_id})}\n\n"
 
             # Validate map image path
             if final_image:
@@ -307,7 +319,11 @@ def handle_chat_stream():
 
         except Exception as err:
             print(f"[Error] Streaming error: {err}")
-            yield f"data: {json.dumps({'done': True, 'error': str(err)})}\n\n"
+            fallback_ans, fallback_img, fallback_src, fallback_sug = generate_campus_response(
+                user_text, session_id=session_key, user_profile=user_profile
+            )
+            yield f"data: {json.dumps({'chunk': fallback_ans, 'conversation_id': conv_id})}\n\n"
+            yield f"data: {json.dumps({'done': True, 'conversation_id': conv_id, 'message_id': 'msg_err', 'answer': fallback_ans, 'image': fallback_img, 'sources': fallback_src, 'suggestions': fallback_sug})}\n\n"
 
     return Response(stream_with_context(event_stream()), mimetype='text/event-stream')
 

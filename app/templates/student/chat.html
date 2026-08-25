@@ -182,27 +182,69 @@
                     <button type="button" class="sidebar-icon-btn" id="sidebarSearchBtn" title="Search Chats" onclick="toggleSidebarSearch()">
                         <i data-lucide="search"></i>
                     </button>
-                    <button type="button" class="sidebar-icon-btn" id="sidebarCollapseBtn" title="Collapse Sidebar" onclick="toggleSidebarCollapse()">
+                    <!-- Mobile Close Button -->
+                    <button type="button" class="sidebar-icon-btn mobile-drawer-close-btn" id="mobileDrawerCloseBtn" title="Close Menu" onclick="toggleMobileSidebar(false)">
+                        <i data-lucide="x"></i>
+                    </button>
+                    <!-- Desktop Collapse Button -->
+                    <button type="button" class="sidebar-icon-btn desktop-collapse-btn" id="sidebarCollapseBtn" title="Collapse Sidebar" onclick="toggleSidebarCollapse()">
                         <i data-lucide="panel-left-close"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- 2. Main Navigation: New Chat & Collapsed Icon Rail -->
+            <!-- Mobile Drawer Dedicated Profile Card (Visible only in mobile drawer) -->
+            <div class="drawer-profile-card" id="drawerProfileCard">
+                <div class="drawer-profile-avatar">
+                    <span>{{ (current_user.full_name or current_user.name or 'Student')[:2]|upper }}</span>
+                </div>
+                <div class="drawer-profile-meta">
+                    <div class="drawer-profile-name">{{ current_user.full_name or current_user.name or 'Student User' }}</div>
+                    <div class="drawer-profile-role">Student</div>
+                </div>
+                <a href="/student/profile/" class="drawer-view-profile-btn" onclick="toggleMobileSidebar(false);" title="View Profile">
+                    <span>View Profile &gt;</span>
+                </a>
+            </div>
+
+            <!-- 2. Main Navigation: New Chat, Menu Links & Collapsed Rail -->
             <div class="sidebar-main-nav">
                 <!-- + New Chat (ChatGPT Style Primary Button) -->
-                <a href="#" class="nav-item new-chat-btn" id="newChatBtn" onclick="resetChat(); return false;" title="Start New Chat">
+                <a href="#" class="nav-item new-chat-btn" id="newChatBtn" onclick="resetChat(); toggleMobileSidebar(false); return false;" title="Start New Chat">
                     <i data-lucide="plus"></i>
-                    <span>New Chat</span>
+                    <span>+ New Chat</span>
                 </a>
 
-                <!-- Collapsed Icon Rail Navigation (ChatGPT Style) -->
+                <!-- Core Navigation Menu Links (Visible in Expanded & Mobile Drawer) -->
+                <div class="sidebar-menu-links">
+                    <a href="/student/chat" class="sidebar-menu-link active" id="menuChatLink" title="Student Chat" onclick="toggleMobileSidebar(false);">
+                        <i data-lucide="message-square"></i>
+                        <span>Student Chat</span>
+                    </a>
+                    <a href="/student/profile/" class="sidebar-menu-link" id="menuProfileLink" title="Student Profile" onclick="toggleMobileSidebar(false);">
+                        <i data-lucide="user"></i>
+                        <span>👤 Profile</span>
+                    </a>
+                    <a href="/chat/history-page" class="sidebar-menu-link" id="menuHistoryLink" title="Chat History" onclick="toggleMobileSidebar(false);">
+                        <i data-lucide="history"></i>
+                        <span>Chat History</span>
+                    </a>
+                    <a href="/auth/logout" class="sidebar-menu-link exit-chat-link" id="menuExitLink" title="Exit Chat" onclick="toggleMobileSidebar(false);">
+                        <i data-lucide="log-out"></i>
+                        <span>🏠 Exit Chat</span>
+                    </a>
+                </div>
+
+                <!-- Collapsed Icon Rail Navigation (ChatGPT Style for Desktop) -->
                 <div class="sidebar-rail-nav" id="sidebarRailNav">
                     <button type="button" class="rail-icon-btn" id="railSearchBtn" title="Search Chats" onclick="toggleSidebarSearch()">
                         <i data-lucide="search"></i>
                     </button>
-                    <a href="/" class="rail-icon-btn active" id="railChatBtn" title="Chat">
+                    <a href="/student/chat" class="rail-icon-btn active" id="railChatBtn" title="Chat">
                         <i data-lucide="message-square"></i>
+                    </a>
+                    <a href="/student/profile/" class="rail-icon-btn" id="railProfileBtn" title="Profile">
+                        <i data-lucide="user"></i>
                     </a>
                     <a href="/chat/history-page" class="rail-icon-btn" id="railHistoryBtn" title="Chat History">
                         <i data-lucide="history"></i>
@@ -220,7 +262,7 @@
             <!-- 3. Recents Section (Clean, Scrollable with Subtle Divider) -->
             <div class="sidebar-recents-section">
                 <div class="recents-header">
-                    <span>Recents</span>
+                    <span>RECENTS</span>
                 </div>
                 <div class="recents-list" id="sidebarRecentList">
                     <div class="recents-loading">
@@ -228,6 +270,16 @@
                         <span>Loading chats...</span>
                     </div>
                 </div>
+                <!-- Mobile Drawer View All Chats Button -->
+                <a href="/chat/history-page" class="drawer-view-all-chats-btn" onclick="toggleMobileSidebar(false);" title="View All Chats">
+                    <i data-lucide="message-circle"></i>
+                    <span>View All Chats &gt;</span>
+                </a>
+                <!-- Mobile Drawer Dedicated Exit App Button -->
+                <a href="/auth/logout" class="drawer-exit-chat-btn" onclick="toggleMobileSidebar(false);" title="Exit App">
+                    <i data-lucide="log-out"></i>
+                    <span>🚪 Exit App</span>
+                </a>
             </div>
 
             <!-- 4. Sidebar Bottom: Student User Card & Logout -->
@@ -247,20 +299,40 @@
             </div>
         </aside>
 
-        <!-- Main Content Area -->
-        <div class="main-wrapper">
-            <!-- Floating Mobile Sidebar Toggle Button -->
-            <button type="button" class="mobile-floating-toggle" id="mobileSidebarToggle" onclick="toggleMobileSidebar()" title="Toggle Menu">
-                <i data-lucide="menu"></i>
-            </button>
+        <!-- Main Chat Area Wrapper (Fixed Flex Layout Column) -->
+        <div class="main-wrapper" id="mainWrapper">
 
-            <!-- ChatGPT-Style Conversation Top-Right Header Controls -->
+            <!-- Mobile Dedicated Top Bar (Visible only on <= 768px) -->
+            <header class="mobile-top-bar" id="mobileTopBar">
+                <button type="button" class="mobile-hamburger-btn" id="mobileSidebarToggle" onclick="toggleMobileSidebar()" aria-label="Open navigation menu">
+                    <i data-lucide="menu"></i>
+                </button>
+                <div class="mobile-brand-title">
+                    <div class="mobile-brand-icon">
+                        <img src="{{ url_for('static', filename='logo/svit logo u.png') }}" alt="SVIT Logo" class="mobile-logo-img">
+                    </div>
+                    <div class="mobile-brand-text-wrap">
+                        <span class="mobile-brand-name">SVIT AI</span>
+                        <span class="mobile-brand-sub">Assistant</span>
+                    </div>
+                </div>
+                <div class="mobile-top-actions">
+                    <button type="button" class="mobile-action-btn" id="headerShareBtn" onclick="handleHeaderShare()" aria-label="Share conversation" title="Share">
+                        <i data-lucide="share-2"></i>
+                    </button>
+                    <button type="button" class="mobile-action-btn" id="headerOptionsBtn" onclick="toggleHeaderOptionsMenu(event)" aria-label="More options" title="More options">
+                        <i data-lucide="more-horizontal"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- ChatGPT-Style Conversation Top-Right Header Controls (Desktop View) -->
             <div class="chat-top-header-controls" id="chatTopHeaderControls">
-                <button type="button" class="chat-header-btn share-btn" id="headerShareBtn" onclick="handleHeaderShare()" title="Share">
+                <button type="button" class="chat-header-btn share-btn" id="desktopHeaderShareBtn" onclick="handleHeaderShare()" title="Share">
                     <i data-lucide="share-2"></i>
                     <span>Share</span>
                 </button>
-                <button type="button" class="chat-header-btn options-btn" id="headerOptionsBtn" onclick="toggleHeaderOptionsMenu(event)" title="More options">
+                <button type="button" class="chat-header-btn options-btn" id="desktopHeaderOptionsBtn" onclick="toggleHeaderOptionsMenu(event)" title="More options">
                     <i data-lucide="more-horizontal"></i>
                 </button>
             </div>
@@ -282,8 +354,7 @@
                     <div class="student-home-hero">
                         <div class="student-home-hero-left">
                             <div class="greeting-pill student-home-greeting">
-                                <i data-lucide="sparkles"></i>
-                                <span>Hello, {{ current_user.full_name or current_user.name or 'Student' }}!</span>
+                                <span>✨ Hello, {{ current_user.full_name or current_user.name or 'Student' }}! 👋</span>
                             </div>
                             <h1 class="student-home-title">
                                 <span class="title-dark">Your Campus.</span><br>
@@ -293,14 +364,18 @@
                                 Ask anything about your college — timetables, rooms, events, placements and more.
                             </p>
                             <div class="student-home-tagline">
-                                <i data-lucide="zap" style="width: 14px; height: 14px;"></i>
+                                <span class="tagline-bolt">⚡</span>
                                 <span>Smart answers. Instantly.</span>
                             </div>
                         </div>
                         <div class="student-home-hero-visual" aria-hidden="true">
-                            <div class="ambient-orb-outer">
-                                <div class="ambient-orb-core">
-                                    <i data-lucide="graduation-cap"></i>
+                            <div class="mobile-hero-robot-card">
+                                <div class="robot-avatar-glow"></div>
+                                <div class="robot-avatar-badge">
+                                    <div class="robot-avatar-face">
+                                        <i data-lucide="bot"></i>
+                                    </div>
+                                    <span class="robot-status-dot"></span>
                                 </div>
                             </div>
                         </div>
@@ -309,33 +384,41 @@
                     <!-- 2. Home Page Centered Composer (Visible ONLY on New/Empty Chat State) -->
                     <div class="student-home-composer" id="homeComposerWrapper">
                         <form id="homeChatForm" class="home-input-box" onsubmit="handleHomeFormSubmit(event)">
-                            <input type="text" placeholder="Ask anything about timetables, rooms, events, placements..." id="homeChatInput" autocomplete="off" required>
-                            <button type="button" class="voice-btn" id="homeVoiceBtn" onclick="triggerHomeVoiceInput(event)" title="Voice Input (Speech-to-Text)">
-                                <i data-lucide="mic"></i>
-                            </button>
-                            <button type="submit" class="send-btn" id="homeSendBtn" title="Send Message">
-                                <i data-lucide="send"></i>
-                            </button>
+                            <div class="composer-leading-logo">
+                                <img src="{{ url_for('static', filename='logo/svit logo u.png') }}" alt="SVIT AI" class="composer-logo-img" onerror="this.outerHTML='<span class=\'composer-sparkle-icon\'>✨</span>'">
+                            </div>
+                            <input type="text" placeholder="Ask anything about timetables, rooms, events..." id="homeChatInput" autocomplete="off" required>
+                            <div class="composer-action-btns">
+                                <button type="button" class="voice-btn" id="homeVoiceBtn" onclick="triggerHomeVoiceInput(event)" title="Voice Input (Speech-to-Text)">
+                                    <i data-lucide="mic"></i>
+                                </button>
+                                <button type="submit" class="send-btn" id="homeSendBtn" title="Send Message">
+                                    <i data-lucide="send"></i>
+                                </button>
+                            </div>
                         </form>
 
                         <!-- Suggestion Chips directly below the composer input -->
                         <div class="home-prompt-chips">
-                            <span class="home-prompt-chips-label"><i data-lucide="sparkles"></i> Try asking:</span>
+                            <div class="home-prompt-chips-header">
+                                <span class="home-prompt-chips-label"><i data-lucide="sparkles"></i> Try asking</span>
+                                <button type="button" class="view-all-prompts-btn" onclick="sendSuggested('What is SVIT AI?')">View all &gt;</button>
+                            </div>
                             <div class="prompt-chips-wrapper">
                                 <button type="button" class="student-home-chip" onclick="sendSuggested('What is my next class right now?')">
-                                    <i data-lucide="clock" class="chip-icon"></i>
+                                    <span class="chip-emoji">🕐</span>
                                     <span>What's my next class?</span>
                                 </button>
                                 <button type="button" class="student-home-chip" onclick="sendSuggested('Where is the library and reading room located?')">
-                                    <i data-lucide="map-pin" class="chip-icon"></i>
+                                    <span class="chip-emoji">📍</span>
                                     <span>Where is the library?</span>
                                 </button>
                                 <button type="button" class="student-home-chip" onclick="sendSuggested('What are the upcoming events and workshops?')">
-                                    <i data-lucide="calendar" class="chip-icon"></i>
+                                    <span class="chip-emoji">🗓️</span>
                                     <span>Upcoming events</span>
                                 </button>
                                 <button type="button" class="student-home-chip" onclick="sendSuggested('Show college placement statistics and records')">
-                                    <i data-lucide="briefcase" class="chip-icon"></i>
+                                    <span class="chip-emoji">📊</span>
                                     <span>Placement stats</span>
                                 </button>
                             </div>
@@ -346,79 +429,91 @@
 
                     <!-- 3. Explore SVIT: 6 Compact Mini-Cards -->
                     <div class="student-home-explore">
-                        <div class="explore-section-title">EXPLORE SVIT</div>
+                        <div class="explore-section-title">Explore SVIT</div>
                         <div class="explore-cards-grid">
                             
                             <!-- Card 1: Classes -->
                             <div class="explore-card card-classes" onclick="sendSuggested('Show my timetable and schedule for today')" tabindex="0" role="button" aria-label="Classes - Timetables, today's schedule & rooms">
-                                <div class="explore-card-icon-wrap icon-purple">
-                                    <i data-lucide="calendar"></i>
+                                <div class="explore-card-top">
+                                    <div class="explore-card-icon-wrap icon-purple">
+                                        <i data-lucide="calendar"></i>
+                                    </div>
+                                    <div class="explore-card-arrow">
+                                        <i data-lucide="arrow-up-right"></i>
+                                    </div>
                                 </div>
                                 <div class="explore-card-title">Classes</div>
                                 <div class="explore-card-desc">Timetables, today's schedule &amp; rooms</div>
-                                <div class="explore-card-arrow">
-                                    <i data-lucide="arrow-right"></i>
-                                </div>
                             </div>
 
                             <!-- Card 2: Campus Guide -->
                             <div class="explore-card card-guide" onclick="sendSuggested('Where is the library, labs and department buildings located?')" tabindex="0" role="button" aria-label="Campus Guide - Find labs, departments & important places">
-                                <div class="explore-card-icon-wrap icon-blue">
-                                    <i data-lucide="map-pin"></i>
+                                <div class="explore-card-top">
+                                    <div class="explore-card-icon-wrap icon-blue">
+                                        <i data-lucide="map-pin"></i>
+                                    </div>
+                                    <div class="explore-card-arrow">
+                                        <i data-lucide="arrow-up-right"></i>
+                                    </div>
                                 </div>
                                 <div class="explore-card-title">Campus Guide</div>
                                 <div class="explore-card-desc">Find labs, departments &amp; important places</div>
-                                <div class="explore-card-arrow">
-                                    <i data-lucide="arrow-right"></i>
-                                </div>
                             </div>
 
                             <!-- Card 3: Notices & Alerts -->
                             <div class="explore-card card-notices" onclick="sendSuggested('What are the latest college notices and announcements?')" tabindex="0" role="button" aria-label="Notices & Alerts - Latest announcements from your college">
-                                <div class="explore-card-icon-wrap icon-red">
-                                    <i data-lucide="bell"></i>
+                                <div class="explore-card-top">
+                                    <div class="explore-card-icon-wrap icon-red">
+                                        <i data-lucide="bell"></i>
+                                    </div>
+                                    <div class="explore-card-arrow">
+                                        <i data-lucide="arrow-up-right"></i>
+                                    </div>
                                 </div>
                                 <div class="explore-card-title">Notices &amp; Alerts</div>
                                 <div class="explore-card-desc">Latest announcements from your college</div>
-                                <div class="explore-card-arrow">
-                                    <i data-lucide="arrow-right"></i>
-                                </div>
                             </div>
 
                             <!-- Card 4: Events -->
                             <div class="explore-card card-events" onclick="sendSuggested('What are the upcoming technical events, workshops and fests?')" tabindex="0" role="button" aria-label="Events - Workshops, fests & important dates">
-                                <div class="explore-card-icon-wrap icon-violet">
-                                    <i data-lucide="sparkles"></i>
+                                <div class="explore-card-top">
+                                    <div class="explore-card-icon-wrap icon-violet">
+                                        <i data-lucide="sparkles"></i>
+                                    </div>
+                                    <div class="explore-card-arrow">
+                                        <i data-lucide="arrow-up-right"></i>
+                                    </div>
                                 </div>
                                 <div class="explore-card-title">Events</div>
                                 <div class="explore-card-desc">Workshops, fests &amp; important dates</div>
-                                <div class="explore-card-arrow">
-                                    <i data-lucide="arrow-right"></i>
-                                </div>
                             </div>
 
                             <!-- Card 5: Placements -->
                             <div class="explore-card card-placements" onclick="sendSuggested('Show placement drives, salary statistics & opportunities')" tabindex="0" role="button" aria-label="Placements - Job drives, stats & opportunities">
-                                <div class="explore-card-icon-wrap icon-green">
-                                    <i data-lucide="briefcase"></i>
+                                <div class="explore-card-top">
+                                    <div class="explore-card-icon-wrap icon-green">
+                                        <i data-lucide="briefcase"></i>
+                                    </div>
+                                    <div class="explore-card-arrow">
+                                        <i data-lucide="arrow-up-right"></i>
+                                    </div>
                                 </div>
                                 <div class="explore-card-title">Placements</div>
                                 <div class="explore-card-desc">Job drives, stats &amp; opportunities</div>
-                                <div class="explore-card-arrow">
-                                    <i data-lucide="arrow-right"></i>
-                                </div>
                             </div>
 
                             <!-- Card 6: Connect -->
                             <div class="explore-card card-connect" onclick="sendSuggested('Show department heads, faculty and administration contact details')" tabindex="0" role="button" aria-label="Connect - Departments, faculty & admin contacts">
-                                <div class="explore-card-icon-wrap icon-pink">
-                                    <i data-lucide="users"></i>
+                                <div class="explore-card-top">
+                                    <div class="explore-card-icon-wrap icon-pink">
+                                        <i data-lucide="users"></i>
+                                    </div>
+                                    <div class="explore-card-arrow">
+                                        <i data-lucide="arrow-up-right"></i>
+                                    </div>
                                 </div>
                                 <div class="explore-card-title">Connect</div>
                                 <div class="explore-card-desc">Departments, faculty &amp; admin contacts</div>
-                                <div class="explore-card-arrow">
-                                    <i data-lucide="arrow-right"></i>
-                                </div>
                             </div>
 
                         </div>
@@ -433,12 +528,17 @@
                 </div>
 
                 <!-- Dynamic Typing Indicator -->
-                <div class="chat-row bot-row" id="typingIndicator" style="display: none;">
+                <div class="chat-row bot-row typing-indicator-row" id="typingIndicator" style="display: none;">
                     <div class="bot-avatar-box">
-                        <i data-lucide="bot"></i>
+                        <img src="{{ url_for('static', filename='logo/svit logo u.png') }}" alt="SVIT AI" class="bot-avatar-img" onerror="this.outerHTML='<i data-lucide=\'bot\'></i>'">
                     </div>
-                    <div class="bot-card typing-box">
-                        <span>SVIT AI is thinking...</span>
+                    <div class="bot-card typing-bubble">
+                        <div class="typing-text">SVIT AI is thinking...</div>
+                        <div class="typing-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
                     </div>
                 </div>
 
@@ -453,15 +553,19 @@
                 </button>
 
                 <form id="chatForm" class="input-box" onsubmit="handleNormalFormSubmit(event)">
-                    <input type="text" placeholder="Ask anything about timetables, rooms, events, placements..." id="chatInput" autocomplete="off" required>
-                    <button type="button" class="voice-btn" id="voiceBtn" onclick="toggleVoiceInput(event)" title="Voice Input (Speech-to-Text)">
-                        <i data-lucide="mic"></i>
-                    </button>
-                    <button type="submit" class="send-btn" id="sendBtn" title="Send Message">
-                        <i data-lucide="send"></i>
-                    </button>
+                    <div class="composer-leading-logo">
+                        <img src="{{ url_for('static', filename='logo/svit logo u.png') }}" alt="SVIT AI" class="composer-logo-img" onerror="this.outerHTML='<span class=\'composer-sparkle-icon\'>✨</span>'">
+                    </div>
+                    <input type="text" placeholder="Ask anything about timetables, rooms, events..." id="chatInput" autocomplete="off" required>
+                    <div class="composer-action-btns">
+                        <button type="button" class="voice-btn" id="voiceBtn" onclick="toggleVoiceInput(event)" title="Voice Input (Speech-to-Text)">
+                            <i data-lucide="mic"></i>
+                        </button>
+                        <button type="submit" class="send-btn" id="sendBtn" title="Send Message">
+                            <i data-lucide="send"></i>
+                        </button>
+                    </div>
                 </form>
-                <p class="disclaimer-text">SVIT AI Assistant provides official campus layout & academic information. Please verify notice deadlines with official department boards.</p>
             </div>
             {% endif %}
         </div>
@@ -477,8 +581,7 @@
             <div class="student-home-hero">
                 <div class="student-home-hero-left">
                     <div class="greeting-pill student-home-greeting">
-                        <i data-lucide="sparkles"></i>
-                        <span>Hello, {{ current_user.full_name or current_user.name or 'Student' }}!</span>
+                        <span>✨ Hello, {{ current_user.full_name or current_user.name or 'Student' }}! 👋</span>
                     </div>
                     <h1 class="student-home-title">
                         <span class="title-dark">Your Campus.</span><br>
@@ -488,14 +591,18 @@
                         Ask anything about your college — timetables, rooms, events, placements and more.
                     </p>
                     <div class="student-home-tagline">
-                        <i data-lucide="zap" style="width: 14px; height: 14px;"></i>
+                        <span class="tagline-bolt">⚡</span>
                         <span>Smart answers. Instantly.</span>
                     </div>
                 </div>
                 <div class="student-home-hero-visual" aria-hidden="true">
-                    <div class="ambient-orb-outer">
-                        <div class="ambient-orb-core">
-                            <i data-lucide="graduation-cap"></i>
+                    <div class="mobile-hero-robot-card">
+                        <div class="robot-avatar-glow"></div>
+                        <div class="robot-avatar-badge">
+                            <div class="robot-avatar-face">
+                                <i data-lucide="bot"></i>
+                            </div>
+                            <span class="robot-status-dot"></span>
                         </div>
                     </div>
                 </div>
@@ -504,33 +611,41 @@
             <!-- 2. Home Page Centered Composer (Visible ONLY on New/Empty Chat State) -->
             <div class="student-home-composer" id="homeComposerWrapper">
                 <form id="homeChatForm" class="home-input-box" onsubmit="handleHomeFormSubmit(event)">
-                    <input type="text" placeholder="Ask anything about timetables, rooms, events, placements..." id="homeChatInput" autocomplete="off" required>
-                    <button type="button" class="voice-btn" id="homeVoiceBtn" onclick="triggerHomeVoiceInput(event)" title="Voice Input (Speech-to-Text)">
-                        <i data-lucide="mic"></i>
-                    </button>
-                    <button type="submit" class="send-btn" id="homeSendBtn" title="Send Message">
-                        <i data-lucide="send"></i>
-                    </button>
+                    <div class="composer-leading-logo">
+                        <img src="/static/logo/svit%20logo%20u.png" alt="SVIT AI" class="composer-logo-img" onerror="this.outerHTML='<span class=\'composer-sparkle-icon\'>✨</span>'">
+                    </div>
+                    <input type="text" placeholder="Ask anything about timetables, rooms, events..." id="homeChatInput" autocomplete="off" required>
+                    <div class="composer-action-btns">
+                        <button type="button" class="voice-btn" id="homeVoiceBtn" onclick="triggerHomeVoiceInput(event)" title="Voice Input (Speech-to-Text)">
+                            <i data-lucide="mic"></i>
+                        </button>
+                        <button type="submit" class="send-btn" id="homeSendBtn" title="Send Message">
+                            <i data-lucide="send"></i>
+                        </button>
+                    </div>
                 </form>
 
                 <!-- Suggestion Chips directly below the composer input -->
                 <div class="home-prompt-chips">
-                    <span class="home-prompt-chips-label"><i data-lucide="sparkles"></i> Try asking:</span>
+                    <div class="home-prompt-chips-header">
+                        <span class="home-prompt-chips-label"><i data-lucide="sparkles"></i> Try asking</span>
+                        <button type="button" class="view-all-prompts-btn" onclick="sendSuggested('What is SVIT AI?')">View all &gt;</button>
+                    </div>
                     <div class="prompt-chips-wrapper">
                         <button type="button" class="student-home-chip" onclick="sendSuggested('What is my next class right now?')">
-                            <i data-lucide="clock" class="chip-icon"></i>
+                            <span class="chip-emoji">🕐</span>
                             <span>What's my next class?</span>
                         </button>
                         <button type="button" class="student-home-chip" onclick="sendSuggested('Where is the library and reading room located?')">
-                            <i data-lucide="map-pin" class="chip-icon"></i>
+                            <span class="chip-emoji">📍</span>
                             <span>Where is the library?</span>
                         </button>
                         <button type="button" class="student-home-chip" onclick="sendSuggested('What are the upcoming events and workshops?')">
-                            <i data-lucide="calendar" class="chip-icon"></i>
+                            <span class="chip-emoji">🗓️</span>
                             <span>Upcoming events</span>
                         </button>
                         <button type="button" class="student-home-chip" onclick="sendSuggested('Show college placement statistics and records')">
-                            <i data-lucide="briefcase" class="chip-icon"></i>
+                            <span class="chip-emoji">📊</span>
                             <span>Placement stats</span>
                         </button>
                     </div>
@@ -541,43 +656,66 @@
 
             <!-- 3. Explore SVIT: 6 Compact Mini-Cards -->
             <div class="student-home-explore">
-                <div class="explore-section-title">EXPLORE SVIT</div>
+                <div class="explore-section-title">Explore SVIT</div>
                 <div class="explore-cards-grid">
+                    <!-- Card 1: Classes -->
                     <div class="explore-card card-classes" onclick="sendSuggested('Show my timetable and schedule for today')" tabindex="0" role="button" aria-label="Classes - Timetables, today's schedule & rooms">
-                        <div class="explore-card-icon-wrap icon-purple"><i data-lucide="calendar"></i></div>
+                        <div class="explore-card-top">
+                            <div class="explore-card-icon-wrap icon-purple"><i data-lucide="calendar"></i></div>
+                            <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                        </div>
                         <div class="explore-card-title">Classes</div>
                         <div class="explore-card-desc">Timetables, today's schedule &amp; rooms</div>
-                        <div class="explore-card-arrow"><i data-lucide="arrow-right"></i></div>
                     </div>
+
+                    <!-- Card 2: Campus Guide -->
                     <div class="explore-card card-guide" onclick="sendSuggested('Where is the library, labs and department buildings located?')" tabindex="0" role="button" aria-label="Campus Guide - Find labs, departments & important places">
-                        <div class="explore-card-icon-wrap icon-blue"><i data-lucide="map-pin"></i></div>
+                        <div class="explore-card-top">
+                            <div class="explore-card-icon-wrap icon-blue"><i data-lucide="map-pin"></i></div>
+                            <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                        </div>
                         <div class="explore-card-title">Campus Guide</div>
                         <div class="explore-card-desc">Find labs, departments &amp; important places</div>
-                        <div class="explore-card-arrow"><i data-lucide="arrow-right"></i></div>
                     </div>
+
+                    <!-- Card 3: Notices & Alerts -->
                     <div class="explore-card card-notices" onclick="sendSuggested('What are the latest college notices and announcements?')" tabindex="0" role="button" aria-label="Notices & Alerts - Latest announcements from your college">
-                        <div class="explore-card-icon-wrap icon-red"><i data-lucide="bell"></i></div>
+                        <div class="explore-card-top">
+                            <div class="explore-card-icon-wrap icon-red"><i data-lucide="bell"></i></div>
+                            <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                        </div>
                         <div class="explore-card-title">Notices &amp; Alerts</div>
                         <div class="explore-card-desc">Latest announcements from your college</div>
-                        <div class="explore-card-arrow"><i data-lucide="arrow-right"></i></div>
                     </div>
+
+                    <!-- Card 4: Events -->
                     <div class="explore-card card-events" onclick="sendSuggested('What are the upcoming technical events, workshops and fests?')" tabindex="0" role="button" aria-label="Events - Workshops, fests & important dates">
-                        <div class="explore-card-icon-wrap icon-violet"><i data-lucide="sparkles"></i></div>
+                        <div class="explore-card-top">
+                            <div class="explore-card-icon-wrap icon-violet"><i data-lucide="sparkles"></i></div>
+                            <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                        </div>
                         <div class="explore-card-title">Events</div>
                         <div class="explore-card-desc">Workshops, fests &amp; important dates</div>
-                        <div class="explore-card-arrow"><i data-lucide="arrow-right"></i></div>
                     </div>
+
+                    <!-- Card 5: Placements -->
                     <div class="explore-card card-placements" onclick="sendSuggested('Show placement drives, salary statistics & opportunities')" tabindex="0" role="button" aria-label="Placements - Job drives, stats & opportunities">
-                        <div class="explore-card-icon-wrap icon-green"><i data-lucide="briefcase"></i></div>
+                        <div class="explore-card-top">
+                            <div class="explore-card-icon-wrap icon-green"><i data-lucide="briefcase"></i></div>
+                            <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                        </div>
                         <div class="explore-card-title">Placements</div>
                         <div class="explore-card-desc">Job drives, stats &amp; opportunities</div>
-                        <div class="explore-card-arrow"><i data-lucide="arrow-right"></i></div>
                     </div>
+
+                    <!-- Card 6: Connect -->
                     <div class="explore-card card-connect" onclick="sendSuggested('Show department heads, faculty and administration contact details')" tabindex="0" role="button" aria-label="Connect - Departments, faculty & admin contacts">
-                        <div class="explore-card-icon-wrap icon-pink"><i data-lucide="users"></i></div>
+                        <div class="explore-card-top">
+                            <div class="explore-card-icon-wrap icon-pink"><i data-lucide="users"></i></div>
+                            <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                        </div>
                         <div class="explore-card-title">Connect</div>
                         <div class="explore-card-desc">Departments, faculty &amp; admin contacts</div>
-                        <div class="explore-card-arrow"><i data-lucide="arrow-right"></i></div>
                     </div>
                 </div>
             </div>
@@ -592,17 +730,89 @@
             </button>
 
             <form id="chatForm" class="input-box" onsubmit="handleNormalFormSubmit(event)">
-                <input type="text" placeholder="Ask anything about timetables, rooms, events, placements..." id="chatInput" autocomplete="off" required>
-                <button type="button" class="voice-btn" id="voiceBtn" onclick="toggleVoiceInput(event)" title="Voice Input (Speech-to-Text)">
-                    <i data-lucide="mic"></i>
-                </button>
-                <button type="submit" class="send-btn" id="sendBtn" title="Send Message">
-                    <i data-lucide="send"></i>
-                </button>
+                <div class="composer-leading-logo">
+                    <img src="/static/logo/svit%20logo%20u.png" alt="SVIT AI" class="composer-logo-img" onerror="this.outerHTML='<span class=\'composer-sparkle-icon\'>✨</span>'">
+                </div>
+                <input type="text" placeholder="Ask anything about timetables, rooms, events..." id="chatInput" autocomplete="off" required>
+                <div class="composer-action-btns">
+                    <button type="button" class="voice-btn" id="voiceBtn" onclick="toggleVoiceInput(event)" title="Voice Input (Speech-to-Text)">
+                        <i data-lucide="mic"></i>
+                    </button>
+                    <button type="submit" class="send-btn" id="sendBtn" title="Send Message">
+                        <i data-lucide="send"></i>
+                    </button>
+                </div>
             </form>
-            <p class="disclaimer-text">SVIT AI Assistant provides official campus layout & academic information. Please verify notice deadlines with official department boards.</p>
         </div>
     </template>
+
+    <!-- Mobile Student Profile Slide-in Modal/Panel -->
+    <div class="mobile-profile-backdrop" id="mobileProfileBackdrop" onclick="closeMobileProfilePanel()"></div>
+    <div class="mobile-profile-panel" id="mobileProfilePanel">
+        <div class="mobile-profile-panel-header">
+            <div class="mobile-profile-panel-title">
+                <i data-lucide="user"></i>
+                <span>Student Profile</span>
+            </div>
+            <button type="button" class="mobile-profile-close-btn" onclick="closeMobileProfilePanel()" aria-label="Close profile">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <div class="mobile-profile-panel-body">
+            <div class="mobile-profile-hero">
+                <div class="mobile-profile-large-avatar">
+                    <span>{{ (current_user.full_name or current_user.name or 'Student')[:2]|upper }}</span>
+                </div>
+                <h4 class="mobile-profile-fullname">{{ current_user.full_name or current_user.name or 'Student User' }}</h4>
+                <span class="mobile-profile-role-pill">🎓 Student</span>
+            </div>
+
+            <div class="mobile-profile-cards-grid">
+                <!-- Department Visual Card -->
+                <div class="mobile-profile-card">
+                    <div class="mobile-profile-card-icon icon-dept">🏫</div>
+                    <div class="mobile-profile-card-content">
+                        <div class="mobile-profile-card-label">Department</div>
+                        <div class="mobile-profile-card-val">{{ current_user.department or 'Computer Engineering' }}</div>
+                    </div>
+                </div>
+
+                <!-- Program Visual Card -->
+                <div class="mobile-profile-card">
+                    <div class="mobile-profile-card-icon icon-prog">🎓</div>
+                    <div class="mobile-profile-card-content">
+                        <div class="mobile-profile-card-label">Program</div>
+                        <div class="mobile-profile-card-val">{{ current_user.program or 'Diploma' }}</div>
+                    </div>
+                </div>
+
+                <!-- Semester Card -->
+                <div class="mobile-profile-card">
+                    <div class="mobile-profile-card-icon icon-sem">📚</div>
+                    <div class="mobile-profile-card-content">
+                        <div class="mobile-profile-card-label">Semester</div>
+                        <div class="mobile-profile-card-val">Semester {{ current_user.semester or 3 }}</div>
+                    </div>
+                </div>
+
+                <!-- Division Card -->
+                <div class="mobile-profile-card">
+                    <div class="mobile-profile-card-icon icon-div">👥</div>
+                    <div class="mobile-profile-card-content">
+                        <div class="mobile-profile-card-label">Division &amp; Batch</div>
+                        <div class="mobile-profile-card-val">Div {{ current_user.division or 'A' }} (Batch {{ current_user.batch or 'A1' }})</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mobile-profile-panel-actions">
+                <a href="/student/profile/" class="mobile-profile-full-btn">
+                    <i data-lucide="edit-3"></i>
+                    <span>Edit Full Profile</span>
+                </a>
+            </div>
+        </div>
+    </div>
 
     <!-- Script Imports with Cache Busting -->
     <script src="{{ url_for('static', filename='js/student/chat.js') }}?v={{ range(1000, 99999) | random }}"></script>

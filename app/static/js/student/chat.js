@@ -118,9 +118,9 @@ async function submitMessage(text) {
         const streamResponse = await fetch('/api/chat/stream', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
+            body: JSON.stringify({
                 message: text,
-                conversation_id: activeConvId 
+                conversation_id: activeConvId
             })
         });
 
@@ -178,11 +178,17 @@ async function submitMessage(text) {
                 }
             }
 
-            // Finalize rendering
-            renderMarkdown(contentEl, accumulatedText);
-            finalizeStreamingBotRow(streamCard, finalImage, finalSources, finalSuggestions);
-            streamedSuccessfully = true;
-            loadSidebarRecents();
+            // Finalize rendering only if tokens were received
+            if (accumulatedText && accumulatedText.trim().length > 0) {
+                renderMarkdown(contentEl, accumulatedText);
+                finalizeStreamingBotRow(streamCard, finalImage, finalSources, finalSuggestions);
+                streamedSuccessfully = true;
+                loadSidebarRecents();
+            } else {
+                // If stream yielded empty content, remove the placeholder and allow fallback
+                streamCard.remove();
+                streamedSuccessfully = false;
+            }
         }
     } catch (streamErr) {
         console.warn("Streaming unavailable, falling back to JSON:", streamErr);
@@ -200,9 +206,9 @@ async function submitMessage(text) {
                     let res = await fetch(url, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
+                        body: JSON.stringify({
                             message: text,
-                            conversation_id: activeConvId 
+                            conversation_id: activeConvId
                         })
                     });
                     if (res.status !== 404) {
@@ -272,12 +278,12 @@ async function loadConversationMessages(convId) {
                     appendUserMessage(text);
                 } else if (m.sender === 'assistant') {
                     appendBotMessage(
-                        text, 
-                        m.image_path, 
-                        m.sources || [], 
-                        lastUserMsg, 
-                        convId, 
-                        m.id, 
+                        text,
+                        m.image_path,
+                        m.sources || [],
+                        lastUserMsg,
+                        convId,
+                        m.id,
                         m.feedback,
                         []
                     );
@@ -313,68 +319,42 @@ function createStreamingBotRow(userQueryText = '', messageId = null, convId = ''
 
     botRow.innerHTML = `
         <div class="bot-avatar-box">
-            <i data-lucide="bot"></i>
+            <img src="/static/logo/svit%20logo%20u.png" alt="SVIT AI" class="bot-avatar-img" onerror="this.outerHTML='<i data-lucide=\\'bot\\'></i>'">
         </div>
         <div class="bot-card">
             <div class="bot-content"></div>
             <div class="map-slot"></div>
             <div class="sources-slot"></div>
             <div class="suggestions-slot"></div>
-            <div class="bot-card-actions" style="margin-top: 8px; display: flex; gap: 6px; align-items: center;">
-                <button class="action-btn" onclick="copyText(this)" title="Copy response text"><i data-lucide="copy"></i> Copy</button>
-                <button class="action-btn tts-btn" onclick="toggleTTS(this)" title="Read aloud response"><i data-lucide="volume-2"></i> <span>Listen</span></button>
-                <button class="action-btn icon-only feedback-btn like-btn" onclick="submitFeedback(this, 'like')" title="Helpful response"><i data-lucide="thumbs-up"></i></button>
-                <button class="action-btn icon-only feedback-btn dislike-btn" onclick="submitFeedback(this, 'dislike')" title="Not helpful"><i data-lucide="thumbs-down"></i></button>
-            </div>
+            <div class="actions-slot"></div>
         </div>
     `;
-
-    // Apply persisted feedback state if present
-    if (feedback) {
-        const likeBtn = botRow.querySelector('.like-btn');
-        const dislikeBtn = botRow.querySelector('.dislike-btn');
-        if (likeBtn && dislikeBtn) {
-            likeBtn.disabled = true;
-            dislikeBtn.disabled = true;
-            likeBtn.style.cursor = 'default';
-            dislikeBtn.style.cursor = 'default';
-
-            if (feedback === 'like') {
-                likeBtn.style.color = '#16a34a';
-                likeBtn.style.backgroundColor = '#dcfce7';
-                likeBtn.style.borderColor = '#86efac';
-                likeBtn.style.opacity = '1';
-                dislikeBtn.style.opacity = '0.35';
-            } else if (feedback === 'dislike') {
-                dislikeBtn.style.color = '#dc2626';
-                dislikeBtn.style.backgroundColor = '#fee2e2';
-                dislikeBtn.style.borderColor = '#fca5a5';
-                dislikeBtn.style.opacity = '1';
-                likeBtn.style.opacity = '0.35';
-            }
-        }
-    }
 
     chatThread.appendChild(botRow);
     if (window.lucide) lucide.createIcons();
     return botRow;
 }
 
-function finalizeStreamingBotRow(botRow, imagePath = null, sources = [], suggestions = []) {
+function finalizeStreamingBotRow(botRow, imagePath = null, sources = [], suggestions = [], feedback = null) {
     if (!botRow) return;
 
+    const contentEl = botRow.querySelector('.bot-content');
+    if (contentEl && (!contentEl.innerHTML || !contentEl.textContent.trim())) {
+        renderMarkdown(contentEl, "Thank you for asking! For specific details, please consult your department coordinator or student portal.");
+    }
+
     if (imagePath) {
-        let fullSrc = imagePath.startsWith('/static/') 
-            ? imagePath 
+        let fullSrc = imagePath.startsWith('/static/')
+            ? imagePath
             : `/static/${imagePath.replace(/^static\//, '')}`;
 
         const mapSlot = botRow.querySelector('.map-slot');
         if (mapSlot) {
             mapSlot.innerHTML = `
                 <div class="map-container" style="margin-top: 12px; margin-bottom: 8px;">
-                    <img src="${fullSrc}" 
-                         alt="Campus Map" 
-                         class="campus-map" 
+                    <img src="${fullSrc}"
+                         alt="Campus Map"
+                         class="campus-map"
                          onerror="this.parentElement.style.display='none';"
                          style="max-width: 100%; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
                 </div>
@@ -409,6 +389,45 @@ function finalizeStreamingBotRow(botRow, imagePath = null, sources = [], suggest
         }
     }
 
+    // Mount Action Buttons (Copy, Listen, Like, Dislike) ONLY when the full answer is ready
+    const actionsSlot = botRow.querySelector('.actions-slot');
+    if (actionsSlot) {
+        actionsSlot.innerHTML = `
+            <div class="bot-card-actions" style="margin-top: 8px; display: flex; gap: 6px; align-items: center;">
+                <button class="action-btn" onclick="copyText(this)" title="Copy response text"><i data-lucide="copy"></i> Copy</button>
+                <button class="action-btn tts-btn" onclick="toggleTTS(this)" title="Read aloud response"><i data-lucide="volume-2"></i> <span>Listen</span></button>
+                <button class="action-btn icon-only feedback-btn like-btn" onclick="submitFeedback(this, 'like')" title="Helpful response"><i data-lucide="thumbs-up"></i></button>
+                <button class="action-btn icon-only feedback-btn dislike-btn" onclick="submitFeedback(this, 'dislike')" title="Not helpful"><i data-lucide="thumbs-down"></i></button>
+            </div>
+        `;
+
+        // Apply persisted feedback state if present
+        if (feedback) {
+            const likeBtn = actionsSlot.querySelector('.like-btn');
+            const dislikeBtn = actionsSlot.querySelector('.dislike-btn');
+            if (likeBtn && dislikeBtn) {
+                likeBtn.disabled = true;
+                dislikeBtn.disabled = true;
+                likeBtn.style.cursor = 'default';
+                dislikeBtn.style.cursor = 'default';
+
+                if (feedback === 'like') {
+                    likeBtn.style.color = '#16a34a';
+                    likeBtn.style.backgroundColor = '#dcfce7';
+                    likeBtn.style.borderColor = '#86efac';
+                    likeBtn.style.opacity = '1';
+                    dislikeBtn.style.opacity = '0.35';
+                } else if (feedback === 'dislike') {
+                    dislikeBtn.style.color = '#dc2626';
+                    dislikeBtn.style.backgroundColor = '#fee2e2';
+                    dislikeBtn.style.borderColor = '#fca5a5';
+                    dislikeBtn.style.opacity = '1';
+                    likeBtn.style.opacity = '0.35';
+                }
+            }
+        }
+    }
+
     if (window.lucide) lucide.createIcons();
     scrollToBottom();
 }
@@ -417,7 +436,10 @@ function renderMarkdown(element, text) {
     if (!element) return;
     if (typeof marked !== 'undefined') {
         marked.setOptions({ breaks: true, gfm: true });
-        element.innerHTML = marked.parse(text);
+        let html = marked.parse(text);
+        // Wrap tables in responsive container to guarantee no mobile overflow
+        html = html.replace(/<table>/g, '<div class="table-responsive"><table>').replace(/<\/table>/g, '</table></div>');
+        element.innerHTML = html;
     } else {
         element.innerHTML = escapeHtml(text)
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -426,10 +448,11 @@ function renderMarkdown(element, text) {
 }
 
 function appendBotMessage(text, imagePath = null, sources = [], userQueryText = '', convId = '', messageId = null, feedback = null, suggestions = []) {
+    const safeText = (text && text.trim().length > 0) ? text : "Thank you for asking! For specific details, please consult your department coordinator.";
     const row = createStreamingBotRow(userQueryText, messageId, convId, feedback);
     const contentEl = row.querySelector('.bot-content');
-    renderMarkdown(contentEl, text);
-    finalizeStreamingBotRow(row, imagePath, sources, suggestions);
+    renderMarkdown(contentEl, safeText);
+    finalizeStreamingBotRow(row, imagePath, sources, suggestions, feedback);
 }
 
 function showHomeState() {
@@ -545,50 +568,50 @@ function triggerHomeVoiceInput(e) {
     }
     const homeInput = document.getElementById('homeChatInput');
     const voiceBtn = document.getElementById('homeVoiceBtn');
-    
+
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
         alert("Speech recognition is not supported in this browser.");
         return;
     }
-    
+
     if (window.activeVoiceRecognition) {
         window.activeVoiceRecognition.stop();
         window.activeVoiceRecognition = null;
         if (voiceBtn) voiceBtn.classList.remove('recording');
         return;
     }
-    
+
     const recognition = new SpeechRecognition();
     recognition.lang = 'en-IN';
     recognition.continuous = false;
     recognition.interimResults = false;
-    
+
     recognition.onstart = () => {
         window.activeVoiceRecognition = recognition;
         if (voiceBtn) voiceBtn.classList.add('recording');
         if (homeInput) homeInput.placeholder = '🎙️ Listening... Speak now';
     };
-    
+
     recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         if (transcript && transcript.trim()) {
             submitMessage(transcript.trim());
         }
     };
-    
+
     recognition.onerror = () => {
         if (voiceBtn) voiceBtn.classList.remove('recording');
         if (homeInput) homeInput.placeholder = 'Ask anything about timetables, rooms, events, placements...';
         window.activeVoiceRecognition = null;
     };
-    
+
     recognition.onend = () => {
         if (voiceBtn) voiceBtn.classList.remove('recording');
         if (homeInput) homeInput.placeholder = 'Ask anything about timetables, rooms, events, placements...';
         window.activeVoiceRecognition = null;
     };
-    
+
     recognition.start();
 }
 window.triggerHomeVoiceInput = triggerHomeVoiceInput;
@@ -599,11 +622,11 @@ function resetChat() {
 
     const convIdInput = document.getElementById('activeConversationId');
     if (convIdInput) convIdInput.value = '';
-    
+
     if (window.history && window.history.pushState) {
         window.history.pushState(null, '', window.location.pathname);
     }
-    
+
     document.querySelectorAll('.recent-chat-item').forEach(el => el.classList.remove('active'));
 
     showHomeState();
@@ -699,7 +722,7 @@ function copyText(button) {
     const botCard = button.closest('.bot-card');
     const textToCopy = botCard ? botCard.querySelector('.bot-content').innerText : '';
     navigator.clipboard.writeText(textToCopy);
-    
+
     button.innerHTML = `<i data-lucide="check"></i> Copied`;
     if (window.lucide) lucide.createIcons();
     setTimeout(() => {
@@ -718,8 +741,8 @@ async function submitFeedback(button, rating) {
     const botContent = botCard ? (botCard.querySelector('.bot-content')?.innerText || '') : '';
 
     // 1. Resolve conversation ID & message ID
-    let convId = (botRow && botRow.getAttribute('data-conv-id')) 
-                 || document.getElementById('activeConversationId')?.value 
+    let convId = (botRow && botRow.getAttribute('data-conv-id'))
+                 || document.getElementById('activeConversationId')?.value
                  || '';
     let msgId = (botRow && botRow.getAttribute('data-msg-id')) || null;
 
@@ -862,7 +885,7 @@ async function requestAudioStream() {
 
 async function toggleVoiceInput() {
     if (isVoiceStarting) return; // Prevent double-trigger on rapid clicks
-    
+
     if (isVoiceActive) {
         stopVoiceInput();
     } else {
@@ -893,7 +916,7 @@ async function startVoiceInput() {
         if (SpeechRecognition) {
             try {
                 console.log("[VoiceInput] Initializing Web Speech Recognition engine...");
-                
+
                 if (recognition) {
                     try { recognition.stop(); } catch (e) {}
                     recognition = null;
@@ -1035,7 +1058,7 @@ async function stopVoiceInput() {
         try { scriptProcessor.disconnect(); } catch (e) {}
         scriptProcessor = null;
     }
-    
+
     let actualSampleRate = 44100;
     if (audioContext) {
         actualSampleRate = audioContext.sampleRate || 44100;
@@ -1226,7 +1249,7 @@ function speakText(text, button) {
 
     currentUtterance = utterance;
     activeTTSButton = button;
-    
+
     // Set UI state immediately for instant responsive feedback
     setTTSActiveState(button, true);
 
@@ -1368,11 +1391,12 @@ function updateCollapseIcon(isCollapsed) {
     }
 }
 
-function toggleMobileSidebar() {
+function toggleMobileSidebar(force) {
     const sidebar = document.getElementById('sidebar');
     const backdrop = document.getElementById('sidebarBackdrop');
     if (!sidebar) return;
-    const isOpen = sidebar.classList.toggle('mobile-open');
+    const isOpen = (typeof force === 'boolean') ? force : !sidebar.classList.contains('mobile-open');
+    sidebar.classList.toggle('mobile-open', isOpen);
     if (backdrop) {
         backdrop.classList.toggle('active', isOpen);
     }
@@ -1439,7 +1463,7 @@ async function loadSidebarRecents() {
         }
         const data = await res.json();
         const grouped = data?.history || {};
-        
+
         let allChats = [];
         ['today', 'yesterday', 'last_7_days', 'last_month', 'older'].forEach(key => {
             if (Array.isArray(grouped[key])) {
@@ -1454,6 +1478,41 @@ async function loadSidebarRecents() {
         container.innerHTML = `<div class="recents-empty">No recent chats</div>`;
     }
 }
+
+function formatChatTime(dateStr) {
+    if (!dateStr) return '';
+    try {
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return '';
+        let hours = d.getHours();
+        const minutes = d.getMinutes();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        const minStr = minutes < 10 ? '0' + minutes : minutes;
+        return `${hours}:${minStr} ${ampm}`;
+    } catch (e) {
+        return '';
+    }
+}
+
+function openMobileProfilePanel() {
+    toggleMobileSidebar(false);
+    const panel = document.getElementById('mobileProfilePanel');
+    const backdrop = document.getElementById('mobileProfileBackdrop');
+    if (panel) panel.classList.add('active');
+    if (backdrop) backdrop.classList.add('active');
+    if (window.lucide) lucide.createIcons();
+}
+window.openMobileProfilePanel = openMobileProfilePanel;
+
+function closeMobileProfilePanel() {
+    const panel = document.getElementById('mobileProfilePanel');
+    const backdrop = document.getElementById('mobileProfileBackdrop');
+    if (panel) panel.classList.remove('active');
+    if (backdrop) backdrop.classList.remove('active');
+}
+window.closeMobileProfilePanel = closeMobileProfilePanel;
 
 function renderRecentChatsList(chats) {
     const container = document.getElementById('sidebarRecentList');
@@ -1473,35 +1532,46 @@ function renderRecentChatsList(chats) {
         return 0;
     });
 
-    container.innerHTML = sortedChats.slice(0, 30).map(c => `
-        <a href="/?conversation_id=${encodeURIComponent(c.id)}" 
-           class="recent-chat-item ${c.id === currentConvId ? 'active' : ''} ${c.is_pinned ? 'pinned' : ''}" 
-           onclick="selectRecentChat(event, '${escapeHtml(c.id)}')" 
+    container.innerHTML = sortedChats.slice(0, 30).map(c => {
+        const timeStr = formatChatTime(c.updated_at || c.created_at);
+        return `
+        <a href="/student/chat?conversation_id=${encodeURIComponent(c.id)}"
+           class="recent-chat-item ${c.id === currentConvId ? 'active' : ''} ${c.is_pinned ? 'pinned' : ''}"
+           onclick="selectRecentChat(event, '${escapeHtml(c.id)}')"
            title="${escapeHtml(c.title || 'Untitled Conversation')}">
-            ${c.is_pinned ? '<i data-lucide="pin" class="pin-indicator-icon" title="Pinned"></i>' : ''}
             <span class="chat-title-text">${escapeHtml(c.title || 'Conversation')}</span>
+            ${timeStr ? `<span class="recent-chat-time">${escapeHtml(timeStr)}</span>` : ''}
             <button type="button" class="recent-item-options-btn" title="Options" onclick="openRecentChatMenu(event, '${escapeHtml(c.id)}', '${escapeHtml(c.title || '')}', ${Boolean(c.is_pinned)})">
                 <i data-lucide="more-horizontal"></i>
             </button>
         </a>
-    `).join('');
+    `}).join('');
 
     if (window.lucide) lucide.createIcons();
 }
 
 function selectRecentChat(e, convId) {
-    if (window.location.pathname === '/' || window.location.pathname === '/student/' || window.location.pathname.endsWith('/chat')) {
-        e.preventDefault();
+    if (window.location.pathname === '/' || window.location.pathname === '/student/' || window.location.pathname.endsWith('/chat') || window.location.pathname.startsWith('/student/chat')) {
+        if (e) {
+            e.preventDefault();
+        }
         loadConversationMessages(convId);
         // Highlight active item
         document.querySelectorAll('.recent-chat-item').forEach(el => el.classList.remove('active'));
-        e.currentTarget?.classList.add('active');
+        if (e && e.currentTarget && e.currentTarget.classList) {
+            e.currentTarget.classList.add('active');
+        } else {
+            const activeLink = document.querySelector(`.recent-chat-item[href*="${encodeURIComponent(convId)}"]`);
+            if (activeLink) activeLink.classList.add('active');
+        }
         // Close mobile drawer if open
         const sidebar = document.getElementById('sidebar');
         if (sidebar && sidebar.classList.contains('mobile-open')) {
             toggleMobileSidebar();
         }
-        window.history.pushState(null, '', `/?conversation_id=${encodeURIComponent(convId)}`);
+        window.history.pushState(null, '', `/student/chat?conversation_id=${encodeURIComponent(convId)}`);
+    } else {
+        window.location.href = `/student/chat?conversation_id=${encodeURIComponent(convId)}`;
     }
 }
 
@@ -1717,28 +1787,34 @@ function toggleHeaderOptionsMenu(e) {
         </button>
     `;
 
-    const btn = document.getElementById('headerOptionsBtn') || (e ? e.currentTarget : null);
+    const btn = (e && e.currentTarget) ? e.currentTarget : (document.getElementById('desktopHeaderOptionsBtn') || document.getElementById('headerOptionsBtn'));
     if (!btn) return;
 
     const btnRect = btn.getBoundingClientRect();
-    const menuWidth = window.innerWidth <= 480 ? 210 : 260;
+    const menuWidth = window.innerWidth <= 480 ? 210 : 240;
     const menuHeight = 180;
 
     let left = btnRect.right - menuWidth;
     let top = btnRect.bottom + 8;
 
-    if (left + menuWidth > window.innerWidth - 10) {
-        left = window.innerWidth - menuWidth - 10;
+    // Viewport bounding clamp
+    if (left + menuWidth > window.innerWidth - 12) {
+        left = window.innerWidth - menuWidth - 12;
     }
-    if (left < 10) left = 10;
-
-    if (top + menuHeight > window.innerHeight - 10) {
-        top = Math.max(10, btnRect.top - menuHeight - 6);
+    if (left < 12) {
+        left = 12;
     }
-    if (top < 10) top = 10;
 
-    menu.style.left = `${left}px`;
-    menu.style.top = `${top}px`;
+    if (top + menuHeight > window.innerHeight - 12) {
+        top = Math.max(12, btnRect.top - menuHeight - 8);
+    }
+    if (top < 12) {
+        top = 12;
+    }
+
+    menu.style.left = `${Math.round(left)}px`;
+    menu.style.top = `${Math.round(top)}px`;
+    menu.style.transformOrigin = 'top right';
     menu.classList.add('active');
     btn.classList.add('active');
 
@@ -1747,8 +1823,8 @@ function toggleHeaderOptionsMenu(e) {
 
 function handleHeaderShare() {
     const activeConvId = document.getElementById('activeConversationId')?.value || '';
-    const shareUrl = activeConvId 
-        ? `${window.location.origin}/?conversation_id=${encodeURIComponent(activeConvId)}`
+    const shareUrl = activeConvId
+        ? `${window.location.origin}/student/chat?conversation_id=${encodeURIComponent(activeConvId)}`
         : window.location.href;
 
     try {
@@ -1771,6 +1847,8 @@ function closeRecentChatMenu() {
     if (menu) menu.classList.remove('active');
     const headerBtn = document.getElementById('headerOptionsBtn');
     if (headerBtn) headerBtn.classList.remove('active');
+    const desktopHeaderBtn = document.getElementById('desktopHeaderOptionsBtn');
+    if (desktopHeaderBtn) desktopHeaderBtn.classList.remove('active');
     activeMenuSource = null;
 }
 
@@ -1828,7 +1906,7 @@ async function handleContextMenuAction(action) {
             const res = await fetch(`/chat/${encodeURIComponent(convId)}`);
             const data = await res.json();
             const messages = data.messages || [];
-            
+
             const files = [];
             messages.forEach(m => {
                 if (m.image_path) {
@@ -2042,7 +2120,7 @@ async function submitDeleteChat(convId) {
 // Global click and keydown listeners for closing context menu
 document.addEventListener('click', function(e) {
     const menu = document.getElementById('chatContextMenu');
-    if (menu && menu.classList.contains('active') && !menu.contains(e.target) && !e.target.closest('.recent-item-options-btn') && !e.target.closest('#headerOptionsBtn')) {
+    if (menu && menu.classList.contains('active') && !menu.contains(e.target) && !e.target.closest('.recent-item-options-btn') && !e.target.closest('#headerOptionsBtn') && !e.target.closest('#desktopHeaderOptionsBtn')) {
         closeRecentChatMenu();
     }
 });
