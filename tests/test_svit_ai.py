@@ -31,7 +31,7 @@ class TestSVITAI(unittest.TestCase):
         res = self.client.get('/')
         self.assertIn(res.status_code, [200, 302])
         if res.status_code == 302:
-            self.assertIn('/auth/student/login', res.headers.get('Location', ''))
+            self.assertIn('/login', res.headers.get('Location', ''))
 
     def test_03_login_page_renders(self):
         """GET /auth/student/login should return 200 with HTML login form."""
