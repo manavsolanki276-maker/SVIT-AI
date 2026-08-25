@@ -110,9 +110,9 @@ def get_mongodb_client() -> Optional[MongoClient]:
         "maxPoolSize": 5,
         "minPoolSize": 0,
         "maxIdleTimeMS": 30000,
-        "serverSelectionTimeoutMS": 3000,
-        "connectTimeoutMS": 3000,
-        "socketTimeoutMS": 5000,
+        "serverSelectionTimeoutMS": 8000,
+        "connectTimeoutMS": 8000,
+        "socketTimeoutMS": 10000,
         "retryWrites": True,
         "appname": "SVIT-AI-Assistant"
     }
