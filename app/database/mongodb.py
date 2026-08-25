@@ -37,6 +37,34 @@ def get_last_error() -> Optional[str]:
     return _last_mongo_error
 
 
+import urllib.parse
+
+
+def format_mongo_uri(raw_uri: str) -> str:
+    """
+    Safely sanitizes and URL-encodes raw username and password in a MongoDB URI
+    to ensure compliance with RFC 3986 and prevent ConfigurationError.
+    """
+    if not raw_uri:
+        return ''
+    uri = raw_uri.strip().strip('\'"')
+    for prefix in ('mongodb+srv://', 'mongodb://'):
+        if uri.startswith(prefix):
+            scheme = prefix
+            rest = uri[len(prefix):]
+            if '@' in rest:
+                creds, host = rest.rsplit('@', 1)
+                if ':' in creds:
+                    u, p = creds.split(':', 1)
+                    clean_u = urllib.parse.quote_plus(urllib.parse.unquote(u))
+                    clean_p = urllib.parse.quote_plus(urllib.parse.unquote(p))
+                    return f"{scheme}{clean_u}:{clean_p}@{host}"
+                else:
+                    clean_u = urllib.parse.quote_plus(urllib.parse.unquote(creds))
+                    return f"{scheme}{clean_u}@{host}"
+    return uri
+
+
 def get_mongodb_uri() -> str:
     """Retrieves MongoDB connection URI from environment variables."""
     uri = (
@@ -48,7 +76,7 @@ def get_mongodb_uri() -> str:
         if db_url.startswith(('mongodb://', 'mongodb+srv://')):
             uri = db_url
     if uri:
-        uri = uri.strip().strip('\'"')
+        uri = format_mongo_uri(uri)
     return uri
 
 
