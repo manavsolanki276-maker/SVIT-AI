@@ -655,6 +655,19 @@ def initialize_datasets_if_needed(project_root: Optional[str] = None):
     if _IS_INITIALIZED:
         return
 
+    # Fast-path check: If MongoDB is connected and already has seeded collections, skip expensive scans
+    try:
+        notices_coll = get_collection("notices")
+        if notices_coll is not None:
+            try:
+                if notices_coll.estimated_document_count() > 0:
+                    _IS_INITIALIZED = True
+                    return
+            except Exception:
+                pass
+    except Exception:
+        pass
+
     if not project_root:
         project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 

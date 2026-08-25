@@ -225,12 +225,17 @@ def seed_admin_accounts(app=None) -> Dict[str, int]:
             pass
         logger.warning(f"[Seed] SQLite admin seeding notice: {e}")
 
-    # 3. Seed MongoDB Admins (if Mongo is connected)
+    # 3. Seed MongoDB Admins (if Mongo is connected and not yet populated)
     try:
-        from app.database.mongodb import get_collection, is_mongodb_connected
-        if is_mongodb_connected():
-            coll = get_collection('admins')
-            if coll is not None:
+        from app.database.mongodb import get_collection
+        coll = get_collection('admins')
+        if coll is not None:
+            doc_count = 0
+            try:
+                doc_count = coll.estimated_document_count()
+            except Exception:
+                pass
+            if doc_count < len(DEFAULT_ADMIN_ACCOUNTS):
                 for acc in DEFAULT_ADMIN_ACCOUNTS:
                     doc = dict(acc)
                     pwd = doc.pop("password")
