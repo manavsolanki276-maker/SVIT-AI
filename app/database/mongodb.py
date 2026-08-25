@@ -101,12 +101,12 @@ def get_mongodb_client() -> Optional[MongoClient]:
             _mongo_client = None
 
     client_kwargs = {
-        "maxPoolSize": 10,
+        "maxPoolSize": 5,
         "minPoolSize": 0,
         "maxIdleTimeMS": 30000,
-        "serverSelectionTimeoutMS": 10000,
-        "connectTimeoutMS": 10000,
-        "socketTimeoutMS": 20000,
+        "serverSelectionTimeoutMS": 3000,
+        "connectTimeoutMS": 3000,
+        "socketTimeoutMS": 5000,
         "retryWrites": True,
         "appname": "SVIT-AI-Assistant"
     }
