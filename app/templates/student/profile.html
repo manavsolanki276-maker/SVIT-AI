@@ -15,17 +15,9 @@
             width: 100%;
             overflow-y: auto;
             flex: 1;
+            box-sizing: border-box;
         }
-        @media (max-width: 768px) {
-            .profile-container {
-                padding: 60px 16px 32px 16px;
-            }
-        }
-        @media (max-width: 375px) {
-            .profile-container {
-                padding: 56px 12px 24px 12px;
-            }
-        }
+
         .profile-card {
             background: #ffffff;
             border-radius: 16px;
@@ -33,7 +25,10 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             padding: 32px;
             margin-bottom: 24px;
+            box-sizing: border-box;
+            width: 100%;
         }
+
         .profile-header-box {
             display: flex;
             align-items: center;
@@ -41,23 +36,45 @@
             padding-bottom: 24px;
             border-bottom: 1px solid #f1f5f9;
             margin-bottom: 24px;
+            gap: 16px;
         }
+
         .profile-user-intro {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 16px;
         }
+
+        .profile-avatar-circle {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 3px 12px rgba(99, 102, 241, 0.28);
+        }
+
         .profile-title-info h2 {
-            margin: 0 0 6px 0;
+            margin: 0 0 4px 0;
             font-size: 1.55rem;
             color: #0f172a;
             font-weight: 700;
+            line-height: 1.25;
         }
+
         .profile-title-info p {
             margin: 0;
             color: #64748b;
             font-size: 0.95rem;
+            line-height: 1.35;
         }
+
         .profile-status-badge {
             display: inline-flex;
             align-items: center;
@@ -68,8 +85,9 @@
             border-radius: 20px;
             font-size: 0.85rem;
             font-weight: 600;
+            flex-shrink: 0;
         }
-        
+
         /* Stats / Info chips */
         .info-chips-grid {
             display: grid;
@@ -77,6 +95,7 @@
             gap: 16px;
             margin-bottom: 28px;
         }
+
         .info-chip-card {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
@@ -86,6 +105,7 @@
             flex-direction: column;
             gap: 4px;
         }
+
         .info-chip-card .chip-label {
             font-size: 0.8rem;
             text-transform: uppercase;
@@ -93,10 +113,12 @@
             color: #64748b;
             font-weight: 600;
         }
+
         .info-chip-card .chip-value {
             font-size: 1.05rem;
             color: #1e293b;
             font-weight: 600;
+            word-break: break-word;
         }
 
         .section-heading {
@@ -114,19 +136,23 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
         }
+
         .form-group {
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
+
         .form-group.full-width {
             grid-column: span 2;
         }
+
         .form-group label {
             font-size: 0.88rem;
             font-weight: 600;
             color: #334155;
         }
+
         .form-group input, .form-group select {
             padding: 11px 14px;
             border: 1px solid #cbd5e1;
@@ -136,22 +162,28 @@
             color: #1e293b;
             outline: none;
             transition: all 0.2s ease;
+            box-sizing: border-box;
+            width: 100%;
         }
+
         .form-group input:focus, .form-group select:focus {
             border-color: #4f46e5;
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
+
         .form-group input[readonly] {
             background: #f1f5f9;
             color: #64748b;
             cursor: not-allowed;
         }
+
         .profile-btn-row {
             margin-top: 28px;
             display: flex;
             justify-content: flex-end;
             gap: 12px;
         }
+
         .btn-save {
             background: #4f46e5;
             color: #ffffff;
@@ -166,13 +198,16 @@
             gap: 8px;
             transition: background 0.2s ease;
         }
+
         .btn-save:hover {
             background: #4338ca;
         }
+
         .btn-save:disabled {
             background: #94a3b8;
             cursor: not-allowed;
         }
+
         .alert-success {
             padding: 14px 18px;
             background: #dcfce7;
@@ -182,6 +217,144 @@
             display: none;
             border: 1px solid #86efac;
             font-weight: 500;
+        }
+
+        /* ================= MOBILE APP-LIKE RESPONSIVE VIEW (<= 768px) ================= */
+        @media (max-width: 768px) {
+            .profile-container {
+                padding: 56px 16px 28px 16px;
+                max-width: 100%;
+            }
+
+            .profile-card {
+                padding: 22px 16px;
+                border-radius: 16px;
+                margin-bottom: 16px;
+                border: 1px solid #e2e8f0;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            }
+
+            .profile-header-box {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 12px;
+                padding-bottom: 20px;
+                margin-bottom: 20px;
+            }
+
+            .profile-user-intro {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 10px;
+            }
+
+            .profile-avatar-circle {
+                width: 72px;
+                height: 72px;
+                font-size: 24px;
+                box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+            }
+
+            .profile-title-info h2 {
+                font-size: 1.45rem;
+                text-align: center;
+            }
+
+            .profile-title-info p {
+                font-size: 0.9rem;
+                text-align: center;
+                color: #64748b;
+            }
+
+            .profile-status-badge {
+                margin-top: 2px;
+            }
+
+            .info-chips-grid {
+                grid-template-columns: 1fr !important;
+                gap: 8px;
+                margin-bottom: 22px;
+            }
+
+            .info-chip-card {
+                padding: 12px 16px;
+                border-radius: 12px;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .info-chip-card .chip-label {
+                font-size: 0.82rem;
+                color: #64748b;
+            }
+
+            .info-chip-card .chip-value {
+                font-size: 0.95rem;
+                color: #1e293b;
+                font-weight: 600;
+                text-align: right;
+            }
+
+            .section-heading {
+                font-size: 1.1rem;
+                margin-bottom: 14px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr !important;
+                gap: 14px;
+            }
+
+            .form-group.full-width {
+                grid-column: span 1 !important;
+            }
+
+            .form-group input, .form-group select {
+                padding: 12px 14px;
+                border-radius: 10px;
+                font-size: 14px;
+            }
+
+            .profile-btn-row {
+                margin-top: 22px;
+                width: 100%;
+            }
+
+            .btn-save {
+                width: 100%;
+                justify-content: center;
+                padding: 14px 20px;
+                font-size: 15px;
+                border-radius: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .profile-container {
+                padding: 52px 12px 20px 12px;
+            }
+
+            .profile-card {
+                padding: 18px 12px;
+                border-radius: 14px;
+            }
+
+            .profile-avatar-circle {
+                width: 66px;
+                height: 66px;
+                font-size: 22px;
+            }
+
+            .profile-title-info h2 {
+                font-size: 1.3rem;
+            }
+
+            .profile-title-info p {
+                font-size: 0.85rem;
+            }
         }
     </style>
 </head>
@@ -217,7 +390,12 @@
                     </div>
                 </a>
                 <div class="sidebar-header-actions">
-                    <button type="button" class="sidebar-icon-btn" id="sidebarCollapseBtn" title="Collapse Sidebar" onclick="toggleSidebarCollapse()">
+                    <!-- Mobile Close Button -->
+                    <button type="button" class="sidebar-icon-btn mobile-drawer-close-btn" id="mobileDrawerCloseBtn" title="Close Menu" onclick="toggleMobileSidebar(false)">
+                        <i data-lucide="x"></i>
+                    </button>
+                    <!-- Desktop Collapse Button -->
+                    <button type="button" class="sidebar-icon-btn desktop-collapse-btn" id="sidebarCollapseBtn" title="Collapse Sidebar" onclick="toggleSidebarCollapse()">
                         <i data-lucide="panel-left-close"></i>
                     </button>
                 </div>
@@ -228,8 +406,28 @@
                 <!-- + New Chat Button -->
                 <a href="/" class="nav-item new-chat-btn" title="Start New Chat">
                     <i data-lucide="plus"></i>
-                    <span>New Chat</span>
+                    <span>+ New Chat</span>
                 </a>
+
+                <!-- Core Navigation Menu Links (Visible in Expanded & Mobile Drawer) -->
+                <div class="sidebar-menu-links">
+                    <a href="/student/chat" class="sidebar-menu-link" id="menuChatLink" title="Student Chat" onclick="toggleMobileSidebar(false);">
+                        <i data-lucide="message-square"></i>
+                        <span>Student Chat</span>
+                    </a>
+                    <a href="/student/profile/" class="sidebar-menu-link active" id="menuProfileLink" title="Student Profile" onclick="toggleMobileSidebar(false);">
+                        <i data-lucide="user"></i>
+                        <span>👤 Profile</span>
+                    </a>
+                    <a href="/chat/history-page" class="sidebar-menu-link" id="menuHistoryLink" title="Chat History" onclick="toggleMobileSidebar(false);">
+                        <i data-lucide="history"></i>
+                        <span>Chat History</span>
+                    </a>
+                    <a href="/auth/logout" class="sidebar-menu-link exit-chat-link" id="menuExitLink" title="Exit Chat" onclick="toggleMobileSidebar(false);">
+                        <i data-lucide="log-out"></i>
+                        <span>🏠 Exit Chat</span>
+                    </a>
+                </div>
 
                 <!-- Collapsed Icon Rail Navigation (ChatGPT Style) -->
                 <div class="sidebar-rail-nav" id="sidebarRailNav">
@@ -248,7 +446,7 @@
             <!-- 3. Recents Section (Clean, Scrollable with Subtle Divider) -->
             <div class="sidebar-recents-section">
                 <div class="recents-header">
-                    <span>Recents</span>
+                    <span>RECENTS</span>
                 </div>
                 <div class="recents-list" id="sidebarRecentList">
                     <div class="recents-loading">
@@ -256,6 +454,10 @@
                         <span>Loading chats...</span>
                     </div>
                 </div>
+                <a href="/chat/history-page" class="drawer-view-all-chats-btn" onclick="toggleMobileSidebar(false)">
+                    <i data-lucide="message-circle"></i>
+                    <span>View All Chats &gt;</span>
+                </a>
             </div>
 
             <!-- 4. Sidebar Bottom: Student User Card & Logout -->
@@ -277,10 +479,26 @@
 
         <!-- Main Content Area -->
         <div class="main-wrapper">
-            <!-- Floating Mobile Sidebar Toggle Button -->
-            <button type="button" class="mobile-floating-toggle" id="mobileSidebarToggle" onclick="toggleMobileSidebar()" title="Toggle Menu">
-                <i data-lucide="menu"></i>
-            </button>
+            <!-- Mobile Dedicated Top Bar (Visible only on <= 768px) -->
+            <header class="mobile-top-bar" id="mobileTopBar">
+                <button type="button" class="mobile-hamburger-btn" id="mobileSidebarToggle" onclick="toggleMobileSidebar()" aria-label="Open navigation menu">
+                    <i data-lucide="menu"></i>
+                </button>
+                <div class="mobile-brand-title">
+                    <div class="mobile-brand-icon">
+                        <img src="{{ url_for('static', filename='logo/svit logo u.png') }}" alt="SVIT Logo" class="mobile-logo-img">
+                    </div>
+                    <div class="mobile-brand-text-wrap">
+                        <span class="mobile-brand-name">SVIT AI</span>
+                        <span class="mobile-brand-sub">Profile</span>
+                    </div>
+                </div>
+                <div class="mobile-top-actions">
+                    <a href="/student/chat" class="mobile-action-btn" aria-label="Back to Chat" title="Back to Chat">
+                        <i data-lucide="message-square"></i>
+                    </a>
+                </div>
+            </header>
 
             <!-- Profile View & Edit Content -->
             <main class="profile-container">
@@ -293,9 +511,12 @@
                 <div class="profile-card">
                     <div class="profile-header-box">
                         <div class="profile-user-intro">
+                            <div class="profile-avatar-circle">
+                                <span>{{ (s_name or 'Student')[:2]|upper }}</span>
+                            </div>
                             <div class="profile-title-info">
                                 <h2 id="headerFullName">{{ s_name }}</h2>
-                                <p id="headerDeptSem"><span id="headerProgText">{{ s_prog }}</span> &bull; <span id="headerDeptText">{{ s_dept }}</span> &bull; Semester {{ s_sem }} (Div {{ s_div }})</p>
+                                <p id="headerDeptSem"><span id="headerProgText">{{ s_prog }}</span> &bull; <span id="headerDeptText">{{ s_dept }}</span></p>
                             </div>
                         </div>
                         <div class="profile-status-badge">
@@ -487,7 +708,7 @@
         // Handle AJAX Profile Update
         document.getElementById('profileEditForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const btnSave = document.getElementById('btnSave');
             btnSave.disabled = true;
             btnSave.querySelector('span').innerText = 'Saving Changes...';
@@ -519,14 +740,14 @@
                     body: JSON.stringify(payload)
                 });
                 const data = await res.json();
-                
+
                 if (res.ok && data.status === 'success') {
                     // Update header texts across the entire interface immediately
                     document.getElementById('headerFullName').innerText = fullNameVal;
                     document.getElementById('headerProgText').innerText = programVal;
                     document.getElementById('headerDeptText').innerText = deptVal;
                     document.getElementById('headerDeptSem').innerText = `${programVal} • ${deptVal} • Semester ${semesterVal} (Div ${divisionVal})`;
-                    
+
                     const topHeaderName = document.getElementById('topHeaderFullName');
                     if (topHeaderName) topHeaderName.innerText = fullNameVal;
 

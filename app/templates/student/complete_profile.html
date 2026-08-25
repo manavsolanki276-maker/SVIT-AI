@@ -121,13 +121,29 @@
             font-size: 0.9rem;
             border: 1px solid #fecaca;
         }
+        @media (max-width: 640px) {
+            .onboarding-wrapper {
+                padding: 16px 12px;
+            }
+            .onboarding-card {
+                padding: 24px 16px;
+                border-radius: 12px;
+            }
+            .form-grid {
+                grid-template-columns: 1fr !important;
+                gap: 12px;
+            }
+            .form-group.full-width {
+                grid-column: span 1 !important;
+            }
+        }
     </style>
 </head>
 <body>
 
     <div class="onboarding-wrapper">
         <div class="onboarding-card">
-            
+
             <div class="onboarding-header">
                 <div class="onboarding-icon">
                     <img src="{{ url_for('static', filename='logo/svit logo u.png') }}" alt="SVIT Logo" class="onboarding-logo-img">
@@ -144,7 +160,7 @@
 
             <form method="POST" action="/student/profile/complete">
                 <div class="form-grid">
-                    
+
                     <div class="form-group full-width">
                         <label for="full_name">Full Name</label>
                         <input type="text" id="full_name" name="full_name" value="{{ current_user.full_name or current_user.name or '' }}" placeholder="e.g. Manav Solanki" required>
