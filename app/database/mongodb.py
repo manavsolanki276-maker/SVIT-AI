@@ -16,6 +16,12 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
+try:
+    import certifi
+    CA_FILE = certifi.where()
+except Exception:
+    CA_FILE = None
+
 # Global singleton client and database instances
 _mongo_client: Optional[MongoClient] = None
 _mongo_db: Optional[Database] = None
@@ -31,6 +37,8 @@ def get_mongodb_uri() -> str:
         db_url = os.environ.get('DATABASE_URL', '').strip()
         if db_url.startswith(('mongodb://', 'mongodb+srv://')):
             uri = db_url
+    if uri:
+        uri = uri.strip().strip('\'"')
     return uri
 
 
@@ -45,29 +53,53 @@ def get_mongodb_client() -> Optional[MongoClient]:
     if not uri:
         return None
 
-    if _mongo_client is None:
+    if _mongo_client is not None:
         try:
-            logger.info("[MongoDB] Initializing pooled MongoClient for serverless execution...")
-            _mongo_client = MongoClient(
-                uri,
-                maxPoolSize=10,
-                minPoolSize=0,
-                maxIdleTimeMS=30000,
-                serverSelectionTimeoutMS=4000,
-                connectTimeoutMS=4000,
-                socketTimeoutMS=10000,
-                retryWrites=True,
-                appname="SVIT-AI-Assistant"
-            )
-            # Quick ping to verify connectivity
             _mongo_client.admin.command('ping')
-            logger.info("[MongoDB] Successfully connected to MongoDB Atlas.")
-        except Exception as e:
-            logger.warning(f"[MongoDB] Connection failed: {e}")
+            return _mongo_client
+        except Exception:
             _mongo_client = None
-            return None
 
-    return _mongo_client
+    client_kwargs = {
+        "maxPoolSize": 10,
+        "minPoolSize": 0,
+        "maxIdleTimeMS": 30000,
+        "serverSelectionTimeoutMS": 10000,
+        "connectTimeoutMS": 10000,
+        "socketTimeoutMS": 20000,
+        "retryWrites": True,
+        "appname": "SVIT-AI-Assistant"
+    }
+
+    if CA_FILE and os.path.exists(CA_FILE):
+        client_kwargs["tlsCAFile"] = CA_FILE
+
+    # Attempt 1: Standard connection with certifi CA bundle
+    try:
+        logger.info("[MongoDB] Initializing pooled MongoClient for serverless execution...")
+        client = MongoClient(uri, **client_kwargs)
+        client.admin.command('ping')
+        _mongo_client = client
+        logger.info("[MongoDB] Successfully connected to MongoDB Atlas.")
+        return _mongo_client
+    except Exception as e:
+        logger.warning(f"[MongoDB] Initial connection attempt failed: {e}")
+
+    # Attempt 2: Fallback with tlsAllowInvalidCertificates if environment certificate store fails
+    try:
+        logger.info("[MongoDB] Retrying connection with fallback TLS options...")
+        fallback_kwargs = dict(client_kwargs)
+        fallback_kwargs.pop("tlsCAFile", None)
+        fallback_kwargs["tlsAllowInvalidCertificates"] = True
+        client = MongoClient(uri, **fallback_kwargs)
+        client.admin.command('ping')
+        _mongo_client = client
+        logger.info("[MongoDB] Connected to MongoDB Atlas with fallback TLS.")
+        return _mongo_client
+    except Exception as e:
+        logger.error(f"[MongoDB] All connection attempts failed: {e}")
+        _mongo_client = None
+        return None
 
 
 def get_mongodb_db(db_name: str = "svit_ai") -> Optional[Database]:
