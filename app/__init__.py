@@ -27,8 +27,8 @@ def create_app():
 
     # Database setup
     base_dir = os.path.abspath(os.path.dirname(__file__))
-    db_url = os.environ.get('DATABASE_URL')
-    if db_url:
+    db_url = os.environ.get('DATABASE_URL', '').strip()
+    if db_url and not db_url.startswith(('mongodb://', 'mongodb+srv://')):
         if db_url.startswith('postgres://'):
             db_url = db_url.replace('postgres://', 'postgresql://', 1)
         app.config['SQLALCHEMY_DATABASE_URI'] = db_url

@@ -4,8 +4,8 @@ import tempfile
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'svit-super-secret-key'
     
-    _db_url = os.environ.get('DATABASE_URL')
-    if _db_url:
+    _db_url = os.environ.get('DATABASE_URL', '').strip()
+    if _db_url and not _db_url.startswith(('mongodb://', 'mongodb+srv://')):
         if _db_url.startswith('postgres://'):
             _db_url = _db_url.replace('postgres://', 'postgresql://', 1)
         SQLALCHEMY_DATABASE_URI = _db_url

@@ -20,7 +20,15 @@ _mongo_db: Optional[Database] = None
 
 def get_mongodb_uri() -> str:
     """Retrieves MongoDB connection URI from environment variables."""
-    return os.environ.get('MONGODB_URI', '').strip()
+    uri = (
+        os.environ.get('MONGODB_URI', '').strip() or
+        os.environ.get('MONGO_URI', '').strip()
+    )
+    if not uri:
+        db_url = os.environ.get('DATABASE_URL', '').strip()
+        if db_url.startswith(('mongodb://', 'mongodb+srv://')):
+            uri = db_url
+    return uri
 
 
 def get_mongodb_client() -> Optional[MongoClient]:
