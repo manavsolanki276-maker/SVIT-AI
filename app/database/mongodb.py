@@ -5,6 +5,7 @@ Designed for serverless execution with connection pooling, lazy client initializ
 and graceful fallback when MONGODB_URI is not set.
 """
 import os
+import re
 import logging
 from typing import Optional
 from dotenv import load_dotenv
