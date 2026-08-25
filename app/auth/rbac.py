@@ -245,11 +245,9 @@ def _unauthorized_response(message: str = "Authentication required.", status_cod
     try:
         if 'auth.login' in getattr(current_app, 'view_functions', {}):
             return redirect(url_for('auth.login', next=request.url))
-        if 'admin.login' in getattr(current_app, 'view_functions', {}):
-            return redirect(url_for('admin.login', next=request.url))
     except Exception:
         pass
-    return redirect('/auth/login')
+    return redirect('/login')
 
 
 def _forbidden_response(message: str = "403 Forbidden: You do not have permission to access this resource."):

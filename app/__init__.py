@@ -211,7 +211,17 @@ def create_app():
             # Render chat page directly without an intermediate 302 bounce
             return render_template('student/chat.html')
 
-        return redirect(url_for('auth.student_login'))
+        return redirect(url_for('auth.login'))
+
+    @app.route('/login', methods=['GET', 'POST'])
+    def root_login():
+        from app.routes.auth import student_login
+        return student_login()
+
+    @app.route('/logout', methods=['GET', 'POST'])
+    def root_logout():
+        from app.routes.auth import logout
+        return logout()
 
     @app.errorhandler(403)
     def handle_403(e):

@@ -66,15 +66,21 @@ def is_safe_url(target: str) -> bool:
 def login():
     """
     Admin Login Endpoint.
-    Supports both HTML form and JSON API submissions.
-    Allows login via Username OR Email (case-insensitive).
-    Enforces active account check, password hash verification, and last_login tracking.
+    Redirects GET requests directly to unified /login.
+    Supports JSON API submissions for backwards-compatible test suites.
     """
     # 1. If already logged in as active admin on GET request, redirect straight to dashboard
     if request.method == 'GET' and current_user.is_authenticated and getattr(current_user, 'is_admin', False) and getattr(current_user, 'is_active', True):
         return redirect(url_for('admin.dashboard'))
 
-    # 2. Auto-login shortcut only in explicit dev mode
+    # 2. Redirect all browser GET requests to the unified login page
+    if request.method == 'GET':
+        next_page = request.args.get('next')
+        if next_page:
+            return redirect(url_for('auth.login', next=next_page))
+        return redirect(url_for('auth.login'))
+
+    # 3. Auto-login shortcut only in explicit dev mode
     if current_app.config.get('AUTO_LOGIN_DEV'):
         admin = Admin.query.filter_by(username='superadmin').first() or Admin.query.filter_by(username='admin').first()
         if admin and admin.is_active:
@@ -100,7 +106,7 @@ def login():
             if is_json_req:
                 return jsonify({"status": "error", "error": "Bad Request", "message": msg}), 400
             flash(msg, 'error')
-            return render_template('admin/login.html')
+            return redirect(url_for('auth.login'))
 
         # ----------------------------------------------------
         # FIND ADMIN: Try MongoDB first, fallback to SQLite
@@ -125,7 +131,7 @@ def login():
             if is_json_req:
                 return jsonify({"status": "error", "error": "Unauthorized", "message": msg}), 401
             flash(msg, 'error')
-            return render_template('admin/login.html')
+            return redirect(url_for('auth.login'))
 
         if not getattr(admin_user, 'is_active', True):
             msg = "Account is disabled. Please contact the Super Administrator."
@@ -137,14 +143,14 @@ def login():
                     "account_status": "disabled"
                 }), 403
             flash(msg, 'error')
-            return render_template('admin/login.html')
+            return redirect(url_for('auth.login'))
 
         if not hasattr(admin_user, 'check_password') or not admin_user.check_password(password):
             msg = "Invalid admin credentials. Incorrect password."
             if is_json_req:
                 return jsonify({"status": "error", "error": "Unauthorized", "message": msg}), 401
             flash(msg, 'error')
-            return render_template('admin/login.html')
+            return redirect(url_for('auth.login'))
 
         login_user(admin_user, remember=remember)
         if hasattr(admin_user, 'update_last_login'):
@@ -172,7 +178,7 @@ def login():
         flash(f"Welcome back, {getattr(admin_user, 'name', 'Admin')}!", "success")
         return redirect(url_for('admin.dashboard'))
 
-    return render_template('admin/login.html')
+    return redirect(url_for('auth.login'))
 
 
 @admin_bp.route('/logout', methods=['GET', 'POST'])
@@ -188,7 +194,7 @@ def logout():
         }), 200
 
     flash('You have been logged out successfully.', 'info')
-    return redirect(url_for('admin.login'))
+    return redirect(url_for('auth.login'))
 
 
 @admin_bp.route('/dev-login')
@@ -196,13 +202,13 @@ def dev_login():
     """Shortcut route for testing in dev environments."""
     if not current_app.debug and not current_app.config.get('AUTO_LOGIN_DEV'):
         flash("Dev login is disabled in production.", "error")
-        return redirect(url_for('admin.login'))
+        return redirect(url_for('auth.login'))
 
     admin = Admin.query.filter_by(username='superadmin').first() or Admin.query.filter_by(username='admin').first()
     if admin and admin.is_active:
         login_user(admin, remember=True)
         return redirect(url_for('admin.dashboard'))
-    return redirect(url_for('admin.login'))
+    return redirect(url_for('auth.login'))
 
 
 # =========================================================================

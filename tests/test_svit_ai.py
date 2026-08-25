@@ -40,9 +40,10 @@ class TestSVITAI(unittest.TestCase):
         self.assertIn(b'SVIT', res.data)
 
     def test_04_admin_login_page_renders(self):
-        """GET /admin/login should return 200."""
+        """GET /admin/login should redirect to unified /login."""
         res = self.client.get('/admin/login')
-        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.status_code, 302)
+        self.assertIn('/login', res.headers.get('Location'))
 
     def test_05_static_file_accessible(self):
         """Verify static files directory is mapped and accessible."""
