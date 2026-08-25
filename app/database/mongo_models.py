@@ -153,13 +153,17 @@ class MongoAdmin(UserMixin):
         self.password_hash = str(doc.get('password_hash', ''))
         self.role = normalize_role(doc.get('role', ROLE_SUPER_ADMIN))
         self.department = doc.get('department', '')
-        self.is_active = bool(doc.get('is_active', True))
+        self._is_active = bool(doc.get('is_active', True))
         self.created_at = doc.get('created_at')
         self.updated_at = doc.get('updated_at')
         self.last_login = doc.get('last_login')
 
     def get_id(self) -> str:
         return f"admin_{self.id}"
+
+    @property
+    def is_active(self) -> bool:
+        return self._is_active
 
     @property
     def is_admin(self) -> bool:
