@@ -233,20 +233,30 @@ class RAGPipeline:
             if not sources:
                 sources = ["timetable.csv"]
 
-        # Option B: Notices (Personalized)
+        # Option B: Notices / Circulars / Exam Rules (Personalized + Admin Uploads)
         elif is_notice:
-            intent_category = "notices"
+            intent_category = "notice"
             context = process_notice_context([], question, user_profile=user_profile)
-            if "notices.csv (Row" not in context:
-                retrieved_docs = retrieve_context_tiered(
-                    self.vector_store,
-                    question,
-                    source_weights=[("notices.csv", 1.0)],
-                    top_k=top_k
-                )
+            retrieved_docs = retrieve_context_tiered(
+                self.vector_store,
+                question,
+                source_weights=[("notices.csv", 1.0)],
+                top_k=top_k
+            )
+            admin_snippets = [doc.page_content for doc, _ in retrieved_docs if doc.metadata.get('source_type') == 'admin_document']
+            if admin_snippets:
+                context = "\n\n---\n\n".join(admin_snippets) + ("\n\n" + context if context else "")
+            elif "notices.csv (Row" not in context:
                 context = process_notice_context(retrieved_docs, question, user_profile=user_profile)
 
-            sources = re.findall(r'notices\.csv \(Row \d+\)', context)
+            for doc, _ in retrieved_docs:
+                if doc.metadata.get('source_type') == 'admin_document':
+                    doc_src = doc.metadata.get('source') or doc.metadata.get('document_name') or 'Official Document'
+                    page_num = doc.metadata.get('page_number', 1)
+                    sources.append(f"{doc_src} (Page {page_num})")
+
+            csv_sources = re.findall(r'notices\.csv \(Row \d+\)', context)
+            sources.extend(csv_sources)
             if not sources:
                 sources = ["notices.csv"]
 
@@ -271,16 +281,26 @@ class RAGPipeline:
         elif is_events:
             intent_category = "events"
             context = process_events_context(question)
-            if "events.csv (Row" not in context:
-                retrieved_docs = retrieve_context_tiered(
-                    self.vector_store,
-                    question,
-                    source_weights=[("events.csv", 1.0)],
-                    top_k=top_k
-                )
+            retrieved_docs = retrieve_context_tiered(
+                self.vector_store,
+                question,
+                source_weights=[("events.csv", 1.0)],
+                top_k=top_k
+            )
+            admin_snippets = [doc.page_content for doc, _ in retrieved_docs if doc.metadata.get('source_type') == 'admin_document']
+            if admin_snippets:
+                context = "\n\n---\n\n".join(admin_snippets) + ("\n\n" + context if context else "")
+            elif "events.csv (Row" not in context:
                 context = "\n\n---\n\n".join([doc.page_content for doc, _ in retrieved_docs])
 
-            sources = re.findall(r'events\.csv \(Row \d+\)', context)
+            for doc, _ in retrieved_docs:
+                if doc.metadata.get('source_type') == 'admin_document':
+                    doc_src = doc.metadata.get('source') or doc.metadata.get('document_name') or 'Official Document'
+                    page_num = doc.metadata.get('page_number', 1)
+                    sources.append(f"{doc_src} (Page {page_num})")
+
+            csv_sources = re.findall(r'events\.csv \(Row \d+\)', context)
+            sources.extend(csv_sources)
             if not sources:
                 sources = ["events.csv"]
 
@@ -315,10 +335,15 @@ class RAGPipeline:
 
             seen = set()
             for doc, score in results:
-                src = (
-                    f"{doc.metadata.get('source', 'Unknown')} "
-                    f"(Row {doc.metadata.get('row', 'N/A')})"
-                )
+                if doc.metadata.get('source_type') == 'admin_document' or 'page_number' in doc.metadata:
+                    doc_src = doc.metadata.get('source') or doc.metadata.get('document_name') or 'Official Document'
+                    page_num = doc.metadata.get('page_number', 1)
+                    src = f"{doc_src} (Page {page_num})"
+                else:
+                    src = (
+                        f"{doc.metadata.get('source', 'Unknown')} "
+                        f"(Row {doc.metadata.get('row', 'N/A')})"
+                    )
                 if src not in seen:
                     seen.add(src)
                     sources.append(src)

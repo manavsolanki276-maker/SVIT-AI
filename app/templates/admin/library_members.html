@@ -1,0 +1,165 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}Library Members{% endblock %}
+{% block header_title %}Library Administration: Card Members{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/library_members.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6 text-white">
+
+    <!-- Header Hero Card -->
+    <div class="library-members-hero-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl">
+        <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-teal-600/20 border border-teal-500/30 flex items-center justify-center text-teal-400 flex-shrink-0">
+                <i data-lucide="id-card" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h2 class="text-lg font-bold text-white mb-0">Library Card Members</h2>
+                    <span id="membersCountBadge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">
+                        0 Members
+                    </span>
+                </div>
+                <p class="text-xs text-gray-400 mb-0 mt-0.5">Manage student and faculty barcode cards, borrowing quotas, and card activation status.</p>
+            </div>
+        </div>
+
+        <button id="openCreateMemberModalBtn" class="px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold shadow-lg shadow-teal-600/30 transition flex items-center gap-2 self-start sm:self-auto">
+            <i data-lucide="user-plus" class="w-4 h-4"></i> Issue Card
+        </button>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <div class="p-4 rounded-2xl bg-[#111827] border border-[#1F2937] flex flex-col sm:flex-row items-center justify-between gap-3 flex-wrap">
+        <div class="relative w-full sm:w-80">
+            <i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="memberSearchInput" placeholder="Search by name, card number, enrollment..." class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl pl-9 pr-3 py-2 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-teal-500 transition">
+        </div>
+
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+            <select id="memberTypeFilter" class="bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-teal-500">
+                <option value="">All Member Types</option>
+                <option value="Student">Students</option>
+                <option value="Faculty">Faculty & Staff</option>
+            </select>
+            <button id="refreshMembersBtn" class="p-2 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-400 hover:text-white" title="Refresh Members">
+                <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Members Table -->
+    <div class="rounded-2xl bg-[#111827] border border-[#1F2937] overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-dark-custom mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th>MEMBER NAME & CARD</th>
+                        <th>TYPE</th>
+                        <th>DEPARTMENT</th>
+                        <th>BORROWING QUOTA</th>
+                        <th>CURRENTLY ISSUED</th>
+                        <th>STATUS</th>
+                        <th class="text-end">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody id="membersTableBody">
+                    <tr>
+                        <td colspan="7" class="text-center py-10 text-gray-400 text-xs">
+                            <div class="w-5 h-5 border-2 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                            Loading library card members...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- ISSUE / EDIT MEMBER MODAL -->
+<div class="modal fade" id="memberFormModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-dark-content">
+            <div class="modal-header border-b border-[#1F2937] p-4">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="id-card" class="w-4 h-4 text-teal-400"></i>
+                    <h3 class="text-sm font-bold text-white mb-0" id="memberModalTitle">Issue Library Card</h3>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="memberForm" class="p-4 space-y-3.5 text-xs">
+                <input type="hidden" id="memberFormRecordId">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Card Barcode No. *</label>
+                        <input type="text" id="memberCardNoInput" required placeholder="e.g. LC-210410107001" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-teal-500 font-mono">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Member Full Name *</label>
+                        <input type="text" id="memberNameInput" required placeholder="Student or Faculty name" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-teal-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Member Type *</label>
+                        <select id="memberTypeSelect" required class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-teal-500">
+                            <option value="Student">Student</option>
+                            <option value="Faculty">Faculty</option>
+                            <option value="Staff">Staff</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Department</label>
+                        <select id="memberDeptSelect" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-teal-500">
+                            <option value="Computer Engineering">Computer Engineering</option>
+                            <option value="Information Technology">Information Technology</option>
+                            <option value="Electronics & Comm.">Electronics</option>
+                            <option value="Mechanical Eng.">Mechanical</option>
+                            <option value="Civil Eng.">Civil</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Max Books Quota</label>
+                        <input type="number" id="memberMaxBooksInput" value="3" min="1" max="10" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-teal-500">
+                    </div>
+                </div>
+
+                <div class="modal-footer border-t border-[#1F2937] pt-4 px-0 pb-0 flex justify-end gap-2">
+                    <button type="button" class="px-4 py-2 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs font-semibold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold shadow-lg shadow-teal-600/30">Save Member</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- DELETE MEMBER MODAL -->
+<div class="modal fade" id="memberDeleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content modal-dark-content text-center p-5 space-y-3">
+            <div class="w-12 h-12 rounded-full bg-red-600/20 text-red-400 border border-red-500/30 flex items-center justify-center mx-auto">
+                <i data-lucide="trash-2" class="w-6 h-6"></i>
+            </div>
+            <h4 class="text-sm font-bold text-white mb-1">Revoke Library Card?</h4>
+            <p class="text-xs text-gray-400 mb-0">
+                Are you sure you want to revoke membership card for <strong id="deleteMemberTargetId" class="text-white"></strong>?
+            </p>
+            <div class="pt-2 flex justify-center gap-2">
+                <button type="button" class="px-3.5 py-1.5 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmDeleteMemberBtn" class="px-4 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-semibold">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin/library_members.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,282 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}Faculty Management{% endblock %}
+{% block header_title %}Academic Administration: Faculty{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/faculty.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6 text-white">
+
+    <!-- Header Hero Card -->
+    <div class="faculty-hero-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl">
+        <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 flex-shrink-0">
+                <i data-lucide="user-check" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h2 class="text-lg font-bold text-white mb-0">Faculty Directory</h2>
+                    <span id="facultyCountBadge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                        0 Faculty
+                    </span>
+                </div>
+                <p class="text-xs text-gray-400 mb-0 mt-0.5">Manage professors, assistant professors, cabin locations, and academic subject allocations.</p>
+            </div>
+        </div>
+
+        <button id="openCreateFacultyModalBtn" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/30 transition flex items-center gap-2 self-start sm:self-auto">
+            <i data-lucide="user-plus" class="w-4 h-4"></i> Add Faculty
+        </button>
+    </div>
+
+    <!-- Search, Filter & View Mode Toolbar -->
+    <div class="p-4 rounded-2xl bg-[#111827] border border-[#1F2937] flex flex-col md:flex-row items-center justify-between gap-3 flex-wrap">
+        <div class="relative w-full md:w-80">
+            <i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="facultySearchInput" placeholder="Search by name, ID, subject, cabin..." class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl pl-9 pr-3 py-2 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition">
+        </div>
+
+        <div class="flex items-center gap-2 w-full md:w-auto flex-wrap">
+            <select id="facultyDeptFilter" class="bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-emerald-500">
+                <option value="">All Departments</option>
+                <option value="Computer Engineering">Computer Engineering</option>
+                <option value="Information Technology">Information Technology</option>
+                <option value="Electronics & Comm.">Electronics & Comm.</option>
+                <option value="Mechanical Eng.">Mechanical Eng.</option>
+                <option value="Civil Eng.">Civil Eng.</option>
+                <option value="Electrical Eng.">Electrical Eng.</option>
+                <option value="Applied Sciences & Humanities">Applied Sciences</option>
+            </select>
+
+            <select id="facultyDesigFilter" class="bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-emerald-500">
+                <option value="">All Designations</option>
+                <option value="Professor & Head">Professor & Head</option>
+                <option value="Professor">Professor</option>
+                <option value="Associate Professor">Associate Professor</option>
+                <option value="Assistant Professor">Assistant Professor</option>
+                <option value="Visiting Lecturer">Visiting Lecturer</option>
+            </select>
+
+            <!-- Toggle View Mode -->
+            <div class="flex items-center bg-[#0F172A] border border-[#1F2937] rounded-xl p-0.5">
+                <button id="viewTableToggleBtn" class="px-2.5 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-semibold" title="Table View">
+                    <i data-lucide="list" class="w-3.5 h-3.5"></i>
+                </button>
+                <button id="viewGridToggleBtn" class="px-2.5 py-1.5 rounded-lg text-gray-400 hover:text-white text-xs font-semibold" title="Grid Cards View">
+                    <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+
+            <button id="refreshFacultyBtn" class="p-2 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-400 hover:text-white" title="Refresh Table">
+                <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Table View -->
+    <div id="facultyTableView" class="rounded-2xl bg-[#111827] border border-[#1F2937] overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-dark-custom mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th>FACULTY ID</th>
+                        <th>NAME & QUALIFICATION</th>
+                        <th>DEPARTMENT</th>
+                        <th>DESIGNATION</th>
+                        <th>PRIMARY SUBJECT</th>
+                        <th>EMAIL</th>
+                        <th>CABIN</th>
+                        <th class="text-end">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody id="facultyTableBody">
+                    <tr>
+                        <td colspan="8" class="text-center py-10 text-gray-400 text-xs">
+                            <div class="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                            Loading faculty members...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Grid Cards View -->
+    <div id="facultyGridView" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 hidden">
+        <div id="facultyGridContainer" class="contents"></div>
+    </div>
+
+    <!-- Faculty Pagination Footer -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-[#111827] border border-[#1F2937]" id="facultyPagination">
+        <div class="flex items-center gap-2 text-xs text-gray-400">
+            <span>Showing</span>
+            <span id="pageStart" class="font-bold text-white">0</span>
+            <span>to</span>
+            <span id="pageEnd" class="font-bold text-white">0</span>
+            <span>of</span>
+            <span id="pageTotal" class="font-bold text-emerald-400">0</span>
+            <span>faculty members</span>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <select id="pageLimitSelect" class="bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-emerald-500">
+                <option value="20">20 per page</option>
+                <option value="50" selected>50 per page</option>
+                <option value="100">100 per page</option>
+                <option value="250">250 per page</option>
+                <option value="10000">Show All</option>
+            </select>
+
+            <div class="flex items-center gap-1">
+                <button id="prevPageBtn" class="px-3 py-1.5 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-400 hover:text-white text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
+                    Previous
+                </button>
+                <div id="pageNumbers" class="flex items-center gap-1"></div>
+                <button id="nextPageBtn" class="px-3 py-1.5 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-400 hover:text-white text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
+                    Next
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- CREATE / EDIT FACULTY MODAL -->
+<div class="modal fade" id="facultyFormModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content modal-dark-content">
+            <div class="modal-header border-b border-[#1F2937] p-4">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="user-plus" class="w-4 h-4 text-emerald-400"></i>
+                    <h3 class="text-sm font-bold text-white mb-0" id="facultyModalTitle">Add Faculty Member</h3>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="facultyForm" class="p-4 space-y-3.5 text-xs">
+                <input type="hidden" id="facultyFormRecordId">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Faculty ID *</label>
+                        <input type="text" id="facultyIdInput" required placeholder="e.g. FAC-CSE-001" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500 font-mono">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Full Name *</label>
+                        <input type="text" id="facultyNameInput" required placeholder="Prof. Dr. Firstname Lastname" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Designation *</label>
+                        <select id="facultyDesigInput" required class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                            <option value="Professor & Head">Professor & Head</option>
+                            <option value="Professor">Professor</option>
+                            <option value="Associate Professor">Associate Professor</option>
+                            <option value="Assistant Professor" selected>Assistant Professor</option>
+                            <option value="Visiting Lecturer">Visiting Lecturer</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Department *</label>
+                        <select id="facultyDeptInput" required class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                            <option value="Computer Engineering">Computer Engineering</option>
+                            <option value="Information Technology">Information Technology</option>
+                            <option value="Electronics & Comm.">Electronics & Comm.</option>
+                            <option value="Mechanical Eng.">Mechanical Eng.</option>
+                            <option value="Civil Eng.">Civil Eng.</option>
+                            <option value="Electrical Eng.">Electrical Eng.</option>
+                            <option value="Applied Sciences & Humanities">Applied Sciences & Humanities</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Primary Subject(s)</label>
+                        <input type="text" id="facultySubjectInput" placeholder="e.g. Data Structures, AI" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Cabin Location</label>
+                        <input type="text" id="facultyCabinInput" placeholder="e.g. CE-Cabin-204" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Qualification</label>
+                        <input type="text" id="facultyQualInput" placeholder="e.g. Ph.D (IIT), M.Tech" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Email Address *</label>
+                        <input type="email" id="facultyEmailInput" required placeholder="faculty@svitvasad.ac.in" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Contact Number</label>
+                        <input type="text" id="facultyPhoneInput" placeholder="+91 9876543210" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500 font-mono">
+                    </div>
+                </div>
+
+                <!-- Profile Photo Upload -->
+                <div>
+                    <label class="text-[11px] font-semibold text-gray-300">Profile Photo</label>
+                    <div id="facultyImageDropZone" class="p-4 border-2 border-dashed border-[#1F2937] rounded-xl text-center cursor-pointer hover:border-emerald-500 transition bg-[#0F172A]">
+                        <i data-lucide="image" class="w-5 h-5 mx-auto mb-1 text-gray-500"></i>
+                        <p class="text-xs text-gray-400 mb-0">Drag & drop photo or click to browse (JPG, PNG, WEBP)</p>
+                    </div>
+                    <input type="file" id="facultyImageInput" accept="image/*" class="hidden">
+                    <div id="facultyImagePreviewContainer" class="mt-2 flex items-center gap-3 hidden"></div>
+                </div>
+
+                <div class="modal-footer border-t border-[#1F2937] pt-4 px-0 pb-0 flex justify-end gap-2">
+                    <button type="button" class="px-4 py-2 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs font-semibold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/30">Save Faculty</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- VIEW FACULTY MODAL -->
+<div class="modal fade" id="facultyViewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-dark-content">
+            <div class="modal-header border-b border-[#1F2937] p-4">
+                <h3 class="text-sm font-bold text-white mb-0">Faculty Details</h3>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="p-4" id="facultyViewContent"></div>
+            <div class="modal-footer border-t border-[#1F2937] p-3">
+                <button type="button" class="px-4 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-semibold" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DELETE FACULTY CONFIRMATION MODAL -->
+<div class="modal fade" id="facultyDeleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content modal-dark-content text-center p-5 space-y-3">
+            <div class="w-12 h-12 rounded-full bg-red-600/20 text-red-400 border border-red-500/30 flex items-center justify-center mx-auto">
+                <i data-lucide="trash-2" class="w-6 h-6"></i>
+            </div>
+            <h4 class="text-sm font-bold text-white mb-1">Remove Faculty Member?</h4>
+            <p class="text-xs text-gray-400 mb-0">
+                Are you sure you want to delete <strong id="deleteFacultyTargetId" class="text-white"></strong>?
+            </p>
+            <div class="pt-2 flex justify-center gap-2">
+                <button type="button" class="px-3.5 py-1.5 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmDeleteFacultyBtn" class="px-4 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-semibold">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin/faculty.js') }}"></script>
+{% endblock %}

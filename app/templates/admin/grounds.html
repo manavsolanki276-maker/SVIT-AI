@@ -1,0 +1,124 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}Grounds & Facilities{% endblock %}
+{% block header_title %}Athletics Administration: Grounds & Courts{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/grounds.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6 text-white">
+
+    <!-- Header Hero Card -->
+    <div class="grounds-hero-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl">
+        <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-yellow-600/20 border border-yellow-500/30 flex items-center justify-center text-yellow-400 flex-shrink-0">
+                <i data-lucide="map" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h2 class="text-lg font-bold text-white mb-0">Athletic Grounds & Sports Courts</h2>
+                    <span id="groundsCountBadge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
+                        0 Grounds
+                    </span>
+                </div>
+                <p class="text-xs text-gray-400 mb-0 mt-0.5">Manage cricket stadium pitches, football fields, volleyball & badminton courts, and night floodlights.</p>
+            </div>
+        </div>
+
+        <button id="openCreateGroundModalBtn" class="px-4 py-2.5 rounded-xl bg-yellow-600 hover:bg-yellow-500 text-white text-xs font-semibold shadow-lg shadow-yellow-600/30 transition flex items-center gap-2 self-start sm:self-auto">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i> Add Ground / Court
+        </button>
+    </div>
+
+    <!-- Search Toolbar -->
+    <div class="p-4 rounded-2xl bg-[#111827] border border-[#1F2937] flex items-center justify-between gap-3">
+        <div class="relative w-full sm:w-80">
+            <i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="groundSearchInput" placeholder="Search grounds by name, sport..." class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl pl-9 pr-3 py-2 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition">
+        </div>
+        <button id="refreshGroundsBtn" class="p-2 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-400 hover:text-white" title="Refresh Grounds">
+            <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+        </button>
+    </div>
+
+    <!-- Grounds Cards Grid -->
+    <div id="groundsGridContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+
+</div>
+
+<!-- CREATE / EDIT GROUND MODAL -->
+<div class="modal fade" id="groundModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-dark-content">
+            <div class="modal-header border-b border-[#1F2937] p-4">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="map" class="w-4 h-4 text-yellow-400"></i>
+                    <h3 class="text-sm font-bold text-white mb-0" id="groundModalTitle">Add Athletic Ground</h3>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="groundForm" class="p-4 space-y-3.5 text-xs">
+                <input type="hidden" id="groundFormRecordId">
+                
+                <div>
+                    <label class="text-[11px] font-semibold text-gray-300">Ground / Court Name *</label>
+                    <input type="text" id="groundNameInput" required placeholder="e.g. SVIT Main Cricket Pavilion" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-yellow-500">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Primary Sport *</label>
+                        <input type="text" id="groundSportInput" required placeholder="e.g. Cricket / Football" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-yellow-500">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Surface Type</label>
+                        <input type="text" id="groundSurfaceInput" placeholder="e.g. Natural Grass Turf" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-yellow-500">
+                    </div>
+                </div>
+
+                <!-- Photo Upload -->
+                <div>
+                    <label class="text-[11px] font-semibold text-gray-300">Ground Photo</label>
+                    <div id="groundPhotoDropZone" class="p-3 border-2 border-dashed border-[#1F2937] rounded-xl text-center cursor-pointer hover:border-yellow-500 transition bg-[#0F172A]">
+                        <i data-lucide="image" class="w-4 h-4 mx-auto mb-1 text-gray-500"></i>
+                        <p class="text-xs text-gray-400 mb-0">Drag & drop photo or browse</p>
+                    </div>
+                    <input type="file" id="groundPhotoInput" accept="image/*" class="hidden">
+                    <div id="groundPhotoPreviewContainer" class="mt-2 flex items-center gap-3 hidden"></div>
+                </div>
+
+                <div class="modal-footer border-t border-[#1F2937] pt-4 px-0 pb-0 flex justify-end gap-2">
+                    <button type="button" class="px-4 py-2 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs font-semibold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-yellow-600 hover:bg-yellow-500 text-white text-xs font-semibold shadow-lg shadow-yellow-600/30">Save Ground</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- DELETE GROUND MODAL -->
+<div class="modal fade" id="groundDeleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content modal-dark-content text-center p-5 space-y-3">
+            <div class="w-12 h-12 rounded-full bg-red-600/20 text-red-400 border border-red-500/30 flex items-center justify-center mx-auto">
+                <i data-lucide="trash-2" class="w-6 h-6"></i>
+            </div>
+            <h4 class="text-sm font-bold text-white mb-1">Delete Ground Facility?</h4>
+            <p class="text-xs text-gray-400 mb-0">
+                Are you sure you want to delete <strong id="deleteGroundTargetId" class="text-white"></strong>?
+            </p>
+            <div class="pt-2 flex justify-center gap-2">
+                <button type="button" class="px-3.5 py-1.5 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmDeleteGroundBtn" class="px-4 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-semibold">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin/grounds.js') }}"></script>
+{% endblock %}

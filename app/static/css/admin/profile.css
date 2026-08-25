@@ -1,0 +1,59 @@
+/* ==========================================================================
+   SVIT Admin - Page 4: Profile & Settings Styles
+   ========================================================================== */
+
+.profile-hero-card {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(17, 24, 39, 0.95) 100%);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.profile-avatar-giant {
+    width: 80px;
+    height: 80px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #4F46E5, #7C3AED);
+    color: #FFFFFF;
+    font-size: 1.75rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(79, 70, 229, 0.35);
+}
+
+.security-card {
+    background: #111827;
+    border: 1px solid #1F2937;
+    border-radius: 16px;
+    padding: 1.5rem;
+}
+
+.security-input {
+    background-color: #0F172A;
+    border: 1px solid #1F2937;
+    color: #F8FAFC;
+    border-radius: 12px;
+    padding: 0.6rem 0.85rem;
+    font-size: 0.82rem;
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+.security-input:focus {
+    outline: none;
+    border-color: #6366F1;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.perm-pill {
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(99, 102, 241, 0.12);
+    color: #A5B4FC;
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}

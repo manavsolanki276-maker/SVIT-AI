@@ -1,0 +1,21 @@
+/* ==========================================================================
+   SVIT Admin - Page 21: Library Members Styles
+   ========================================================================== */
+
+.library-members-hero-card {
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.15) 0%, rgba(17, 24, 39, 0.95) 100%);
+    border: 1px solid rgba(20, 184, 166, 0.25);
+}
+
+.member-avatar-box {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #0D9488, #14B8A6);
+    color: #FFFFFF;
+    font-weight: 700;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

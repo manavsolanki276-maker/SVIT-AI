@@ -1,0 +1,18 @@
+/* ==========================================================================
+   SVIT Admin - Page 27: Sports Events Styles (Tournaments & Matches)
+   ========================================================================== */
+
+.sports-events-hero-card {
+    background: linear-gradient(135deg, rgba(234, 179, 8, 0.15) 0%, rgba(17, 24, 39, 0.95) 100%);
+    border: 1px solid rgba(234, 179, 8, 0.25);
+}
+
+.badge-tourney-type {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(234, 179, 8, 0.15);
+    color: #FDE047;
+    border: 1px solid rgba(234, 179, 8, 0.3);
+}

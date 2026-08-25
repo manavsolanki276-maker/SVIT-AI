@@ -1,0 +1,22 @@
+/* ==========================================================================
+   SVIT Admin - Page 19: Library Overview Styles
+   ========================================================================== */
+
+.library-hero-card {
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.15) 0%, rgba(17, 24, 39, 0.95) 100%);
+    border: 1px solid rgba(20, 184, 166, 0.25);
+}
+
+.lib-stat-card {
+    background: #111827;
+    border: 1px solid #1F2937;
+    border-radius: 16px;
+    padding: 1.25rem;
+    transition: all 0.2s ease;
+}
+
+.lib-stat-card:hover {
+    border-color: #14B8A6;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 15px rgba(20, 184, 166, 0.2);
+}

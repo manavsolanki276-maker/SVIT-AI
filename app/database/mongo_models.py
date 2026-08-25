@@ -4,9 +4,10 @@ MongoDB document models and database access layer for SVIT AI Assistant.
 Provides seamless user authentication, chat history, settings, notifications,
 and academic dataset management via MongoDB Atlas with connection pooling.
 """
+import re
 import uuid
 from datetime import datetime, timedelta
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Set
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app.database.mongodb import get_collection
@@ -132,14 +133,30 @@ class MongoStudent(UserMixin):
 
 
 class MongoAdmin(UserMixin):
-    """Flask-Login compatible Admin user model backed by MongoDB."""
+    """Flask-Login compatible Admin user model backed by MongoDB with full RBAC."""
     def __init__(self, doc: Dict[str, Any]):
+        from app.auth.rbac import (
+            ROLE_SUPER_ADMIN,
+            ROLE_DISPLAY_NAMES,
+            normalize_role,
+            get_role_permissions,
+            has_permission as rbac_has_permission,
+            has_role as rbac_has_role,
+        )
         self._doc = doc
-        self.id = doc.get('id') or str(doc.get('_id', ''))
-        self.username = doc.get('username', '')
-        self.email = doc.get('email', '')
-        self.password_hash = doc.get('password_hash', '')
-        self.full_name = doc.get('full_name', 'Administrator')
+        self.id = str(doc.get('id') or doc.get('_id', ''))
+        self.admin_id = doc.get('admin_id') or doc.get('id') or self.id
+        self.name = doc.get('name') or doc.get('full_name') or 'Administrator'
+        self.full_name = self.name
+        self.username = str(doc.get('username', '')).strip()
+        self.email = str(doc.get('email', '')).strip().lower()
+        self.password_hash = str(doc.get('password_hash', ''))
+        self.role = normalize_role(doc.get('role', ROLE_SUPER_ADMIN))
+        self.department = doc.get('department', '')
+        self.is_active = bool(doc.get('is_active', True))
+        self.created_at = doc.get('created_at')
+        self.updated_at = doc.get('updated_at')
+        self.last_login = doc.get('last_login')
 
     def get_id(self) -> str:
         return f"admin_{self.id}"
@@ -148,10 +165,67 @@ class MongoAdmin(UserMixin):
     def is_admin(self) -> bool:
         return True
 
+    @property
+    def role_display(self) -> str:
+        from app.auth.rbac import ROLE_DISPLAY_NAMES, normalize_role
+        norm = normalize_role(self.role)
+        return ROLE_DISPLAY_NAMES.get(norm, norm.replace('_', ' ').title())
+
+    @property
+    def permissions(self) -> Set[str]:
+        from app.auth.rbac import get_role_permissions
+        return get_role_permissions(self.role)
+
     def check_password(self, password: str) -> bool:
         if not self.password_hash:
             return False
         return check_password_hash(self.password_hash, password)
+
+    def set_password(self, password: str):
+        self.password_hash = generate_password_hash(password)
+        self._doc['password_hash'] = self.password_hash
+
+    def has_permission(self, permission: str) -> bool:
+        from app.auth.rbac import has_permission as rbac_has_permission
+        return rbac_has_permission(self, permission)
+
+    def has_role(self, *roles: str) -> bool:
+        from app.auth.rbac import has_role as rbac_has_role
+        return rbac_has_role(self, *roles)
+
+    def update_last_login(self):
+        coll = get_collection('admins')
+        now = datetime.utcnow()
+        self.last_login = now
+        self.updated_at = now
+        if coll is not None:
+            from bson import ObjectId
+            try:
+                coll.update_one(
+                    {"$or": [{"id": self.id}, {"_id": ObjectId(self.id) if ObjectId.is_valid(self.id) else None}, {"username": self.username}]},
+                    {"$set": {"last_login": now, "updated_at": now}}
+                )
+            except Exception:
+                pass
+
+    def to_dict(self) -> Dict[str, Any]:
+        """CRITICAL: Never exposes password or password_hash."""
+        return {
+            "id": self.id,
+            "admin_id": self.admin_id,
+            "name": self.name,
+            "full_name": self.full_name,
+            "username": self.username,
+            "email": self.email,
+            "role": self.role,
+            "role_display": self.role_display,
+            "department": self.department,
+            "is_active": self.is_active,
+            "permissions": sorted(list(self.permissions)),
+            "created_at": self.created_at.isoformat() if hasattr(self.created_at, 'isoformat') else str(self.created_at) if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if hasattr(self.updated_at, 'isoformat') else str(self.updated_at) if self.updated_at else None,
+            "last_login": self.last_login.isoformat() if hasattr(self.last_login, 'isoformat') else str(self.last_login) if self.last_login else None,
+        }
 
     @classmethod
     def get_by_id(cls, user_id: Any) -> Optional['MongoAdmin']:
@@ -159,7 +233,16 @@ class MongoAdmin(UserMixin):
         if coll is None:
             return None
         try:
-            query = {"$or": [{"id": user_id}, {"id": int(user_id) if str(user_id).isdigit() else -1}, {"username": str(user_id)}]}
+            from bson import ObjectId
+            query = {
+                "$or": [
+                    {"id": user_id},
+                    {"id": int(user_id) if str(user_id).isdigit() else -1},
+                    {"admin_id": str(user_id)},
+                    {"username": str(user_id)},
+                    {"_id": ObjectId(str(user_id)) if ObjectId.is_valid(str(user_id)) else None}
+                ]
+            }
             doc = coll.find_one(query)
             if doc:
                 return cls(doc)
@@ -173,10 +256,58 @@ class MongoAdmin(UserMixin):
         if coll is None or not identifier:
             return None
         ident = identifier.strip()
-        doc = coll.find_one({"$or": [{"username": ident}, {"email": ident}]})
+        ident_lower = ident.lower()
+        doc = coll.find_one({
+            "$or": [
+                {"username": {"$regex": f"^{re.escape(ident)}$", "$options": "i"}},
+                {"email": ident_lower}
+            ]
+        }) if 're' in globals() else coll.find_one({
+            "$or": [
+                {"username": ident},
+                {"email": ident_lower},
+                {"email": ident}
+            ]
+        })
         if doc:
             return cls(doc)
         return None
+
+    @classmethod
+    def save_or_update(cls, data: Dict[str, Any]) -> Optional['MongoAdmin']:
+        coll = get_collection('admins')
+        if coll is None:
+            return None
+
+        uname = str(data.get('username', '')).strip()
+        email = str(data.get('email', '')).strip().lower()
+
+        query = {}
+        if uname:
+            query['username'] = uname
+        elif email:
+            query['email'] = email
+        else:
+            query['id'] = data.get('id')
+
+        clean_data = dict(data)
+        clean_data['updated_at'] = datetime.utcnow()
+        if 'created_at' not in clean_data:
+            clean_data['created_at'] = datetime.utcnow()
+
+        if 'password' in clean_data:
+            clean_data['password_hash'] = generate_password_hash(clean_data.pop('password'))
+
+        coll.update_one(query, {"$set": clean_data}, upsert=True)
+        doc = coll.find_one(query)
+        return cls(doc) if doc else None
+
+    @classmethod
+    def get_all(cls) -> List['MongoAdmin']:
+        coll = get_collection('admins')
+        if coll is None:
+            return []
+        return [cls(doc) for doc in coll.find().sort("created_at", -1)]
 
 
 # =========================================================================

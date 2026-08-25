@@ -1,0 +1,119 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}Bus Routes{% endblock %}
+{% block header_title %}Transport Administration: Bus Routes & Stops Progression{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/bus_routes.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6 text-white">
+
+    <!-- Header Hero Card -->
+    <div class="bus-routes-hero-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl">
+        <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-cyan-600/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 flex-shrink-0">
+                <i data-lucide="map" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h2 class="text-lg font-bold text-white mb-0">Bus Routes & Visual Progression</h2>
+                    <span id="routesCountBadge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                        0 Routes
+                    </span>
+                </div>
+                <p class="text-xs text-gray-400 mb-0 mt-0.5">Visualize stop-by-stop transit timelines, scheduled departure milestones, and driver routes.</p>
+            </div>
+        </div>
+
+        <button id="openCreateRouteModalBtn" class="px-4 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold shadow-lg shadow-cyan-600/30 transition flex items-center gap-2 self-start sm:self-auto">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i> Add Route
+        </button>
+    </div>
+
+    <!-- Search Toolbar -->
+    <div class="p-4 rounded-2xl bg-[#111827] border border-[#1F2937] flex items-center justify-between gap-3">
+        <div class="relative w-full md:w-80">
+            <i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="routeSearchInput" placeholder="Search routes by name or number..." class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl pl-9 pr-3 py-2 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition">
+        </div>
+        <button id="refreshRoutesBtn" class="p-2 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-400 hover:text-white" title="Refresh Routes">
+            <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+        </button>
+    </div>
+
+    <!-- Routes Progression List Container -->
+    <div id="routesListContainer" class="space-y-4"></div>
+
+</div>
+
+<!-- CREATE / EDIT ROUTE MODAL -->
+<div class="modal fade" id="routeFormModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-dark-content">
+            <div class="modal-header border-b border-[#1F2937] p-4">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="map-pin" class="w-4 h-4 text-cyan-400"></i>
+                    <h3 class="text-sm font-bold text-white mb-0" id="routeModalTitle">Add Transit Route</h3>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="routeForm" class="p-4 space-y-3.5 text-xs">
+                <input type="hidden" id="routeFormRecordId">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Route Number *</label>
+                        <input type="text" id="routeNameNumInput" required placeholder="e.g. Route 3" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Route Name / Origin *</label>
+                        <input type="text" id="routeFullNameInput" required placeholder="e.g. Anand - Vidyanagar Express" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Driver In-Charge</label>
+                        <input type="text" id="routeDriverInput" placeholder="Driver name" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Driver Phone</label>
+                        <input type="text" id="routePhoneInput" placeholder="+91 9876543210" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500 font-mono">
+                    </div>
+                </div>
+
+                <div class="modal-footer border-t border-[#1F2937] pt-4 px-0 pb-0 flex justify-end gap-2">
+                    <button type="button" class="px-4 py-2 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs font-semibold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold shadow-lg shadow-cyan-600/30">Save Route</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- DELETE ROUTE MODAL -->
+<div class="modal fade" id="routeDeleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content modal-dark-content text-center p-5 space-y-3">
+            <div class="w-12 h-12 rounded-full bg-red-600/20 text-red-400 border border-red-500/30 flex items-center justify-center mx-auto">
+                <i data-lucide="trash-2" class="w-6 h-6"></i>
+            </div>
+            <h4 class="text-sm font-bold text-white mb-1">Delete Transit Route?</h4>
+            <p class="text-xs text-gray-400 mb-0">
+                Are you sure you want to remove <strong id="deleteRouteTargetId" class="text-white"></strong>?
+            </p>
+            <div class="pt-2 flex justify-center gap-2">
+                <button type="button" class="px-3.5 py-1.5 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmDeleteRouteBtn" class="px-4 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-semibold">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin/bus_routes.js') }}"></script>
+{% endblock %}

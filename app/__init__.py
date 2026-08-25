@@ -52,10 +52,13 @@ def create_app():
 
     # Ensure static upload folders exist safely
     profile_upload_path = os.path.join(app.root_path, 'static', 'profile_images')
-    try:
-        os.makedirs(profile_upload_path, exist_ok=True)
-    except OSError:
-        pass
+    images_upload_path = os.path.join(app.root_path, 'static', 'uploads', 'images')
+    docs_upload_path = os.path.join(app.root_path, 'static', 'uploads', 'documents')
+    for p in [profile_upload_path, images_upload_path, docs_upload_path]:
+        try:
+            os.makedirs(p, exist_ok=True)
+        except OSError:
+            pass
 
     # =========================================================
     # 2. EXTENSION INITIALIZATION
@@ -160,10 +163,16 @@ def create_app():
     # =========================================================
     # 5. JINJA CONTEXT PROCESSORS & UTILITIES
     # =========================================================
+    from app.auth.rbac import has_permission, has_role, ROLE_DISPLAY_NAMES, normalize_role
+
     @app.context_processor
     def inject_endpoints():
         return {
-            'bootstrap_endpoints': set(app.view_functions.keys())
+            'bootstrap_endpoints': set(app.view_functions.keys()),
+            'has_permission': has_permission,
+            'has_role': has_role,
+            'ROLE_DISPLAY_NAMES': ROLE_DISPLAY_NAMES,
+            'normalize_role': normalize_role,
         }
 
     app.jinja_env.globals.update(
@@ -171,8 +180,19 @@ def create_app():
         hasattr=hasattr,
         str=str,
         int=int,
-        len=len
+        len=len,
+        has_permission=has_permission,
+        has_role=has_role,
+        ROLE_DISPLAY_NAMES=ROLE_DISPLAY_NAMES,
+        normalize_role=normalize_role,
     )
+
+    # Register CLI commands
+    try:
+        from app.commands import admin_cli
+        app.cli.add_command(admin_cli)
+    except Exception as e:
+        logger.warning(f"CLI command registration notice: {e}")
 
     # =========================================================
     # 6. DEFAULT APPLICATION ROOT ROUTE
@@ -193,8 +213,12 @@ def create_app():
 
         return redirect(url_for('auth.student_login'))
 
+    @app.errorhandler(403)
+    def handle_403(e):
+        return render_template('errors/403.html', error_message=getattr(e, 'description', 'Access Denied: You do not have permission to view this resource.')), 403
+
     # =========================================================
-    # 7. MODEL METADATA REGISTRATION & TABLE INITIALIZATION
+    # 7. MODEL METADATA REGISTRATION, MIGRATION & SEEDING
     # =========================================================
     with app.app_context():
         try:
@@ -208,5 +232,19 @@ def create_app():
             db.create_all()
         except Exception as db_err:
             logger.warning(f"Database table initialization notice: {db_err}")
+
+        # Seed admin accounts for RBAC system
+        try:
+            from app.database.admin_seed import seed_admin_accounts
+            seed_admin_accounts(app)
+        except Exception as seed_err:
+            logger.warning(f"Admin seeding notice: {seed_err}")
+
+        # Initialize and seed datasets from CSV knowledge base
+        try:
+            from app.database.admin_crud_service import initialize_datasets_if_needed
+            initialize_datasets_if_needed(os.path.abspath(os.path.join(base_dir, '..')))
+        except Exception as data_err:
+            logger.warning(f"Dataset initialization notice: {data_err}")
 
     return app

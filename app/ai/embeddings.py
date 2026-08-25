@@ -36,8 +36,18 @@ class LightweightFallbackEmbeddings:
 
 def get_embedding_model(model_name: str = "sentence-transformers/all-MiniLM-L6-v2"):
     """
-    Returns HuggingFace Embeddings model with automatic lightweight serverless fallback.
+    Returns HuggingFace Embeddings model with automatic lightweight fallback for testing and serverless.
     """
+    if os.environ.get('FAST_EMBEDDINGS') or os.environ.get('TEST_MODE') or os.environ.get('TESTING'):
+        return LightweightFallbackEmbeddings()
+
+    try:
+        from flask import current_app
+        if current_app and current_app.config.get('TESTING'):
+            return LightweightFallbackEmbeddings()
+    except Exception:
+        pass
+
     try:
         from langchain_huggingface import HuggingFaceEmbeddings
         cache_dir = '/tmp/huggingface' if (os.environ.get('VERCEL') or os.environ.get('AWS_LAMBDA_FUNCTION_NAME')) else None
@@ -47,5 +57,5 @@ def get_embedding_model(model_name: str = "sentence-transformers/all-MiniLM-L6-v
             model_kwargs={'device': 'cpu'},
             encode_kwargs={'normalize_embeddings': True}
         )
-    except Exception as e:
+    except Exception:
         return LightweightFallbackEmbeddings()

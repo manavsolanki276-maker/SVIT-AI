@@ -7,9 +7,12 @@ and graceful fallback when MONGODB_URI is not set.
 import os
 import logging
 from typing import Optional
+from dotenv import load_dotenv
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.collection import Collection
+
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 

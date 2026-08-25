@@ -1,0 +1,49 @@
+"""
+app/rbac.py
+Top-level export for RBAC constants, helpers, and decorators.
+"""
+from app.auth.rbac import (
+    ROLE_SUPER_ADMIN,
+    ROLE_ACADEMIC_ADMIN,
+    ROLE_ADMISSION_ADMIN,
+    ROLE_NOTICE_ADMIN,
+    ROLE_EVENT_ADMIN,
+    ROLE_BUS_ADMIN,
+    ROLE_LIBRARY_ADMIN,
+    ROLE_CANTEEN_ADMIN,
+    ROLE_SPORTS_ADMIN,
+    ALL_ADMIN_ROLES,
+    ROLE_DISPLAY_NAMES,
+    ROLE_PERMISSIONS,
+    ROLE_ALIASES,
+    normalize_role,
+    get_role_permissions,
+    has_permission,
+    has_role,
+    admin_required,
+    require_role,
+    require_permission,
+)
+
+__all__ = [
+    'ROLE_SUPER_ADMIN',
+    'ROLE_ACADEMIC_ADMIN',
+    'ROLE_ADMISSION_ADMIN',
+    'ROLE_NOTICE_ADMIN',
+    'ROLE_EVENT_ADMIN',
+    'ROLE_BUS_ADMIN',
+    'ROLE_LIBRARY_ADMIN',
+    'ROLE_CANTEEN_ADMIN',
+    'ROLE_SPORTS_ADMIN',
+    'ALL_ADMIN_ROLES',
+    'ROLE_DISPLAY_NAMES',
+    'ROLE_PERMISSIONS',
+    'ROLE_ALIASES',
+    'normalize_role',
+    'get_role_permissions',
+    'has_permission',
+    'has_role',
+    'admin_required',
+    'require_role',
+    'require_permission',
+]

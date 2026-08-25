@@ -49,10 +49,10 @@ def load_csv_knowledge_base(knowledge_base_dir: str = None):
         target_dir = os.path.join(project_root, "knowledge_base")
 
     if not os.path.exists(target_dir):
-        print(f"❌ Error: Could not locate directory at '{target_dir}'.")
+        print(f"[ERROR] Could not locate directory at '{target_dir}'.")
         return []
 
-    print(f"📁 Scanning knowledge base directory: {target_dir}")
+    print(f"[INFO] Scanning knowledge base directory: {target_dir}")
 
     documents = []
     csv_files = []
@@ -64,7 +64,7 @@ def load_csv_knowledge_base(knowledge_base_dir: str = None):
                 csv_files.append(os.path.join(root, file))
 
     if not csv_files:
-        print(f"⚠️ Warning: Found directory '{target_dir}', but no .csv files were detected inside.")
+        print(f"[WARNING] Found directory '{target_dir}', but no .csv files were detected inside.")
         return documents
 
     # 4. Convert every CSV row into a clean Document with metadata
@@ -95,7 +95,7 @@ def load_csv_knowledge_base(knowledge_base_dir: str = None):
                 documents.append(doc)
 
         except Exception as e:
-            print(f"❌ Error reading CSV file {file_path}: {e}")
+            print(f"[ERROR] Error reading CSV file {file_path}: {e}")
 
-    print(f"✅ Successfully loaded {len(documents)} clean documents from {len(csv_files)} CSV files.")
+    print(f"[OK] Successfully loaded {len(documents)} clean documents from {len(csv_files)} CSV files.")
     return documents

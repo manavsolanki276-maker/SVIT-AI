@@ -1,6 +1,7 @@
 # Environment and Secrets
 .env
-*.env
+.env.*
+!.env.example
 
 # Python Bytecode and Virtual Environments
 __pycache__/
@@ -15,6 +16,12 @@ env/
 *.sqlite3
 instance/
 chroma_db/
+
+# Uploads
+app/static/uploads/documents/*
+app/static/uploads/images/*
+!app/static/uploads/documents/.gitkeep
+!app/static/uploads/images/.gitkeep
 
 # Logs and OS files
 *.log

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Admin Panel{% endblock %} - SVIT</title>
+    <title>{% block title %}Admin Panel{% endblock %} - SVIT Vasad</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -26,166 +26,306 @@
         }
     </script>
 
+    <!-- Bootstrap 5 CSS (Scoped overrides) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <!-- Lucide Icons & Chart.js -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+            background-color: #0B0F19;
+            color: #E2E8F0;
+        }
+
+        /* Custom Scrollbars */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #090D16;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #1F2937;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #374151;
+        }
+
+        /* Dark Theme Card & Table Overrides */
+        .bg-dark-card {
+            background-color: #111827 !important;
+            border: 1px solid #1F2937 !important;
+            border-radius: 0.85rem !important;
+        }
+
+        .text-muted-custom {
+            color: #9CA3AF !important;
+        }
+
+        .stat-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quick-action-btn {
+            background-color: #0F172A;
+            border: 1px solid #1F2937;
+            color: #D1D5DB;
+            border-radius: 12px;
+            padding: 0.85rem 0.6rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.45rem;
+            transition: all 0.2s ease-in-out;
+            text-decoration: none;
+        }
+        .quick-action-btn:hover {
+            border-color: #6366F1;
+            background-color: #1E1B4B;
+            color: #FFFFFF;
+            transform: translateY(-2px);
+        }
+
+        .table-dark-custom {
+            --bs-table-bg: transparent;
+            --bs-table-color: #D1D5DB;
+            --bs-table-border-color: #1F2937;
+        }
+        .table-dark-custom th {
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #9CA3AF;
+            border-bottom: 1px solid #1F2937;
+            padding: 12px 14px;
+        }
+        .table-dark-custom td {
+            font-size: 13px;
+            border-bottom: 1px solid #1F2937;
+            padding: 12px 14px;
+            vertical-align: middle;
+        }
+        .table-dark-custom tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.02) !important;
+        }
+
+        /* Toast Container */
+        #toastContainer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 380px;
+        }
+
+        /* Urgent Ticker Animation */
+        @keyframes pulseBorder {
+            0%, 100% { border-color: rgba(239, 68, 68, 0.8); }
+            50% { border-color: rgba(239, 68, 68, 0.2); }
+        }
+        .urgent-alert-banner {
+            animation: pulseBorder 2s infinite;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
-<body class="bg-brand-bg text-gray-200 antialiased min-h-screen flex">
+<body class="bg-[#0B0F19] text-gray-200 antialiased min-h-screen flex flex-col">
+
+    <!-- MOBILE OVERLAY BACKDROP -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 lg:hidden hidden"></div>
 
     <!-- SIDEBAR -->
-    <aside class="w-64 bg-brand-sidebar border-r border-brand-border flex flex-col fixed inset-y-0 left-0 z-50">
-        <!-- Brand Header -->
-        <div class="p-5 border-b border-brand-border flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
-                <i data-lucide="graduation-cap" class="w-6 h-6"></i>
-            </div>
-            <div>
-                <h2 class="font-bold text-white tracking-wide text-base leading-none">SVIT</h2>
-                <span class="text-[10px] text-gray-400 tracking-wider">VASAD ADMIN PANEL</span>
-            </div>
-        </div>
+    {% include "partials/sidebar.html" %}
 
-        <!-- Navigation Links -->
-        <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
-            <div>
-                <a href="{{ url_for('admin.dashboard') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-indigo-600 text-white font-medium text-sm transition">
-                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
-                    <span>Dashboard</span>
-                </a>
-            </div>
-
-            <div class="space-y-1">
-                <p class="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Management</p>
-                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
-                    <div class="flex items-center gap-3"><i data-lucide="users" class="w-4 h-4"></i><span>Students</span></div>
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
-                </a>
-                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
-                    <div class="flex items-center gap-3"><i data-lucide="user-check" class="w-4 h-4"></i><span>Faculty</span></div>
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
-                </a>
-                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
-                    <div class="flex items-center gap-3"><i data-lucide="building-2" class="w-4 h-4"></i><span>Departments</span></div>
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
-                </a>
-                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
-                    <div class="flex items-center gap-3"><i data-lucide="calendar" class="w-4 h-4"></i><span>Timetable</span></div>
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
-                </a>
-                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
-                    <div class="flex items-center gap-3"><i data-lucide="book-open" class="w-4 h-4"></i><span>Library</span></div>
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
-                </a>
-                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
-                    <div class="flex items-center gap-3"><i data-lucide="bus" class="w-4 h-4"></i><span>Transport (Bus)</span></div>
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
-                </a>
-                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
-                    <div class="flex items-center gap-3"><i data-lucide="briefcase" class="w-4 h-4"></i><span>Placement</span></div>
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
-                </a>
-                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
-                    <div class="flex items-center gap-3"><i data-lucide="utensils" class="w-4 h-4"></i><span>Canteen</span></div>
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
-                </a>
-                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
-                    <div class="flex items-center gap-3"><i data-lucide="trophy" class="w-4 h-4"></i><span>Sports</span></div>
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
-                </a>
-                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
-                    <div class="flex items-center gap-3"><i data-lucide="party-popper" class="w-4 h-4"></i><span>Events</span></div>
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
-                </a>
-                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
-                    <div class="flex items-center gap-3"><i data-lucide="megaphone" class="w-4 h-4"></i><span>Notices</span></div>
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
-                </a>
-            </div>
-
-            <div class="space-y-1">
-                <p class="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">System</p>
-                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
-                    <div class="flex items-center gap-3"><i data-lucide="bot" class="w-4 h-4"></i><span>AI Chatbot</span></div>
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
-                </a>
-                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
-                    <div class="flex items-center gap-3"><i data-lucide="bar-chart-3" class="w-4 h-4"></i><span>Reports & Analytics</span></div>
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
-                </a>
-                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm transition">
-                    <div class="flex items-center gap-3"><i data-lucide="settings" class="w-4 h-4"></i><span>Settings</span></div>
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600"></i>
-                </a>
-            </div>
-        </nav>
-
-        <!-- Sidebar Profile & Logout -->
-        <div class="p-3 border-t border-brand-border space-y-2">
-            <div class="p-2.5 rounded-xl bg-gray-900/60 border border-gray-800 flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 font-bold text-xs">
-                    AU
-                </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-xs font-semibold text-white truncate">{{ current_user.username if current_user.is_authenticated else 'Admin User' }}</p>
-                    <p class="text-[10px] text-emerald-400 flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Online
-                    </p>
-                </div>
-            </div>
-            <a href="{{ url_for('admin.logout') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-red-400 hover:bg-red-500/10 text-xs font-medium transition">
-                <i data-lucide="log-out" class="w-4 h-4"></i>
-                <span>Logout</span>
-            </a>
-        </div>
-    </aside>
-
-    <!-- MAIN WRAPPER -->
-    <div class="pl-64 flex-1 flex flex-col min-w-0">
-        <!-- TOP NAVBAR -->
-        <header class="h-16 border-b border-brand-border bg-brand-sidebar/80 backdrop-blur sticky top-0 z-40 px-6 flex items-center justify-between">
-            <!-- Search Bar -->
-            <div class="relative w-80">
-                <i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
-                <input type="text" placeholder="Search anything... (Ctrl /)" class="w-full bg-brand-bg border border-brand-border rounded-lg pl-9 pr-4 py-1.5 text-xs text-gray-300 placeholder-gray-500 focus:outline-none focus:border-indigo-500">
-            </div>
-
-            <!-- Navbar Actions -->
+    <!-- MAIN APP CONTENT WRAPPER -->
+    <div class="lg:pl-64 flex-1 flex flex-col min-w-0">
+        
+        <!-- TOP NAVIGATION BAR -->
+        <header class="h-16 border-b border-[#1F2937] bg-[#090D16]/90 backdrop-blur sticky top-0 z-30 px-4 sm:px-6 flex items-center justify-between">
+            
+            <!-- Left: Mobile Toggle & Breadcrumb -->
             <div class="flex items-center gap-3">
-                <button class="w-8 h-8 rounded-lg border border-brand-border bg-brand-bg text-gray-400 flex items-center justify-center hover:text-white">
-                    <i data-lucide="sun" class="w-4 h-4"></i>
+                <button id="mobileSidebarToggle" class="lg:hidden p-2 rounded-lg bg-[#111827] border border-[#1F2937] text-gray-400 hover:text-white">
+                    <i data-lucide="menu" class="w-5 h-5"></i>
                 </button>
+                <div>
+                    <h1 class="text-sm sm:text-base font-bold text-white tracking-wide leading-none m-0">
+                        {% block header_title %}SVIT Admin Panel{% endblock %}
+                    </h1>
+                    <span class="text-[11px] text-gray-400">Shardar Vallabhbhai Patel Institute of Technology</span>
+                </div>
+            </div>
+
+            <!-- Right: Search, Alerts, Role Badge & User Profile -->
+            <div class="flex items-center gap-3">
+                
+                <!-- Quick Global Search Input -->
+                <div class="relative hidden md:block w-64">
+                    <i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                    <input type="text" id="globalSearchInput" placeholder="Quick search... (/)" class="w-full bg-[#111827] border border-[#1F2937] rounded-lg pl-9 pr-3 py-1.5 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition">
+                </div>
+
+                <!-- Urgent Notice / Alert Bell -->
                 <div class="relative">
-                    <button class="w-8 h-8 rounded-lg border border-brand-border bg-brand-bg text-gray-400 flex items-center justify-center hover:text-white relative">
+                    <a href="{{ url_for('admin.notices') if has_permission(current_user, 'notices') or has_role(current_user, 'super_admin') else '#' }}" 
+                       class="w-9 h-9 rounded-xl border border-[#1F2937] bg-[#111827] text-gray-400 flex items-center justify-center hover:text-white hover:border-gray-600 transition text-decoration-none relative"
+                       title="View Alerts & Announcements">
                         <i data-lucide="bell" class="w-4 h-4"></i>
-                        <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white font-bold text-[9px] rounded-full flex items-center justify-center">8</span>
-                    </button>
+                        <span id="alertCountBadge" class="absolute -top-1 -right-1 px-1.5 py-0.5 bg-red-500 text-white font-bold text-[9px] rounded-full hidden">0</span>
+                    </a>
                 </div>
-                <div class="flex items-center gap-3 pl-3 border-l border-brand-border">
-                    <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold">
-                        AU
-                    </div>
-                    <div class="text-left text-xs">
-                        <p class="font-semibold text-white leading-tight">Admin User</p>
-                        <p class="text-[10px] text-gray-400">Super Admin</p>
-                    </div>
+
+                <!-- Admin Profile Dropdown Pill -->
+                <div class="flex items-center gap-3 pl-3 border-l border-[#1F2937]">
+                    <a href="{{ url_for('admin.profile') }}" class="flex items-center gap-2.5 text-decoration-none group">
+                        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white text-xs font-bold shadow-md shadow-indigo-600/30">
+                            {{ (current_user.username[:2] if current_user.is_authenticated and current_user.username else 'AD') }}
+                        </div>
+                        <div class="hidden sm:block text-left">
+                            <p class="font-semibold text-white text-xs leading-tight m-0 group-hover:text-indigo-400 transition">
+                                {{ current_user.name if current_user.is_authenticated and hasattr(current_user, 'name') and current_user.name else current_user.username if current_user.is_authenticated else 'Administrator' }}
+                            </p>
+                            <p class="text-[10px] text-indigo-400 font-medium m-0">
+                                {{ current_user.role_display if current_user.is_authenticated else 'Admin' }}
+                            </p>
+                        </div>
+                    </a>
                 </div>
+
             </div>
         </header>
 
-        <!-- CONTENT BODY -->
-        <main class="p-6 flex-1">
+        <!-- FLASH MESSAGES / TOASTS -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="px-6 pt-4">
+                    {% for category, message in messages %}
+                        <div class="alert {% if category == 'error' or category == 'danger' %}alert-danger bg-red-950/50 border-red-500/50 text-red-200{% elif category == 'success' %}alert-success bg-emerald-950/50 border-emerald-500/50 text-emerald-200{% else %}alert-info bg-indigo-950/50 border-indigo-500/50 text-indigo-200{% endif %} alert-dismissible fade show text-xs d-flex align-items-center justify-content-between p-3 rounded-xl border mb-2" role="alert">
+                            <div class="d-flex align-items-center gap-2">
+                                <i data-lucide="{% if category == 'error' or category == 'danger' %}alert-triangle{% elif category == 'success' %}check-circle{% else %}info{% endif %}" class="w-4 h-4"></i>
+                                <span>{{ message }}</span>
+                            </div>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- MAIN CONTENT INJECTION -->
+        <main class="p-4 sm:p-6 flex-1">
             {% block content %}{% endblock %}
         </main>
+
+        <!-- FOOTER -->
+        <footer class="px-6 py-4 border-t border-[#1F2937] bg-[#090D16] text-[11px] text-gray-500 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <span>&copy; 2026 Shardar Vallabhbhai Patel Institute of Technology, Vasad. All rights reserved.</span>
+            <div class="flex items-center gap-4">
+                <span class="text-indigo-400 font-medium flex items-center gap-1">
+                    <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> RBAC Enforced
+                </span>
+                <span class="text-emerald-400 font-medium flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> SVIT-AI v2.0
+                </span>
+            </div>
+        </footer>
+
     </div>
 
+    <!-- GLOBAL TOAST NOTIFICATION CONTAINER -->
+    <div id="toastContainer"></div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Global Layout Scripts -->
     <script>
-        lucide.createIcons();
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+
+            // Mobile Sidebar Toggle
+            const toggleBtn = document.getElementById('mobileSidebarToggle');
+            const closeBtn = document.getElementById('closeSidebarBtn');
+            const sidebar = document.getElementById('adminSidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            if (toggleBtn && sidebar && overlay) {
+                toggleBtn.addEventListener('click', () => {
+                    sidebar.classList.remove('-translate-x-full');
+                    overlay.classList.remove('hidden');
+                });
+
+                const closeSidebar = () => {
+                    sidebar.classList.add('-translate-x-full');
+                    overlay.classList.add('hidden');
+                };
+
+                if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+                overlay.addEventListener('click', closeSidebar);
+            }
+
+            // Keyboard shortcut for search
+            window.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === '/') {
+                    e.preventDefault();
+                    const s = document.getElementById('globalSearchInput');
+                    if (s) s.focus();
+                }
+            });
+        });
+
+        // Universal Toast Dispatcher
+        function showAdminToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            const bgClass = type === 'error' ? 'bg-red-950/90 border-red-500 text-red-200' :
+                            type === 'warning' ? 'bg-amber-950/90 border-amber-500 text-amber-200' :
+                            type === 'info' ? 'bg-indigo-950/90 border-indigo-500 text-indigo-200' :
+                            'bg-emerald-950/90 border-emerald-500 text-emerald-200';
+
+            const iconName = type === 'error' ? 'alert-triangle' :
+                             type === 'warning' ? 'alert-circle' :
+                             type === 'info' ? 'info' : 'check-circle';
+
+            toast.className = `p-3 rounded-xl border backdrop-blur shadow-2xl flex items-center justify-between gap-3 text-xs transition-all duration-300 transform translate-y-2 opacity-0 ${bgClass}`;
+            toast.innerHTML = `
+                <div class="flex items-center gap-2.5">
+                    <i data-lucide="${iconName}" class="w-4 h-4 flex-shrink-0"></i>
+                    <span class="font-medium">${message}</span>
+                </div>
+                <button class="text-gray-400 hover:text-white text-xs font-bold px-1" onclick="this.parentElement.remove()">✕</button>
+            `;
+
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 20);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', '-translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
     </script>
     {% block extra_js %}{% endblock %}
 </body>

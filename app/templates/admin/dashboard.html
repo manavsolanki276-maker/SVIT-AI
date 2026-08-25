@@ -1,305 +1,255 @@
 {% extends "layouts/admin_base.html" %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block header_title %}Admin Dashboard{% endblock %}
 
 {% block extra_css %}
-<!-- Bootstrap 5 CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<style>
-    /* Custom Dark Styling Overrides for Bootstrap Cards */
-    .bg-dark-card {
-        background-color: #111827 !important;
-        border: 1px solid #1f2937 !important;
-        border-radius: 0.85rem !important;
-    }
-
-    .text-muted-custom {
-        color: #9ca3af !important;
-    }
-
-    .stat-icon-box {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .quick-action-btn {
-        background-color: #0b0f19;
-        border: 1px solid #1f2937;
-        color: #d1d5db;
-        border-radius: 10px;
-        padding: 0.75rem 0.5rem;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.4rem;
-        transition: all 0.2s ease-in-out;
-        text-decoration: none;
-    }
-
-    .quick-action-btn:hover {
-        border-color: #6366f1;
-        background-color: #1e1b4b;
-        color: #ffffff;
-    }
-
-    .table-dark-custom {
-        --bs-table-bg: transparent;
-        --bs-table-color: #d1d5db;
-        --bs-table-border-color: #1f2937;
-    }
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/dashboard.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid p-0 text-white">
+<div class="space-y-6 text-white">
 
-    <!-- Top Dashboard Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h4 font-weight-bold text-white mb-1">Welcome back, Admin! 👋</h1>
-            <p class="text-muted-custom small mb-0">Here's what's happening at SVIT, Vasad today.</p>
+    <!-- 1. URGENT NOTICES / EMERGENCY ALERT BANNER (If Active) -->
+    {% if stats and stats.urgent_notices and stats.urgent_notices|length > 0 %}
+        {% for alert in stats.urgent_notices %}
+        <div class="urgent-ticker-box p-4 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="flex items-start gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-red-600/30 border border-red-500 flex items-center justify-center text-red-400 flex-shrink-0 animate-bounce">
+                    <i data-lucide="alert-octagon" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-red-600 text-white tracking-wider animate-pulse">EMERGENCY ALERT</span>
+                        <span class="text-xs text-red-300 font-medium"><i data-lucide="calendar" class="w-3 h-3 d-inline"></i> {{ alert.publish_date }}</span>
+                        <span class="text-xs text-gray-400">Target: <strong class="text-white">{{ alert.target_audience }}</strong></span>
+                    </div>
+                    <h3 class="text-base sm:text-lg font-bold text-white mt-1 mb-0.5">{{ alert.title }}</h3>
+                    <p class="text-xs text-red-200/90 mb-0 line-clamp-2">{{ alert.description }}</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 self-end md:self-center flex-shrink-0">
+                <a href="{{ url_for('admin.notices') }}" class="px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-semibold text-xs transition flex items-center gap-2 text-decoration-none shadow-lg shadow-red-600/30">
+                    <i data-lucide="eye" class="w-4 h-4"></i> View Alert Details
+                </a>
+            </div>
         </div>
-        <div class="bg-dark-card px-3 py-2 text-muted-custom small d-flex align-items-center gap-2">
+        {% endfor %}
+    {% endif %}
+
+    <!-- 2. WELCOME HERO BANNER & DATE -->
+    <div class="dashboard-hero-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl">
+        <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 font-bold text-lg flex-shrink-0">
+                <i data-lucide="sparkles" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <h2 class="text-lg font-bold text-white mb-0.5">
+                    Welcome back, {{ admin.name if (admin is defined and hasattr(admin, 'name') and admin.name) else (admin.username if admin is defined else 'Admin') }}! 👋
+                </h2>
+                <p class="text-xs text-gray-400 mb-0">
+                    Logged in as <span class="text-indigo-400 font-semibold">{{ admin.role_display if (admin is defined and hasattr(admin, 'role_display')) else 'Administrator' }}</span>. Real-time operations and activity overview.
+                </p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#0F172A] border border-[#1F2937] text-xs text-gray-300 self-start sm:self-auto">
             <i data-lucide="calendar" class="w-4 h-4 text-indigo-400"></i>
-            <span>28 May 2026, Wednesday</span>
+            <span id="currentDateDisplay">Today</span>
         </div>
     </div>
 
-    <!-- STAT CARDS GRID (6 Key College Metrics) -->
-    <div class="row g-3 mb-4">
-        <!-- 📊 Total Students -->
-        <div class="col-12 col-sm-6 col-xl-2">
-            <div class="card bg-dark-card text-white h-100 p-3">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-muted-custom small">Total Students</span>
-                    <div class="stat-icon-box bg-primary bg-opacity-10 text-primary">
-                        <i data-lucide="graduation-cap"></i>
+    <!-- 3. ROLE-CUSTOMIZED STAT CARDS GRID -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {% if stats and stats.counters %}
+            {% for label, val in stats.counters.items() %}
+            <div class="p-4 rounded-2xl bg-[#111827] border border-[#1F2937] stat-card-glow group">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ label.replace('_', ' ').title() }}</span>
+                    <div class="stat-icon-wrapper bg-indigo-600/10 text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white">
+                        <i data-lucide="activity" class="w-4 h-4"></i>
                     </div>
                 </div>
-                <h3 class="fw-bold h4 mb-1">2,487</h3>
-                <span class="text-success small"><i data-lucide="arrow-up-right" class="w-3 h-3 d-inline"></i> 12.5%</span>
-            </div>
-        </div>
-
-        <!-- 👨‍🏫 Total Faculty -->
-        <div class="col-12 col-sm-6 col-xl-2">
-            <div class="card bg-dark-card text-white h-100 p-3">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-muted-custom small">Total Faculty</span>
-                    <div class="stat-icon-box bg-success bg-opacity-10 text-success">
-                        <i data-lucide="user-check"></i>
-                    </div>
+                <div class="flex items-baseline justify-between mt-1">
+                    <h3 class="text-2xl font-black text-white m-0">{{ val }}</h3>
+                    <span class="text-[11px] font-semibold text-emerald-400 flex items-center gap-0.5">
+                        <i data-lucide="arrow-up-right" class="w-3 h-3"></i> Active
+                    </span>
                 </div>
-                <h3 class="fw-bold h4 mb-1">186</h3>
-                <span class="text-success small"><i data-lucide="arrow-up-right" class="w-3 h-3 d-inline"></i> 5.3%</span>
             </div>
-        </div>
-
-        <!-- 🏢 Departments -->
-        <div class="col-12 col-sm-6 col-xl-2">
-            <div class="card bg-dark-card text-white h-100 p-3">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-muted-custom small">Departments</span>
-                    <div class="stat-icon-box bg-info bg-opacity-10 text-info">
-                        <i data-lucide="building-2"></i>
-                    </div>
-                </div>
-                <h3 class="fw-bold h4 mb-1">12</h3>
-                <span class="text-muted-custom small">No change</span>
-            </div>
-        </div>
-
-        <!-- 📚 Library Books -->
-        <div class="col-12 col-sm-6 col-xl-2">
-            <div class="card bg-dark-card text-white h-100 p-3">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-muted-custom small">Library Books</span>
-                    <div class="stat-icon-box bg-warning bg-opacity-10 text-warning">
-                        <i data-lucide="book-open"></i>
-                    </div>
-                </div>
-                <h3 class="fw-bold h4 mb-1">14,820</h3>
-                <span class="text-success small">+120 added</span>
-            </div>
-        </div>
-
-        <!-- 🚌 Transport Routes -->
-        <div class="col-12 col-sm-6 col-xl-2">
-            <div class="card bg-dark-card text-white h-100 p-3">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-muted-custom small">Bus Routes</span>
-                    <div class="stat-icon-box bg-danger bg-opacity-10 text-danger">
-                        <i data-lucide="bus"></i>
-                    </div>
-                </div>
-                <h3 class="fw-bold h4 mb-1">24</h3>
-                <span class="text-muted-custom small">Active routes</span>
-            </div>
-        </div>
-
-        <!-- 📢 Active Notices -->
-        <div class="col-12 col-sm-6 col-xl-2">
-            <div class="card bg-dark-card text-white h-100 p-3">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-muted-custom small">Active Notices</span>
-                    <div class="stat-icon-box bg-purple bg-opacity-10 text-purple" style="color: #a855f7;">
-                        <i data-lucide="megaphone"></i>
-                    </div>
-                </div>
-                <h3 class="fw-bold h4 mb-1">36</h3>
-                <span class="text-success small">+4 published</span>
-            </div>
-        </div>
+            {% endfor %}
+        {% endif %}
     </div>
 
-    <!-- MIDDLE SECTION: Chart.js Graph, Activity Feed & Quick Actions -->
-    <div class="row g-3 mb-4">
+    <!-- 4. MIDDLE ROW: ANALYTICS CHART & QUICK SHORTCUTS -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- 📈 Chart.js Analytics Widget -->
-        <div class="col-12 col-lg-6">
-            <div class="card bg-dark-card text-white h-100 p-3">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2 class="h6 font-weight-bold mb-0">📈 Overview Analytics</h2>
-                    <select class="form-select form-select-sm bg-dark border-secondary text-white w-auto">
-                        <option>This Month</option>
-                        <option>Last Month</option>
-                    </select>
+        <!-- Left 2 Cols: Analytics Overview Chart -->
+        <div class="lg:col-span-2 p-5 rounded-2xl bg-[#111827] border border-[#1F2937]">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-sm font-bold text-white mb-0.5">📈 Platform Traffic & Activity Telemetry</h3>
+                    <p class="text-xs text-gray-400 mb-0">Live student queries, administrative operations, and service traffic</p>
                 </div>
-                <div style="height: 250px;">
-                    <canvas id="overviewChart"></canvas>
-                </div>
+                <span class="px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                    Live Telemetry
+                </span>
+            </div>
+            <div class="chart-card-container">
+                <canvas id="overviewChart"></canvas>
             </div>
         </div>
 
-        <!-- 🕒 Recent Activity Widget -->
-        <div class="col-12 col-lg-3">
-            <div class="card bg-dark-card text-white h-100 p-3">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2 class="h6 font-weight-bold mb-0">🕒 Recent Activity</h2>
-                    <a href="#" class="text-primary text-decoration-none small">View All</a>
+        <!-- Right Col: Quick Actions Tailored to Logged-in Admin -->
+        <div class="p-5 rounded-2xl bg-[#111827] border border-[#1F2937] flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-bold text-white mb-0">⚡ Quick Actions</h3>
+                    <span class="text-[10px] text-gray-400 font-medium">1-Click Fast Access</span>
                 </div>
-                <ul class="list-unstyled mb-0 d-flex flex-column gap-3">
-                    <li class="d-flex align-items-start gap-2">
-                        <div class="p-1 bg-primary bg-opacity-10 text-primary rounded"><i data-lucide="user-plus" class="w-4 h-4"></i></div>
-                        <div class="flex-grow-1">
-                            <p class="small mb-0 font-weight-semibold">Aarav Patel registered</p>
-                            <span class="text-muted-custom text-xs">2 min ago</span>
-                        </div>
-                    </li>
-                    <li class="d-flex align-items-start gap-2">
-                        <div class="p-1 bg-info bg-opacity-10 text-info rounded"><i data-lucide="calendar" class="w-4 h-4"></i></div>
-                        <div class="flex-grow-1">
-                            <p class="small mb-0 font-weight-semibold">Timetable updated</p>
-                            <span class="text-muted-custom text-xs">15 min ago</span>
-                        </div>
-                    </li>
-                    <li class="d-flex align-items-start gap-2">
-                        <div class="p-1 bg-success bg-opacity-10 text-success rounded"><i data-lucide="megaphone" class="w-4 h-4"></i></div>
-                        <div class="flex-grow-1">
-                            <p class="small mb-0 font-weight-semibold">Exam notice published</p>
-                            <span class="text-muted-custom text-xs">1 hr ago</span>
-                        </div>
-                    </li>
-                </ul>
+                <p class="text-xs text-gray-400 mb-4">Fast shortcuts for administrative tasks assigned to your role privileges.</p>
+
+                <div class="grid grid-cols-2 gap-2.5">
+                    {% if has_permission(current_user, 'academic') or has_role(current_user, 'super_admin') %}
+                        <a href="{{ url_for('admin.students') }}" class="quick-action-card">
+                            <i data-lucide="users" class="w-5 h-5 text-indigo-400"></i>
+                            <span class="text-xs font-semibold">Students</span>
+                        </a>
+                        <a href="{{ url_for('admin.faculty') }}" class="quick-action-card">
+                            <i data-lucide="user-check" class="w-5 h-5 text-emerald-400"></i>
+                            <span class="text-xs font-semibold">Faculty</span>
+                        </a>
+                        <a href="{{ url_for('admin.academic_documents') }}" class="quick-action-card">
+                            <i data-lucide="file-text" class="w-5 h-5 text-blue-400"></i>
+                            <span class="text-xs font-semibold">Academic PDFs</span>
+                        </a>
+                    {% endif %}
+
+                    {% if has_permission(current_user, 'notices') or has_role(current_user, 'super_admin') %}
+                        <a href="{{ url_for('admin.notices') }}" class="quick-action-card">
+                            <i data-lucide="megaphone" class="w-5 h-5 text-amber-400"></i>
+                            <span class="text-xs font-semibold">Add Notice</span>
+                        </a>
+                    {% endif %}
+
+                    {% if has_permission(current_user, 'events') or has_role(current_user, 'super_admin') %}
+                        <a href="{{ url_for('admin.events') }}" class="quick-action-card">
+                            <i data-lucide="party-popper" class="w-5 h-5 text-pink-400"></i>
+                            <span class="text-xs font-semibold">Add Event</span>
+                        </a>
+                    {% endif %}
+
+                    {% if has_permission(current_user, 'bus') or has_role(current_user, 'super_admin') %}
+                        <a href="{{ url_for('admin.buses') }}" class="quick-action-card">
+                            <i data-lucide="bus" class="w-5 h-5 text-cyan-400"></i>
+                            <span class="text-xs font-semibold">Bus Routes</span>
+                        </a>
+                    {% endif %}
+
+                    {% if has_permission(current_user, 'library') or has_role(current_user, 'super_admin') %}
+                        <a href="{{ url_for('admin.library_books') }}" class="quick-action-card">
+                            <i data-lucide="book-open" class="w-5 h-5 text-teal-400"></i>
+                            <span class="text-xs font-semibold">Library Books</span>
+                        </a>
+                    {% endif %}
+
+                    {% if has_permission(current_user, 'canteen') or has_role(current_user, 'super_admin') %}
+                        <a href="{{ url_for('admin.canteen') }}" class="quick-action-card">
+                            <i data-lucide="utensils" class="w-5 h-5 text-orange-400"></i>
+                            <span class="text-xs font-semibold">Canteen Menu</span>
+                        </a>
+                    {% endif %}
+
+                    {% if has_permission(current_user, 'sports') or has_role(current_user, 'super_admin') %}
+                        <a href="{{ url_for('admin.sports') }}" class="quick-action-card">
+                            <i data-lucide="trophy" class="w-5 h-5 text-yellow-400"></i>
+                            <span class="text-xs font-semibold">Sports</span>
+                        </a>
+                        <a href="{{ url_for('admin.sports_events') }}" class="quick-action-card">
+                            <i data-lucide="medal" class="w-5 h-5 text-yellow-400"></i>
+                            <span class="text-xs font-semibold">Tournaments</span>
+                        </a>
+                    {% endif %}
+
+                    {% if has_permission(current_user, 'admission') or has_role(current_user, 'super_admin') %}
+                        <a href="{{ url_for('admin.admission') }}" class="quick-action-card">
+                            <i data-lucide="graduation-cap" class="w-5 h-5 text-emerald-400"></i>
+                            <span class="text-xs font-semibold">Admission</span>
+                        </a>
+                    {% endif %}
+
+                    {% if has_role(current_user, 'super_admin') %}
+                        <a href="{{ url_for('admin.admin_management') }}" class="quick-action-card">
+                            <i data-lucide="shield-check" class="w-5 h-5 text-indigo-400"></i>
+                            <span class="text-xs font-semibold">Admins (RBAC)</span>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-[#1F2937] flex items-center justify-between text-xs text-gray-400">
+                <span>Security Enforcement:</span>
+                <span class="text-emerald-400 font-semibold flex items-center gap-1">
+                    <i data-lucide="lock" class="w-3.5 h-3.5"></i> RBAC Active
+                </span>
             </div>
         </div>
 
-        <!-- ⚡ Quick Actions Widget -->
-        <div class="col-12 col-lg-3">
-            <div class="card bg-dark-card text-white h-100 p-3">
-                <h2 class="h6 font-weight-bold mb-3">⚡ Quick Actions</h2>
-                <div class="row g-2">
-                    <div class="col-4">
-                        <a href="#" class="quick-action-btn">
-                            <i data-lucide="user-plus" class="text-primary"></i>
-                            <span class="small" style="font-size: 10px;">Student</span>
-                        </a>
-                    </div>
-                    <div class="col-4">
-                        <a href="#" class="quick-action-btn">
-                            <i data-lucide="user-check" class="text-success"></i>
-                            <span class="small" style="font-size: 10px;">Faculty</span>
-                        </a>
-                    </div>
-                    <div class="col-4">
-                        <a href="#" class="quick-action-btn">
-                            <i data-lucide="file-plus" class="text-warning"></i>
-                            <span class="small" style="font-size: 10px;">Notice</span>
-                        </a>
-                    </div>
-                    <div class="col-4">
-                        <a href="#" class="quick-action-btn">
-                            <i data-lucide="calendar-plus" class="text-danger"></i>
-                            <span class="small" style="font-size: 10px;">Event</span>
-                        </a>
-                    </div>
-                    <div class="col-4">
-                        <a href="#" class="quick-action-btn">
-                            <i data-lucide="book-plus" class="text-info"></i>
-                            <span class="small" style="font-size: 10px;">Book</span>
-                        </a>
-                    </div>
-                    <div class="col-4">
-                        <a href="#" class="quick-action-btn">
-                            <i data-lucide="send" style="color: #a855f7;"></i>
-                            <span class="small" style="font-size: 10px;">Message</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
-    <!-- BOTTOM ROW: 🎉 Upcoming Events & Drives -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card bg-dark-card text-white p-3">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2 class="h6 font-weight-bold mb-0">🎉 Upcoming Events & Drives</h2>
-                    <a href="#" class="text-primary text-decoration-none small">View Calendar</a>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-dark-custom align-middle mb-0">
-                        <thead class="text-muted-custom small">
-                            <tr>
-                                <th>TITLE</th>
-                                <th>TYPE</th>
-                                <th>DATE</th>
-                                <th>ORGANIZED BY</th>
-                                <th>STATUS</th>
-                            </tr>
-                        </thead>
-                        <tbody class="small">
-                            <tr>
-                                <td class="fw-bold">TCS Campus Placement Drive</td>
-                                <td class="text-muted-custom">Placement</td>
-                                <td class="text-muted-custom"><i data-lucide="calendar" class="w-3 h-3 d-inline me-1"></i>10 Jun 2026</td>
-                                <td class="text-muted-custom">Training & Placement Cell</td>
-                                <td><span class="badge bg-primary bg-opacity-20 text-primary">Upcoming</span></td>
-                            </tr>
-                            <tr>
-                                <td class="fw-bold">Tech Hackathon 2026</td>
-                                <td class="text-muted-custom">Event</td>
-                                <td class="text-muted-custom"><i data-lucide="calendar" class="w-3 h-3 d-inline me-1"></i>15 Jun 2026</td>
-                                <td class="text-muted-custom">Computer Dept.</td>
-                                <td><span class="badge bg-primary bg-opacity-20 text-primary">Upcoming</span></td>
-                            </tr>
-                            <tr>
-                                <td class="fw-bold">Workshop on AI & ML</td>
-                                <td class="text-muted-custom">Workshop</td>
-                                <td class="text-muted-custom"><i data-lucide="calendar" class="w-3 h-3 d-inline me-1"></i>25 Jun 2026</td>
-                                <td class="text-muted-custom">IT Department</td>
-                                <td><span class="badge bg-primary bg-opacity-20 text-primary">Upcoming</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+    <!-- 5. BOTTOM SECTION: RECENT NOTICES & EVENTS TABLE -->
+    <div class="p-5 rounded-2xl bg-[#111827] border border-[#1F2937]">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h3 class="text-sm font-bold text-white mb-0.5">📢 Recent Notices & Announcements</h3>
+                <p class="text-xs text-gray-400 mb-0">Latest published campus updates, circulars, and notifications</p>
             </div>
+            {% if has_permission(current_user, 'notices') or has_role(current_user, 'super_admin') %}
+            <a href="{{ url_for('admin.notices') }}" class="text-xs text-indigo-400 hover:text-indigo-300 font-semibold text-decoration-none flex items-center gap-1">
+                Manage All <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </a>
+            {% endif %}
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-dark-custom mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th>NOTICE TITLE</th>
+                        <th>CATEGORY</th>
+                        <th>PRIORITY</th>
+                        <th>TARGET AUDIENCE</th>
+                        <th>DATE</th>
+                        <th>STATUS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if stats and stats.recent_notices and stats.recent_notices|length > 0 %}
+                        {% for n in stats.recent_notices %}
+                        <tr>
+                            <td class="font-semibold text-white">{{ n.title or n.notice_title or 'Notice' }}</td>
+                            <td><span class="px-2 py-0.5 rounded text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">{{ n.category or 'General' }}</span></td>
+                            <td>
+                                {% if n.is_urgent or n.priority == 'Emergency' or n.priority == 'High' %}
+                                    <span class="px-2 py-0.5 rounded text-[10px] bg-red-600 text-white font-bold animate-pulse">{{ n.priority or 'High' }}</span>
+                                {% else %}
+                                    <span class="px-2 py-0.5 rounded text-[10px] bg-blue-500/20 text-blue-300">{{ n.priority or 'Normal' }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-gray-300">{{ n.target_audience or 'All Students' }}</td>
+                            <td class="text-gray-400 text-xs">{{ n.publish_date or n.date or '-' }}</td>
+                            <td><span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300">{{ n.status or 'Published' }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-8 text-gray-400 text-xs">
+                                <i data-lucide="bell-off" class="w-6 h-6 text-gray-600 mx-auto mb-2 block"></i>
+                                No notices available.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -307,61 +257,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- Bootstrap 5 JS Bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Chart.js Engine -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        lucide.createIcons();
-
-        // 📊 Render Bootstrap Chart.js Line Analytics
-        const ctx = document.getElementById('overviewChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['01 May', '07 May', '14 May', '21 May', '28 May'],
-                datasets: [
-                    {
-                        label: 'Students',
-                        data: [1400, 1700, 1600, 1850, 2100],
-                        borderColor: '#6366f1',
-                        backgroundColor: '#6366f1',
-                        borderWidth: 2,
-                        tension: 0.4
-                    },
-                    {
-                        label: 'Faculty',
-                        data: [600, 700, 800, 950, 850],
-                        borderColor: '#22c55e',
-                        backgroundColor: '#22c55e',
-                        borderWidth: 2,
-                        tension: 0.4
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        labels: { color: '#9ca3af' }
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: { display: false },
-                        ticks: { color: '#6b7280' }
-                    },
-                    y: {
-                        grid: { color: '#1f2937' },
-                        ticks: { color: '#6b7280' }
-                    }
-                }
-            }
-        });
-    });
-</script>
+<script src="{{ url_for('static', filename='js/admin/dashboard.js') }}"></script>
 {% endblock %}

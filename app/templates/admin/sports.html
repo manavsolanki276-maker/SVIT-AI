@@ -1,0 +1,146 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}Sports Disciplines{% endblock %}
+{% block header_title %}Athletics Administration: Sports Disciplines{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/sports.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6 text-white">
+
+    <!-- Header Hero Card -->
+    <div class="sports-hero-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl">
+        <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-yellow-600/20 border border-yellow-500/30 flex items-center justify-center text-yellow-400 flex-shrink-0">
+                <i data-lucide="trophy" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h2 class="text-lg font-bold text-white mb-0">Athletics & Sports Disciplines</h2>
+                    <span id="sportsCountBadge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
+                        0 Disciplines
+                    </span>
+                </div>
+                <p class="text-xs text-gray-400 mb-0 mt-0.5">Manage college sports teams, coaches, court assignments, and athletic equipment (Strictly separate from General Events).</p>
+            </div>
+        </div>
+
+        <button id="openCreateSportModalBtn" class="px-4 py-2.5 rounded-xl bg-yellow-600 hover:bg-yellow-500 text-white text-xs font-semibold shadow-lg shadow-yellow-600/30 transition flex items-center gap-2 self-start sm:self-auto">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i> Add Sport Discipline
+        </button>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <div class="p-4 rounded-2xl bg-[#111827] border border-[#1F2937] flex flex-col sm:flex-row items-center justify-between gap-3 flex-wrap">
+        <div class="relative w-full sm:w-80">
+            <i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="sportSearchInput" placeholder="Search sports (e.g. Cricket, Badminton)..." class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl pl-9 pr-3 py-2 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition">
+        </div>
+
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+            <select id="sportTypeFilter" class="bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-yellow-500">
+                <option value="">All Types (Indoor & Outdoor)</option>
+                <option value="Outdoor">Outdoor Sports</option>
+                <option value="Indoor">Indoor Games</option>
+            </select>
+            <button id="refreshSportsBtn" class="p-2 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-400 hover:text-white" title="Refresh Sports">
+                <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Sports Grid Cards -->
+    <div id="sportsGridContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+
+</div>
+
+<!-- CREATE / EDIT SPORT MODAL -->
+<div class="modal fade" id="sportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-dark-content">
+            <div class="modal-header border-b border-[#1F2937] p-4">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="trophy" class="w-4 h-4 text-yellow-400"></i>
+                    <h3 class="text-sm font-bold text-white mb-0" id="sportModalTitle">Add Sports Discipline</h3>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="sportForm" class="p-4 space-y-3.5 text-xs">
+                <input type="hidden" id="sportFormRecordId">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Sport Name *</label>
+                        <input type="text" id="sportNameInput" required placeholder="e.g. Cricket" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-yellow-500">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Sport Classification *</label>
+                        <select id="sportTypeSelect" required class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-yellow-500">
+                            <option value="Outdoor" selected>Outdoor Sport</option>
+                            <option value="Indoor">Indoor Sport</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Coach / Faculty In-Charge</label>
+                        <input type="text" id="sportCoachInput" placeholder="Prof. Coach Name" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-yellow-500">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Ground / Facility Location</label>
+                        <input type="text" id="sportGroundInput" placeholder="e.g. SVIT Cricket Ground" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-yellow-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[11px] font-semibold text-gray-300">Equipment & Gear Information</label>
+                    <textarea id="sportEquipInput" rows="2" placeholder="Kits available, booking guidelines, practice timings..." class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-yellow-500"></textarea>
+                </div>
+
+                <!-- Photo Upload -->
+                <div>
+                    <label class="text-[11px] font-semibold text-gray-300">Discipline Cover Photo</label>
+                    <div id="sportPhotoDropZone" class="p-3 border-2 border-dashed border-[#1F2937] rounded-xl text-center cursor-pointer hover:border-yellow-500 transition bg-[#0F172A]">
+                        <i data-lucide="image" class="w-4 h-4 mx-auto mb-1 text-gray-500"></i>
+                        <p class="text-xs text-gray-400 mb-0">Drag & drop photo or browse</p>
+                    </div>
+                    <input type="file" id="sportPhotoInput" accept="image/*" class="hidden">
+                    <div id="sportPhotoPreviewContainer" class="mt-2 flex items-center gap-3 hidden"></div>
+                </div>
+
+                <div class="modal-footer border-t border-[#1F2937] pt-4 px-0 pb-0 flex justify-end gap-2">
+                    <button type="button" class="px-4 py-2 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs font-semibold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-yellow-600 hover:bg-yellow-500 text-white text-xs font-semibold shadow-lg shadow-yellow-600/30">Save Sport</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- DELETE SPORT MODAL -->
+<div class="modal fade" id="sportDeleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content modal-dark-content text-center p-5 space-y-3">
+            <div class="w-12 h-12 rounded-full bg-red-600/20 text-red-400 border border-red-500/30 flex items-center justify-center mx-auto">
+                <i data-lucide="trash-2" class="w-6 h-6"></i>
+            </div>
+            <h4 class="text-sm font-bold text-white mb-1">Remove Sport Discipline?</h4>
+            <p class="text-xs text-gray-400 mb-0">
+                Are you sure you want to delete <strong id="deleteSportTargetId" class="text-white"></strong>?
+            </p>
+            <div class="pt-2 flex justify-center gap-2">
+                <button type="button" class="px-3.5 py-1.5 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmDeleteSportBtn" class="px-4 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-semibold">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin/sports.js') }}"></script>
+{% endblock %}

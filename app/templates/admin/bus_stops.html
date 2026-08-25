@@ -1,0 +1,154 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}Bus Stops{% endblock %}
+{% block header_title %}Transport Administration: Bus Stops & Pick Points{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/bus_stops.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6 text-white">
+
+    <!-- Header Hero Card -->
+    <div class="bus-stops-hero-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl">
+        <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-cyan-600/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 flex-shrink-0">
+                <i data-lucide="map-pin" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h2 class="text-lg font-bold text-white mb-0">Bus Stops & Boarding Stations</h2>
+                    <span id="stopsCountBadge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                        0 Stops
+                    </span>
+                </div>
+                <p class="text-xs text-gray-400 mb-0 mt-0.5">Manage designated student pickup locations, highway junctions, and scheduled arrival timestamps.</p>
+            </div>
+        </div>
+
+        <button id="openCreateStopModalBtn" class="px-4 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold shadow-lg shadow-cyan-600/30 transition flex items-center gap-2 self-start sm:self-auto">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i> Add Stop
+        </button>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <div class="p-4 rounded-2xl bg-[#111827] border border-[#1F2937] flex flex-col sm:flex-row items-center justify-between gap-3 flex-wrap">
+        <div class="relative w-full sm:w-80">
+            <i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="stopSearchInput" placeholder="Search by stop name, landmark..." class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl pl-9 pr-3 py-2 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition">
+        </div>
+
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+            <select id="stopRouteFilter" class="bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-cyan-500">
+                <option value="">All Routes</option>
+                <option value="Route 1">Route 1</option>
+                <option value="Route 2">Route 2</option>
+                <option value="Route 3">Route 3</option>
+            </select>
+            <button id="refreshStopsBtn" class="p-2 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-400 hover:text-white" title="Refresh Stops">
+                <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Stops Table -->
+    <div class="rounded-2xl bg-[#111827] border border-[#1F2937] overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-dark-custom mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th>STOP NAME</th>
+                        <th>ROUTE</th>
+                        <th>MORNING PICKUP</th>
+                        <th>EVENING DROP</th>
+                        <th>LANDMARK</th>
+                        <th class="text-end">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody id="stopsTableBody">
+                    <tr>
+                        <td colspan="6" class="text-center py-10 text-gray-400 text-xs">
+                            <div class="w-5 h-5 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                            Loading bus stops...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- CREATE / EDIT STOP MODAL -->
+<div class="modal fade" id="stopFormModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-dark-content">
+            <div class="modal-header border-b border-[#1F2937] p-4">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="map-pin" class="w-4 h-4 text-cyan-400"></i>
+                    <h3 class="text-sm font-bold text-white mb-0" id="stopModalTitle">Add Bus Stop</h3>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="stopForm" class="p-4 space-y-3.5 text-xs">
+                <input type="hidden" id="stopFormRecordId">
+                
+                <div>
+                    <label class="text-[11px] font-semibold text-gray-300">Stop Name *</label>
+                    <input type="text" id="stopNameInput" required placeholder="e.g. Fatehgunj Circle" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Assigned Route *</label>
+                        <select id="stopRouteSelect" required class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500">
+                            <option value="Route 1">Route 1 (Vadodara Main)</option>
+                            <option value="Route 2">Route 2 (Manjalpur / Makarpura)</option>
+                            <option value="Route 3">Route 3 (Anand / Vidyanagar)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Morning Pickup Time</label>
+                        <input type="time" id="stopMorningTimeInput" value="07:30" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[11px] font-semibold text-gray-300">Nearest Landmark / Description</label>
+                    <input type="text" id="stopLandmarkInput" placeholder="e.g. Opposite Central Petrol Pump" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500">
+                </div>
+
+                <div class="modal-footer border-t border-[#1F2937] pt-4 px-0 pb-0 flex justify-end gap-2">
+                    <button type="button" class="px-4 py-2 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs font-semibold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold shadow-lg shadow-cyan-600/30">Save Stop</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- DELETE STOP MODAL -->
+<div class="modal fade" id="stopDeleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content modal-dark-content text-center p-5 space-y-3">
+            <div class="w-12 h-12 rounded-full bg-red-600/20 text-red-400 border border-red-500/30 flex items-center justify-center mx-auto">
+                <i data-lucide="trash-2" class="w-6 h-6"></i>
+            </div>
+            <h4 class="text-sm font-bold text-white mb-1">Remove Bus Stop?</h4>
+            <p class="text-xs text-gray-400 mb-0">
+                Are you sure you want to delete stop <strong id="deleteStopTargetId" class="text-white"></strong>?
+            </p>
+            <div class="pt-2 flex justify-center gap-2">
+                <button type="button" class="px-3.5 py-1.5 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmDeleteStopBtn" class="px-4 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-semibold">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin/bus_stops.js') }}"></script>
+{% endblock %}

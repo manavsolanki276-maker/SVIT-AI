@@ -1,0 +1,108 @@
+/* ==========================================================================
+   SVIT Admin - Page 7: Timetable Styles (Weekly Grid UI)
+   ========================================================================== */
+
+.timetable-hero-card {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(17, 24, 39, 0.95) 100%);
+    border: 1px solid rgba(99, 102, 241, 0.25);
+}
+
+.timetable-matrix-wrapper {
+    overflow-x: auto;
+    border-radius: 16px;
+    border: 1px solid #1F2937;
+    background: #111827;
+}
+
+.timetable-grid-table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.timetable-grid-table th {
+    background: #0F172A;
+    color: #9CA3AF;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 12px 14px;
+    border-bottom: 1px solid #1F2937;
+    border-right: 1px solid #1F2937;
+}
+
+.timetable-grid-table th:last-child {
+    border-right: none;
+}
+
+.timetable-grid-table td {
+    padding: 10px;
+    border-bottom: 1px solid #1F2937;
+    border-right: 1px solid #1F2937;
+    vertical-align: top;
+    min-width: 140px;
+    height: 100px;
+}
+
+.timetable-grid-table td:last-child {
+    border-right: none;
+}
+
+.time-col {
+    width: 110px;
+    min-width: 110px !important;
+    background: #0B0F19;
+    font-weight: 700;
+    font-size: 11px;
+    color: #818CF8;
+    text-align: center;
+    vertical-align: middle !important;
+}
+
+.lecture-card {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(30, 27, 75, 0.5));
+    border: 1px solid rgba(99, 102, 241, 0.4);
+    border-radius: 10px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.lecture-card:hover {
+    border-color: #818CF8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.lecture-subject {
+    font-weight: 700;
+    font-size: 11px;
+    color: #FFFFFF;
+    line-height: 1.2;
+    margin-bottom: 2px;
+}
+
+.lecture-meta {
+    font-size: 10px;
+    color: #C7D2FE;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.lecture-room {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: rgba(99, 102, 241, 0.3);
+    color: #E0E7FF;
+    display: inline-block;
+    margin-top: 4px;
+}

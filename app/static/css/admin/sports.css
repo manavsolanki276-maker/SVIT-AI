@@ -1,0 +1,51 @@
+/* ==========================================================================
+   SVIT Admin - Page 26: Sports Disciplines Styles
+   ========================================================================== */
+
+.sports-hero-card {
+    background: linear-gradient(135deg, rgba(234, 179, 8, 0.15) 0%, rgba(17, 24, 39, 0.95) 100%);
+    border: 1px solid rgba(234, 179, 8, 0.25);
+}
+
+.sport-card-box {
+    background: #111827;
+    border: 1px solid #1F2937;
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+}
+
+.sport-card-box:hover {
+    border-color: #EAB308;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 15px rgba(234, 179, 8, 0.2);
+}
+
+.sport-img-wrapper {
+    height: 130px;
+    background: #0F172A;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.sport-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.badge-sport-type {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(234, 179, 8, 0.15);
+    color: #FDE047;
+    border: 1px solid rgba(234, 179, 8, 0.3);
+}

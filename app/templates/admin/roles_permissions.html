@@ -1,0 +1,130 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}Roles & Permissions{% endblock %}
+{% block header_title %}RBAC Security & Permission Matrix{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/roles_permissions.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6 text-white">
+
+    <!-- Header Card -->
+    <div class="rbac-hero-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl">
+        <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 flex-shrink-0">
+                <i data-lucide="key" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <h2 class="text-lg font-bold text-white mb-0">Role-Based Access Control (RBAC)</h2>
+                <p class="text-xs text-gray-400 mb-0 mt-0.5">Comprehensive permission matrix defining module-level operations across administrative roles.</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#0F172A] border border-[#1F2937] text-xs text-emerald-400 font-semibold self-start sm:self-auto">
+            <i data-lucide="shield-check" class="w-4 h-4"></i> 9 Roles Configured
+        </div>
+    </div>
+
+    <!-- Role Selector Tabs -->
+    <div class="flex items-center gap-2 overflow-x-auto pb-2 custom-scrollbar">
+        <button class="role-pill-btn active" data-role="super_admin">
+            <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> Super Admin
+        </button>
+        <button class="role-pill-btn" data-role="academic_admin">
+            <i data-lucide="book-open" class="w-3.5 h-3.5"></i> Academic Admin
+        </button>
+        <button class="role-pill-btn" data-role="admission_admin">
+            <i data-lucide="graduation-cap" class="w-3.5 h-3.5"></i> Admission Admin
+        </button>
+        <button class="role-pill-btn" data-role="notice_admin">
+            <i data-lucide="megaphone" class="w-3.5 h-3.5"></i> Notice Admin
+        </button>
+        <button class="role-pill-btn" data-role="event_admin">
+            <i data-lucide="party-popper" class="w-3.5 h-3.5"></i> Event Admin
+        </button>
+        <button class="role-pill-btn" data-role="bus_admin">
+            <i data-lucide="bus" class="w-3.5 h-3.5"></i> Bus Admin
+        </button>
+        <button class="role-pill-btn" data-role="library_admin">
+            <i data-lucide="book" class="w-3.5 h-3.5"></i> Library Admin
+        </button>
+        <button class="role-pill-btn" data-role="canteen_admin">
+            <i data-lucide="utensils" class="w-3.5 h-3.5"></i> Canteen Admin
+        </button>
+        <button class="role-pill-btn" data-role="sports_admin">
+            <i data-lucide="trophy" class="w-3.5 h-3.5"></i> Sports Admin
+        </button>
+    </div>
+
+    <!-- Active Role Summary Card -->
+    <div class="p-4 rounded-2xl bg-[#111827] border border-[#1F2937] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="space-y-1">
+            <div class="flex items-center gap-2">
+                <h3 class="text-sm font-bold text-white mb-0" id="selectedRoleTitle">Super Administrator</h3>
+                <span id="selectedRoleBadge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                    Full Access
+                </span>
+            </div>
+            <p class="text-xs text-gray-400 mb-0" id="selectedRoleDesc">
+                Unrestricted master control across all administrative modules, credentials, RAG pipeline, and system configurations.
+            </p>
+        </div>
+    </div>
+
+    <!-- Permissions Matrix Table Card -->
+    <div class="rounded-2xl bg-[#111827] border border-[#1F2937] overflow-hidden">
+        <div class="table-responsive">
+            <table class="matrix-table mb-0">
+                <thead>
+                    <tr>
+                        <th style="min-width: 240px;">SYSTEM MODULE</th>
+                        <th class="text-center" style="width: 90px;">VIEW</th>
+                        <th class="text-center" style="width: 90px;">CREATE</th>
+                        <th class="text-center" style="width: 90px;">EDIT</th>
+                        <th class="text-center" style="width: 90px;">DELETE</th>
+                        <th class="text-center" style="width: 90px;">UPLOAD</th>
+                        <th class="text-center" style="width: 90px;">PUBLISH</th>
+                    </tr>
+                </thead>
+                <tbody id="matrixTableBody">
+                    <!-- Matrix rows rendered via JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Security Information Card -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="role-card-box">
+            <div class="flex items-center gap-2.5 mb-2">
+                <i data-lucide="lock" class="w-4 h-4 text-emerald-400"></i>
+                <h4 class="text-xs font-bold text-white mb-0">Backend Enforcement</h4>
+            </div>
+            <p class="text-[11px] text-gray-400 mb-0">Every API endpoint enforces strict Flask-Login session authentication and role decorator checks before querying MongoDB.</p>
+        </div>
+
+        <div class="role-card-box">
+            <div class="flex items-center gap-2.5 mb-2">
+                <i data-lucide="shield-alert" class="w-4 h-4 text-amber-400"></i>
+                <h4 class="text-xs font-bold text-white mb-0">Strict Segregation</h4>
+            </div>
+            <p class="text-[11px] text-gray-400 mb-0">Sports Admin is isolated from College Events; Event Admin is isolated from Sports. Cross-module tampering is blocked at the HTTP layer (403 Forbidden).</p>
+        </div>
+
+        <div class="role-card-box">
+            <div class="flex items-center gap-2.5 mb-2">
+                <i data-lucide="eye" class="w-4 h-4 text-indigo-400"></i>
+                <h4 class="text-xs font-bold text-white mb-0">Credential Protection</h4>
+            </div>
+            <p class="text-[11px] text-gray-400 mb-0">Admin passwords use salted Argon2/PBKDF2 hashes. Hashes are permanently stripped from all client-side JSON serialization endpoints.</p>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin/roles_permissions.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}Bus Timings{% endblock %}
+{% block header_title %}Transport Administration: Bus Timings & Schedule Board{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/bus_timings.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6 text-white">
+
+    <!-- Header Hero Card -->
+    <div class="bus-timings-hero-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl">
+        <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-cyan-600/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 flex-shrink-0">
+                <i data-lucide="clock" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <h2 class="text-lg font-bold text-white mb-0">Bus Schedule & Departure Board</h2>
+                <p class="text-xs text-gray-400 mb-0 mt-0.5">Real-time daily morning pickup and evening return timings across all Vadodara & Anand routes.</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#0F172A] border border-[#1F2937] text-xs text-cyan-400 font-semibold self-start sm:self-auto">
+            <i data-lucide="shield-check" class="w-4 h-4"></i> SVIT Transport Cell
+        </div>
+    </div>
+
+    <!-- Search Toolbar -->
+    <div class="p-4 rounded-2xl bg-[#111827] border border-[#1F2937] flex items-center justify-between gap-3">
+        <div class="relative w-full sm:w-80">
+            <i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="timingsSearchInput" placeholder="Search routes by destination..." class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl pl-9 pr-3 py-2 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition">
+        </div>
+        <button id="refreshTimingsBtn" class="p-2 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-400 hover:text-white" title="Refresh Schedule">
+            <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+        </button>
+    </div>
+
+    <!-- Timings Board Table -->
+    <div class="rounded-2xl bg-[#111827] border border-[#1F2937] overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-dark-custom mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th>ROUTE NO</th>
+                        <th>DESTINATION / LINE</th>
+                        <th>FIRST PICKUP</th>
+                        <th>CAMPUS ARRIVAL</th>
+                        <th>EVENING DEPARTURE</th>
+                        <th>COORDINATOR</th>
+                    </tr>
+                </thead>
+                <tbody id="timingsTableBody">
+                    <tr>
+                        <td colspan="6" class="text-center py-10 text-gray-400 text-xs">
+                            <div class="w-5 h-5 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                            Loading schedule...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin/bus_timings.js') }}"></script>
+{% endblock %}

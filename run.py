@@ -54,42 +54,38 @@ def handle_unauthorized():
     except Exception:
         return redirect('/')
 
-# Active User class fallback for local session testing
-class ActiveUser(UserMixin):
-    def __init__(self, user_id):
-        self.id = user_id
-        self.full_name = "Manav Solanki"
-        self.department = "Computer Engineering"
-        self.semester = 3
-        self.division = "A"
-        self.batch = "A1"
-        self.avatar_url = None
-        self.is_admin = False
-        self.is_profile_complete = True
-
 @login_manager.user_loader
 def load_user(user_id):
     user_str = str(user_id)
     try:
         from app.database.mongo_models import MongoStudent, MongoAdmin
+        from app.database.models import Student, Admin
         if user_str.startswith('admin_'):
             real_id = user_str.split('_', 1)[1]
-            return MongoAdmin.get_by_id(real_id) or Admin.query.get(int(real_id))
+            admin = MongoAdmin.get_by_id(real_id)
+            if admin:
+                return admin
+            try:
+                return Admin.query.get(int(real_id))
+            except Exception:
+                return None
         elif user_str.startswith('student_'):
             real_id = user_str.split('_', 1)[1]
-            return MongoStudent.get_by_id(real_id) or Student.query.get(int(real_id))
+            student = MongoStudent.get_by_id(real_id)
+            if student:
+                return student
+            try:
+                return Student.query.get(int(real_id))
+            except Exception:
+                return None
         
         m_user = MongoStudent.get_by_id(user_id) or MongoAdmin.get_by_id(user_id)
         if m_user:
             return m_user
 
-        from app.database.models import Student, Admin
         return Student.query.get(int(user_id)) or Admin.query.get(int(user_id))
     except Exception:
-        pass
-    
-    # Fallback user so chatbot endpoints work seamlessly during dev testing
-    return ActiveUser(user_id)
+        return None
 
 
 # 4. Register All Blueprints (Prevent Duplicate Registrations)
@@ -135,17 +131,32 @@ try:
 except ImportError as e:
     print(f"⚠️ Note: notification_bp registration: {e}")
 
+from app.auth.rbac import has_permission, has_role, ROLE_DISPLAY_NAMES, normalize_role
+
 # Pass registered endpoints to Jinja context for safety check
 @app.context_processor
 def inject_endpoints():
     return {
-        'bootstrap_endpoints': set(app.view_functions.keys())
+        'bootstrap_endpoints': set(app.view_functions.keys()),
+        'has_permission': has_permission,
+        'has_role': has_role,
+        'ROLE_DISPLAY_NAMES': ROLE_DISPLAY_NAMES,
+        'normalize_role': normalize_role,
     }
 
-# 5. Root Endpoint to Render Chatbot UI
+app.jinja_env.globals.update(
+    has_permission=has_permission,
+    has_role=has_role,
+    ROLE_DISPLAY_NAMES=ROLE_DISPLAY_NAMES,
+    normalize_role=normalize_role,
+)
+
+# 5. Root Endpoint & Global Error Handlers
 @app.route("/")
 def home():
-    """Renders the main student chat interface safely."""
+    """Renders the main student chat interface safely or routes admin to dashboard."""
+    if current_user.is_authenticated and getattr(current_user, 'is_admin', False):
+        return redirect(url_for('admin.dashboard'))
     try:
         return render_template("student/chat.html")
     except TemplateNotFound:
@@ -154,15 +165,20 @@ def home():
         except TemplateNotFound:
             return render_template("chat/chat.html")
 
+@app.errorhandler(403)
+def handle_403(e):
+    """Clean 403 access denied handler without template variable dependencies."""
+    return render_template('errors/403.html', error_message=getattr(e, 'description', 'Access Denied: You do not have permission to view this resource.')), 403
+
 
 # 6. Server Entry Point
 if __name__ == "__main__":
-    print("🚀 Starting SVIT AI Assistant Server...")
-    print(f"📁 Static Directory: {STATIC_DIR}")
-    print(f"📄 Template Directory: {TEMPLATE_DIR}")
+    print("[START] Starting SVIT AI Assistant Server...")
+    print(f"[STATIC] Static Directory: {STATIC_DIR}")
+    print(f"[TEMPLATE] Template Directory: {TEMPLATE_DIR}")
     
     with app.app_context():
-        # Load user models first so SQLAlchemy registers the 'students' table schema
+        # Load user models first so SQLAlchemy registers the 'students' and 'admins' table schema
         try:
             from app.database.models import Student, Admin
         except ImportError:
@@ -176,5 +192,11 @@ if __name__ == "__main__":
             pass
 
         db.create_all()
+
+        try:
+            from app.database.admin_seed import seed_admin_accounts
+            seed_admin_accounts(app)
+        except Exception as seed_err:
+            print(f"⚠️ Note: Admin seeding: {seed_err}")
 
     app.run(host="127.0.0.1", port=5000, debug=True)

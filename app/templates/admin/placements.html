@@ -1,0 +1,272 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}Placements Management{% endblock %}
+{% block header_title %}Academic Administration: Placements & Careers{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/placements.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6 text-white">
+
+    <!-- Header Hero Card -->
+    <div class="placements-hero-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl">
+        <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 flex-shrink-0">
+                <i data-lucide="briefcase" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h2 class="text-lg font-bold text-white mb-0">Campus Placement Drives</h2>
+                    <span id="placementsCountBadge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                        0 Drives
+                    </span>
+                </div>
+                <p class="text-xs text-gray-400 mb-0 mt-0.5">Manage corporate recruitment visits, salary packages, eligibility cutoffs, and application deadlines.</p>
+            </div>
+        </div>
+
+        <button id="openCreatePlacementModalBtn" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 transition flex items-center gap-2 self-start sm:self-auto">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i> Add Placement Drive
+        </button>
+    </div>
+
+    <!-- Placement Stat Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="p-4 rounded-2xl bg-[#111827] border border-[#1F2937]">
+            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Highest Package</span>
+            <h3 class="text-2xl font-black text-emerald-400 mt-1 mb-0" id="statHighestPackage">18.5 LPA</h3>
+            <span class="text-[11px] text-gray-500">Current Academic Year</span>
+        </div>
+        <div class="p-4 rounded-2xl bg-[#111827] border border-[#1F2937]">
+            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Visiting Companies</span>
+            <h3 class="text-2xl font-black text-indigo-400 mt-1 mb-0">65+ Partners</h3>
+            <span class="text-[11px] text-gray-500">Tier-1 & Core Recruiters</span>
+        </div>
+        <div class="p-4 rounded-2xl bg-[#111827] border border-[#1F2937]">
+            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Training & Placement Cell</span>
+            <h3 class="text-2xl font-black text-white mt-1 mb-0">T&P Center</h3>
+            <span class="text-[11px] text-gray-500">Active Recruitment Season</span>
+        </div>
+    </div>
+
+    <!-- Search & Filter Toolbar -->
+    <div class="p-4 rounded-2xl bg-[#111827] border border-[#1F2937] flex flex-col md:flex-row items-center justify-between gap-3 flex-wrap">
+        <div class="relative w-full md:w-80">
+            <i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="placementSearchInput" placeholder="Search by company, role, package..." class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl pl-9 pr-3 py-2 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition">
+        </div>
+
+        <div class="flex items-center gap-2 w-full md:w-auto flex-wrap">
+            <select id="placementDeptFilter" class="bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500">
+                <option value="">All Departments</option>
+                <option value="Computer Engineering">Computer Engineering</option>
+                <option value="Information Technology">Information Technology</option>
+                <option value="Electronics & Comm.">Electronics & Comm.</option>
+                <option value="Mechanical Eng.">Mechanical Eng.</option>
+                <option value="Civil Eng.">Civil Eng.</option>
+                <option value="Electrical Eng.">Electrical Eng.</option>
+            </select>
+
+            <select id="placementStatusFilter" class="bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500">
+                <option value="">All Statuses</option>
+                <option value="Registration Open">Registration Open</option>
+                <option value="Upcoming">Upcoming</option>
+                <option value="Completed">Completed</option>
+            </select>
+
+            <button id="refreshPlacementsBtn" class="p-2 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-400 hover:text-white" title="Refresh Table">
+                <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Placements Data Table -->
+    <div class="rounded-2xl bg-[#111827] border border-[#1F2937] overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-dark-custom mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th>COMPANY</th>
+                        <th>JOB ROLE</th>
+                        <th>PACKAGE</th>
+                        <th>ELIGIBLE DEPTS</th>
+                        <th>DRIVE DATE</th>
+                        <th>STATUS</th>
+                        <th class="text-end">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody id="placementsTableBody">
+                    <tr>
+                        <td colspan="7" class="text-center py-10 text-gray-400 text-xs">
+                            <div class="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                            Loading placement drives...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Placements Pagination Footer -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-[#111827] border border-[#1F2937]" id="placementsPagination">
+        <div class="flex items-center gap-2 text-xs text-gray-400">
+            <span>Showing</span>
+            <span id="pageStart" class="font-bold text-white">0</span>
+            <span>to</span>
+            <span id="pageEnd" class="font-bold text-white">0</span>
+            <span>of</span>
+            <span id="pageTotal" class="font-bold text-indigo-400">0</span>
+            <span>drives</span>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <select id="pageLimitSelect" class="bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-indigo-500">
+                <option value="20">20 per page</option>
+                <option value="50" selected>50 per page</option>
+                <option value="100">100 per page</option>
+                <option value="250">250 per page</option>
+                <option value="10000">Show All</option>
+            </select>
+
+            <div class="flex items-center gap-1">
+                <button id="prevPageBtn" class="px-3 py-1.5 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-400 hover:text-white text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
+                    Previous
+                </button>
+                <div id="pageNumbers" class="flex items-center gap-1"></div>
+                <button id="nextPageBtn" class="px-3 py-1.5 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-400 hover:text-white text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
+                    Next
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- CREATE / EDIT PLACEMENT MODAL -->
+<div class="modal fade" id="placementFormModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content modal-dark-content">
+            <div class="modal-header border-b border-[#1F2937] p-4">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="briefcase" class="w-4 h-4 text-indigo-400"></i>
+                    <h3 class="text-sm font-bold text-white mb-0" id="placementModalTitle">Add Placement Drive</h3>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="placementForm" class="p-4 space-y-3.5 text-xs">
+                <input type="hidden" id="placementFormRecordId">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Placement ID *</label>
+                        <input type="text" id="placementIdInput" required placeholder="e.g. PLC-2026-TCS" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 font-mono">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Company Name *</label>
+                        <input type="text" id="placementCompanyInput" required placeholder="e.g. Tata Consultancy Services" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Job Role / Designation *</label>
+                        <input type="text" id="placementRoleInput" required placeholder="e.g. Associate Software Engineer" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Package (LPA) *</label>
+                        <input type="text" id="placementPkgInput" required placeholder="e.g. 7.5" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Eligible Departments</label>
+                        <input type="text" id="placementDeptInput" placeholder="e.g. CE, IT, EC" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Drive Date</label>
+                        <input type="date" id="placementDateInput" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Registration Deadline</label>
+                        <input type="date" id="placementDeadlineInput" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Drive Status</label>
+                        <select id="placementStatusInput" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                            <option value="Upcoming">Upcoming</option>
+                            <option value="Registration Open" selected>Registration Open</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-gray-300">Eligibility Criteria</label>
+                        <input type="text" id="placementEligInput" placeholder="e.g. Min 6.5 CPI, No Active Backlogs" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <!-- Company Logo Upload -->
+                <div>
+                    <label class="text-[11px] font-semibold text-gray-300">Company Brand Logo</label>
+                    <div id="companyLogoDropZone" class="p-3 border-2 border-dashed border-[#1F2937] rounded-xl text-center cursor-pointer hover:border-indigo-500 transition bg-[#0F172A]">
+                        <i data-lucide="image" class="w-4 h-4 mx-auto mb-1 text-gray-500"></i>
+                        <p class="text-xs text-gray-400 mb-0">Drag & drop logo or click to select</p>
+                    </div>
+                    <input type="file" id="companyLogoInput" accept="image/*" class="hidden">
+                    <div id="companyLogoPreviewContainer" class="mt-2 flex items-center gap-3 hidden"></div>
+                </div>
+
+                <div class="modal-footer border-t border-[#1F2937] pt-4 px-0 pb-0 flex justify-end gap-2">
+                    <button type="button" class="px-4 py-2 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs font-semibold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30">Save Placement Drive</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- VIEW PLACEMENT MODAL -->
+<div class="modal fade" id="placementViewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-dark-content">
+            <div class="modal-header border-b border-[#1F2937] p-4">
+                <h3 class="text-sm font-bold text-white mb-0">Placement Drive Overview</h3>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="p-4" id="placementViewContent"></div>
+            <div class="modal-footer border-t border-[#1F2937] p-3">
+                <button type="button" class="px-4 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DELETE PLACEMENT MODAL -->
+<div class="modal fade" id="placementDeleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content modal-dark-content text-center p-5 space-y-3">
+            <div class="w-12 h-12 rounded-full bg-red-600/20 text-red-400 border border-red-500/30 flex items-center justify-center mx-auto">
+                <i data-lucide="trash-2" class="w-6 h-6"></i>
+            </div>
+            <h4 class="text-sm font-bold text-white mb-1">Remove Placement Drive?</h4>
+            <p class="text-xs text-gray-400 mb-0">
+                Are you sure you want to delete <strong id="deletePlacementTargetId" class="text-white"></strong>?
+            </p>
+            <div class="pt-2 flex justify-center gap-2">
+                <button type="button" class="px-3.5 py-1.5 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmDeletePlacementBtn" class="px-4 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-semibold">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin/placements.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,57 @@
+/* ==========================================================================
+   SVIT Admin - Page 12: Admission CMS Styles (4 Tabs)
+   ========================================================================== */
+
+.admission-hero-card {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(17, 24, 39, 0.95) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.adm-nav-tab {
+    padding: 0.65rem 1.1rem;
+    border-radius: 12px;
+    background: #0F172A;
+    border: 1px solid #1F2937;
+    color: #9CA3AF;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.adm-nav-tab:hover {
+    border-color: #10B981;
+    color: #FFFFFF;
+    background: #064E3B;
+}
+
+.adm-nav-tab.active {
+    background: #10B981;
+    border-color: #10B981;
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+}
+
+.adm-step-card {
+    background: #111827;
+    border: 1px solid #1F2937;
+    border-radius: 16px;
+    padding: 1.25rem;
+    position: relative;
+}
+
+.adm-step-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: #10B981;
+    color: #FFFFFF;
+    font-weight: 800;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
