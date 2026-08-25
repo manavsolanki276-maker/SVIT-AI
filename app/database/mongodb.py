@@ -29,6 +29,7 @@ _mongo_db: Optional[Database] = None
 
 
 _last_mongo_error: Optional[str] = None
+_last_failed_time: float = 0.0
 
 
 def get_last_error() -> Optional[str]:
@@ -85,7 +86,8 @@ def get_mongodb_client() -> Optional[MongoClient]:
     Returns a pooled, reusable MongoClient singleton suitable for serverless functions.
     Reuses the existing connection across warm function invocations.
     """
-    global _mongo_client, _last_mongo_error
+    global _mongo_client, _last_mongo_error, _last_failed_time
+    import time
     uri = get_mongodb_uri()
 
     if not uri:
@@ -97,8 +99,12 @@ def get_mongodb_client() -> Optional[MongoClient]:
             _mongo_client.admin.command('ping')
             _last_mongo_error = None
             return _mongo_client
-        except Exception as e:
+        except Exception:
             _mongo_client = None
+
+    # Do not hammer failing connection within 10 seconds in the same function invocation
+    if (time.time() - _last_failed_time) < 10.0:
+        return None
 
     client_kwargs = {
         "maxPoolSize": 5,
@@ -145,6 +151,7 @@ def get_mongodb_client() -> Optional[MongoClient]:
         _last_mongo_error = f"{_last_mongo_error} | Fallback failed: {safe_err}"
         logger.error(f"[MongoDB] All connection attempts failed: {safe_err}")
         _mongo_client = None
+        _last_failed_time = time.time()
         return None
 
 
