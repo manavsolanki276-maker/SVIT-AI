@@ -3,12 +3,16 @@ app/ai/rag_pipeline.py
 High-Performance Tiered RAG Pipeline with Student Profile Personalization, Real-Time "Next Class Now" Interception,
 Fast Greeting Interception, In-Memory DataFrames, Dynamic Category-Trimmed Prompts, and Streaming Generator Support.
 """
-import datetime
+from datetime import datetime
+from zoneinfo import ZoneInfo
 import os
 import re
 from typing import Dict, Any, List, Optional, Generator, Tuple
 from collections import OrderedDict
 from dotenv import load_dotenv
+
+# Indian Standard Time (IST, UTC+05:30) Timezone definition
+IST = ZoneInfo("Asia/Kolkata")
 
 # Load environment variables
 load_dotenv()
@@ -322,111 +326,6 @@ class RAGPipeline:
             context = "\n\n---\n\n".join([doc.page_content for doc, _ in results])
 
         return context, map_image, sources, intent_category
-
-    def answer_question(
-        self, 
-        question: str, 
-        session_id: str = "default_user", 
-        top_k: int = 8,
-        filter_dict: dict = None,
-        user_profile: dict = None
-    ) -> dict:
-        """
-        Executes personalized RAG workflow:
-        1. Fast Greeting Interception (0ms)
-        2. Fast Next Class Real-time Interception (0ms)
-        3. Fast Spatial Navigation Interception (0ms)
-        4. Response Cache Lookup
-        5. In-Memory Context Processing with student defaults
-        6. Category-Trimmed Prompt with Student Metadata + OpenRouter LLM
-        """
-        clean_q = question.strip().lower()
-        user_name = user_profile.get('full_name') if user_profile else ""
-        first_name = user_name.split()[0] if user_name else ""
-        name_suffix = f" {first_name}" if first_name else ""
-
-        # ---------------------------------------------------------
-        # STEP 0: FAST-PATH GREETING & SMALL TALK (0ms)
-        # ---------------------------------------------------------
-        for pattern, reply_tmpl in FAST_GREETINGS:
-            if re.search(pattern, clean_q):
-                reply = reply_tmpl.format(name_suffix=name_suffix)
-                memory_manager.add_message(session_id, "user", question)
-                memory_manager.add_message(session_id, "assistant", reply)
-                suggestions = generate_followup_suggestions(question, "general", reply, user_profile=user_profile)
-                return {
-                    "answer": reply,
-                    "image": None,
-                    "sources": ["SVIT Assistant Greeting"],
-                    "suggestions": suggestions
-                }
-
-        # ---------------------------------------------------------
-        # STEP 0.2: FAST-PATH DIRECT PROFILE QUERY RESOLUTION (0ms)
-        # ---------------------------------------------------------
-        profile_ans = resolve_student_profile_query(question, user_profile=user_profile)
-        if profile_ans:
-            memory_manager.add_message(session_id, "user", question)
-            memory_manager.add_message(session_id, "assistant", profile_ans)
-            suggestions = [
-                "Show today's timetable 📅",
-                "Where is my next class right now? 📍",
-                "Who is my HOD? 👨‍🏫"
-            ]
-            return {
-                "answer": profile_ans,
-                "image": None,
-                "sources": ["student_profile.db"],
-                "suggestions": suggestions
-            }
-
-        # ---------------------------------------------------------
-        # STEP 0.5: FAST-PATH "NEXT CLASS NOW" REAL-TIME ANALYZER (0ms)
-        # ---------------------------------------------------------
-        if any(re.search(p, clean_q) for p in NEXT_CLASS_PATTERNS):
-            ans_text, nav_map, srcs = process_next_class_context(question, user_profile=user_profile)
-            memory_manager.add_message(session_id, "user", question)
-            memory_manager.add_message(session_id, "assistant", ans_text)
-            suggestions = generate_followup_suggestions(question, "timetable", ans_text, user_profile=user_profile)
-            return {
-                "answer": ans_text,
-                "image": nav_map,
-                "sources": srcs,
-                "suggestions": suggestions
-            }
-
-        # ---------------------------------------------------------
-        # STEP 1: NAVIGATION MODULE INTERCEPTION (0ms)
-        # ---------------------------------------------------------
-        nav_result = find_location(question)
-        if nav_result:
-            nav_image_path = f"navigation_maps/{nav_result['image']}"
-            memory_manager.add_message(session_id, "user", question)
-            memory_manager.add_message(session_id, "assistant", nav_result["formatted_text"])
-            suggestions = generate_followup_suggestions(question, "navigation", nav_result["formatted_text"], user_profile=user_profile)
-            return {
-                "answer": nav_result["formatted_text"],
-                "image": nav_image_path,
-                "sources": ["SVIT Navigation Directory"],
-                "navigation": nav_result,
-                "suggestions": suggestions
-            }
-
-        # ---------------------------------------------------------
-        # STEP 2: CACHED QUERY LOOKUP (Profile-Aware)
-        # ---------------------------------------------------------
-        prof_key = (
-            f"{user_profile.get('program')}_{user_profile.get('department')}_"
-            f"{user_profile.get('semester')}_{user_profile.get('division')}_"
-            f"{user_profile.get('batch')}"
-        ) if user_profile else "none"
-        cache_key = f"{clean_q}_{prof_key}_{top_k}"
-        if cache_key in _RESPONSE_CACHE:
-            cached_res = _RESPONSE_CACHE[cache_key]
-            _RESPONSE_CACHE.move_to_end(cache_key)
-            memory_manager.add_message(session_id, "user", question)
-            memory_manager.add_message(session_id, "assistant", cached_res["answer"])
-            return cached_res
 
     def _format_context_as_direct_answer(
         self, 
@@ -798,7 +697,7 @@ class RAGPipeline:
         )
 
         history = memory_manager.format_history_for_prompt(session_id)
-        current_date_str = datetime.datetime.now().strftime("%A, %d %B YYYY")
+        current_date_str = datetime.now(IST).strftime("%A, %d %B %Y")
 
         prompt = get_dynamic_system_prompt(
             intent_category=intent_category,
@@ -928,7 +827,7 @@ class RAGPipeline:
             question, top_k=top_k, user_profile=user_profile
         )
         history = memory_manager.format_history_for_prompt(session_id)
-        current_date_str = datetime.datetime.now().strftime("%A, %d %B YYYY")
+        current_date_str = datetime.now(IST).strftime("%A, %d %B YYYY")
 
         prompt = get_dynamic_system_prompt(
             intent_category=intent_category,

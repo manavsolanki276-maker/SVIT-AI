@@ -5,9 +5,17 @@ and Real-Time "Next Class Now" / "Where Do I Go Right Now?" schedule analyzer.
 """
 import os
 import re
-import datetime
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 import pandas as pd
 from typing import List, Dict, Any, Tuple, Optional
+
+# Indian Standard Time (IST, UTC+05:30) Timezone definition
+IST = ZoneInfo("Asia/Kolkata")
+
+def get_ist_now() -> datetime:
+    """Returns the current timezone-aware datetime in Asia/Kolkata (IST)."""
+    return datetime.now(IST)
 
 # =========================================================================
 # STATIC MAP & LOCATION LOOKUP DIRECTORY
@@ -207,23 +215,23 @@ def format_minutes_to_time_str(mins: int) -> str:
 def resolve_day_and_date(query: str) -> dict:
     """
     Resolves relative time keywords ('today', 'tomorrow', 'yesterday') or explicit day names
-    into both the target day name ('Wednesday') and a formatted date string.
+    into both the target day name ('Wednesday') and a formatted date string using Indian Standard Time (IST).
     """
     msg = re.sub(r"['’]s\b", "", query, flags=re.IGNORECASE)
     msg = msg.replace('"', '').replace("'", "").strip().lower()
 
-    now = datetime.datetime.now()
+    now = get_ist_now()
     days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 
     if "tomorrow" in msg:
-        target_date = now + datetime.timedelta(days=1)
+        target_date = now + timedelta(days=1)
         return {
             "day_name": target_date.strftime("%A"),
             "formatted_date": target_date.strftime("%A, %d %B %Y")
         }
 
     if "yesterday" in msg:
-        target_date = now - datetime.timedelta(days=1)
+        target_date = now - timedelta(days=1)
         return {
             "day_name": target_date.strftime("%A"),
             "formatted_date": target_date.strftime("%A, %d %B %Y")
@@ -240,7 +248,7 @@ def resolve_day_and_date(query: str) -> dict:
             days_ahead = days.index(day) - now.weekday()
             if days_ahead <= 0:
                 days_ahead += 7
-            target_date = now + datetime.timedelta(days=days_ahead)
+            target_date = now + timedelta(days=days_ahead)
             return {
                 "day_name": day.capitalize(),
                 "formatted_date": target_date.strftime("%A, %d %B %Y")
@@ -280,9 +288,9 @@ def get_navigation_map_url(query: str) -> str:
 def process_next_class_context(query: str, user_profile: dict = None) -> Tuple[str, Optional[str], List[str]]:
     """
     Computes real-time lecture status (Current Class In Progress vs Upcoming Next Class)
-    based on the current clock time and the logged-in student's schedule.
+    based on current clock time in Asia/Kolkata (IST) and the logged-in student's schedule.
     """
-    now = datetime.datetime.now()
+    now = get_ist_now()
     current_day = now.strftime("%A")
     formatted_date = now.strftime("%A, %d %B %Y")
     current_time_str = now.strftime("%I:%M %p")
