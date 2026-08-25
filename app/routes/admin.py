@@ -266,10 +266,17 @@ def api_me():
 @admin_required
 def api_stats():
     """Returns dynamic dashboard counters tailored to the logged-in admin role."""
+    from app.database.mongodb import is_mongodb_connected, get_last_error, get_mongodb_uri
     stats = AdminCRUDService.get_stats_for_admin(current_user)
+    has_uri = bool(get_mongodb_uri())
     return jsonify({
         "status": "success",
-        "stats": stats
+        "stats": stats,
+        "mongo_status": {
+            "has_uri": has_uri,
+            "connected": is_mongodb_connected(),
+            "last_error": get_last_error()
+        }
     }), 200
 
 
