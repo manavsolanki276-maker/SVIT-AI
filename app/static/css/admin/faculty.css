@@ -1,26 +1,128 @@
-/* SVIT Admin - Faculty Management Responsive Stylesheet */
+/* ==========================================================================
+   SVIT Admin - Faculty Management Mobile-First Stylesheet
+   Color System: SVIT Light SaaS (#F8F9FE background, #FFFFFF cards, #8B5CF6 purple)
+   ========================================================================== */
+
 :root {
-    --fac-hero-bg: linear-gradient(135deg, #E8EBFA 0%, #FFFFFF 65%, #E7DDFB 100%);
-    --fac-hero-border: var(--svit-border);
+    --fac-bg: #F8F9FE;
     --fac-card-bg: #FFFFFF;
-    --fac-card-border: var(--svit-border);
-    --fac-card-hover: #F8F9FE;
-    --fac-accent: var(--svit-primary);
-    --fac-accent-light: var(--svit-periwinkle);
-    --fac-text-primary: var(--svit-text);
-    --fac-text-muted: var(--svit-text-secondary);
+    --fac-border: #E1E5F0;
+    --fac-primary: #8B5CF6;
+    --fac-primary-soft: #E8EBFA;
+    --fac-primary-hover: #7C4FE8;
+    --fac-text-main: #171D3A;
+    --fac-text-muted: #66708F;
+    --fac-text-subtle: #8C95AD;
+    --fac-success: #15803D;
+    --fac-success-bg: #DCFCE7;
+    --fac-warning: #B45309;
+    --fac-warning-bg: #FEF3C7;
+    --fac-danger: #B91C1C;
+    --fac-danger-bg: #FEE2E2;
+    --fac-shadow-sm: 0 2px 8px rgba(23, 29, 58, 0.04);
+    --fac-shadow-md: 0 4px 16px rgba(23, 29, 58, 0.08);
 }
 
+.faculty-page-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
+}
+
+/* ==========================================================================
+   1. Header Section
+   ========================================================================== */
+
 .faculty-hero-card {
-    background: var(--fac-hero-bg);
-    border: 1px solid var(--fac-hero-border);
-    box-shadow: 0 4px 20px rgba(23, 29, 58, 0.06);
-    border-radius: 1rem;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: linear-gradient(135deg, #FFFFFF 0%, #F8F9FE 60%, #E8EBFA 100%);
+    border: 1px solid var(--fac-border);
+    box-shadow: var(--fac-shadow-sm);
+    transition: box-shadow 0.2s ease;
 }
 
 .faculty-hero-card:hover {
-    box-shadow: 0 8px 28px rgba(139, 92, 246, 0.12);
+    box-shadow: var(--fac-shadow-md);
+}
+
+/* ==========================================================================
+   2. Search & Toolbar Controls
+   ========================================================================== */
+
+.faculty-toolbar-card {
+    background: #FFFFFF;
+    border: 1px solid var(--fac-border);
+}
+
+.faculty-search-input {
+    min-height: 44px;
+    font-size: 14px;
+}
+
+@media (max-width: 767.98px) {
+    .faculty-search-input {
+        font-size: 16px !important; /* Prevents auto-zoom in iOS Safari */
+    }
+}
+
+.clear-search-btn {
+    min-width: 32px;
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.mobile-filter-trigger-btn {
+    min-height: 44px;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.mobile-filter-trigger-btn:active {
+    background-color: var(--fac-primary-soft);
+    border-color: var(--fac-primary);
+}
+
+/* ==========================================================================
+   3. Faculty Mobile Record Card
+   ========================================================================== */
+
+.faculty-mobile-card {
+    background: #FFFFFF;
+    border: 1px solid var(--fac-border);
+    border-radius: 16px;
+    padding: 14px 15px;
+    box-shadow: var(--fac-shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.faculty-mobile-card:active {
+    transform: scale(0.99);
+}
+
+/* Card Header: Avatar + Identity + Designation */
+.faculty-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.faculty-card-identity {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    flex: 1;
 }
 
 .faculty-avatar {
@@ -44,3 +146,394 @@
     height: 100%;
     object-fit: cover;
 }
+
+.faculty-card-name-group {
+    min-width: 0;
+    flex: 1;
+}
+
+.faculty-card-name {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--fac-text-main);
+    margin: 0;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.faculty-card-id {
+    font-size: 11px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: 700;
+    color: var(--fac-primary);
+    margin: 2px 0 0 0;
+    line-height: 1;
+}
+
+/* Designation Badges */
+.badge-designation {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 10.5px;
+    font-weight: 700;
+    background: var(--fac-primary-soft);
+    color: var(--fac-primary);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    white-space: nowrap;
+}
+
+.badge-designation.is-head {
+    background: #FEF3C7;
+    color: #B45309;
+    border-color: #FCD34D;
+}
+
+.badge-designation.is-professor {
+    background: #E0E7FF;
+    color: #4338CA;
+    border-color: #C7D2FE;
+}
+
+.badge-designation.is-associate {
+    background: #EDE9FE;
+    color: #6D28D9;
+    border-color: #DDD6FE;
+}
+
+.badge-designation.is-assistant {
+    background: var(--fac-primary-soft);
+    color: var(--fac-primary);
+    border-color: rgba(139, 92, 246, 0.25);
+}
+
+.badge-designation.is-lecturer {
+    background: #F1F5F9;
+    color: #475569;
+    border-color: #CBD5E1;
+}
+
+/* Card Metadata Grid (2-Column clean SaaS info layout) */
+.faculty-card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 10px;
+    background: #F8F9FE;
+    border: 1px solid var(--fac-border);
+    border-radius: 12px;
+    padding: 10px 12px;
+}
+
+.faculty-grid-item {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.faculty-grid-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--fac-text-subtle);
+    display: flex;
+    align-items: center;
+    gap: 3.5px;
+}
+
+.faculty-grid-value {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--fac-text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.faculty-grid-contact {
+    grid-column: span 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    padding-top: 4px;
+    border-top: 1px dashed var(--fac-border);
+    margin-top: 2px;
+}
+
+.faculty-contact-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--fac-text-muted);
+    min-width: 0;
+    max-width: 100%;
+}
+
+.faculty-contact-pill span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Bottom Action Buttons (Touch Target >= 44px) */
+.faculty-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-top: 2px;
+}
+
+.faculty-action-btn {
+    min-height: 44px;
+    padding: 0 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: #FFFFFF;
+    border: 1px solid var(--fac-border);
+    color: var(--fac-text-main);
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: all 0.15s ease;
+    flex: 1;
+}
+
+.faculty-action-btn:active {
+    transform: scale(0.97);
+}
+
+.faculty-action-btn.is-primary {
+    background: var(--fac-primary);
+    border-color: var(--fac-primary);
+    color: #FFFFFF;
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25);
+}
+
+.faculty-action-btn.is-primary:hover {
+    background: var(--fac-primary-hover);
+    border-color: var(--fac-primary-hover);
+}
+
+.faculty-action-btn.is-danger {
+    background: #FFFFFF;
+    border-color: var(--fac-border);
+    color: #DC2626;
+}
+
+.faculty-action-btn.is-danger:hover,
+.faculty-action-btn.is-danger:active {
+    background: #FEE2E2;
+    border-color: #FCA5A5;
+}
+
+.faculty-action-btn.is-icon-only {
+    flex: 0 0 44px;
+    width: 44px;
+    padding: 0;
+}
+
+/* ==========================================================================
+   4. Skeleton Shimmer Loading State
+   ========================================================================== */
+
+.faculty-skeleton-card {
+    background: #FFFFFF;
+    border: 1px solid var(--fac-border);
+    border-radius: 16px;
+    padding: 14px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.skeleton-shimmer {
+    background: linear-gradient(90deg, #F1F3FA 0%, #E8EBFA 50%, #F1F3FA 100%);
+    background-size: 200% 100%;
+    animation: facShimmer 1.5s infinite;
+    border-radius: 8px;
+}
+
+@keyframes facShimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ==========================================================================
+   5. Empty State
+   ========================================================================== */
+
+.faculty-mobile-empty {
+    background: #FFFFFF;
+    border: 1px dashed var(--fac-border);
+    border-radius: 16px;
+    padding: 32px 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.faculty-mobile-empty-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    background: var(--fac-primary-soft);
+    color: var(--fac-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.faculty-mobile-empty h3 {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--fac-text-main);
+    margin: 0 0 4px 0;
+}
+
+.faculty-mobile-empty p {
+    font-size: 12px;
+    color: var(--fac-text-muted);
+    margin: 0 0 14px 0;
+    max-width: 260px;
+}
+
+/* ==========================================================================
+   6. Custom Form Controls in Modals
+   ========================================================================== */
+
+.form-control-custom {
+    width: 100%;
+    background: #F8F9FE;
+    border: 1px solid var(--fac-border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--fac-text-main);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    min-height: 44px;
+}
+
+@media (max-width: 767.98px) {
+    .form-control-custom {
+        font-size: 16px !important; /* Prevents auto-zoom in iOS Safari */
+    }
+}
+
+.form-control-custom:focus {
+    outline: none;
+    border-color: var(--fac-primary);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+    background: #FFFFFF;
+}
+
+/* ==========================================================================
+   7. Mobile Bottom Sheet Modal Overrides (< 768px)
+   ========================================================================== */
+
+@media (max-width: 767.98px) {
+    .modal-dialog.modal-dialog-centered,
+    .modal-dialog {
+        display: flex !important;
+        align-items: flex-end !important;
+        min-height: 100% !important;
+        margin: 0 !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    .modal-content.mobile-bottom-sheet-content {
+        border-radius: 24px 24px 0 0 !important;
+        max-height: 90vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        padding-bottom: env(safe-area-inset-bottom);
+        box-shadow: 0 -10px 30px rgba(23, 29, 58, 0.15) !important;
+    }
+
+    .sheet-drag-handle-bar {
+        display: flex !important;
+    }
+
+    .modal.fade .modal-dialog {
+        transform: translateY(100%);
+        transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .modal.show .modal-dialog {
+        transform: translateY(0);
+    }
+}
+
+/* ==========================================================================
+   8. Responsive Viewport Media Queries
+   ========================================================================== */
+
+/* 320px - 360px: Compact Mobile */
+@media (max-width: 360px) {
+    .faculty-page-wrapper {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .faculty-mobile-card {
+        padding: 12px 10px;
+    }
+
+    .faculty-card-grid {
+        grid-template-columns: 1fr;
+        padding: 8px 10px;
+    }
+
+    .faculty-avatar {
+        width: 38px;
+        height: 38px;
+        font-size: 0.75rem;
+    }
+
+    .faculty-card-name {
+        font-size: 13px;
+    }
+
+    .faculty-action-btn {
+        font-size: 11px;
+        padding: 0 8px;
+    }
+}
+
+/* 361px - 430px: Standard Mobile */
+@media (min-width: 361px) and (max-width: 430px) {
+    .faculty-card-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Desktop Visibility Control */
+@media (min-width: 768px) {
+    .faculty-data-container .admin-mobile-record-list {
+        display: none !important;
+    }
+
+    .faculty-data-container .table-responsive {
+        display: block !important;
+    }
+}
+

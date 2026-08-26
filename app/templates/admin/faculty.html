@@ -8,82 +8,101 @@
 {% endblock %}
 
 {% block content %}
-<div class="space-y-6 text-[#171D3A]">
+<div class="faculty-page-wrapper space-y-4 sm:space-y-6 text-[#171D3A]">
 
-    <!-- Header Hero Card -->
-    <div class="faculty-hero-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl">
-        <div class="flex items-center gap-3.5">
-            <div class="w-12 h-12 rounded-2xl bg-[#E8EBFA] border border-[#8B5CF6]/30 flex items-center justify-center text-[#8B5CF6] flex-shrink-0 shadow-sm">
-                <i data-lucide="user-check" class="w-6 h-6"></i>
+    <!-- 1. Header Section (Desktop Hero Card / Mobile Streamlined Header) -->
+    <div class="faculty-hero-card p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+        <div class="flex items-center gap-3 sm:gap-3.5">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-[#E8EBFA] border border-[#8B5CF6]/30 flex items-center justify-center text-[#8B5CF6] flex-shrink-0 shadow-sm">
+                <i data-lucide="user-check" class="w-5 h-5 sm:w-6 sm:h-6"></i>
             </div>
-            <div>
-                <div class="flex items-center gap-2">
-                    <h2 class="text-lg font-bold text-[#171D3A] mb-0">Faculty Directory</h2>
-                    <span id="facultyCountBadge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-[#E8EBFA] text-[#8B5CF6] border border-[#8B5CF6]/30">
+            <div class="min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <h2 class="text-base sm:text-lg font-bold text-[#171D3A] mb-0 truncate">Faculty</h2>
+                    <span id="facultyCountBadge" class="px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-bold bg-[#E8EBFA] text-[#8B5CF6] border border-[#8B5CF6]/30">
                         0 Faculty
                     </span>
                 </div>
-                <p class="text-xs text-[#66708F] mb-0 mt-0.5">Manage professors, assistant professors, cabin locations, and academic subject allocations.</p>
+                <p class="text-xs text-[#66708F] mb-0 mt-0.5 truncate sm:whitespace-normal">Manage faculty members, departments and academic assignments</p>
             </div>
         </div>
 
-        <button id="openCreateFacultyModalBtn" class="btn-primary-custom self-start sm:self-auto">
-            <i data-lucide="user-plus" class="w-4 h-4"></i> Add Faculty
+        <button id="openCreateFacultyModalBtn" class="btn-primary-custom w-full sm:w-auto justify-center self-stretch sm:self-auto flex items-center gap-2 text-xs font-bold">
+            <i data-lucide="user-plus" class="w-4 h-4"></i>
+            <span>Add Faculty</span>
         </button>
     </div>
 
-    <!-- Search, Filter & View Mode Toolbar -->
-    <div class="p-4 rounded-2xl bg-white border border-[#E1E5F0] flex flex-col md:flex-row items-center justify-between gap-3 flex-wrap shadow-sm">
+    <!-- 2. Search & Filter Bar (Mobile-Optimized Toolbar) -->
+    <div class="faculty-toolbar-card p-3 sm:p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm flex flex-col md:flex-row items-center justify-between gap-2.5 sm:gap-3">
+        <!-- Search Input with Clear Button -->
         <div class="relative w-full md:w-80">
-            <i data-lucide="search" class="w-4 h-4 text-[#8C95AD] absolute left-3 top-1/2 -translate-y-1/2"></i>
-            <input type="text" id="facultySearchInput" placeholder="Search by name, ID, subject, cabin..." class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl pl-9 pr-3 py-2 text-xs text-[#171D3A] placeholder-[#8C95AD] focus:outline-none focus:border-[#8B5CF6] transition">
+            <i data-lucide="search" class="w-4 h-4 text-[#8C95AD] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+            <input type="text" id="facultySearchInput" placeholder="Search name, ID, subject, cabin..." class="faculty-search-input w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl pl-9 pr-9 py-2.5 text-xs sm:text-xs text-[#171D3A] placeholder-[#8C95AD] focus:outline-none focus:border-[#8B5CF6] transition">
+            <button type="button" id="clearFacultySearchBtn" class="clear-search-btn hidden absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[#8C95AD] hover:text-[#171D3A]" title="Clear search">
+                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+            </button>
         </div>
 
-        <div class="flex items-center gap-2 w-full md:w-auto flex-wrap">
-            <select id="facultyDeptFilter" class="bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-[#8B5CF6]">
-                <option value="">All Departments</option>
-                <option value="Computer Engineering">Computer Engineering</option>
-                <option value="Information Technology">Information Technology</option>
-                <option value="Electronics & Comm.">Electronics & Comm.</option>
-                <option value="Mechanical Eng.">Mechanical Eng.</option>
-                <option value="Civil Eng.">Civil Eng.</option>
-                <option value="Electrical Eng.">Electrical Eng.</option>
-                <option value="Applied Sciences & Humanities">Applied Sciences</option>
-            </select>
+        <!-- Mobile Filter Button & Desktop Filter Dropdowns -->
+        <div class="flex items-center gap-2 w-full md:w-auto">
+            <!-- Mobile Filter Trigger Button (Visible on Mobile Only) -->
+            <button type="button" id="openMobileFacultyFilterBtn" class="mobile-filter-trigger-btn md:hidden flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs font-semibold hover:bg-[#E8EBFA]">
+                <i data-lucide="sliders-horizontal" class="w-4 h-4 text-[#8B5CF6]"></i>
+                <span>Filters</span>
+                <span id="mobileFacultyFilterActiveBadge" class="hidden px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-[#8B5CF6] text-white">0</span>
+            </button>
 
-            <select id="facultyDesigFilter" class="bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-[#8B5CF6]">
-                <option value="">All Designations</option>
-                <option value="Professor & Head">Professor & Head</option>
-                <option value="Professor">Professor</option>
-                <option value="Associate Professor">Associate Professor</option>
-                <option value="Assistant Professor">Assistant Professor</option>
-                <option value="Visiting Lecturer">Visiting Lecturer</option>
-            </select>
+            <!-- Desktop Filters (Visible on Tablet & Desktop) -->
+            <div class="hidden md:flex items-center gap-2">
+                <select id="facultyDeptFilter" class="bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-[#8B5CF6]">
+                    <option value="">All Departments</option>
+                    <option value="Computer Engineering">Computer Engineering</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="Electronics & Comm.">Electronics &amp; Comm.</option>
+                    <option value="Mechanical Eng.">Mechanical Eng.</option>
+                    <option value="Civil Eng.">Civil Eng.</option>
+                    <option value="Electrical Eng.">Electrical Eng.</option>
+                    <option value="Applied Sciences & Humanities">Applied Sciences &amp; Hum.</option>
+                </select>
 
-            <!-- Toggle View Mode (Desktop) -->
-            <div class="hidden sm:flex items-center bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl p-0.5">
-                <button id="viewTableToggleBtn" class="px-2.5 py-1.5 rounded-lg bg-[#8B5CF6] text-white text-xs font-semibold" title="Table View">
-                    <i data-lucide="list" class="w-3.5 h-3.5"></i>
-                </button>
-                <button id="viewGridToggleBtn" class="px-2.5 py-1.5 rounded-lg text-[#66708F] hover:text-[#171D3A] text-xs font-semibold" title="Grid Cards View">
-                    <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
-                </button>
+                <select id="facultyDesigFilter" class="bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-[#8B5CF6]">
+                    <option value="">All Designations</option>
+                    <option value="Professor & Head">Professor &amp; Head</option>
+                    <option value="Professor">Professor</option>
+                    <option value="Associate Professor">Associate Professor</option>
+                    <option value="Assistant Professor">Assistant Professor</option>
+                    <option value="Visiting Lecturer">Visiting Lecturer</option>
+                </select>
+
+                <!-- Toggle View Mode (Desktop) -->
+                <div class="flex items-center bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl p-0.5">
+                    <button type="button" id="viewTableToggleBtn" class="px-2.5 py-1.5 rounded-lg bg-[#8B5CF6] text-white text-xs font-semibold" title="Table View">
+                        <i data-lucide="list" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button type="button" id="viewGridToggleBtn" class="px-2.5 py-1.5 rounded-lg text-[#66708F] hover:text-[#171D3A] text-xs font-semibold" title="Grid Cards View">
+                        <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
             </div>
 
-            <button id="refreshFacultyBtn" class="p-2 rounded-xl bg-[#F8F9FE] border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A] hover:bg-[#E8EBFA]" title="Refresh Table">
+            <!-- Refresh Button -->
+            <button id="refreshFacultyBtn" class="p-2.5 rounded-xl bg-[#F8F9FE] border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A] hover:bg-[#E8EBFA] flex-shrink-0" title="Refresh Faculty">
                 <i data-lucide="rotate-cw" class="w-4 h-4"></i>
             </button>
         </div>
     </div>
 
-    <!-- Table View (Desktop) -->
-    <div id="facultyTableView" class="rounded-2xl bg-white border border-[#E1E5F0] overflow-hidden shadow-sm">
-        <div class="table-responsive">
+    <!-- 3. Faculty Data Container: Desktop Table / Grid vs Mobile Cards -->
+    <div class="faculty-data-container rounded-2xl bg-white border border-[#E1E5F0] overflow-hidden shadow-sm">
+        
+        <!-- Table View (Desktop Only) -->
+        <div id="facultyTableView" class="table-responsive">
             <table class="mobile-card-table table table-dark-custom mb-0 align-middle">
                 <thead>
                     <tr>
                         <th>FACULTY ID</th>
-                        <th>NAME & QUALIFICATION</th>
+                        <th>NAME &amp; QUALIFICATION</th>
                         <th>DEPARTMENT</th>
                         <th>DESIGNATION</th>
                         <th>PRIMARY SUBJECT</th>
@@ -102,55 +121,120 @@
                 </tbody>
             </table>
         </div>
-        
-        <!-- Mobile Faculty Cards List -->
-        <div id="facultyMobileCards" class="admin-mobile-record-list p-3" aria-live="polite"></div>
-    </div>
 
-    <!-- Grid Cards View (Optional Desktop) -->
-    <div id="facultyGridView" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 hidden">
-        <div id="facultyGridContainer" class="contents"></div>
-    </div>
+        <!-- Mobile Faculty Cards List (Visible on Mobile < 768px) -->
+        <div id="facultyMobileCards" class="admin-mobile-record-list p-3 space-y-3" aria-live="polite"></div>
 
-    <!-- Faculty Pagination Footer -->
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm" id="facultyPagination">
-        <div class="flex items-center gap-2 text-xs text-[#66708F]">
-            <span>Showing</span>
-            <span id="pageStart" class="font-bold text-[#171D3A]">0</span>
-            <span>to</span>
-            <span id="pageEnd" class="font-bold text-[#171D3A]">0</span>
-            <span>of</span>
-            <span id="pageTotal" class="font-bold text-[#8B5CF6]">0</span>
-            <span>faculty members</span>
+        <!-- Grid Cards View (Desktop Alternate) -->
+        <div id="facultyGridView" class="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 hidden">
+            <div id="facultyGridContainer" class="contents"></div>
         </div>
 
-        <div class="flex items-center gap-3">
-            <select id="pageLimitSelect" class="bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-[#8B5CF6]">
-                <option value="20">20 per page</option>
-                <option value="50" selected>50 per page</option>
-                <option value="100">100 per page</option>
-                <option value="250">250 per page</option>
-                <option value="10000">Show All</option>
-            </select>
+        <!-- Faculty Pagination Footer -->
+        <div class="p-3 sm:p-4 border-t border-[#E1E5F0] bg-[#F8F9FE] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#66708F]" id="facultyPagination">
+            <div class="flex items-center gap-1.5 font-medium text-center sm:text-left">
+                <span>Showing</span>
+                <span id="pageStart" class="font-bold text-[#171D3A]">0</span>
+                <span>to</span>
+                <span id="pageEnd" class="font-bold text-[#171D3A]">0</span>
+                <span>of</span>
+                <span id="pageTotal" class="font-bold text-[#8B5CF6]">0</span>
+                <span>faculty members</span>
+            </div>
 
-            <div class="flex items-center gap-1">
-                <button id="prevPageBtn" class="px-3 py-1.5 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A] text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
-                    Previous
-                </button>
-                <div id="pageNumbers" class="flex items-center gap-1"></div>
-                <button id="nextPageBtn" class="px-3 py-1.5 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A] text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
-                    Next
-                </button>
+            <div class="flex items-center gap-2">
+                <select id="pageLimitSelect" class="bg-white border border-[#E1E5F0] text-[#171D3A] text-xs rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-[#8B5CF6]">
+                    <option value="20">20 / page</option>
+                    <option value="50" selected>50 / page</option>
+                    <option value="100">100 / page</option>
+                    <option value="10000">Show All</option>
+                </select>
+
+                <div class="flex items-center gap-1">
+                    <button id="prevPageBtn" class="px-3 py-1.5 rounded-xl bg-white border border-[#E1E5F0] hover:border-[#8B5CF6] text-[#171D3A] font-semibold text-xs disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1">
+                        <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                        <span>Prev</span>
+                    </button>
+                    <div id="pageNumbers" class="flex items-center gap-1"></div>
+                    <button id="nextPageBtn" class="px-3 py-1.5 rounded-xl bg-white border border-[#E1E5F0] hover:border-[#8B5CF6] text-[#171D3A] font-semibold text-xs disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1">
+                        <span>Next</span>
+                        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
 </div>
 
+<!-- MOBILE FILTER BOTTOM SHEET MODAL -->
+<div class="modal fade" id="facultyMobileFilterModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content mobile-bottom-sheet-content bg-white border border-[#E1E5F0] rounded-t-3xl sm:rounded-2xl shadow-2xl">
+            <!-- Sheet Drag Handle -->
+            <div class="sheet-drag-handle-bar sm:hidden pt-3 pb-1 flex justify-center">
+                <div class="w-10 h-1.5 rounded-full bg-[#CBD5E1]"></div>
+            </div>
+
+            <div class="modal-header border-b border-[#E1E5F0] p-4 bg-[#F8F9FE]">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-[#E8EBFA] text-[#8B5CF6] flex items-center justify-center">
+                        <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-[#171D3A] mb-0">Filter Faculty</h3>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="p-4 space-y-4 text-xs">
+                <div>
+                    <label class="text-[11px] font-bold text-[#66708F] uppercase tracking-wider block mb-1.5">Department</label>
+                    <select id="mobileFacultyDeptFilter" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3.5 py-2.5 text-xs text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                        <option value="">All Departments</option>
+                        <option value="Computer Engineering">Computer Engineering</option>
+                        <option value="Information Technology">Information Technology</option>
+                        <option value="Electronics & Comm.">Electronics &amp; Comm.</option>
+                        <option value="Mechanical Eng.">Mechanical Eng.</option>
+                        <option value="Civil Eng.">Civil Eng.</option>
+                        <option value="Electrical Eng.">Electrical Eng.</option>
+                        <option value="Applied Sciences & Humanities">Applied Sciences &amp; Hum.</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="text-[11px] font-bold text-[#66708F] uppercase tracking-wider block mb-1.5">Designation</label>
+                    <select id="mobileFacultyDesigFilter" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3.5 py-2.5 text-xs text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                        <option value="">All Designations</option>
+                        <option value="Professor & Head">Professor &amp; Head</option>
+                        <option value="Professor">Professor</option>
+                        <option value="Associate Professor">Associate Professor</option>
+                        <option value="Assistant Professor">Assistant Professor</option>
+                        <option value="Visiting Lecturer">Visiting Lecturer</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="modal-footer border-t border-[#E1E5F0] p-3.5 bg-[#F8F9FE] flex items-center justify-between gap-2">
+                <button type="button" id="resetMobileFacultyFilterBtn" class="px-4 py-2.5 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A] text-xs font-semibold">
+                    Reset
+                </button>
+                <button type="button" id="applyMobileFacultyFilterBtn" class="btn-primary-custom flex-1 justify-center py-2.5 text-xs font-bold">
+                    Apply Filters
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- CREATE / EDIT FACULTY MODAL -->
 <div class="modal fade" id="facultyFormModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content bg-white border border-[#E1E5F0] rounded-2xl shadow-xl">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content mobile-bottom-sheet-content bg-white border border-[#E1E5F0] rounded-t-3xl sm:rounded-2xl shadow-2xl">
+            <!-- Sheet Drag Handle (Mobile) -->
+            <div class="sheet-drag-handle-bar sm:hidden pt-3 pb-1 flex justify-center">
+                <div class="w-10 h-1.5 rounded-full bg-[#CBD5E1]"></div>
+            </div>
+
             <div class="modal-header border-b border-[#E1E5F0] p-4 bg-[#F8F9FE]">
                 <div class="flex items-center gap-2">
                     <div class="w-8 h-8 rounded-lg bg-[#E8EBFA] text-[#8B5CF6] flex items-center justify-center">
@@ -160,85 +244,106 @@
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="facultyForm" class="p-4 space-y-3.5 text-xs">
+
+            <form id="facultyForm" class="flex flex-col flex-1 overflow-hidden text-xs">
                 <input type="hidden" id="facultyFormRecordId">
                 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                    <div>
-                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Faculty ID *</label>
-                        <input type="text" id="facultyIdInput" required placeholder="e.g. FAC-CSE-001" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6] font-mono">
+                <div class="modal-body p-4 sm:p-5 space-y-5 overflow-y-auto">
+                    <!-- Section 1: Personal Details -->
+                    <div class="form-group-section">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="w-5 h-5 rounded-full bg-[#E8EBFA] text-[#8B5CF6] text-[11px] font-bold flex items-center justify-center">1</span>
+                            <h4 class="text-xs font-bold text-[#171D3A] uppercase tracking-wider mb-0">Personal Information</h4>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5">
+                            <div class="sm:col-span-2">
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Full Name with Title *</label>
+                                <input type="text" id="facultyNameInput" required placeholder="Prof. Dr. Firstname Lastname" class="form-control-custom">
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Email Address *</label>
+                                <input type="email" id="facultyEmailInput" required placeholder="faculty@svitvasad.ac.in" class="form-control-custom">
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Contact Number</label>
+                                <input type="tel" id="facultyPhoneInput" placeholder="+91 9876543210" class="form-control-custom font-mono">
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Full Name *</label>
-                        <input type="text" id="facultyNameInput" required placeholder="Prof. Dr. Firstname Lastname" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+
+                    <!-- Section 2: Professional & Department -->
+                    <div class="form-group-section pt-3 border-t border-[#E1E5F0]">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="w-5 h-5 rounded-full bg-[#E8EBFA] text-[#8B5CF6] text-[11px] font-bold flex items-center justify-center">2</span>
+                            <h4 class="text-xs font-bold text-[#171D3A] uppercase tracking-wider mb-0">Professional &amp; Academic Role</h4>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-3.5">
+                            <div>
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Faculty ID *</label>
+                                <input type="text" id="facultyIdInput" required placeholder="e.g. FAC-CSE-001" class="form-control-custom font-mono">
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Designation *</label>
+                                <select id="facultyDesigInput" required class="form-control-custom">
+                                    <option value="Professor & Head">Professor &amp; Head</option>
+                                    <option value="Professor">Professor</option>
+                                    <option value="Associate Professor">Associate Professor</option>
+                                    <option value="Assistant Professor" selected>Assistant Professor</option>
+                                    <option value="Visiting Lecturer">Visiting Lecturer</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Department *</label>
+                                <select id="facultyDeptInput" required class="form-control-custom">
+                                    <option value="Computer Engineering">Computer Engineering</option>
+                                    <option value="Information Technology">Information Technology</option>
+                                    <option value="Electronics & Comm.">Electronics &amp; Comm.</option>
+                                    <option value="Mechanical Eng.">Mechanical Eng.</option>
+                                    <option value="Civil Eng.">Civil Eng.</option>
+                                    <option value="Electrical Eng.">Electrical Eng.</option>
+                                    <option value="Applied Sciences & Humanities">Applied Sciences &amp; Hum.</option>
+                                </select>
+                            </div>
+                            <div class="sm:col-span-2 lg:col-span-3">
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Highest Qualification</label>
+                                <input type="text" id="facultyQualInput" placeholder="e.g. Ph.D (IIT Bombay), M.Tech (CSE)" class="form-control-custom">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 3: Academic Allocation & Cabin -->
+                    <div class="form-group-section pt-3 border-t border-[#E1E5F0]">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="w-5 h-5 rounded-full bg-[#E8EBFA] text-[#8B5CF6] text-[11px] font-bold flex items-center justify-center">3</span>
+                            <h4 class="text-xs font-bold text-[#171D3A] uppercase tracking-wider mb-0">Location &amp; Photo</h4>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5">
+                            <div>
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Primary Subject(s)</label>
+                                <input type="text" id="facultySubjectInput" placeholder="e.g. Data Structures, Machine Learning" class="form-control-custom">
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Cabin Location</label>
+                                <input type="text" id="facultyCabinInput" placeholder="e.g. CE-Cabin-204" class="form-control-custom">
+                            </div>
+                        </div>
+
+                        <!-- Profile Photo Upload -->
+                        <div class="mt-3">
+                            <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Profile Photo</label>
+                            <div id="facultyImageDropZone" class="p-3.5 border-2 border-dashed border-[#E1E5F0] rounded-xl text-center cursor-pointer hover:border-[#8B5CF6] transition bg-[#F8F9FE]">
+                                <i data-lucide="image" class="w-5 h-5 mx-auto mb-1 text-[#8C95AD]"></i>
+                                <p class="text-xs text-[#66708F] mb-0">Tap or drag photo to upload (JPG, PNG, WEBP)</p>
+                            </div>
+                            <input type="file" id="facultyImageInput" accept="image/*" class="hidden">
+                            <div id="facultyImagePreviewContainer" class="mt-2 flex items-center gap-3 hidden"></div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                    <div>
-                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Designation *</label>
-                        <select id="facultyDesigInput" required class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
-                            <option value="Professor & Head">Professor & Head</option>
-                            <option value="Professor">Professor</option>
-                            <option value="Associate Professor">Associate Professor</option>
-                            <option value="Assistant Professor" selected>Assistant Professor</option>
-                            <option value="Visiting Lecturer">Visiting Lecturer</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Department *</label>
-                        <select id="facultyDeptInput" required class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
-                            <option value="Computer Engineering">Computer Engineering</option>
-                            <option value="Information Technology">Information Technology</option>
-                            <option value="Electronics & Comm.">Electronics & Comm.</option>
-                            <option value="Mechanical Eng.">Mechanical Eng.</option>
-                            <option value="Civil Eng.">Civil Eng.</option>
-                            <option value="Electrical Eng.">Electrical Eng.</option>
-                            <option value="Applied Sciences & Humanities">Applied Sciences & Humanities</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                    <div>
-                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Primary Subject(s)</label>
-                        <input type="text" id="facultySubjectInput" placeholder="e.g. Data Structures, AI" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
-                    </div>
-                    <div>
-                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Cabin Location</label>
-                        <input type="text" id="facultyCabinInput" placeholder="e.g. CE-Cabin-204" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
-                    </div>
-                    <div>
-                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Qualification</label>
-                        <input type="text" id="facultyQualInput" placeholder="e.g. Ph.D (IIT), M.Tech" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                    <div>
-                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Email Address *</label>
-                        <input type="email" id="facultyEmailInput" required placeholder="faculty@svitvasad.ac.in" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
-                    </div>
-                    <div>
-                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Contact Number</label>
-                        <input type="text" id="facultyPhoneInput" placeholder="+91 9876543210" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6] font-mono">
-                    </div>
-                </div>
-
-                <!-- Profile Photo Upload -->
-                <div>
-                    <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Profile Photo</label>
-                    <div id="facultyImageDropZone" class="p-4 border-2 border-dashed border-[#E1E5F0] rounded-xl text-center cursor-pointer hover:border-[#8B5CF6] transition bg-[#F8F9FE]">
-                        <i data-lucide="image" class="w-5 h-5 mx-auto mb-1 text-[#8C95AD]"></i>
-                        <p class="text-xs text-[#66708F] mb-0">Drag & drop photo or click to browse (JPG, PNG, WEBP)</p>
-                    </div>
-                    <input type="file" id="facultyImageInput" accept="image/*" class="hidden">
-                    <div id="facultyImagePreviewContainer" class="mt-2 flex items-center gap-3 hidden"></div>
-                </div>
-
-                <div class="modal-footer border-t border-[#E1E5F0] pt-4 px-0 pb-0 flex justify-end gap-2">
-                    <button type="button" class="px-4 py-2 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A] text-xs font-semibold" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn-primary-custom">Save Faculty</button>
+                <div class="modal-footer border-t border-[#E1E5F0] p-3.5 sm:p-4 bg-[#F8F9FE] flex items-center justify-end gap-2">
+                    <button type="button" class="px-4 py-2.5 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A] text-xs font-semibold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-primary-custom py-2.5 px-5 text-xs font-bold">Save Faculty</button>
                 </div>
             </form>
         </div>
@@ -247,15 +352,30 @@
 
 <!-- VIEW FACULTY MODAL -->
 <div class="modal fade" id="facultyViewModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-white border border-[#E1E5F0] rounded-2xl shadow-xl">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content mobile-bottom-sheet-content bg-white border border-[#E1E5F0] rounded-t-3xl sm:rounded-2xl shadow-2xl">
+            <!-- Sheet Drag Handle (Mobile) -->
+            <div class="sheet-drag-handle-bar sm:hidden pt-3 pb-1 flex justify-center">
+                <div class="w-10 h-1.5 rounded-full bg-[#CBD5E1]"></div>
+            </div>
+
             <div class="modal-header border-b border-[#E1E5F0] p-4 bg-[#F8F9FE]">
-                <h3 class="text-sm font-bold text-[#171D3A] mb-0">Faculty Details</h3>
+                <div class="flex items-center gap-2 min-w-0">
+                    <div class="w-8 h-8 rounded-lg bg-[#E8EBFA] text-[#8B5CF6] flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="user-check" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-[#171D3A] mb-0 truncate">Faculty Profile &amp; Academic Role</h3>
+                </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="p-4" id="facultyViewContent"></div>
-            <div class="modal-footer border-t border-[#E1E5F0] p-3">
-                <button type="button" class="btn-primary-custom text-xs" data-bs-dismiss="modal">Close</button>
+            
+            <div class="modal-body p-4 sm:p-5 overflow-y-auto" id="facultyViewContent"></div>
+
+            <div class="modal-footer border-t border-[#E1E5F0] p-3.5 bg-[#F8F9FE] flex items-center justify-between gap-2">
+                <button type="button" id="editFromViewModalBtn" class="px-4 py-2 rounded-xl bg-white border border-[#E1E5F0] text-[#171D3A] hover:bg-[#E8EBFA] text-xs font-bold flex items-center gap-1.5">
+                    <i data-lucide="edit-2" class="w-3.5 h-3.5"></i> Edit Profile
+                </button>
+                <button type="button" class="btn-primary-custom text-xs px-5 py-2" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -264,17 +384,17 @@
 <!-- DELETE FACULTY CONFIRMATION MODAL -->
 <div class="modal fade" id="facultyDeleteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content bg-white border border-[#E1E5F0] rounded-2xl shadow-xl text-center p-5 space-y-3">
-            <div class="w-12 h-12 rounded-full bg-red-50 text-red-600 border border-red-200 flex items-center justify-center mx-auto">
+        <div class="modal-content mobile-bottom-sheet-content bg-white border border-[#E1E5F0] rounded-t-3xl sm:rounded-2xl shadow-2xl text-center p-5 space-y-3">
+            <div class="w-12 h-12 rounded-2xl bg-red-50 text-red-600 border border-red-200 flex items-center justify-center mx-auto shadow-sm">
                 <i data-lucide="trash-2" class="w-6 h-6"></i>
             </div>
             <h4 class="text-sm font-bold text-[#171D3A] mb-1">Remove Faculty Member?</h4>
             <p class="text-xs text-[#66708F] mb-0">
-                Are you sure you want to delete <strong id="deleteFacultyTargetId" class="text-[#171D3A]"></strong>?
+                Are you sure you want to remove <strong id="deleteFacultyTargetName" class="text-[#171D3A]"></strong> (<span id="deleteFacultyTargetId" class="text-[#8B5CF6] font-mono"></span>)?
             </p>
-            <div class="pt-2 flex justify-center gap-2">
-                <button type="button" class="px-3.5 py-1.5 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] text-xs" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" id="confirmDeleteFacultyBtn" class="px-4 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-semibold">Delete</button>
+            <div class="pt-2 flex justify-center gap-2 w-full">
+                <button type="button" class="px-4 py-2.5 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] text-xs font-semibold flex-1" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmDeleteFacultyBtn" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-sm flex-1">Delete</button>
             </div>
         </div>
     </div>
@@ -285,3 +405,4 @@
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/admin/faculty.js') }}"></script>
 {% endblock %}
+
