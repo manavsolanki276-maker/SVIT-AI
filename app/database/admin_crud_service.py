@@ -689,10 +689,17 @@ def initialize_datasets_if_needed(project_root: Optional[str] = None):
         records_to_seed = []
 
         # 1. Try reading from CSV file if configured
-        if src_csv and os.path.exists(os.path.join(kb_dir, src_csv)):
+        target_csv = src_csv
+        if target_csv and not os.path.exists(os.path.join(kb_dir, target_csv)):
+            if target_csv == "subjects.csv" and os.path.exists(os.path.join(kb_dir, "subject.csv")):
+                target_csv = "subject.csv"
+            elif target_csv == "subject.csv" and os.path.exists(os.path.join(kb_dir, "subjects.csv")):
+                target_csv = "subjects.csv"
+
+        if target_csv and os.path.exists(os.path.join(kb_dir, target_csv)):
             try:
-                csv_path = os.path.join(kb_dir, src_csv)
-                df = pd.read_csv(csv_path, dtype=str).fillna("")
+                csv_path = os.path.join(kb_dir, target_csv)
+                df = pd.read_csv(csv_path, sep=None, engine='python', dtype=str).fillna("")
                 for idx, r in enumerate(df.to_dict(orient="records")):
                     clean = {str(k).strip().lower(): str(v).strip() for k, v in r.items()}
                     id_field = config["id_field"]
@@ -703,7 +710,7 @@ def initialize_datasets_if_needed(project_root: Optional[str] = None):
                     clean["created_by"] = "system_dataset"
                     records_to_seed.append(clean)
             except Exception as e:
-                logger.warning(f"Error loading {module_key} from {src_csv}: {e}")
+                logger.warning(f"Error loading {module_key} from {target_csv}: {e}")
 
         # 2. For students: sync genuine registered students if present in SQLite/MongoDB
         elif module_key == "students":

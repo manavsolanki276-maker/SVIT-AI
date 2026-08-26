@@ -1,7 +1,7 @@
 /**
  * SVIT Admin - Subjects & Curriculum Management Controller (Mobile-First Architecture)
  * Complete Hierarchy: PROGRAM -> DEPARTMENT -> YEAR -> SEMESTER -> SUBJECTS
- * Live MongoDB Data, Real KPI Calculations, Dynamic Filters, Debounced Search, and Full CRUD
+ * 100% Dynamic Metadata, Live MongoDB Data, Real-Time Calculations, and Full CRUD
  */
 
 (function() {
@@ -18,6 +18,22 @@
         'Electrical Engineering': 'zap',
         'Automobile Engineering': 'car',
         'Computer Applications': 'terminal'
+    };
+
+    const PROGRAM_NAMES = {
+        'Diploma': 'Diploma Engineering',
+        'BE': 'BE / B.Tech (Degree)',
+        'BCA': 'BCA (Computer App)',
+        'MCA': 'MCA (Master of App)',
+        'ME': 'ME / M.Tech (Master)'
+    };
+
+    const PROGRAM_ICONS = {
+        'Diploma': 'award',
+        'BE': 'graduation-cap',
+        'BCA': 'code-2',
+        'MCA': 'laptop',
+        'ME': 'book-marked'
     };
 
     const YEAR_LABELS = {
@@ -68,25 +84,6 @@
     // =========================================================================
 
     function bindEvents() {
-        // Level 1: Program Navigation Pills
-        document.querySelectorAll('#programSelectorContainer .program-nav-pill').forEach(pill => {
-            pill.addEventListener('click', () => {
-                const prog = pill.getAttribute('data-program');
-                if (!prog) return;
-                state.selectedProgram = prog;
-                state.selectedCourse = ''; // Reset to course selection view
-                state.selectedYear = '';
-                state.selectedSemester = '1';
-                state.search = '';
-                const searchInput = document.getElementById('subjectSearchInput');
-                if (searchInput) searchInput.value = '';
-                document.getElementById('subjectSearchClearBtn')?.classList.add('hidden');
-                
-                updateProgramPillsUI();
-                renderCurriculumViews();
-            });
-        });
-
         // Back to Courses Navigation Button
         const backBtn = document.getElementById('backToCoursesBtn');
         if (backBtn) {
@@ -153,14 +150,14 @@
         const applyMobileBtn = document.getElementById('mFilterApplyBtn');
         if (applyMobileBtn) {
             applyMobileBtn.addEventListener('click', () => {
-                state.selectedProgram = document.getElementById('mFilterProgram')?.value || 'Diploma';
+                state.selectedProgram = document.getElementById('mFilterProgram')?.value || state.selectedProgram;
                 state.selectedCourse = document.getElementById('mFilterDept')?.value || '';
                 state.selectedYear = document.getElementById('mFilterYear')?.value || '';
                 state.selectedSemester = document.getElementById('mFilterSem')?.value || '1';
                 state.typeFilter = document.getElementById('mFilterType')?.value || '';
                 state.creditsFilter = document.getElementById('mFilterCredits')?.value || '';
 
-                updateProgramPillsUI();
+                renderProgramPills();
                 if (mobileFilterModal) mobileFilterModal.hide();
                 renderCurriculumViews();
             });
@@ -170,7 +167,6 @@
         const resetMobileBtn = document.getElementById('mFilterResetBtn');
         if (resetMobileBtn) {
             resetMobileBtn.addEventListener('click', () => {
-                state.selectedProgram = 'Diploma';
                 state.selectedCourse = '';
                 state.selectedYear = '';
                 state.selectedSemester = '1';
@@ -179,7 +175,7 @@
                 state.search = '';
                 if (searchInput) searchInput.value = '';
                 searchClearBtn?.classList.add('hidden');
-                updateProgramPillsUI();
+                renderProgramPills();
                 if (mobileFilterModal) mobileFilterModal.hide();
                 renderCurriculumViews();
             });
@@ -249,15 +245,8 @@
         if (mCred) mCred.value = state.creditsFilter;
     }
 
-    function updateProgramPillsUI() {
-        document.querySelectorAll('#programSelectorContainer .program-nav-pill').forEach(pill => {
-            const prog = pill.getAttribute('data-program');
-            pill.classList.toggle('active', prog === state.selectedProgram);
-        });
-    }
-
     // =========================================================================
-    // 2. DATA LOADING & API INTERACTION (Live MongoDB Atlas Dataset)
+    // 2. DATA LOADING & API INTERACTION (Live MongoDB Dataset)
     // =========================================================================
 
     async function loadCurriculumData() {
@@ -271,6 +260,8 @@
             if (res.ok && (data.status === 'success' || Array.isArray(data.items))) {
                 state.allSubjects = Array.isArray(data.items) ? data.items : [];
                 calculateAndRenderCurriculumStats();
+                renderProgramPills();
+                syncDynamicFilterAndFormDropdowns();
                 renderCurriculumViews();
             } else {
                 showErrorState(data.message || 'Error retrieving subjects dataset from MongoDB.');
@@ -357,20 +348,115 @@
 
         const heroBadge = document.getElementById('heroTotalBadge');
         if (heroBadge) heroBadge.innerText = `${all.length} Subjects`;
-
-        // Update Pill Counts for each Program
-        ['Diploma', 'BE', 'BCA', 'MCA', 'ME'].forEach(prog => {
-            const countEl = document.getElementById(`pillCount${prog}`);
-            if (countEl) {
-                const progCourses = Object.values(courseMap).filter(c => (c.program || '').toLowerCase() === prog.toLowerCase());
-                const progSubjs = all.filter(s => (s.program || '').toLowerCase() === prog.toLowerCase());
-                countEl.innerText = `${progCourses.length} ${progCourses.length === 1 ? 'Course' : 'Courses'} • ${progSubjs.length} Subjects`;
-            }
-        });
     }
 
     // =========================================================================
-    // 4. MAIN CURRICULUM RENDERING CONTROLLER
+    // 4. LEVEL 1: DYNAMIC PROGRAM SELECTOR PILLS
+    // =========================================================================
+
+    function renderProgramPills() {
+        const container = document.getElementById('programSelectorContainer');
+        if (!container) return;
+
+        // Group subjects by Program dynamically
+        const programMap = {};
+        state.allSubjects.forEach(s => {
+            const p = s.program || 'General';
+            if (!programMap[p]) {
+                programMap[p] = { program: p, courses: new Set(), subjectsCount: 0 };
+            }
+            if (s.department) programMap[p].courses.add(s.department);
+            programMap[p].subjectsCount++;
+        });
+
+        const progList = Object.keys(programMap).sort();
+        if (!progList.length) return;
+
+        // Verify active selection exists
+        if (!progList.some(p => p.toLowerCase() === state.selectedProgram.toLowerCase())) {
+            state.selectedProgram = progList[0];
+        }
+
+        const progInfo = document.getElementById('programInfoLabel');
+        if (progInfo) {
+            progInfo.innerText = `${progList.length} Degree Programs Available`;
+        }
+
+        container.innerHTML = progList.map(prog => {
+            const item = programMap[prog];
+            const isActive = prog.toLowerCase() === state.selectedProgram.toLowerCase();
+            const iconName = PROGRAM_ICONS[prog] || 'award';
+            const title = PROGRAM_NAMES[prog] || prog;
+            const courseCount = item.courses.size;
+            const subCount = item.subjectsCount;
+
+            return `
+                <button type="button" class="program-nav-pill ${isActive ? 'active' : ''}" data-program="${escapeHtml(prog)}" onclick="window.selectProgram('${escapeQuotes(prog)}')">
+                    <div class="pill-badge-icon"><i data-lucide="${iconName}" class="w-4 h-4"></i></div>
+                    <div class="text-left">
+                        <span class="program-title">${escapeHtml(title)}</span>
+                        <span class="program-sub">${courseCount} ${courseCount === 1 ? 'Course' : 'Courses'} • ${subCount} Subjects</span>
+                    </div>
+                </button>
+            `;
+        }).join('');
+
+        if (window.lucide) lucide.createIcons();
+    }
+
+    window.selectProgram = function(prog) {
+        state.selectedProgram = prog;
+        state.selectedCourse = '';
+        state.selectedYear = '';
+        state.selectedSemester = '1';
+        state.search = '';
+        const searchInput = document.getElementById('subjectSearchInput');
+        if (searchInput) searchInput.value = '';
+        document.getElementById('subjectSearchClearBtn')?.classList.add('hidden');
+        renderProgramPills();
+        renderCurriculumViews();
+    };
+
+    function syncDynamicFilterAndFormDropdowns() {
+        const programs = Array.from(new Set(state.allSubjects.map(s => s.program).filter(Boolean))).sort();
+        const depts = Array.from(new Set(state.allSubjects.map(s => s.department).filter(Boolean))).sort();
+
+        // Populate Mobile Filter Program Dropdown
+        const mProg = document.getElementById('mFilterProgram');
+        if (mProg && programs.length) {
+            const cur = mProg.value;
+            mProg.innerHTML = programs.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(PROGRAM_NAMES[p] || p)}</option>`).join('');
+            if (cur && programs.includes(cur)) mProg.value = cur;
+            else mProg.value = state.selectedProgram;
+        }
+
+        // Populate Mobile Filter Dept Dropdown
+        const mDept = document.getElementById('mFilterDept');
+        if (mDept && depts.length) {
+            const cur = mDept.value;
+            mDept.innerHTML = `<option value="">All Departments</option>` + depts.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
+            if (cur && depts.includes(cur)) mDept.value = cur;
+        }
+
+        // Populate Form Program Dropdown
+        const formProg = document.getElementById('formProgram');
+        if (formProg && programs.length) {
+            const cur = formProg.value;
+            formProg.innerHTML = programs.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(PROGRAM_NAMES[p] || p)}</option>`).join('');
+            if (cur && programs.includes(cur)) formProg.value = cur;
+        }
+
+        // Populate Form Dept Dropdown
+        const formDept = document.getElementById('formDepartment');
+        if (formDept && depts.length) {
+            const cur = formDept.value;
+            formDept.innerHTML = depts.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
+            if (cur && depts.includes(cur)) formDept.value = cur;
+        }
+    }
+
+    // =========================================================================
+    // 5. MAIN CURRICULUM RENDERING CONTROLLER
     // =========================================================================
 
     function renderCurriculumViews() {
@@ -411,7 +497,7 @@
     }
 
     // =========================================================================
-    // 5. LEVEL 2: COURSES / DEPARTMENTS GRID RENDERING
+    // 6. LEVEL 2: COURSES / DEPARTMENTS GRID RENDERING
     // =========================================================================
 
     function renderCoursesGrid() {
@@ -421,15 +507,7 @@
         const titleEl = document.getElementById('courseSectionTitle');
         const subEl = document.getElementById('courseSectionSubtitle');
 
-        const progNames = {
-            'Diploma': 'Diploma Engineering',
-            'BE': 'BE / B.Tech (Degree)',
-            'BCA': 'BCA (Computer Applications)',
-            'MCA': 'MCA (Master of Computer Applications)',
-            'ME': 'ME / M.Tech (Master of Engineering)'
-        };
-
-        const currentProgLabel = progNames[state.selectedProgram] || state.selectedProgram;
+        const currentProgLabel = PROGRAM_NAMES[state.selectedProgram] || state.selectedProgram;
         if (titleEl) titleEl.innerText = `${currentProgLabel} Courses`;
 
         // Filter subjects for this program
@@ -507,7 +585,7 @@
     };
 
     // =========================================================================
-    // 6. LEVEL 3 & 4: PROGRAM -> DEPARTMENT -> YEAR -> SEMESTER -> SUBJECTS
+    // 7. LEVEL 3 & 4: PROGRAM -> DEPARTMENT -> YEAR -> SEMESTER -> SUBJECTS
     // =========================================================================
 
     function renderCourseDetailAndSubjects() {
@@ -547,7 +625,6 @@
         const sortedSems = Array.from(semsSet).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
 
         if (!sortedSems.length) {
-            // If year has no sems, reset selectedYear
             state.selectedYear = '';
             relevantSubjectsForSems = courseSubjects;
             courseSubjects.forEach(s => { if (s.semester) semsSet.add(String(s.semester)); });
@@ -691,7 +768,7 @@
     };
 
     // =========================================================================
-    // 7. GLOBAL SEARCH RESULTS RENDERING
+    // 8. GLOBAL SEARCH RESULTS RENDERING
     // =========================================================================
 
     function renderSearchResults() {
@@ -877,7 +954,7 @@
     }
 
     // =========================================================================
-    // 8. CRUD OPERATIONS (ADD, EDIT, DELETE, DETAILS)
+    // 9. CRUD OPERATIONS (ADD, EDIT, DELETE, DETAILS)
     // =========================================================================
 
     window.quickAddSubject = function(program, department, semester, year) {
@@ -1073,7 +1150,7 @@
     }
 
     // =========================================================================
-    // 9. TOAST UTILITY & HELPERS
+    // 10. TOAST UTILITY & HELPERS
     // =========================================================================
 
     function showAdminToast(msg, type = 'info') {

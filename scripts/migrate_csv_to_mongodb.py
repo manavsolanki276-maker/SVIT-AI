@@ -46,11 +46,12 @@ def migrate_csv_files(db) -> Dict[str, Dict[str, int]]:
 
     for file_path in sorted(csv_files):
         filename = os.path.basename(file_path)
-        collection_name = filename.replace(".csv", "").lower().replace(" ", "_")
+        base_name = filename.replace(".csv", "").lower().replace(" ", "_")
+        collection_name = "subjects" if base_name in ("subject", "subjects") else base_name
         coll = db[collection_name]
 
         try:
-            df = pd.read_csv(file_path, dtype=str).fillna("")
+            df = pd.read_csv(file_path, sep=None, engine='python', dtype=str).fillna("")
             records = df.to_dict(orient="records")
 
             inserted = 0
