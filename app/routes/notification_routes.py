@@ -21,9 +21,12 @@ def get_real_user_id():
 @login_required
 def get_notifications():
     uid = get_real_user_id()
+    enrollment = getattr(current_user, 'enrollment_no', getattr(current_user, 'enrollment_number', ''))
 
     # 1. MongoDB check
     res = MongoNotificationService.get_notifications(uid, limit=30)
+    if not res.get("notifications") and enrollment:
+        res = MongoNotificationService.get_notifications(enrollment, limit=30)
     if res.get("notifications"):
         return jsonify(res)
 

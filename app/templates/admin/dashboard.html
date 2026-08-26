@@ -62,27 +62,29 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {% if stats and stats.counters %}
             {% for label, val in stats.counters.items() %}
-            <div class="p-4 rounded-2xl bg-[#111827] border border-[#1F2937] stat-card-glow group">
+            <a href="{% if label == 'pending_registrations' %}{{ url_for('admin.students', status='pending') }}{% elif label == 'total_students' %}{{ url_for('admin.students') }}{% elif label == 'faculty_members' %}{{ url_for('admin.faculty') }}{% elif label == 'active_notices' or label == 'total_notices' %}{{ url_for('admin.notices') }}{% elif label == 'library_books' %}{{ url_for('admin.library_books') }}{% elif label == 'bus_routes' %}{{ url_for('admin.buses') }}{% elif label == 'events_count' %}{{ url_for('admin.events') }}{% elif label == 'subjects' %}{{ url_for('admin.subjects') }}{% elif label == 'academic_documents' %}{{ url_for('admin.academic_documents') }}{% elif label == 'menu_items' %}{{ url_for('admin.canteen') }}{% else %}#{% endif %}"
+               class="p-4 rounded-2xl bg-[#111827] border {% if label == 'pending_registrations' and val > 0 %}border-amber-500/50 bg-amber-950/20 shadow-lg shadow-amber-950/30{% else %}border-[#1F2937]{% endif %} stat-card-glow group text-decoration-none block transition transform hover:-translate-y-1">
                 <div class="flex items-center justify-between mb-2">
-                    <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ label.replace('_', ' ').title() }}</span>
-                    <div class="stat-icon-wrapper bg-indigo-600/10 text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white">
-                        <i data-lucide="activity" class="w-4 h-4"></i>
+                    <span class="text-xs font-semibold {% if label == 'pending_registrations' and val > 0 %}text-amber-400 font-bold{% else %}text-gray-400{% endif %} uppercase tracking-wider">{{ label.replace('_', ' ').title() }}</span>
+                    <div class="stat-icon-wrapper {% if label == 'pending_registrations' %}bg-amber-600/20 text-amber-400 group-hover:bg-amber-600 group-hover:text-white{% else %}bg-indigo-600/10 text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white{% endif %}">
+                        <i data-lucide="{% if label == 'pending_registrations' %}clock{% elif label == 'total_students' %}users{% elif label == 'faculty_members' %}user-check{% elif label == 'active_notices' or label == 'total_notices' %}megaphone{% elif label == 'library_books' %}book-open{% elif label == 'bus_routes' %}bus{% else %}activity{% endif %}" class="w-4 h-4"></i>
                     </div>
                 </div>
                 <div class="flex items-baseline justify-between mt-1">
-                    <h3 class="text-2xl font-black text-white m-0">{{ val }}</h3>
-                    <span class="text-[11px] font-semibold text-emerald-400 flex items-center gap-0.5">
-                        <i data-lucide="arrow-up-right" class="w-3 h-3"></i> Active
+                    <h3 class="text-2xl font-black {% if label == 'pending_registrations' and val > 0 %}text-amber-300{% else %}text-white{% endif %} m-0">{{ val }}</h3>
+                    <span class="text-[11px] font-semibold {% if label == 'pending_registrations' and val > 0 %}text-amber-400 animate-pulse{% elif label == 'pending_registrations' %}text-gray-400{% else %}text-emerald-400{% endif %} flex items-center gap-0.5">
+                        <i data-lucide="{% if label == 'pending_registrations' and val > 0 %}alert-circle{% elif label == 'pending_registrations' %}check{% else %}arrow-up-right{% endif %}" class="w-3 h-3"></i>
+                        {% if label == 'pending_registrations' and val > 0 %}Needs Review{% elif label == 'pending_registrations' %}All Reviewed{% else %}Active{% endif %}
                     </span>
                 </div>
-            </div>
+            </a>
             {% endfor %}
         {% endif %}
     </div>
 
     <!-- 4. MIDDLE ROW: ANALYTICS CHART & QUICK SHORTCUTS -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+
         <!-- Left 2 Cols: Analytics Overview Chart -->
         <div class="lg:col-span-2 p-5 rounded-2xl bg-[#111827] border border-[#1F2937]">
             <div class="flex items-center justify-between mb-4">

@@ -18,6 +18,19 @@ from app.models.chat_history import ChatConversation, ChatMessage
 
 chat_bp = Blueprint('chat', __name__)
 
+
+@chat_bp.before_request
+def verify_chat_student_status():
+    if current_user.is_authenticated and not getattr(current_user, 'is_admin', False):
+        status = getattr(current_user, 'status', 'active')
+        if status != 'active':
+            return jsonify({
+                "status": "error",
+                "error": "Forbidden",
+                "message": f"Student account is {status}. Access restricted."
+            }), 403
+
+
 # ---------------------------------------------------------
 # Global RAG Instance Placeholder (Lazy-loaded on demand)
 # ---------------------------------------------------------

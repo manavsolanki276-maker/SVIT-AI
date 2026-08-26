@@ -89,11 +89,11 @@ def login():
 
     if request.method == 'POST':
         data = request.get_json(silent=True) or request.form or {}
-        
+
         identifier = str(
-            data.get('identifier') or 
-            data.get('username') or 
-            data.get('email') or 
+            data.get('identifier') or
+            data.get('username') or
+            data.get('email') or
             ''
         ).strip()
         password = str(data.get('password') or '').strip()
@@ -121,7 +121,7 @@ def login():
         if not admin_user and Admin:
             ident_lower = identifier.lower()
             admin_user = Admin.query.filter(
-                (Admin.username == identifier) | 
+                (Admin.username == identifier) |
                 (Admin.email == ident_lower) |
                 (Admin.email == identifier)
             ).first()
@@ -186,7 +186,7 @@ def logout():
     """Admin logout endpoint."""
     logout_user()
     session.clear()
-    
+
     if request.is_json or request.path.startswith('/api/'):
         return jsonify({
             "status": "success",
@@ -538,7 +538,7 @@ def api_list_items(module_name: str):
     sort_by = request.args.get('sort_by')
     sort_order = int(request.args.get('sort_order', 1))
     page = int(request.args.get('page', 1))
-    
+
     limit_raw = request.args.get('limit', '50')
     if str(limit_raw).lower() in ('all', '0', '-1'):
         limit = 0
@@ -629,6 +629,237 @@ def api_delete_item(module_name: str, item_id: str):
         return jsonify({"status": "error", "error": "Not Found", "message": msg}), 404
 
     return jsonify({"status": "success", "message": msg}), 200
+
+
+# =========================================================================
+# 5.1. STUDENT REGISTRATION APPROVAL & NOTIFICATIONS WORKFLOW
+# =========================================================================
+@admin_bp.route('/api/students/<student_id>/approve', methods=['POST'])
+@admin_bp.route('/api/students/<student_id>/accept', methods=['POST'])
+@admin_required
+@require_permission('academic', 'students')
+def api_approve_student(student_id):
+    """
+    Approves a pending student registration request.
+    Enforces RBAC: only Academic Admin and Super Admin can approve.
+    Sets status='active', approved_by, approved_at.
+    Creates student notification in MongoDB.
+    """
+    from datetime import datetime
+    from bson import ObjectId
+    from app.database.mongodb import get_collection
+    from app.database.mongo_models import MongoNotificationService
+
+    coll = get_collection('students')
+    admin_identifier = getattr(current_user, 'username', getattr(current_user, 'name', 'admin'))
+    admin_id_str = getattr(current_user, 'id', admin_identifier)
+    now = datetime.utcnow()
+
+    student_doc = None
+    if coll is not None:
+        query = {
+            "$or": [
+                {"enrollment_no": str(student_id)},
+                {"enrollment_number": str(student_id)},
+                {"id": str(student_id)},
+                {"id": int(student_id) if str(student_id).isdigit() else -1},
+                {"_id": ObjectId(str(student_id)) if ObjectId.is_valid(str(student_id)) else None}
+            ]
+        }
+        student_doc = coll.find_one(query)
+        if student_doc:
+            coll.update_one(
+                {"_id": student_doc["_id"]},
+                {"$set": {
+                    "status": "active",
+                    "approved_by": admin_identifier,
+                    "approved_by_id": str(admin_id_str),
+                    "approved_at": now.isoformat(),
+                    "rejected_by": None,
+                    "rejected_at": None,
+                    "rejection_reason": None,
+                    "updated_at": now.isoformat()
+                }}
+            )
+
+    # SQLite fallback update
+    try:
+        from app.database.models import Student
+        from app.extensions import db
+        s_db = Student.query.filter(
+            (Student.enrollment_no == str(student_id)) | (Student.id == int(student_id) if str(student_id).isdigit() else -1)
+        ).first()
+        if s_db:
+            if hasattr(s_db, 'status'):
+                s_db.status = 'active'
+            if hasattr(s_db, 'approved_by'):
+                s_db.approved_by = admin_identifier
+            if hasattr(s_db, 'approved_at'):
+                s_db.approved_at = now
+            db.session.commit()
+    except Exception:
+        pass
+
+    target_enroll = student_doc.get("enrollment_no") or str(student_id) if student_doc else str(student_id)
+    student_name = student_doc.get("full_name") or student_doc.get("name") if student_doc else "Student"
+
+    # Send Student Notification
+    MongoNotificationService.notify_student(
+        student_id=target_enroll,
+        title="Registration Approved",
+        message="Your SVIT student registration has been approved. You can now access SVIT AI.",
+        category="approval",
+        data={
+            "approval_status": "approved",
+            "status": "active",
+            "approved_at": now.isoformat(),
+            "approved_by": admin_identifier,
+            "department": student_doc.get("department", "SVIT Vasad") if student_doc else "SVIT Vasad"
+        }
+    )
+
+    return jsonify({
+        "status": "success",
+        "message": "Student registration approved successfully.",
+        "student": {
+            "id": target_enroll,
+            "name": student_name,
+            "status": "active",
+            "approved_by": admin_identifier,
+            "approved_at": now.isoformat()
+        }
+    }), 200
+
+
+@admin_bp.route('/api/students/<student_id>/reject', methods=['POST'])
+@admin_required
+@require_permission('academic', 'students')
+def api_reject_student(student_id):
+    """
+    Rejects a student registration request with an optional reason.
+    Enforces RBAC: only Academic Admin and Super Admin can reject.
+    Sets status='rejected', rejected_by, rejected_at, rejection_reason.
+    Creates student notification in MongoDB.
+    """
+    from datetime import datetime
+    from bson import ObjectId
+    from app.database.mongodb import get_collection
+    from app.database.mongo_models import MongoNotificationService
+
+    data = request.get_json(silent=True) or request.form or {}
+    reason = str(data.get('reason') or data.get('rejection_reason') or '').strip()
+
+    coll = get_collection('students')
+    admin_identifier = getattr(current_user, 'username', getattr(current_user, 'name', 'admin'))
+    admin_id_str = getattr(current_user, 'id', admin_identifier)
+    now = datetime.utcnow()
+
+    student_doc = None
+    if coll is not None:
+        query = {
+            "$or": [
+                {"enrollment_no": str(student_id)},
+                {"enrollment_number": str(student_id)},
+                {"id": str(student_id)},
+                {"id": int(student_id) if str(student_id).isdigit() else -1},
+                {"_id": ObjectId(str(student_id)) if ObjectId.is_valid(str(student_id)) else None}
+            ]
+        }
+        student_doc = coll.find_one(query)
+        if student_doc:
+            coll.update_one(
+                {"_id": student_doc["_id"]},
+                {"$set": {
+                    "status": "rejected",
+                    "rejected_by": admin_identifier,
+                    "rejected_by_id": str(admin_id_str),
+                    "rejected_at": now.isoformat(),
+                    "rejection_reason": reason,
+                    "updated_at": now.isoformat()
+                }}
+            )
+
+    # SQLite fallback update
+    try:
+        from app.database.models import Student
+        from app.extensions import db
+        s_db = Student.query.filter(
+            (Student.enrollment_no == str(student_id)) | (Student.id == int(student_id) if str(student_id).isdigit() else -1)
+        ).first()
+        if s_db:
+            if hasattr(s_db, 'status'):
+                s_db.status = 'rejected'
+            if hasattr(s_db, 'rejected_by'):
+                s_db.rejected_by = admin_identifier
+            if hasattr(s_db, 'rejected_at'):
+                s_db.rejected_at = now
+            if hasattr(s_db, 'rejection_reason'):
+                s_db.rejection_reason = reason
+            db.session.commit()
+    except Exception:
+        pass
+
+    target_enroll = student_doc.get("enrollment_no") or str(student_id) if student_doc else str(student_id)
+    student_name = student_doc.get("full_name") or student_doc.get("name") if student_doc else "Student"
+
+    notif_msg = "Your SVIT registration request was rejected."
+    if reason:
+        notif_msg += f" Reason: {reason}"
+
+    # Send Student Notification
+    MongoNotificationService.notify_student(
+        student_id=target_enroll,
+        title="Registration Request Rejected",
+        message=notif_msg,
+        category="rejection",
+        data={
+            "approval_status": "rejected",
+            "status": "rejected",
+            "rejected_at": now.isoformat(),
+            "rejected_by": admin_identifier,
+            "rejection_reason": reason
+        }
+    )
+
+    return jsonify({
+        "status": "success",
+        "message": "Student registration rejected.",
+        "student": {
+            "id": target_enroll,
+            "name": student_name,
+            "status": "rejected",
+            "rejected_by": admin_identifier,
+            "rejected_at": now.isoformat(),
+            "rejection_reason": reason
+        }
+    }), 200
+
+
+@admin_bp.route('/api/notifications', methods=['GET'])
+@admin_required
+def api_admin_notifications():
+    """Returns real-time notifications for the Admin Header UI."""
+    from app.database.mongo_models import MongoNotificationService
+    res = MongoNotificationService.get_admin_notifications(limit=30)
+    return jsonify(res), 200
+
+
+@admin_bp.route('/api/notifications/<notification_id>/read', methods=['PATCH', 'POST'])
+@admin_required
+def api_admin_notification_mark_read(notification_id):
+    """Marks a single admin notification as read."""
+    from app.database.mongo_models import MongoNotificationService
+    MongoNotificationService.mark_admin_notification_read(notification_id)
+    return jsonify({"status": "success"}), 200
+
+
+@admin_bp.route('/api/notifications/read-all', methods=['POST'])
+@admin_required
+def api_admin_notifications_mark_all_read():
+    """Marks all admin notifications as read."""
+    from app.database.mongo_models import MongoNotificationService
+    MongoNotificationService.mark_all_admin_notifications_read()
+    return jsonify({"status": "success"}), 200
 
 
 # =========================================================================

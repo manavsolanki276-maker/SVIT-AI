@@ -1,44 +1,90 @@
 /**
  * SVIT Admin - Page 5: Students Controller
- * Handles student roster querying, department/semester/status filtering,
- * registration modal, profile view modal, and record deletion.
+ * Handles student roster querying, status tabs (All, Pending, Active, Rejected),
+ * approval and rejection workflow, audit trail viewing, and record management.
  */
 
 (function() {
     'use strict';
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialStatus = urlParams.get('status') || '';
 
     const state = {
         moduleKey: 'students',
         search: '',
         department: '',
         semester: '',
-        status: '',
+        status: initialStatus,
         page: 1,
         limit: 50,
         total: 0,
         items: [],
-        pendingDeleteId: null
+        pendingDeleteId: null,
+        pendingAcceptTarget: null,
+        pendingRejectTarget: null
     };
 
     let studentFormModal = null;
     let studentViewModal = null;
+    let studentAcceptModal = null;
+    let studentRejectModal = null;
     let deleteConfirmModal = null;
     let searchDebounce = null;
 
     document.addEventListener('DOMContentLoaded', function() {
         const formEl = document.getElementById('studentFormModal');
         const viewEl = document.getElementById('studentViewModal');
+        const acceptEl = document.getElementById('studentAcceptModal');
+        const rejectEl = document.getElementById('studentRejectModal');
         const delEl = document.getElementById('studentDeleteModal');
 
         if (formEl) studentFormModal = new bootstrap.Modal(formEl);
         if (viewEl) studentViewModal = new bootstrap.Modal(viewEl);
+        if (acceptEl) studentAcceptModal = new bootstrap.Modal(acceptEl);
+        if (rejectEl) studentRejectModal = new bootstrap.Modal(rejectEl);
         if (delEl) deleteConfirmModal = new bootstrap.Modal(delEl);
 
+        // Synchronize initial active tab from URL param if present
+        if (initialStatus) {
+            document.querySelectorAll('.status-tab-btn').forEach(btn => {
+                const btnStatus = btn.getAttribute('data-status') || '';
+                if (btnStatus.toLowerCase() === initialStatus.toLowerCase()) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
         bindEvents();
+        loadTabCounts();
         loadStudents();
     });
 
     function bindEvents() {
+        // Status Tabs Click Event
+        document.querySelectorAll('.status-tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.status-tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                state.status = btn.getAttribute('data-status') || '';
+                state.page = 1;
+
+                // Update URL history smoothly without reload
+                const currentUrl = new URL(window.location);
+                if (state.status) {
+                    currentUrl.searchParams.set('status', state.status);
+                } else {
+                    currentUrl.searchParams.delete('status');
+                }
+                window.history.replaceState({}, '', currentUrl);
+
+                loadStudents();
+            });
+        });
+
+        // Search Input
         const searchInput = document.getElementById('studentSearchInput');
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {
@@ -51,6 +97,7 @@
             });
         }
 
+        // Department Filter
         const deptFilter = document.getElementById('deptFilter');
         if (deptFilter) {
             deptFilter.addEventListener('change', (e) => {
@@ -60,6 +107,7 @@
             });
         }
 
+        // Semester Filter
         const semFilter = document.getElementById('semFilter');
         if (semFilter) {
             semFilter.addEventListener('change', (e) => {
@@ -69,9 +117,16 @@
             });
         }
 
+        // Refresh Button
         const refreshBtn = document.getElementById('refreshStudentsBtn');
-        if (refreshBtn) refreshBtn.addEventListener('click', loadStudents);
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => {
+                loadTabCounts();
+                loadStudents();
+            });
+        }
 
+        // Open Create Modal
         const openCreateBtn = document.getElementById('openCreateStudentModalBtn');
         if (openCreateBtn) {
             openCreateBtn.addEventListener('click', () => {
@@ -79,17 +134,29 @@
                 document.getElementById('studentFormRecordId').value = '';
                 document.getElementById('studentForm').reset();
                 document.getElementById('studentEnrollment').disabled = false;
+                const stSelect = document.getElementById('studentStatus');
+                if (stSelect) stSelect.value = 'active';
                 studentFormModal.show();
             });
         }
 
+        // Form Submit
         const form = document.getElementById('studentForm');
         if (form) form.addEventListener('submit', handleStudentFormSubmit);
 
+        // Confirm Accept Student Button
+        const confirmAcceptBtn = document.getElementById('confirmAcceptStudentBtn');
+        if (confirmAcceptBtn) confirmAcceptBtn.addEventListener('click', handleConfirmAccept);
+
+        // Confirm Reject Student Button
+        const confirmRejectBtn = document.getElementById('confirmRejectStudentBtn');
+        if (confirmRejectBtn) confirmRejectBtn.addEventListener('click', handleConfirmReject);
+
+        // Confirm Delete Button
         const confirmDeleteBtn = document.getElementById('confirmDeleteStudentBtn');
         if (confirmDeleteBtn) confirmDeleteBtn.addEventListener('click', handleConfirmDelete);
 
-        // Pagination
+        // Pagination Buttons
         const prevBtn = document.getElementById('prevPageBtn');
         if (prevBtn) {
             prevBtn.addEventListener('click', () => {
@@ -112,6 +179,34 @@
         }
     }
 
+    async function loadTabCounts() {
+        try {
+            const [allRes, pendingRes, activeRes, rejectedRes] = await Promise.all([
+                fetch('/admin/api/crud/students?limit=1'),
+                fetch('/admin/api/crud/students?status=pending&limit=1'),
+                fetch('/admin/api/crud/students?status=active&limit=1'),
+                fetch('/admin/api/crud/students?status=rejected&limit=1')
+            ]);
+
+            const allData = await allRes.json();
+            const pendingData = await pendingRes.json();
+            const activeData = await activeRes.json();
+            const rejectedData = await rejectedRes.json();
+
+            const cAll = document.getElementById('countAll');
+            const cPend = document.getElementById('countPending');
+            const cAct = document.getElementById('countActive');
+            const cRej = document.getElementById('countRejected');
+
+            if (cAll) cAll.innerText = allData.total || 0;
+            if (cPend) cPend.innerText = pendingData.total || 0;
+            if (cAct) cAct.innerText = activeData.total || 0;
+            if (cRej) cRej.innerText = rejectedData.total || 0;
+        } catch (e) {
+            console.error('Failed to load status tab counts:', e);
+        }
+    }
+
     async function loadStudents() {
         const tbody = document.getElementById('studentsTableBody');
         if (!tbody) return;
@@ -130,6 +225,7 @@
             limit: state.limit,
             search: state.search
         });
+        if (state.status) params.append('status', state.status);
         if (state.department) params.append('filter_department', state.department);
         if (state.semester) params.append('filter_semester', state.semester);
 
@@ -160,7 +256,7 @@
                 <tr>
                     <td colspan="8" class="text-center py-12 text-gray-400 text-xs">
                         <i data-lucide="users" class="w-8 h-8 mx-auto mb-2 text-gray-600"></i>
-                        <p class="mb-0">No student records found matching the query.</p>
+                        <p class="mb-0">No student records found matching the active filter.</p>
                     </td>
                 </tr>
             `;
@@ -175,41 +271,68 @@
             const sem = s.semester ? `Sem ${s.semester}` : 'Sem 1';
             const email = s.email || '-';
             const phone = s.phone || s.contact_number || '-';
-            const isComplete = s.is_profile_complete !== false;
+            const status = (s.status || 'active').toLowerCase();
+            const createdAt = s.created_at ? new Date(s.created_at).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : phone;
+
+            let statusBadgeHtml = '';
+            if (status === 'pending') {
+                statusBadgeHtml = '<span class="badge-status-pending"><i data-lucide="clock" class="w-3 h-3"></i>PENDING</span>';
+            } else if (status === 'rejected') {
+                statusBadgeHtml = '<span class="badge-status-rejected"><i data-lucide="x-circle" class="w-3 h-3"></i>REJECTED</span>';
+            } else {
+                statusBadgeHtml = '<span class="badge-status-active"><i data-lucide="check-circle" class="w-3 h-3"></i>ACTIVE</span>';
+            }
+
+            const isPending = status === 'pending';
 
             return `
-                <tr>
+                <tr class="${isPending ? 'bg-amber-950/10' : ''}">
                     <td>
                         <span class="font-mono text-indigo-400 font-bold text-xs">${enroll}</span>
                     </td>
                     <td>
                         <div class="flex items-center gap-2.5">
-                            <div class="student-avatar">
+                            <div class="student-avatar ${isPending ? 'bg-amber-600/30 text-amber-300' : ''}">
                                 ${name.slice(0, 2).toUpperCase()}
                             </div>
                             <div>
                                 <p class="text-xs font-bold text-white mb-0">${name}</p>
-                                <span class="text-[10px] text-gray-500">${s.program || 'BE'}</span>
+                                <span class="text-[10px] text-gray-400">${s.program || 'BE'}</span>
                             </div>
                         </div>
                     </td>
                     <td class="text-gray-300 text-xs">${dept}</td>
                     <td><span class="badge-sem">${sem}</span></td>
                     <td class="text-gray-300 text-xs">${email}</td>
-                    <td class="text-gray-400 text-xs font-mono">${phone}</td>
-                    <td>
-                        ${isComplete ? 
-                            '<span class="badge-profile-complete"><i data-lucide="check" class="w-3 h-3 d-inline mr-0.5"></i>Active</span>' : 
-                            '<span class="badge-profile-pending"><i data-lucide="clock" class="w-3 h-3 d-inline mr-0.5"></i>Pending</span>'}
-                    </td>
+                    <td class="text-gray-400 text-xs font-mono">${createdAt}</td>
+                    <td>${statusBadgeHtml}</td>
                     <td class="text-end">
                         <div class="inline-flex items-center gap-1.5">
+                            <!-- View Button -->
                             <button class="p-1.5 rounded-lg bg-[#0F172A] border border-[#1F2937] text-gray-300 hover:text-white" onclick="window.viewStudent('${enroll}')" title="View Profile">
                                 <i data-lucide="eye" class="w-3.5 h-3.5"></i>
                             </button>
+
+                            <!-- Accept Button (Visible on Pending or All) -->
+                            ${status !== 'active' ? `
+                            <button class="px-2 py-1 rounded-lg bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600 hover:text-white text-[11px] font-bold transition flex items-center gap-1" onclick="window.acceptStudent('${enroll}', '${escapeQuotes(name)}')" title="Accept Student">
+                                <i data-lucide="check" class="w-3 h-3"></i> Accept
+                            </button>
+                            ` : ''}
+
+                            <!-- Reject Button (Visible on Pending or Active) -->
+                            ${status !== 'rejected' ? `
+                            <button class="px-2 py-1 rounded-lg bg-red-600/20 text-red-400 border border-red-500/30 hover:bg-red-600 hover:text-white text-[11px] font-bold transition flex items-center gap-1" onclick="window.rejectStudent('${enroll}', '${escapeQuotes(name)}')" title="Reject Student">
+                                <i data-lucide="x" class="w-3 h-3"></i> Reject
+                            </button>
+                            ` : ''}
+
+                            <!-- Edit Button -->
                             <button class="p-1.5 rounded-lg bg-[#0F172A] border border-[#1F2937] text-gray-300 hover:text-white" onclick="window.editStudent('${enroll}')" title="Edit Student">
                                 <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
                             </button>
+
+                            <!-- Delete Button -->
                             <button class="p-1.5 rounded-lg bg-[#0F172A] border border-[#1F2937] text-red-400 hover:bg-red-500/20" onclick="window.deleteStudent('${enroll}')" title="Delete Student">
                                 <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                             </button>
@@ -220,6 +343,10 @@
         }).join('');
 
         lucide.createIcons();
+    }
+
+    function escapeQuotes(str) {
+        return (str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
     }
 
     function updatePagination() {
@@ -247,7 +374,8 @@
             department: document.getElementById('studentDepartment').value,
             semester: parseInt(document.getElementById('studentSemester').value, 10) || 1,
             division: document.getElementById('studentDivision').value.trim(),
-            phone: document.getElementById('studentPhone').value.trim()
+            phone: document.getElementById('studentPhone').value.trim(),
+            status: document.getElementById('studentStatus') ? document.getElementById('studentStatus').value : 'active'
         };
 
         const isEdit = Boolean(recordId);
@@ -264,9 +392,75 @@
             if (res.ok && data.status === 'success') {
                 showAdminToast(data.message, 'success');
                 studentFormModal.hide();
+                loadTabCounts();
                 loadStudents();
             } else {
                 showAdminToast(data.message || 'Error saving student record.', 'error');
+            }
+        } catch (err) {
+            showAdminToast(err.message, 'error');
+        }
+    }
+
+    window.acceptStudent = function(enroll, name) {
+        state.pendingAcceptTarget = { enroll, name };
+        document.getElementById('acceptStudentTargetName').innerText = name || 'Student';
+        document.getElementById('acceptStudentTargetEnroll').innerText = enroll;
+        studentAcceptModal.show();
+    };
+
+    async function handleConfirmAccept() {
+        if (!state.pendingAcceptTarget) return;
+        const { enroll } = state.pendingAcceptTarget;
+
+        try {
+            const res = await fetch(`/admin/api/students/${encodeURIComponent(enroll)}/approve`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await res.json();
+            if (res.ok && data.status === 'success') {
+                showAdminToast('Student registration approved successfully.', 'success');
+                studentAcceptModal.hide();
+                if (studentViewModal) studentViewModal.hide();
+                loadTabCounts();
+                loadStudents();
+            } else {
+                showAdminToast(data.message || 'Failed to approve student.', 'error');
+            }
+        } catch (err) {
+            showAdminToast(err.message, 'error');
+        }
+    }
+
+    window.rejectStudent = function(enroll, name) {
+        state.pendingRejectTarget = { enroll, name };
+        document.getElementById('rejectStudentTargetName').innerText = name || 'Student';
+        document.getElementById('rejectStudentTargetEnroll').innerText = enroll;
+        document.getElementById('studentRejectReason').value = '';
+        studentRejectModal.show();
+    };
+
+    async function handleConfirmReject() {
+        if (!state.pendingRejectTarget) return;
+        const { enroll } = state.pendingRejectTarget;
+        const reason = document.getElementById('studentRejectReason').value.trim();
+
+        try {
+            const res = await fetch(`/admin/api/students/${encodeURIComponent(enroll)}/reject`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reason: reason })
+            });
+            const data = await res.json();
+            if (res.ok && data.status === 'success') {
+                showAdminToast('Student registration rejected.', 'warning');
+                studentRejectModal.hide();
+                if (studentViewModal) studentViewModal.hide();
+                loadTabCounts();
+                loadStudents();
+            } else {
+                showAdminToast(data.message || 'Failed to reject student.', 'error');
             }
         } catch (err) {
             showAdminToast(err.message, 'error');
@@ -287,7 +481,9 @@
         document.getElementById('studentDepartment').value = student.department || 'Computer Engineering';
         document.getElementById('studentSemester').value = student.semester || 1;
         document.getElementById('studentDivision').value = student.division || '';
-        document.getElementById('studentPhone').value = student.phone || '';
+        document.getElementById('studentPhone').value = student.phone || student.contact_number || '';
+        const stSelect = document.getElementById('studentStatus');
+        if (stSelect) stSelect.value = student.status || 'active';
 
         studentFormModal.show();
     };
@@ -297,40 +493,104 @@
         if (!student) return;
 
         const container = document.getElementById('studentViewContent');
+        const quickActions = document.getElementById('studentViewQuickActions');
         if (!container) return;
 
+        const status = (student.status || 'active').toLowerCase();
+        let statusBadge = '';
+        if (status === 'pending') {
+            statusBadge = '<span class="badge-status-pending"><i data-lucide="clock" class="w-3 h-3"></i>PENDING APPROVAL</span>';
+        } else if (status === 'rejected') {
+            statusBadge = '<span class="badge-status-rejected"><i data-lucide="x-circle" class="w-3 h-3"></i>REJECTED</span>';
+        } else {
+            statusBadge = '<span class="badge-status-active"><i data-lucide="check-circle" class="w-3 h-3"></i>ACTIVE</span>';
+        }
+
+        const name = student.full_name || student.name || 'Student';
+
         container.innerHTML = `
-            <div class="space-y-3">
-                <div class="flex items-center gap-3 p-3 rounded-xl bg-[#0F172A] border border-[#1F2937]">
-                    <div class="w-12 h-12 rounded-xl bg-indigo-600/30 text-indigo-400 font-bold text-base flex items-center justify-center">
-                        ${(student.full_name || 'ST').slice(0, 2).toUpperCase()}
+            <div class="space-y-4">
+                <div class="flex items-center justify-between p-3.5 rounded-xl bg-[#0F172A] border border-[#1F2937] flex-wrap gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-xl bg-indigo-600/30 text-indigo-400 font-bold text-base flex items-center justify-center">
+                            ${name.slice(0, 2).toUpperCase()}
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-bold text-white mb-0.5">${name}</h4>
+                            <p class="text-xs text-indigo-400 font-mono mb-0">${student.enrollment_no || enroll}</p>
+                        </div>
                     </div>
-                    <div>
-                        <h4 class="text-sm font-bold text-white mb-0.5">${student.full_name || student.name}</h4>
-                        <p class="text-xs text-indigo-400 font-mono mb-0">${student.enrollment_no || enroll}</p>
-                    </div>
+                    <div>${statusBadge}</div>
                 </div>
-                <div class="grid grid-cols-2 gap-3 text-xs">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                     <div class="p-2.5 rounded-lg bg-[#0F172A] border border-[#1F2937]">
-                        <span class="text-gray-500 block text-[10px]">DEPARTMENT</span>
+                        <span class="text-gray-500 block text-[10px] uppercase font-semibold">DEPARTMENT</span>
                         <span class="text-white font-medium">${student.department || '-'}</span>
                     </div>
                     <div class="p-2.5 rounded-lg bg-[#0F172A] border border-[#1F2937]">
-                        <span class="text-gray-500 block text-[10px]">PROGRAM & SEMESTER</span>
+                        <span class="text-gray-500 block text-[10px] uppercase font-semibold">PROGRAM &amp; SEMESTER</span>
                         <span class="text-white font-medium">${student.program || 'BE'} - Sem ${student.semester || 1}</span>
                     </div>
                     <div class="p-2.5 rounded-lg bg-[#0F172A] border border-[#1F2937]">
-                        <span class="text-gray-500 block text-[10px]">EMAIL ADDRESS</span>
+                        <span class="text-gray-500 block text-[10px] uppercase font-semibold">EMAIL ADDRESS</span>
                         <span class="text-white font-medium">${student.email || '-'}</span>
                     </div>
                     <div class="p-2.5 rounded-lg bg-[#0F172A] border border-[#1F2937]">
-                        <span class="text-gray-500 block text-[10px]">PHONE NUMBER</span>
-                        <span class="text-white font-medium font-mono">${student.phone || '-'}</span>
+                        <span class="text-gray-500 block text-[10px] uppercase font-semibold">CONTACT NUMBER</span>
+                        <span class="text-white font-medium font-mono">${student.phone || student.contact_number || '-'}</span>
+                    </div>
+                    <div class="p-2.5 rounded-lg bg-[#0F172A] border border-[#1F2937]">
+                        <span class="text-gray-500 block text-[10px] uppercase font-semibold">REQUEST ID / REF</span>
+                        <span class="text-indigo-300 font-mono text-[11px]">${student.request_id || 'N/A'}</span>
+                    </div>
+                    <div class="p-2.5 rounded-lg bg-[#0F172A] border border-[#1F2937]">
+                        <span class="text-gray-500 block text-[10px] uppercase font-semibold">REGISTERED AT</span>
+                        <span class="text-gray-300 font-mono text-[11px]">${student.created_at ? new Date(student.created_at).toLocaleString() : 'N/A'}</span>
                     </div>
                 </div>
+
+                <!-- Audit Trail Box -->
+                ${status === 'active' && student.approved_by ? `
+                    <div class="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/30 text-xs">
+                        <div class="flex items-center gap-1.5 text-emerald-400 font-semibold mb-1">
+                            <i data-lucide="shield-check" class="w-4 h-4"></i> Approved Record
+                        </div>
+                        <p class="text-gray-300 mb-0">Approved by <strong class="text-white">${student.approved_by}</strong> on ${student.approved_at ? new Date(student.approved_at).toLocaleString() : 'N/A'}</p>
+                    </div>
+                ` : ''}
+
+                ${status === 'rejected' ? `
+                    <div class="p-3 rounded-xl bg-red-950/20 border border-red-500/30 text-xs">
+                        <div class="flex items-center gap-1.5 text-red-400 font-semibold mb-1">
+                            <i data-lucide="alert-triangle" class="w-4 h-4"></i> Rejection Details
+                        </div>
+                        <p class="text-gray-300 mb-1">Rejected by <strong class="text-white">${student.rejected_by || 'Admin'}</strong> on ${student.rejected_at ? new Date(student.rejected_at).toLocaleString() : 'N/A'}</p>
+                        ${student.rejection_reason ? `<p class="text-red-300 mb-0 font-medium">Reason: ${student.rejection_reason}</p>` : ''}
+                    </div>
+                ` : ''}
             </div>
         `;
 
+        if (quickActions) {
+            quickActions.innerHTML = '';
+            if (status !== 'active') {
+                quickActions.innerHTML += `
+                    <button class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1" onclick="window.acceptStudent('${enroll}', '${escapeQuotes(name)}')">
+                        <i data-lucide="check" class="w-3.5 h-3.5"></i> Approve Student
+                    </button>
+                `;
+            }
+            if (status !== 'rejected') {
+                quickActions.innerHTML += `
+                    <button class="px-3 py-1.5 rounded-xl bg-red-600/20 text-red-400 border border-red-500/30 hover:bg-red-600 hover:text-white text-xs font-semibold flex items-center gap-1" onclick="window.rejectStudent('${enroll}', '${escapeQuotes(name)}')">
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i> Reject
+                    </button>
+                `;
+            }
+        }
+
+        lucide.createIcons();
         studentViewModal.show();
     };
 
@@ -349,6 +609,7 @@
             if (res.ok && data.status === 'success') {
                 showAdminToast(data.message, 'success');
                 deleteConfirmModal.hide();
+                loadTabCounts();
                 loadStudents();
             } else {
                 showAdminToast(data.message || 'Failed to delete student.', 'error');

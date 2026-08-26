@@ -203,6 +203,20 @@ def create_app():
             if getattr(current_user, 'is_admin', False):
                 return redirect(url_for('admin.dashboard'))
             
+            # Check student approval status
+            status = getattr(current_user, 'status', 'active')
+            if status != 'active':
+                logout_user()
+                if status == 'pending':
+                    flash('Your registration is pending admin approval.', 'warning')
+                elif status == 'rejected':
+                    reason = getattr(current_user, 'rejection_reason', '')
+                    msg = 'Your registration request was rejected.'
+                    if reason:
+                        msg += f' Reason: {reason}'
+                    flash(msg, 'error')
+                return redirect(url_for('auth.login'))
+
             # Check profile completion status
             is_complete = getattr(current_user, 'is_profile_completed', getattr(current_user, 'is_profile_complete', True))
             if not is_complete:
@@ -217,6 +231,11 @@ def create_app():
     def root_login():
         from app.routes.auth import student_login
         return student_login()
+
+    @app.route('/register', methods=['GET', 'POST'])
+    def root_register():
+        from app.routes.auth import register
+        return register()
 
     @app.route('/logout', methods=['GET', 'POST'])
     def root_logout():
@@ -240,6 +259,25 @@ def create_app():
 
         try:
             db.create_all()
+            with db.engine.connect() as conn:
+                res = conn.execute(db.text("PRAGMA table_info(students)")).fetchall()
+                cols = [r[1] for r in res]
+                if cols:
+                    if 'status' not in cols:
+                        conn.execute(db.text("ALTER TABLE students ADD COLUMN status VARCHAR(20) DEFAULT 'active'"))
+                    if 'request_id' not in cols:
+                        conn.execute(db.text("ALTER TABLE students ADD COLUMN request_id VARCHAR(50)"))
+                    if 'approved_by' not in cols:
+                        conn.execute(db.text("ALTER TABLE students ADD COLUMN approved_by VARCHAR(50)"))
+                    if 'approved_at' not in cols:
+                        conn.execute(db.text("ALTER TABLE students ADD COLUMN approved_at DATETIME"))
+                    if 'rejected_by' not in cols:
+                        conn.execute(db.text("ALTER TABLE students ADD COLUMN rejected_by VARCHAR(50)"))
+                    if 'rejected_at' not in cols:
+                        conn.execute(db.text("ALTER TABLE students ADD COLUMN rejected_at DATETIME"))
+                    if 'rejection_reason' not in cols:
+                        conn.execute(db.text("ALTER TABLE students ADD COLUMN rejection_reason TEXT"))
+                    conn.commit()
         except Exception as db_err:
             logger.warning(f"Database table initialization notice: {db_err}")
 

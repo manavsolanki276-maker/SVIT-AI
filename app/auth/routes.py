@@ -99,6 +99,18 @@ def login():
                 student = Student.query.filter_by(enrollment_number=identifier).first()
 
         if student and hasattr(student, 'check_password') and student.check_password(password):
+            status = getattr(student, 'status', 'active')
+            if status == 'pending':
+                flash('Your registration is pending admin approval.', 'warning')
+                return render_template('auth/login.html')
+            elif status == 'rejected':
+                reason = getattr(student, 'rejection_reason', '')
+                msg = 'Your registration request was rejected.'
+                if reason:
+                    msg += f' Reason: {reason}'
+                flash(msg, 'danger')
+                return render_template('auth/login.html')
+
             login_user(student, remember=remember)
 
             if next_page and is_safe_url(next_page) and not next_page.startswith('/admin'):
@@ -118,7 +130,18 @@ def login():
 
 
 # =========================================================
-# 2. LOGOUT ROUTE
+# 2. REGISTRATION ROUTE
+# =========================================================
+@auth_bp.route('/register', methods=['GET', 'POST'], endpoint='register')
+@auth_bp.route('/student/register', methods=['GET', 'POST'])
+def register():
+    """Handles new student registration."""
+    from app.routes.auth import register as routes_auth_register
+    return routes_auth_register()
+
+
+# =========================================================
+# 3. LOGOUT ROUTE
 # =========================================================
 @auth_bp.route('/logout')
 def logout():
@@ -131,7 +154,7 @@ def logout():
 
 
 # =========================================================
-# 3. FORGOT PASSWORD ROUTE
+# 4. FORGOT PASSWORD ROUTE
 # =========================================================
 @auth_bp.route('/forgot-password', methods=['GET', 'POST'], endpoint='forgot_password')
 def forgot_password():

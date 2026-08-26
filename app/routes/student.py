@@ -9,6 +9,24 @@ from app.models.chat_history import ChatConversation, ChatMessage
 student_bp = Blueprint('student', __name__, url_prefix='/student')
 
 
+@student_bp.before_request
+def verify_student_status():
+    if current_user.is_authenticated and not getattr(current_user, 'is_admin', False):
+        status = getattr(current_user, 'status', 'active')
+        if status != 'active':
+            from flask_login import logout_user
+            logout_user()
+            if status == 'pending':
+                flash('Your registration is pending admin approval.', 'warning')
+            elif status == 'rejected':
+                reason = getattr(current_user, 'rejection_reason', '')
+                msg = 'Your registration request was rejected.'
+                if reason:
+                    msg += f' Reason: {reason}'
+                flash(msg, 'error')
+            return redirect(url_for('auth.login'))
+
+
 # =========================================================
 # 1. FIRST-TIME PROFILE ONBOARDING & VIEW REDIRECTS
 # =========================================================

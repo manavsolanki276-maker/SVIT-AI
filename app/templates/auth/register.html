@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration - SVIT AI Assistant</title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth/login.css') }}">
+    <style>
+        .register-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        @media (max-width: 640px) {
+            .register-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .form-select-custom {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: #f8fafc;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-select-custom:focus {
+            border-color: #6366f1;
+        }
+        .form-select-custom option {
+            background: #0f172a;
+            color: #f8fafc;
+        }
+        .badge-approval-notice {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            color: #fbbf24;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-wrapper">
+        <!-- Left Hero Section with Real SVIT Campus Photo -->
+        <div class="hero-section">
+            <div class="hero-overlay"></div>
+
+            <div class="hero-inner">
+                <!-- Top Brand Header -->
+                <div class="brand-header">
+                    <div class="brand-logo-box">
+                        <img src="{{ url_for('static', filename='logo/svit logo u.png') }}" alt="SVIT Logo" class="auth-brand-logo">
+                    </div>
+                    <div class="brand-text">
+                        <h1>SVIT</h1>
+                        <p>VASAD</p>
+                        <span>AI ASSISTANT</span>
+                    </div>
+                </div>
+
+                <!-- Lower Hero Text & Highlights -->
+                <div class="hero-content">
+                    <div class="hero-tagline">
+                        <h2>Join the<br><span>SVIT AI Community</span></h2>
+                        <p>Register your student profile to access 24x7 intelligent academic assistance, campus maps, schedules, and official notices.</p>
+                    </div>
+
+                    <!-- 3 Feature Highlights -->
+                    <div class="feature-list">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i data-lucide="shield-check"></i>
+                            </div>
+                            <div class="feature-info">
+                                <strong>Admin Verification & Approval</strong>
+                                <span>Academic admin securely approves official student registrations</span>
+                            </div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i data-lucide="bell"></i>
+                            </div>
+                            <div class="feature-info">
+                                <strong>Real-Time Status Alerts</strong>
+                                <span>Get notified as soon as your account is reviewed &amp; activated</span>
+                            </div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i data-lucide="bot"></i>
+                            </div>
+                            <div class="feature-info">
+                                <strong>Personalized AI Companion</strong>
+                                <span>Tailored answers based on your department, semester &amp; batch</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Footer -->
+                <div class="hero-footer">
+                    <span>Sardar Vallabhbhai Patel Institute of Technology, Vasad</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Form Panel -->
+        <div class="form-section">
+            <div class="form-scroll-container">
+                <div class="form-card" style="max-width: 520px;">
+                    <!-- Form Header with SVIT Logo in Rounded Card -->
+                    <div class="form-header">
+                        <div class="form-logo-box">
+                            <img src="{{ url_for('static', filename='logo/svit logo u.png') }}" alt="SVIT Logo" class="form-brand-logo">
+                        </div>
+                        <h2>Student Registration</h2>
+                        <p>Create your SVIT AI Assistant student account</p>
+                    </div>
+
+                    <!-- Approval Workflow Notice -->
+                    <div class="badge-approval-notice">
+                        <i data-lucide="info" style="width: 18px; height: 18px; flex-shrink: 0;"></i>
+                        <span>New student registrations require administrative review and approval before accessing SVIT AI.</span>
+                    </div>
+
+                    <!-- Flash Messages -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                      {% if messages %}
+                        {% for category, message in messages %}
+                          <div class="alert alert-{{ category }}">
+                            <i data-lucide="alert-circle" class="alert-icon"></i>
+                            <span>{{ message }}</span>
+                          </div>
+                        {% endfor %}
+                      {% endif %}
+                    {% endwith %}
+
+                    <!-- Registration Form -->
+                    <form id="registerForm" action="{{ url_for('auth.register') }}" method="POST">
+                        <div class="input-group">
+                            <label for="full_name">Full Legal Name *</label>
+                            <div class="input-field">
+                                <i data-lucide="user" class="field-icon"></i>
+                                <input type="text" id="full_name" name="full_name" placeholder="e.g. Manav Solanki" required autocomplete="name" value="{{ form_data.full_name if form_data is defined else '' }}">
+                            </div>
+                        </div>
+
+                        <div class="register-grid">
+                            <div class="input-group">
+                                <label for="enrollment_no">Enrollment Number *</label>
+                                <div class="input-field">
+                                    <i data-lucide="credit-card" class="field-icon"></i>
+                                    <input type="text" id="enrollment_no" name="enrollment_no" placeholder="e.g. 210410107001" required autocomplete="off" value="{{ form_data.enrollment_no if form_data is defined else '' }}">
+                                </div>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="phone">Phone / Mobile</label>
+                                <div class="input-field">
+                                    <i data-lucide="phone" class="field-icon"></i>
+                                    <input type="tel" id="phone" name="phone" placeholder="+91 9876543210" autocomplete="tel" value="{{ form_data.phone if form_data is defined else '' }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="email">College / Personal Email *</label>
+                            <div class="input-field">
+                                <i data-lucide="mail" class="field-icon"></i>
+                                <input type="email" id="email" name="email" placeholder="student@svitvasad.ac.in" required autocomplete="email" value="{{ form_data.email if form_data is defined else '' }}">
+                            </div>
+                        </div>
+
+                        <div class="register-grid">
+                            <div class="input-group">
+                                <label for="program">Program *</label>
+                                <select id="program" name="program" class="form-select-custom" required>
+                                    <option value="BE" {% if form_data is defined and form_data.program == 'BE' %}selected{% endif %}>BE / BTech</option>
+                                    <option value="ME" {% if form_data is defined and form_data.program == 'ME' %}selected{% endif %}>ME / MTech</option>
+                                    <option value="MCA" {% if form_data is defined and form_data.program == 'MCA' %}selected{% endif %}>MCA</option>
+                                    <option value="BCA" {% if form_data is defined and form_data.program == 'BCA' %}selected{% endif %}>BCA</option>
+                                    <option value="Diploma" {% if form_data is defined and form_data.program == 'Diploma' %}selected{% endif %}>Diploma</option>
+                                </select>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="semester">Semester *</label>
+                                <select id="semester" name="semester" class="form-select-custom" required>
+                                    <option value="1" {% if form_data is defined and form_data.semester == '1' %}selected{% endif %}>Semester 1</option>
+                                    <option value="2" {% if form_data is defined and form_data.semester == '2' %}selected{% endif %}>Semester 2</option>
+                                    <option value="3" {% if form_data is defined and form_data.semester == '3' or not form_data is defined %}selected{% endif %}>Semester 3</option>
+                                    <option value="4" {% if form_data is defined and form_data.semester == '4' %}selected{% endif %}>Semester 4</option>
+                                    <option value="5" {% if form_data is defined and form_data.semester == '5' %}selected{% endif %}>Semester 5</option>
+                                    <option value="6" {% if form_data is defined and form_data.semester == '6' %}selected{% endif %}>Semester 6</option>
+                                    <option value="7" {% if form_data is defined and form_data.semester == '7' %}selected{% endif %}>Semester 7</option>
+                                    <option value="8" {% if form_data is defined and form_data.semester == '8' %}selected{% endif %}>Semester 8</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="department">Department *</label>
+                            <select id="department" name="department" class="form-select-custom" required>
+                                <option value="Computer Engineering" {% if form_data is defined and form_data.department == 'Computer Engineering' or not form_data is defined %}selected{% endif %}>Computer Engineering</option>
+                                <option value="Information Technology" {% if form_data is defined and form_data.department == 'Information Technology' %}selected{% endif %}>Information Technology</option>
+                                <option value="Electronics & Comm." {% if form_data is defined and form_data.department == 'Electronics & Comm.' %}selected{% endif %}>Electronics & Comm.</option>
+                                <option value="Mechanical Eng." {% if form_data is defined and form_data.department == 'Mechanical Eng.' %}selected{% endif %}>Mechanical Eng.</option>
+                                <option value="Civil Eng." {% if form_data is defined and form_data.department == 'Civil Eng.' %}selected{% endif %}>Civil Eng.</option>
+                                <option value="Electrical Eng." {% if form_data is defined and form_data.department == 'Electrical Eng.' %}selected{% endif %}>Electrical Eng.</option>
+                                <option value="Aeronautical Eng." {% if form_data is defined and form_data.department == 'Aeronautical Eng.' %}selected{% endif %}>Aeronautical Eng.</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="password">Password *</label>
+                            <div class="input-field">
+                                <i data-lucide="lock" class="field-icon"></i>
+                                <input type="password" id="password" name="password" placeholder="Create a secure password" required autocomplete="new-password">
+                                <button type="button" class="toggle-password" onclick="togglePasswordVisibility()" title="Toggle password visibility">
+                                    <i data-lucide="eye" id="eyeIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-btn" id="registerSubmitBtn" style="margin-top: 8px;">
+                            <i data-lucide="user-plus"></i>
+                            <span>Submit Registration</span>
+                        </button>
+                    </form>
+
+                    <!-- Divider -->
+                    <div class="divider">
+                        <span>Already registered?</span>
+                    </div>
+
+                    <!-- Login Link -->
+                    <p class="register-prompt" style="margin-top: 8px;">
+                        Have an approved account? <a href="{{ url_for('auth.login') }}">Back to Login</a>
+                    </p>
+                </div>
+
+                <div class="global-footer">
+                    <p>&copy; 2026 SVIT, Vasad. All Rights Reserved.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

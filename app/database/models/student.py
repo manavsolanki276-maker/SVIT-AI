@@ -26,6 +26,15 @@ class Student(UserMixin, db.Model):
     # Profile Completion Flag
     is_profile_complete = db.Column(db.Boolean, default=False, nullable=False)
 
+    # Approval Workflow Fields
+    status = db.Column(db.String(20), default='active', nullable=True)
+    request_id = db.Column(db.String(100), nullable=True)
+    approved_by = db.Column(db.String(100), nullable=True)
+    approved_at = db.Column(db.DateTime, nullable=True)
+    rejected_by = db.Column(db.String(100), nullable=True)
+    rejected_at = db.Column(db.DateTime, nullable=True)
+    rejection_reason = db.Column(db.Text, nullable=True)
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 

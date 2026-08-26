@@ -30,10 +30,10 @@ MODULE_CONFIGS: Dict[str, Dict[str, Any]] = {
         "icon": "users",
         "required_permission": "academic",
         "id_field": "enrollment_no",
-        "search_fields": ["enrollment_no", "full_name", "name", "email", "department", "program"],
-        "filter_fields": ["department", "program", "semester", "division", "gender"],
-        "sort_fields": ["enrollment_no", "full_name", "semester", "created_at"],
-        "default_sort": ("enrollment_no", 1),
+        "search_fields": ["enrollment_no", "full_name", "name", "email", "department", "program", "status"],
+        "filter_fields": ["department", "program", "semester", "division", "gender", "status"],
+        "sort_fields": ["enrollment_no", "full_name", "semester", "created_at", "status"],
+        "default_sort": ("created_at", -1),
         "source_csv": None,
         "fields": [
             {"key": "enrollment_no", "label": "Enrollment No", "type": "text", "required": True, "table": True},
@@ -42,6 +42,7 @@ MODULE_CONFIGS: Dict[str, Dict[str, Any]] = {
             {"key": "program", "label": "Program", "type": "select", "options": ["BE", "BTech", "ME", "MTech", "MCA", "BCA", "Diploma"], "required": True, "table": True},
             {"key": "department", "label": "Department", "type": "select", "options": ["Computer Engineering", "Information Technology", "Electronics & Comm.", "Mechanical Eng.", "Civil Eng.", "Electrical Eng.", "Aeronautical Eng."], "required": True, "table": True},
             {"key": "semester", "label": "Semester", "type": "number", "min": 1, "max": 8, "required": True, "table": True},
+            {"key": "status", "label": "Status", "type": "select", "options": ["active", "pending", "rejected"], "required": False, "table": True},
             {"key": "division", "label": "Division", "type": "text", "required": False, "table": False},
             {"key": "batch", "label": "Batch", "type": "text", "required": False, "table": False},
             {"key": "phone", "label": "Phone", "type": "text", "required": False, "table": False},
@@ -802,8 +803,14 @@ class AdminCRUDService:
             # 2. Filters
             if filters:
                 for k, v in filters.items():
-                    if v is not None and str(v).strip() != "" and str(v) != "All":
-                        if str(v).lower() in ("true", "false"):
+                    if v is not None and str(v).strip() != "" and str(v).lower() != "all":
+                        if k == "status" and str(v).lower() == "active":
+                            # Active includes documents where status='active' OR status is missing
+                            status_clause = {"$or": [{"status": "active"}, {"status": {"$exists": False}}]}
+                            if "$and" not in query:
+                                query["$and"] = []
+                            query["$and"].append(status_clause)
+                        elif str(v).lower() in ("true", "false"):
                             query[k] = (str(v).lower() == "true")
                         else:
                             query[k] = v
@@ -834,6 +841,9 @@ class AdminCRUDService:
                         doc_dict[k] = v.isoformat()
                 if "id" not in doc_dict or not doc_dict["id"]:
                     doc_dict["id"] = doc_dict.get(id_field) or str(doc_dict.get("_id", ""))
+                # Default status to active if missing
+                if module_key == "students" and "status" not in doc_dict:
+                    doc_dict["status"] = "active"
                 items.append(doc_dict)
 
             return {
@@ -874,8 +884,10 @@ class AdminCRUDService:
             # 2. Filters
             if filters:
                 for k, v in filters.items():
-                    if v is not None and str(v).strip() != "" and str(v) != "All":
-                        if str(v).lower() in ("true", "false"):
+                    if v is not None and str(v).strip() != "" and str(v).lower() != "all":
+                        if k == "status" and str(v).lower() == "active":
+                            all_items = [i for i in all_items if i.get("status", "active") == "active"]
+                        elif str(v).lower() in ("true", "false"):
                             bool_val = (str(v).lower() == "true")
                             all_items = [i for i in all_items if bool(i.get(k)) == bool_val]
                         else:
@@ -1304,6 +1316,24 @@ class AdminCRUDService:
         recent_notices_res = AdminCRUDService.list_items("notices", limit=5)
         stats["recent_notices"] = recent_notices_res.get("items", [])
 
+        def get_pending_count():
+            coll = get_collection("students")
+            if coll is not None:
+                try:
+                    return coll.count_documents({"status": "pending"})
+                except Exception:
+                    pass
+            try:
+                from app.database.models.student import Student
+                if Student and hasattr(Student, 'status'):
+                    return Student.query.filter_by(status="pending").count()
+            except Exception:
+                pass
+            return sum(1 for s in _LOCAL_DATA_STORE.get("students", {}).values() if s.get("status") == "pending")
+
+        pending_count = get_pending_count()
+        stats["pending_registrations"] = pending_count
+
         # 1. Bus Admin stats
         if user_role == "bus_admin":
             transport_count = get_count("transport")
@@ -1356,6 +1386,7 @@ class AdminCRUDService:
         elif user_role == "academic_admin":
             stats["counters"] = {
                 "total_students": get_count("students"),
+                "pending_registrations": pending_count,
                 "faculty_members": get_count("faculty"),
                 "subjects": get_count("subjects"),
                 "academic_documents": get_count("academic_documents")
@@ -1383,6 +1414,7 @@ class AdminCRUDService:
         else:
             stats["counters"] = {
                 "total_students": get_count("students"),
+                "pending_registrations": pending_count,
                 "faculty_members": get_count("faculty"),
                 "active_notices": get_count("notices"),
                 "library_books": get_count("library_books"),
