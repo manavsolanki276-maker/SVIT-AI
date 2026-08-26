@@ -471,22 +471,17 @@
    6. Custom Form Controls in Modals
    ========================================================================== */
 
+/* Form Element Sizing & Focus */
 .form-control-custom {
     width: 100%;
     background: #F8F9FE;
     border: 1px solid var(--fac-border);
     border-radius: 12px;
     padding: 10px 14px;
-    font-size: 13px;
+    font-size: 13.5px;
     color: var(--fac-text-main);
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
     min-height: 44px;
-}
-
-@media (max-width: 767.98px) {
-    .form-control-custom {
-        font-size: 16px !important; /* Prevents auto-zoom in iOS Safari */
-    }
 }
 
 .form-control-custom:focus {
@@ -496,20 +491,39 @@
     background: #FFFFFF;
 }
 
-/* Sticky Modal Footer for Mobile Bottom Sheets */
+/* Modal Form Container Structure */
+.modal-content.mobile-bottom-sheet-content {
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    background: #FFFFFF !important;
+    border: 1px solid var(--fac-border) !important;
+}
+
+#facultyForm {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+}
+
+#facultyForm .modal-body {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+}
+
+/* Modal Footer & Action Buttons */
 .sticky-modal-footer {
-    position: sticky !important;
-    bottom: 0 !important;
     background: #F8F9FE !important;
     border-top: 1px solid var(--fac-border) !important;
-    z-index: 20 !important;
-    padding: 12px 16px !important;
-    padding-bottom: max(12px, env(safe-area-inset-bottom)) !important;
     display: flex !important;
     align-items: center !important;
     justify-content: flex-end !important;
-    gap: 10px !important;
-    margin-top: auto !important;
+    gap: 12px !important;
+    flex-shrink: 0 !important;
 }
 
 .sticky-modal-footer button {
@@ -524,27 +538,57 @@
     transition: all 0.15s ease !important;
 }
 
-.sticky-modal-footer .btn-modal-cancel {
-    flex: 1 !important;
-    background: #FFFFFF !important;
-    border: 1px solid var(--fac-border) !important;
-    color: var(--fac-text-muted) !important;
+/* Desktop & Tablet Defaults (>= 768px) */
+@media (min-width: 768px) {
+    .modal-dialog.modal-lg {
+        max-width: 800px !important;
+        margin: 1.75rem auto !important;
+    }
+
+    .modal-content.mobile-bottom-sheet-content {
+        border-radius: 18px !important;
+        max-height: calc(100vh - 3.5rem) !important;
+        box-shadow: 0 20px 60px rgba(23, 29, 58, 0.18) !important;
+    }
+
+    #facultyForm .modal-body {
+        max-height: calc(85vh - 140px) !important;
+        padding: 24px !important;
+    }
+
+    .sticky-modal-footer {
+        position: relative !important;
+        border-radius: 0 0 18px 18px !important;
+        padding: 14px 24px !important;
+    }
+
+    .sticky-modal-footer .btn-modal-cancel {
+        flex: 0 0 auto !important;
+        min-width: 110px !important;
+        padding: 0 20px !important;
+        background: #FFFFFF !important;
+        border: 1px solid var(--fac-border) !important;
+        color: var(--fac-text-muted) !important;
+    }
+
+    .sticky-modal-footer .btn-modal-cancel:hover {
+        color: var(--fac-text-main) !important;
+        background: #F1F5F9 !important;
+    }
+
+    .sticky-modal-footer .btn-modal-save {
+        flex: 0 0 auto !important;
+        min-width: 140px !important;
+        padding: 0 24px !important;
+    }
 }
 
-.sticky-modal-footer .btn-modal-cancel:hover {
-    color: var(--fac-text-main) !important;
-    background: #F1F5F9 !important;
-}
-
-.sticky-modal-footer .btn-modal-save {
-    flex: 1.5 !important;
-}
-
-/* ==========================================================================
-   7. Mobile Bottom Sheet Modal Overrides (< 768px)
-   ========================================================================== */
-
+/* Mobile Screens (< 768px: Bottom Sheet) */
 @media (max-width: 767.98px) {
+    .form-control-custom {
+        font-size: 16px !important; /* Prevents auto-zoom in iOS Safari */
+    }
+
     .modal-dialog.modal-dialog-centered,
     .modal-dialog {
         display: flex !important;
@@ -562,9 +606,6 @@
     .modal-content.mobile-bottom-sheet-content {
         border-radius: 24px 24px 0 0 !important;
         max-height: 90vh !important;
-        display: flex !important;
-        flex-direction: column !important;
-        padding-bottom: env(safe-area-inset-bottom);
         box-shadow: 0 -10px 30px rgba(23, 29, 58, 0.15) !important;
     }
 
@@ -579,6 +620,30 @@
 
     .modal.show .modal-dialog {
         transform: translateY(0);
+    }
+
+    .sticky-modal-footer {
+        position: sticky !important;
+        bottom: 0 !important;
+        padding: 12px 16px !important;
+        padding-bottom: max(12px, env(safe-area-inset-bottom)) !important;
+        z-index: 20 !important;
+    }
+
+    .sticky-modal-footer .btn-modal-cancel {
+        flex: 1 !important;
+        background: #FFFFFF !important;
+        border: 1px solid var(--fac-border) !important;
+        color: var(--fac-text-muted) !important;
+    }
+
+    .sticky-modal-footer .btn-modal-cancel:hover {
+        color: var(--fac-text-main) !important;
+        background: #F1F5F9 !important;
+    }
+
+    .sticky-modal-footer .btn-modal-save {
+        flex: 1.5 !important;
     }
 }
 
