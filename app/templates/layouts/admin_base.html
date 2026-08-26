@@ -372,6 +372,13 @@
         function buildAdminMobileCards() {
             if (window.innerWidth >= 768) return;
             document.querySelectorAll('main .table-responsive table:not(.mobile-card-table)').forEach((table) => {
+                const parentContainer = table.closest('.table-responsive')?.parentElement;
+                if (parentContainer && (parentContainer.querySelector('.admin-mobile-record-list') || parentContainer.querySelector('[id$="MobileCards"]'))) {
+                    const previousList = table.closest('.table-responsive')?.nextElementSibling;
+                    if (previousList?.classList.contains('admin-auto-card-list')) previousList.remove();
+                    return;
+                }
+
                 const headers = [...table.querySelectorAll('thead th')].map((header) => header.innerText.trim());
                 const rows = [...table.querySelectorAll('tbody tr')].filter((row) => row.children.length > 1);
                 if (!rows.length || !headers.length) return;
