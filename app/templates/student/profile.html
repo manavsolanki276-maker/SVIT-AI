@@ -358,10 +358,36 @@
 
             .profile-title-info h2 {
                 font-size: 1.3rem;
+                overflow-wrap: anywhere;
             }
 
             .profile-title-info p {
                 font-size: 0.85rem;
+                overflow-wrap: anywhere;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .profile-container {
+                padding: 48px 8px 16px 8px;
+            }
+
+            .profile-card {
+                padding: 14px 10px;
+                border-radius: 12px;
+            }
+
+            .info-chip-card {
+                padding: 10px 12px;
+            }
+
+            .info-chip-card .chip-value {
+                font-size: 0.88rem;
+            }
+
+            .btn-save {
+                padding: 12px 16px;
+                font-size: 14px;
             }
         }
     </style>
@@ -401,6 +427,9 @@
                     </div>
                 </a>
                 <div class="sidebar-header-actions">
+                    <button type="button" class="sidebar-icon-btn" id="sidebarSearchBtn" title="Search Chats" onclick="window.location.href='/chat/history-page';">
+                        <i data-lucide="search"></i>
+                    </button>
                     <!-- Mobile Close Button -->
                     <button type="button" class="sidebar-icon-btn mobile-drawer-close-btn" id="mobileDrawerCloseBtn" title="Close Menu" onclick="toggleMobileSidebar(false)">
                         <i data-lucide="x"></i>
@@ -412,10 +441,24 @@
                 </div>
             </div>
 
+            <!-- Mobile Drawer Dedicated Profile Card (Visible only in mobile drawer) -->
+            <div class="drawer-profile-card" id="drawerProfileCard">
+                <div class="drawer-profile-avatar">
+                    <span>{{ (s_name or 'ST')[:2]|upper }}</span>
+                </div>
+                <div class="drawer-profile-meta">
+                    <div class="drawer-profile-name">{{ s_name }}</div>
+                    <div class="drawer-profile-role">Student</div>
+                </div>
+                <a href="/student/profile/" class="drawer-view-profile-btn" onclick="toggleMobileSidebar(false);" title="View Profile">
+                    <span>View Profile &gt;</span>
+                </a>
+            </div>
+
             <!-- 2. Main Navigation: New Chat & Collapsed Icon Rail -->
             <div class="sidebar-main-nav">
                 <!-- + New Chat Button -->
-                <a href="/" class="nav-item new-chat-btn" title="Start New Chat">
+                <a href="/student/chat" class="nav-item new-chat-btn" title="Start New Chat">
                     <i data-lucide="plus"></i>
                     <span>+ New Chat</span>
                 </a>
@@ -428,7 +471,7 @@
                     </a>
                     <a href="/student/profile/" class="sidebar-menu-link active" id="menuProfileLink" title="Student Profile" onclick="toggleMobileSidebar(false);">
                         <i data-lucide="user"></i>
-                        <span>👤 Profile</span>
+                        <span>Profile</span>
                     </a>
                     <a href="/chat/history-page" class="sidebar-menu-link" id="menuHistoryLink" title="Chat History" onclick="toggleMobileSidebar(false);">
                         <i data-lucide="history"></i>
@@ -436,19 +479,22 @@
                     </a>
                     <a href="/auth/logout" class="sidebar-menu-link exit-chat-link" id="menuExitLink" title="Exit Chat" onclick="toggleMobileSidebar(false);">
                         <i data-lucide="log-out"></i>
-                        <span>🏠 Exit Chat</span>
+                        <span>Exit Chat</span>
                     </a>
                 </div>
 
                 <!-- Collapsed Icon Rail Navigation (ChatGPT Style) -->
                 <div class="sidebar-rail-nav" id="sidebarRailNav">
-                    <button type="button" class="rail-icon-btn" id="railSearchBtn" title="Search Chats" onclick="window.location.href='/chat/history-page';">
+                    <button type="button" class="rail-icon-btn" id="railSearchBtn" title="Search Chats" onclick="window.location.href='/chat/history-page';" aria-label="Search Chats">
                         <i data-lucide="search"></i>
                     </button>
-                    <a href="/" class="rail-icon-btn" id="railChatBtn" title="Chat">
+                    <a href="/student/chat" class="rail-icon-btn" id="railChatBtn" title="Student Chat" aria-label="Student Chat">
                         <i data-lucide="message-square"></i>
                     </a>
-                    <a href="/chat/history-page" class="rail-icon-btn" id="railHistoryBtn" title="Chat History">
+                    <a href="/student/profile/" class="rail-icon-btn active" id="railProfileBtn" title="Student Profile" aria-label="Student Profile">
+                        <i data-lucide="user"></i>
+                    </a>
+                    <a href="/chat/history-page" class="rail-icon-btn" id="railHistoryBtn" title="Chat History" aria-label="Chat History">
                         <i data-lucide="history"></i>
                     </a>
                 </div>
@@ -465,24 +511,32 @@
                         <span>Loading chats...</span>
                     </div>
                 </div>
-                <a href="/chat/history-page" class="drawer-view-all-chats-btn" onclick="toggleMobileSidebar(false)">
-                    <i data-lucide="message-circle"></i>
+            </div>
+
+            <!-- Mobile Drawer Dedicated Bottom Action Area (Anchored to Bottom) -->
+            <div class="drawer-bottom-actions" id="drawerBottomActions">
+                <a href="/chat/history-page" class="drawer-view-all-chats-btn" onclick="toggleMobileSidebar(false);" title="View All Chats">
+                    <i data-lucide="history"></i>
                     <span>View All Chats &gt;</span>
+                </a>
+                <a href="/auth/logout" class="drawer-exit-chat-btn" onclick="toggleMobileSidebar(false);" title="Sign out">
+                    <i data-lucide="log-out"></i>
+                    <span>Sign out</span>
                 </a>
             </div>
 
             <!-- 4. Sidebar Bottom: Student User Card & Logout -->
             <div class="sidebar-footer">
                 <a href="/student/profile/" class="sidebar-user-card" title="My Profile">
-                    <div class="sidebar-collapsed-user-icon">
-                        <i data-lucide="user"></i>
+                    <div class="sidebar-user-avatar sidebar-collapsed-user-icon">
+                        <span>{{ (s_name or 'ST')[:2]|upper }}</span>
                     </div>
                     <div class="sidebar-user-info">
                         <span class="user-display-name">{{ s_name }}</span>
                         <span class="user-program-badge">{{ (s_prog ~ ' • ' if s_prog else '') ~ (s_dept or 'Computer Engineering') }}</span>
                     </div>
                 </a>
-                <a href="/auth/logout" class="sidebar-logout-btn" title="Logout">
+                <a href="/auth/logout" class="sidebar-logout-btn" title="Sign out" aria-label="Sign out">
                     <i data-lucide="log-out"></i>
                 </a>
             </div>
@@ -860,15 +914,35 @@
                     if (!a.is_pinned && b.is_pinned) return 1;
                     return 0;
                 });
-                container.innerHTML = sortedChats.slice(0, 30).map(c => `
-                    <a href="/?conversation_id=${encodeURIComponent(c.id)}" class="recent-chat-item ${c.is_pinned ? 'pinned' : ''}" title="${c.title || 'Conversation'}">
+                function formatChatTime(dateStr) {
+                    if (!dateStr) return '';
+                    try {
+                        const d = new Date(dateStr);
+                        if (isNaN(d.getTime())) return '';
+                        let hours = d.getHours();
+                        const minutes = d.getMinutes();
+                        const ampm = hours >= 12 ? 'PM' : 'AM';
+                        hours = hours % 12;
+                        hours = hours ? hours : 12;
+                        const minStr = minutes < 10 ? '0' + minutes : minutes;
+                        return `${hours}:${minStr} ${ampm}`;
+                    } catch (e) {
+                        return '';
+                    }
+                }
+
+                container.innerHTML = sortedChats.slice(0, 30).map(c => {
+                    const timeStr = formatChatTime(c.updated_at || c.created_at);
+                    return `
+                    <a href="/student/chat?conversation_id=${encodeURIComponent(c.id)}" class="recent-chat-item ${c.is_pinned ? 'pinned' : ''}" title="${c.title || 'Conversation'}">
                         ${c.is_pinned ? '<i data-lucide="pin" class="pin-indicator-icon" title="Pinned"></i>' : ''}
                         <span class="chat-title-text">${c.title || 'Conversation'}</span>
+                        ${timeStr ? `<span class="recent-chat-time">${timeStr}</span>` : ''}
                         <button type="button" class="recent-item-options-btn" title="Options" onclick="event.stopPropagation(); window.location.href='/chat/history-page';">
                             <i data-lucide="more-horizontal"></i>
                         </button>
                     </a>
-                `).join('');
+                `}).join('');
                 if (window.lucide) lucide.createIcons();
             } catch (err) {
                 container.innerHTML = `<div class="recents-empty">No recent chats</div>`;

@@ -17,62 +17,165 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
     <script src="{{ url_for('static', filename='js/loader.js') }}"></script>
-    
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
+            background-color: var(--svit-bg, #F8F9FE);
+            color: var(--svit-text, #171D3A);
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
         }
         .error-card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            box-shadow: var(--card-shadow);
+            background-color: #FFFFFF;
+            border: 1px solid var(--svit-border, #E1E5F0);
+            border-radius: var(--radius-xl, 16px);
+            color: var(--svit-text, #171D3A);
+            box-shadow: 0 4px 20px rgba(23, 29, 58, 0.06);
+            max-width: 460px;
+            width: 100%;
+            padding: 32px 24px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+        .error-icon-box {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            background: #FEE2E2;
+            border: 1.5px solid #FCA5A5;
+            color: #DC2626;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .error-pill {
+            display: inline-flex;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            background: #FEE2E2;
+            color: #991B1B;
+            border: 1px solid #FCA5A5;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .error-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--svit-text, #171D3A);
+            margin-top: -4px;
+        }
+        .error-desc {
+            font-size: 13.5px;
+            color: var(--svit-text-secondary, #66708F);
+            line-height: 1.5;
+        }
+        .action-row {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            margin-top: 8px;
+        }
+        .btn-primary-action {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: var(--svit-primary, #8B5CF6);
+            color: #FFFFFF;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.18s ease;
+            box-shadow: 0 2px 6px rgba(139, 92, 246, 0.25);
+            border: none;
+        }
+        .btn-primary-action:hover {
+            background: var(--svit-primary-hover, #7C4FE8);
+            transform: translateY(-1px);
+        }
+        .btn-secondary-action {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: #FFFFFF;
+            border: 1px solid var(--svit-border, #E1E5F0);
+            color: var(--svit-text, #171D3A);
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.18s ease;
+        }
+        .btn-secondary-action:hover {
+            background: var(--svit-surface-soft, #E8EBFA);
+            border-color: var(--svit-primary, #8B5CF6);
+            color: var(--svit-primary, #8B5CF6);
+        }
+        .error-footer-text {
+            font-size: 11.5px;
+            color: var(--svit-muted, #8C95AD);
+            border-top: 1px solid var(--svit-border, #E1E5F0);
+            padding-top: 12px;
+            width: 100%;
+        }
+        @media (max-width: 480px) {
+            .error-card {
+                padding: 24px 16px;
+            }
+            .action-row {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body>
     <!-- GLOBAL ANIMATED LOADER -->
     {% include "partials/loader.html" %}
 
-    <div class="max-w-md w-full p-8 rounded-3xl error-card text-center shadow-2xl space-y-6">
-        
-        <!-- Icon Banner -->
-        <div class="w-16 h-16 rounded-2xl bg-red-600/10 border border-red-500/30 flex items-center justify-center text-red-400 mx-auto shadow-lg shadow-red-600/10">
-            <i data-lucide="shield-alert" class="w-8 h-8"></i>
+    <div class="error-card">
+        <div class="error-icon-box">
+            <i data-lucide="shield-alert" style="width: 30px; height: 30px;"></i>
         </div>
 
-        <!-- Heading & Details -->
-        <div class="space-y-2">
-            <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-500/20 text-red-300 border border-red-500/30 uppercase tracking-wider">
-                HTTP 403 Forbidden
-            </span>
-            <h1 class="text-xl font-bold text-white">Access Denied</h1>
-            <p class="text-xs text-gray-400 leading-relaxed">
-                {{ error_message if error_message else "You do not have administrative privileges to access this resource. Student accounts are restricted to the student portal." }}
-            </p>
-        </div>
+        <span class="error-pill">HTTP 403 Forbidden</span>
+        <h1 class="error-title">Access Denied</h1>
+        <p class="error-desc">
+            {{ error_message if error_message else "You do not have administrative privileges to access this resource. Student accounts are restricted to the student portal." }}
+        </p>
 
-        <!-- Action Buttons -->
-        <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <a href="/" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2 text-decoration-none">
-                <i data-lucide="message-square" class="w-4 h-4"></i>
-                Return to Student Chat
+        <div class="action-row">
+            <a href="/" class="btn-primary-action">
+                <i data-lucide="message-square" style="width: 15px; height: 15px;"></i>
+                <span>Return to Chat</span>
             </a>
-            <a href="{{ url_for('auth.logout') if 'auth.logout' in bootstrap_endpoints|default([]) else '/auth/logout' }}" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-300 hover:text-white text-xs font-semibold transition flex items-center justify-center gap-2 text-decoration-none">
-                <i data-lucide="log-out" class="w-4 h-4"></i>
-                Sign in as Admin
+            <a href="{{ url_for('auth.logout') if 'auth.logout' in bootstrap_endpoints|default([]) else '/auth/logout' }}" class="btn-secondary-action">
+                <i data-lucide="log-out" style="width: 15px; height: 15px;"></i>
+                <span>Sign in as Admin</span>
             </a>
         </div>
 
-        <div class="pt-4 border-t border-[#1F2937]">
-            <p class="text-[11px] text-gray-500 mb-0">SVIT AI Assistant &copy; 2026 Sardar Vallabhbhai Patel Institute of Technology</p>
-        </div>
-
+        <p class="error-footer-text">SVIT AI Assistant &copy; 2026 Sardar Vallabhbhai Patel Institute of Technology</p>
     </div>
 
     <script>

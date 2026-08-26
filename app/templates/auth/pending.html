@@ -23,50 +23,71 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/auth/login.css') }}">
     <style>
         body {
-            background-color: var(--bg-primary) !important;
-            color: var(--text-primary);
+            background-color: var(--svit-bg, #F8F9FE) !important;
+            color: var(--svit-text, #171D3A);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            min-height: 100dvh;
+            margin: 0;
+            padding: 16px;
+            box-sizing: border-box;
         }
         .status-container {
             max-width: 480px;
             width: 100%;
-            background: var(--bg-card) !important;
-            border: 1px solid var(--border-color) !important;
-            border-radius: 16px;
+            background: #FFFFFF !important;
+            border: 1px solid var(--svit-border, #E1E5F0) !important;
+            border-radius: var(--radius-xl, 16px);
             padding: 32px 28px;
-            box-shadow: var(--card-shadow);
+            box-shadow: 0 4px 20px rgba(23, 29, 58, 0.06);
             text-align: center;
-            color: var(--text-primary);
+            color: var(--svit-text, #171D3A);
+            box-sizing: border-box;
         }
         .status-icon-box {
             width: 64px;
             height: 64px;
             border-radius: 50%;
-            background: rgba(245, 158, 11, 0.15);
-            border: 2px solid rgba(245, 158, 11, 0.35);
-            color: #f59e0b;
+            background: #FEF3C7;
+            border: 2px solid #FCD34D;
+            color: #D97706;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 20px auto;
+            margin: 0 auto 18px auto;
         }
         .status-pill {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: rgba(245, 158, 11, 0.2);
-            border: 1px solid rgba(245, 158, 11, 0.4);
-            color: #fbbf24;
-            padding: 4px 12px;
+            background: #FEF3C7;
+            border: 1px solid #FCD34D;
+            color: #92400E;
+            padding: 5px 14px;
             border-radius: 9999px;
-            font-size: 11px;
+            font-size: 11.5px;
             font-weight: 700;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.04em;
             text-transform: uppercase;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
+        }
+        .status-heading {
+            margin: 0 0 8px 0;
+            color: var(--svit-text, #171D3A);
+            font-size: 22px;
+            font-weight: 700;
+        }
+        .status-description {
+            margin: 0 0 16px 0;
+            color: var(--svit-text-secondary, #66708F);
+            font-size: 13.5px;
+            line-height: 1.5;
         }
         .details-card {
-            background: var(--bg-surface-raised) !important;
-            border: 1px solid var(--border-color) !important;
+            background: var(--svit-surface-soft, #E8EBFA) !important;
+            border: 1px solid var(--svit-border, #E1E5F0) !important;
             border-radius: 12px;
             padding: 16px;
             margin: 20px 0;
@@ -76,19 +97,34 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid var(--border-subtle) !important;
+            padding: 9px 0;
+            border-bottom: 1px solid var(--svit-border-subtle, rgba(225, 229, 240, 0.8)) !important;
             font-size: 13px;
         }
         .details-row:last-child {
             border-bottom: none;
         }
         .details-label {
-            color: var(--text-secondary) !important;
+            color: var(--svit-text-secondary, #66708F) !important;
         }
         .details-val {
-            color: var(--text-primary) !important;
+            color: var(--svit-text, #171D3A) !important;
             font-weight: 600;
+            overflow-wrap: anywhere;
+            text-align: right;
+        }
+        .info-notice-box {
+            background: #EDE9FE;
+            border: 1px solid #DDD6FE;
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 12.5px;
+            color: #5B21B6;
+            text-align: left;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            line-height: 1.45;
         }
         .action-btns {
             display: flex;
@@ -97,12 +133,12 @@
         }
         .btn-refresh {
             flex: 1;
-            background: var(--accent-primary) !important;
-            color: #ffffff !important;
+            background: var(--svit-primary, #8B5CF6) !important;
+            color: #FFFFFF !important;
             border: none;
             padding: 12px 16px;
             border-radius: 10px;
-            font-size: 13px;
+            font-size: 13.5px;
             font-weight: 600;
             cursor: pointer;
             display: flex;
@@ -110,20 +146,21 @@
             justify-content: center;
             gap: 8px;
             text-decoration: none;
-            transition: background 0.2s;
-            box-shadow: 0 2px 8px var(--accent-glow);
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25);
         }
         .btn-refresh:hover {
-            background: var(--accent-hover) !important;
+            background: var(--svit-primary-hover, #7C4FE8) !important;
+            transform: translateY(-1px);
         }
         .btn-logout {
             flex: 1;
-            background: var(--bg-surface-raised) !important;
-            color: var(--text-primary) !important;
-            border: 1px solid var(--border-color) !important;
+            background: #FFFFFF !important;
+            color: var(--svit-text, #171D3A) !important;
+            border: 1px solid var(--svit-border, #E1E5F0) !important;
             padding: 12px 16px;
             border-radius: 10px;
-            font-size: 13px;
+            font-size: 13.5px;
             font-weight: 600;
             cursor: pointer;
             display: flex;
@@ -131,15 +168,27 @@
             justify-content: center;
             gap: 8px;
             text-decoration: none;
-            transition: background 0.2s;
+            transition: all 0.2s ease;
         }
         .btn-logout:hover {
-            background: var(--bg-card-hover) !important;
-            border-color: var(--border-strong) !important;
+            background: var(--svit-surface-soft, #E8EBFA) !important;
+            color: var(--svit-primary, #8B5CF6) !important;
+            border-color: var(--svit-primary, #8B5CF6) !important;
+        }
+        @media (max-width: 480px) {
+            .status-container {
+                padding: 24px 16px;
+            }
+            .action-btns {
+                flex-direction: column;
+            }
+            .btn-refresh, .btn-logout {
+                width: 100%;
+            }
         }
     </style>
 </head>
-<body style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--bg-primary); margin: 0; padding: 16px;">
+<body>
     <!-- GLOBAL ANIMATED LOADER -->
     {% include "partials/loader.html" %}
 
@@ -153,8 +202,8 @@
             <span>Pending Admin Approval</span>
         </div>
 
-        <h2 style="margin: 0 0 8px 0; color: #f8fafc; font-size: 22px; font-weight: 700;">Registration Under Review</h2>
-        <p style="margin: 0 0 16px 0; color: #94a3b8; font-size: 13px; line-height: 1.5;">
+        <h2 class="status-heading">Registration Under Review</h2>
+        <p class="status-description">
             Your registration is pending approval. Our academic administration team reviews every student request before granting access.
         </p>
 
@@ -177,12 +226,12 @@
             </div>
             <div class="details-row">
                 <span class="details-label">Current Status</span>
-                <span class="details-val" style="color: #fbbf24; text-transform: uppercase;">PENDING</span>
+                <span class="details-val" style="color: #D97706; text-transform: uppercase;">PENDING</span>
             </div>
         </div>
 
-        <div style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 10px; padding: 12px; font-size: 12px; color: #cbd5e1; text-align: left; display: flex; gap: 8px; align-items: flex-start;">
-            <i data-lucide="info" style="width: 16px; height: 16px; color: #818cf8; flex-shrink: 0; margin-top: 2px;"></i>
+        <div class="info-notice-box">
+            <i data-lucide="info" style="width: 16px; height: 16px; color: #7C3AED; flex-shrink: 0; margin-top: 2px;"></i>
             <span>Once an Academic Administrator approves your account, you will automatically be able to access the 24x7 SVIT AI Assistant.</span>
         </div>
 

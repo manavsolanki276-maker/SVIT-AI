@@ -234,8 +234,15 @@
             lucide.createIcons();
         }
 
-        // Initialize role tab on page load based on URL params
+        // Initialize role tab on page load based on URL params & clear transition flag
         document.addEventListener('DOMContentLoaded', function() {
+            try {
+                sessionStorage.removeItem('svit_student_just_logged_in');
+            } catch (e) {}
+            if (window.SVITLoader) {
+                window.SVITLoader.hide(0);
+            }
+
             const urlParams = new URLSearchParams(window.location.search);
             const tabParam = urlParams.get('tab') || urlParams.get('mode') || urlParams.get('role');
             if (tabParam === 'admin') {
@@ -262,6 +269,9 @@
         const loginForm = document.getElementById('loginForm');
         if (loginForm) {
             loginForm.addEventListener('submit', function() {
+                const roleInput = document.getElementById('roleInput');
+                const isStudent = !roleInput || roleInput.value === 'student' || roleInput.value === 'student_faculty';
+
                 const btn = document.getElementById('loginSubmitBtn');
                 const btnText = document.getElementById('loginBtnText');
                 if (btn && btnText) {
@@ -269,6 +279,16 @@
                     btnText.textContent = 'Signing in...';
                     btn.style.opacity = '0.75';
                     btn.style.cursor = 'wait';
+                }
+
+                // Show SVIT animated loader on student login transition to chat page
+                if (isStudent) {
+                    try {
+                        sessionStorage.setItem('svit_student_just_logged_in', 'true');
+                    } catch (e) {}
+                    if (window.SVITLoader) {
+                        window.SVITLoader.show(10000);
+                    }
                 }
             });
         }

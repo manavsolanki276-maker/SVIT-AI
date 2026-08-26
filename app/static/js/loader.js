@@ -194,6 +194,30 @@
         };
     }
 
+    /**
+     * Checks if the student just logged in and displays the loader during the login -> chat page transition
+     */
+    function checkLoginTransition() {
+        try {
+            const isTransitioning = sessionStorage.getItem('svit_student_just_logged_in');
+            if (isTransitioning === 'true') {
+                const path = window.location.pathname;
+                // If on student chat/home page, show loader during transition then smoothly hide
+                if (path === '/' || path === '/student/chat' || path === '/chat' || path === '') {
+                    show(4000);
+                    setTimeout(() => {
+                        hide(350);
+                        sessionStorage.removeItem('svit_student_just_logged_in');
+                    }, 900);
+                } else if (path.includes('/login') || path.includes('/auth/login')) {
+                    // Still on login (e.g. error or refresh), clear and hide
+                    sessionStorage.removeItem('svit_student_just_logged_in');
+                    hide(0);
+                }
+            }
+        } catch (e) {}
+    }
+
     function init() {
         if (isInitialized) return;
         isInitialized = true;
@@ -206,6 +230,7 @@
         }
 
         enableAutoApiLoader();
+        checkLoginTransition();
     }
 
     // Initialize immediately

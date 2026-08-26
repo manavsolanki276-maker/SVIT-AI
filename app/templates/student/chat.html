@@ -371,7 +371,7 @@
                     </a>
                     <a href="/student/profile/" class="sidebar-menu-link" id="menuProfileLink" title="Student Profile" onclick="toggleMobileSidebar(false);">
                         <i data-lucide="user"></i>
-                        <span>👤 Profile</span>
+                        <span>Profile</span>
                     </a>
                     <a href="/chat/history-page" class="sidebar-menu-link" id="menuHistoryLink" title="Chat History" onclick="toggleMobileSidebar(false);">
                         <i data-lucide="history"></i>
@@ -379,22 +379,22 @@
                     </a>
                     <a href="/auth/logout" class="sidebar-menu-link exit-chat-link" id="menuExitLink" title="Exit Chat" onclick="toggleMobileSidebar(false);">
                         <i data-lucide="log-out"></i>
-                        <span>🏠 Exit Chat</span>
+                        <span>Exit Chat</span>
                     </a>
                 </div>
 
                 <!-- Collapsed Icon Rail Navigation (ChatGPT Style for Desktop) -->
                 <div class="sidebar-rail-nav" id="sidebarRailNav">
-                    <button type="button" class="rail-icon-btn" id="railSearchBtn" title="Search Chats" onclick="toggleSidebarSearch()">
+                    <button type="button" class="rail-icon-btn" id="railSearchBtn" title="Search Chats" onclick="toggleSidebarSearch()" aria-label="Search Chats">
                         <i data-lucide="search"></i>
                     </button>
-                    <a href="/student/chat" class="rail-icon-btn active" id="railChatBtn" title="Chat">
+                    <a href="/student/chat" class="rail-icon-btn active" id="railChatBtn" title="Student Chat" aria-label="Student Chat">
                         <i data-lucide="message-square"></i>
                     </a>
-                    <a href="/student/profile/" class="rail-icon-btn" id="railProfileBtn" title="Profile">
+                    <a href="/student/profile/" class="rail-icon-btn" id="railProfileBtn" title="Student Profile" aria-label="Student Profile">
                         <i data-lucide="user"></i>
                     </a>
-                    <a href="/chat/history-page" class="rail-icon-btn" id="railHistoryBtn" title="Chat History">
+                    <a href="/chat/history-page" class="rail-icon-btn" id="railHistoryBtn" title="Chat History" aria-label="Chat History">
                         <i data-lucide="history"></i>
                     </a>
                 </div>
@@ -403,7 +403,7 @@
                 <div class="sidebar-search-box" id="sidebarSearchBox" style="display: none;">
                     <i data-lucide="search" style="width: 15px; height: 15px; color: #71717a;"></i>
                     <input type="text" id="recentSearchInput" placeholder="Search chats..." oninput="filterRecentConversations(this.value)">
-                    <button type="button" class="search-clear-btn" onclick="clearRecentSearch()">&times;</button>
+                    <button type="button" class="search-clear-btn" onclick="clearRecentSearch()" aria-label="Clear search">&times;</button>
                 </div>
             </div>
 
@@ -423,27 +423,27 @@
             <!-- Mobile Drawer Dedicated Bottom Action Area (Anchored to Bottom) -->
             <div class="drawer-bottom-actions" id="drawerBottomActions">
                 <a href="/chat/history-page" class="drawer-view-all-chats-btn" onclick="toggleMobileSidebar(false);" title="View All Chats">
-                    <i data-lucide="message-circle"></i>
+                    <i data-lucide="history"></i>
                     <span>View All Chats &gt;</span>
                 </a>
-                <a href="/auth/logout" class="drawer-exit-chat-btn" onclick="toggleMobileSidebar(false);" title="Exit App">
+                <a href="/auth/logout" class="drawer-exit-chat-btn" onclick="toggleMobileSidebar(false);" title="Sign out">
                     <i data-lucide="log-out"></i>
-                    <span>🚪 Exit App</span>
+                    <span>Sign out</span>
                 </a>
             </div>
 
             <!-- 4. Sidebar Bottom: Student User Card & Logout (Desktop View) -->
             <div class="sidebar-footer">
                 <a href="/student/profile/" class="sidebar-user-card" title="View & Edit Profile">
-                    <div class="sidebar-collapsed-user-icon">
-                        <i data-lucide="user"></i>
+                    <div class="sidebar-user-avatar sidebar-collapsed-user-icon">
+                        <span>{{ (current_user.full_name or current_user.name or 'ST')[:2]|upper }}</span>
                     </div>
                     <div class="sidebar-user-info">
                         <span class="user-display-name">{{ current_user.full_name or current_user.name or 'Student User' }}</span>
                         <span class="user-program-badge">{{ (current_user.program ~ ' • ' if (current_user and current_user.program) else '') ~ (current_user.department if current_user else 'Computer Engineering') }}</span>
                     </div>
                 </a>
-                <a href="/auth/logout" class="sidebar-logout-btn" title="Logout">
+                <a href="/auth/logout" class="sidebar-logout-btn" title="Sign out" aria-label="Sign out">
                     <i data-lucide="log-out"></i>
                 </a>
             </div>
@@ -1213,6 +1213,18 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             loadStudentNotifications();
+            // Handle smooth student login to chat transition loader
+            try {
+                if (sessionStorage.getItem('svit_student_just_logged_in') === 'true') {
+                    if (window.SVITLoader) {
+                        window.SVITLoader.show(3000);
+                        setTimeout(() => {
+                            window.SVITLoader.hide(350);
+                            sessionStorage.removeItem('svit_student_just_logged_in');
+                        }, 850);
+                    }
+                }
+            } catch (e) {}
         });
     </script>
 </body>

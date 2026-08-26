@@ -1539,6 +1539,7 @@ function renderRecentChatsList(chats) {
            class="recent-chat-item ${c.id === currentConvId ? 'active' : ''} ${c.is_pinned ? 'pinned' : ''}"
            onclick="selectRecentChat(event, '${escapeHtml(c.id)}')"
            title="${escapeHtml(c.title || 'Untitled Conversation')}">
+            ${c.is_pinned ? `<i data-lucide="pin" class="pin-indicator-icon" title="Pinned"></i>` : ''}
             <span class="chat-title-text">${escapeHtml(c.title || 'Conversation')}</span>
             ${timeStr ? `<span class="recent-chat-time">${escapeHtml(timeStr)}</span>` : ''}
             <button type="button" class="recent-item-options-btn" title="Options" onclick="openRecentChatMenu(event, '${escapeHtml(c.id)}', '${escapeHtml(c.title || '')}', ${Boolean(c.is_pinned)})">

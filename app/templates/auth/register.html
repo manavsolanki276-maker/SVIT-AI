@@ -34,33 +34,38 @@
         }
         .form-select-custom {
             width: 100%;
-            background: #0f172a;
-            border: 1px solid #1e293b;
-            border-radius: 10px;
+            background: #FFFFFF;
+            border: 1.5px solid var(--svit-border, #E1E5F0);
+            border-radius: 12px;
             padding: 10px 14px;
-            color: #f8fafc;
-            font-size: 13px;
+            color: var(--svit-text, #171D3A);
+            font-size: 13.5px;
+            font-weight: 500;
             outline: none;
-            transition: border-color 0.2s;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(23, 29, 58, 0.03);
         }
         .form-select-custom:focus {
-            border-color: #6366f1;
+            border-color: var(--svit-primary, #8B5CF6);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
         }
         .form-select-custom option {
-            background: #0f172a;
-            color: #f8fafc;
+            background: #FFFFFF;
+            color: var(--svit-text, #171D3A);
         }
         .badge-approval-notice {
-            background: rgba(245, 158, 11, 0.15);
-            border: 1px solid rgba(245, 158, 11, 0.35);
-            color: #fbbf24;
+            background: #FEF3C7;
+            border: 1px solid #FCD34D;
+            color: #92400E;
             padding: 10px 14px;
             border-radius: 10px;
-            font-size: 12px;
+            font-size: 12.5px;
+            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 8px;
             margin-bottom: 16px;
+            line-height: 1.4;
         }
     </style>
 </head>
