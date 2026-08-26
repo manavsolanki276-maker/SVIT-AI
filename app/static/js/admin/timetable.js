@@ -935,17 +935,76 @@
         if (!state.pendingDeleteId) return;
 
         try {
-            const res = await fetch(`/admin/api/crud/timetable/${state.pendingDeleteId}`, { method: 'DELETE' });
+            const res = await fetch(`/admin/api/crud/timetable/${state.pendingDeleteId}`, {
+                method: 'DELETE'
+            });
             const data = await res.json();
             if (res.ok && data.status === 'success') {
-                showAdminToast(data.message, 'success');
-                deleteModal.hide();
+                showAdminToast(data.message || 'Lecture slot removed.', 'success');
+                if (deleteModal) deleteModal.hide();
+                state.pendingDeleteId = null;
+                state.pendingDeleteDoc = null;
                 loadTimetable();
             } else {
-                showAdminToast(data.message || 'Failed to delete slot.', 'error');
+                showAdminToast(data.message || 'Error deleting slot.', 'error');
             }
         } catch (err) {
-            showAdminToast(err.message, 'error');
+            showAdminToast(err.message || 'Error deleting slot.', 'error');
         }
     }
+
+    function handleExportPrint() {
+        window.print();
+    }
+
+    // =========================================================================
+    // UTILITIES
+    // =========================================================================
+
+    function showAdminToast(msg, type = 'info') {
+        if (window.showToast) {
+            window.showToast(msg, type);
+            return;
+        }
+        let container = document.getElementById('adminToastContainer');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'adminToastContainer';
+            container.className = 'fixed top-5 right-5 z-[9999] flex flex-col gap-2 max-w-sm pointer-events-none';
+            document.body.appendChild(container);
+        }
+
+        const toast = document.createElement('div');
+        const bg = type === 'success' ? 'bg-emerald-600' : (type === 'error' ? 'bg-red-600' : 'bg-[#171D3A]');
+        toast.className = `${bg} text-white text-xs font-semibold px-4 py-3 rounded-2xl shadow-xl pointer-events-auto flex items-center justify-between gap-3 transition transform duration-200 translate-y-2 opacity-0`;
+        toast.innerHTML = `<span>${escapeHtml(msg)}</span><button class="opacity-70 hover:opacity-100">&times;</button>`;
+
+        toast.querySelector('button').onclick = () => toast.remove();
+        container.appendChild(toast);
+
+        requestAnimationFrame(() => {
+            toast.classList.remove('translate-y-2', 'opacity-0');
+        });
+
+        setTimeout(() => {
+            toast.classList.add('translate-y-2', 'opacity-0');
+            setTimeout(() => toast.remove(), 200);
+        }, 3500);
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function escapeQuotes(str) {
+        if (!str) return '';
+        return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
 })();
