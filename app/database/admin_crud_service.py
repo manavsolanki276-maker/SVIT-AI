@@ -86,15 +86,16 @@ MODULE_CONFIGS: Dict[str, Dict[str, Any]] = {
         "icon": "calendar",
         "required_permission": "academic",
         "id_field": "id",
-        "search_fields": ["subject", "faculty", "room", "department", "day"],
-        "filter_fields": ["department", "program", "semester", "division", "day"],
+        "search_fields": ["subject", "faculty", "room", "department", "day", "program", "division"],
+        "filter_fields": ["department", "program", "year", "semester", "division", "day", "faculty", "room"],
         "sort_fields": ["day", "start_time", "department", "semester"],
         "default_sort": ("day", 1),
         "source_csv": "timetable.csv",
         "fields": [
             {"key": "id", "label": "Schedule ID", "type": "text", "required": True, "table": True},
-            {"key": "program", "label": "Program", "type": "select", "options": ["BE", "ME", "MCA", "Diploma"], "required": True, "table": False},
-            {"key": "department", "label": "Department", "type": "select", "options": ["Computer Engineering", "Information Technology", "Electronics & Comm.", "Mechanical Eng.", "Civil Eng.", "Electrical Eng."], "required": True, "table": True},
+            {"key": "program", "label": "Program", "type": "select", "options": ["Diploma", "BE", "BCA", "MCA", "ME"], "required": True, "table": True},
+            {"key": "department", "label": "Department", "type": "select", "options": ["Computer Engineering", "Information Technology", "Artificial Intelligence & Machine Learning", "Data Science", "Electronics & Communication", "Mechanical Engineering", "Civil Engineering", "Electrical Engineering", "Automobile Engineering", "Computer Applications"], "required": True, "table": True},
+            {"key": "year", "label": "Year", "type": "select", "options": ["FY", "SY", "TY", "LY"], "required": False, "table": True},
             {"key": "semester", "label": "Semester", "type": "number", "min": 1, "max": 8, "required": True, "table": True},
             {"key": "division", "label": "Division", "type": "text", "required": True, "table": True},
             {"key": "day", "label": "Day of Week", "type": "select", "options": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"], "required": True, "table": True},
@@ -812,6 +813,14 @@ class AdminCRUDService:
                             query["$and"].append(status_clause)
                         elif str(v).lower() in ("true", "false"):
                             query[k] = (str(v).lower() == "true")
+                        elif k in ("semester", "sem"):
+                            try:
+                                val_int = int(v)
+                                query[k] = {"$in": [str(v), val_int]}
+                            except (ValueError, TypeError):
+                                query[k] = v
+                        elif isinstance(v, str) and not v.isdigit() and k not in ("id", "place_id", "faculty_id", "enrollment_no", "_id"):
+                            query[k] = {"$regex": f"^{re.escape(v.strip())}$", "$options": "i"}
                         else:
                             query[k] = v
 

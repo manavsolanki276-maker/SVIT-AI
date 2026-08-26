@@ -1,66 +1,522 @@
-/* SVIT Admin - Weekly Timetable Matrix Responsive Stylesheet */
+/* ==========================================================================
+   SVIT Admin - Timetable Management Stylesheet (Mobile-First Architecture)
+   Color System: SVIT Light SaaS (#F8F9FE background, #FFFFFF cards, #8B5CF6 purple)
+   ========================================================================== */
+
 :root {
-    --tt-hero-bg: linear-gradient(135deg, #E8EBFA 0%, #FFFFFF 65%, #E7DDFB 100%);
-    --tt-hero-border: var(--svit-border);
+    --tt-bg: #F8F9FE;
     --tt-card-bg: #FFFFFF;
-    --tt-card-border: var(--svit-border);
+    --tt-border: #E1E5F0;
+    --tt-primary: #8B5CF6;
+    --tt-primary-soft: #E8EBFA;
+    --tt-primary-hover: #7C4FE8;
+    --tt-text-main: #171D3A;
+    --tt-text-muted: #66708F;
+    --tt-text-subtle: #8C95AD;
     --tt-slot-bg: #F8F9FE;
-    --tt-slot-hover: #E8EBFA;
-    --tt-accent: var(--svit-primary);
-    --tt-accent-light: var(--svit-periwinkle);
-    --tt-text-primary: var(--svit-text);
-    --tt-text-muted: var(--svit-text-secondary);
+    --tt-slot-hover: #FFFFFF;
+    --tt-success: #10B981;
+    --tt-success-bg: #DCFCE7;
+    --tt-warning: #F59E0B;
+    --tt-warning-bg: #FEF3C7;
+    --tt-danger: #EF4444;
+    --tt-danger-bg: #FEE2E2;
 }
+
+.timetable-page-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
+}
+
+/* ==========================================================================
+   1. Header Hero Card
+   ========================================================================== */
 
 .timetable-hero-card {
-    background: var(--tt-hero-bg);
-    border: 1px solid var(--tt-hero-border);
-    box-shadow: 0 4px 20px rgba(23, 29, 58, 0.06);
-    border-radius: 1rem;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: linear-gradient(135deg, #FFFFFF 0%, #F8F9FE 60%, #E8EBFA 100%);
+    border: 1px solid var(--tt-border);
+    box-shadow: 0 2px 8px rgba(23, 29, 58, 0.04);
 }
 
-.timetable-hero-card:hover {
-    box-shadow: 0 8px 28px rgba(139, 92, 246, 0.12);
+/* ==========================================================================
+   2. KPI Stat Cards
+   ========================================================================== */
+
+.kpi-stat-card {
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
-.timetable-matrix-wrapper {
-    background-color: var(--tt-card-bg);
-    border: 1px solid var(--tt-card-border);
-    border-radius: 1rem;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    box-shadow: 0 4px 20px rgba(23, 29, 58, 0.06);
+.kpi-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(139, 92, 246, 0.08);
+    border-color: #CBD5E1;
 }
 
-.timetable-grid-table {
+/* ==========================================================================
+   3. Custom Form Controls
+   ========================================================================== */
+
+.form-control-custom {
     width: 100%;
-    border-collapse: collapse;
-    min-width: 820px;
-}
-
-.timetable-grid-table th {
     background-color: #F8F9FE;
-    color: var(--tt-text-muted);
-    font-size: 0.75rem;
-    font-weight: 800;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    padding: 0.85rem;
-    border-bottom: 1px solid var(--tt-card-border);
+    border: 1px solid var(--tt-border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 13.5px;
+    color: var(--tt-text-main);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+    min-height: 44px;
 }
 
+.form-control-custom.select-sm {
+    min-height: 38px;
+    padding: 7px 12px;
+    font-size: 12.5px;
+}
+
+.form-control-custom:focus {
+    border-color: var(--tt-primary);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.14);
+    background-color: #FFFFFF;
+}
+
+/* ==========================================================================
+   4. Active Filter Chips
+   ========================================================================== */
+
+.filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: #E8EBFA;
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--tt-primary);
+}
+
+.filter-chip-remove {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tt-primary);
+    opacity: 0.7;
+    transition: opacity 0.15s ease;
+}
+
+.filter-chip-remove:hover {
+    opacity: 1;
+}
+
+/* ==========================================================================
+   5. Mobile Day Selector Pills (< 768px)
+   ========================================================================== */
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.mobile-day-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--tt-text-muted);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    min-height: 40px;
+    white-space: nowrap;
+}
+
+.mobile-day-pill:hover {
+    background: #F1F5F9;
+    color: var(--tt-text-main);
+}
+
+.mobile-day-pill.active {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C4FE8 100%);
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.mobile-day-pill .day-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 800;
+    background: #F1F5F9;
+    color: var(--tt-text-muted);
+}
+
+.mobile-day-pill.active .day-count {
+    background: rgba(255, 255, 255, 0.25);
+    color: #FFFFFF;
+}
+
+/* ==========================================================================
+   6. Desktop Weekly Timetable Matrix (>= 768px)
+   ========================================================================== */
+
+.timetable-matrix-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    min-width: 900px;
+}
+
+.timetable-matrix-table th {
+    background: #F8F9FE;
+    color: var(--tt-text-muted);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--tt-border);
+    border-right: 1px solid var(--tt-border);
+}
+
+.timetable-matrix-table th:last-child {
+    border-right: none;
+}
+
+.timetable-matrix-table th.time-col {
+    width: 140px;
+    background: #F1F5F9;
+    color: var(--tt-text-main);
+}
+
+.timetable-matrix-table td {
+    padding: 10px;
+    border-bottom: 1px solid var(--tt-border);
+    border-right: 1px solid var(--tt-border);
+    vertical-align: top;
+    background: #FFFFFF;
+    height: 90px;
+    transition: background-color 0.15s ease;
+}
+
+.timetable-matrix-table td:last-child {
+    border-right: none;
+}
+
+.timetable-matrix-table tr:last-child td {
+    border-bottom: none;
+}
+
+.timetable-matrix-table td.time-col-cell {
+    background: #F8F9FE;
+    width: 140px;
+    font-weight: 700;
+    font-size: 11.5px;
+    color: var(--tt-text-main);
+    vertical-align: middle;
+    padding: 12px;
+}
+
+/* Desktop Slot Card */
 .timetable-slot-card {
-    background-color: var(--tt-slot-bg);
-    border: 1px solid var(--tt-card-border);
-    border-radius: 0.65rem;
-    padding: 0.65rem;
-    transition: all 0.2s ease;
+    position: relative;
+    background: #F8F9FE;
+    border: 1px solid var(--tt-border);
+    border-radius: 12px;
+    padding: 9px 10px;
+    transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(23, 29, 58, 0.03);
 }
 
 .timetable-slot-card:hover {
-    background-color: var(--tt-slot-hover);
-    border-color: var(--tt-accent);
+    background: #FFFFFF;
+    border-color: var(--tt-primary);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
+    box-shadow: 0 6px 18px rgba(139, 92, 246, 0.14);
 }
+
+.timetable-slot-card.has-conflict {
+    border-left: 3px solid var(--tt-warning);
+    background: #FFFBEB;
+}
+
+.timetable-slot-card.has-conflict:hover {
+    background: #FEF3C7;
+    border-color: var(--tt-warning);
+}
+
+/* Empty Cell Add Trigger */
+.timetable-empty-cell {
+    height: 100%;
+    min-height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px dashed transparent;
+    border-radius: 10px;
+    color: #CBD5E1;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.timetable-empty-cell:hover {
+    border-color: rgba(139, 92, 246, 0.4);
+    background: #F8F9FE;
+    color: var(--tt-primary);
+}
+
+/* ==========================================================================
+   7. Mobile Schedule Timeline Cards (< 768px)
+   ========================================================================== */
+
+.mobile-schedule-card {
+    position: relative;
+    background: #FFFFFF;
+    border: 1px solid var(--tt-border);
+    border-radius: 18px;
+    padding: 14px 16px;
+    box-shadow: 0 2px 8px rgba(23, 29, 58, 0.04);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.mobile-schedule-card:active {
+    transform: scale(0.985);
+    background: #F8F9FE;
+}
+
+/* Current / Next Live Badge */
+.mobile-schedule-card.is-now {
+    border-left: 4px solid var(--tt-success);
+    background: linear-gradient(135deg, #FFFFFF 0%, #F0FDF4 100%);
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.12);
+}
+
+.mobile-schedule-card.is-next {
+    border-left: 4px solid var(--tt-primary);
+    background: linear-gradient(135deg, #FFFFFF 0%, #FAF5FF 100%);
+}
+
+.badge-now {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    background: var(--tt-success-bg);
+    color: #15803D;
+    border: 1px solid #86EFAC;
+    animation: pulseGlow 2s infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.badge-next {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    background: var(--tt-primary-soft);
+    color: var(--tt-primary);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+/* Conflict Banner in Card */
+.conflict-alert-banner {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    background: var(--tt-warning-bg);
+    border: 1px solid #FCD34D;
+    color: #92400E;
+    font-size: 11px;
+    font-weight: 700;
+    margin-top: 8px;
+}
+
+/* ==========================================================================
+   8. Modal Bottom Sheet & Desktop Modal Overrides
+   ========================================================================== */
+
+.modal-content.mobile-bottom-sheet-content {
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    background: #FFFFFF !important;
+    border: 1px solid var(--tt-border) !important;
+}
+
+#timetableForm {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+}
+
+#timetableForm .modal-body {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+}
+
+/* Modal Footer */
+.sticky-modal-footer {
+    background: #F8F9FE !important;
+    border-top: 1px solid var(--tt-border) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 12px !important;
+    flex-shrink: 0 !important;
+}
+
+.sticky-modal-footer button {
+    min-height: 44px !important;
+    height: 44px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    border-radius: 12px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.15s ease !important;
+}
+
+/* Desktop & Tablet Defaults (>= 768px) */
+@media (min-width: 768px) {
+    .modal-dialog.modal-lg {
+        max-width: 800px !important;
+        margin: 1.75rem auto !important;
+    }
+
+    .modal-content.mobile-bottom-sheet-content {
+        border-radius: 18px !important;
+        max-height: calc(100vh - 3.5rem) !important;
+        box-shadow: 0 20px 60px rgba(23, 29, 58, 0.18) !important;
+    }
+
+    #timetableForm .modal-body {
+        max-height: calc(85vh - 140px) !important;
+        padding: 24px !important;
+    }
+
+    .sticky-modal-footer {
+        position: relative !important;
+        border-radius: 0 0 18px 18px !important;
+        padding: 14px 24px !important;
+    }
+
+    .sticky-modal-footer .btn-modal-cancel {
+        flex: 0 0 auto !important;
+        min-width: 110px !important;
+        padding: 0 20px !important;
+        background: #FFFFFF !important;
+        border: 1px solid var(--tt-border) !important;
+        color: var(--tt-text-muted) !important;
+    }
+
+    .sticky-modal-footer .btn-modal-cancel:hover {
+        color: var(--tt-text-main) !important;
+        background: #F1F5F9 !important;
+    }
+
+    .sticky-modal-footer .btn-modal-save {
+        flex: 0 0 auto !important;
+        min-width: 140px !important;
+        padding: 0 24px !important;
+    }
+}
+
+/* Mobile Screens (< 768px) */
+@media (max-width: 767.98px) {
+    .form-control-custom {
+        font-size: 16px !important; /* No iOS auto-zoom */
+    }
+
+    .modal-dialog.modal-dialog-centered,
+    .modal-dialog {
+        display: flex !important;
+        align-items: flex-end !important;
+        min-height: 100% !important;
+        margin: 0 !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    .modal-content.mobile-bottom-sheet-content {
+        border-radius: 24px 24px 0 0 !important;
+        max-height: 90vh !important;
+        box-shadow: 0 -10px 30px rgba(23, 29, 58, 0.15) !important;
+    }
+
+    .sheet-drag-handle-bar {
+        display: flex !important;
+    }
+
+    .modal.fade .modal-dialog {
+        transform: translateY(100%);
+        transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .modal.show .modal-dialog {
+        transform: translateY(0);
+    }
+
+    .sticky-modal-footer {
+        position: sticky !important;
+        bottom: 0 !important;
+        padding: 12px 16px !important;
+        padding-bottom: max(12px, env(safe-area-inset-bottom)) !important;
+        z-index: 20 !important;
+    }
+
+    .sticky-modal-footer .btn-modal-cancel {
+        flex: 1 !important;
+        background: #FFFFFF !important;
+        border: 1px solid var(--tt-border) !important;
+        color: var(--tt-text-muted) !important;
+    }
+
+    .sticky-modal-footer .btn-modal-cancel:hover {
+        color: var(--tt-text-main) !important;
+        background: #F1F5F9 !important;
+    }
+
+    .sticky-modal-footer .btn-modal-save {
+        flex: 1.5 !important;
+    }
+}
+
