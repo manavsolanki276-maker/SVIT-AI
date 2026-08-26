@@ -226,11 +226,17 @@
         if (openCreateBtn) {
             openCreateBtn.addEventListener('click', () => {
                 document.getElementById('studentModalTitle').innerText = 'Register New Student';
+                const subtitle = document.getElementById('studentModalSubtitle');
+                if (subtitle) subtitle.innerText = 'Fill in complete academic and registration details';
+                const submitBtn = document.getElementById('studentSubmitBtn');
+                if (submitBtn) submitBtn.innerText = 'Register Student';
                 document.getElementById('studentFormRecordId').value = '';
                 document.getElementById('studentForm').reset();
                 document.getElementById('studentEnrollment').disabled = false;
                 const stSelect = document.getElementById('studentStatus');
                 if (stSelect) stSelect.value = 'active';
+                const profChk = document.getElementById('studentProfileComplete');
+                if (profChk) profChk.checked = true;
                 studentFormModal.show();
             });
         }
@@ -655,12 +661,17 @@
             enrollment_no: document.getElementById('studentEnrollment').value.trim(),
             full_name: document.getElementById('studentFullName').value.trim(),
             email: document.getElementById('studentEmail').value.trim(),
+            phone: document.getElementById('studentPhone').value.trim(),
+            gender: document.getElementById('studentGender') ? document.getElementById('studentGender').value : 'Male',
+            dob: document.getElementById('studentDob') ? document.getElementById('studentDob').value : '',
+            address: document.getElementById('studentAddress') ? document.getElementById('studentAddress').value.trim() : '',
             program: document.getElementById('studentProgram').value,
             department: document.getElementById('studentDepartment').value,
             semester: parseInt(document.getElementById('studentSemester').value, 10) || 1,
             division: document.getElementById('studentDivision').value.trim(),
-            phone: document.getElementById('studentPhone').value.trim(),
-            status: document.getElementById('studentStatus') ? document.getElementById('studentStatus').value : 'active'
+            batch: document.getElementById('studentBatch') ? document.getElementById('studentBatch').value.trim() : '',
+            status: document.getElementById('studentStatus') ? document.getElementById('studentStatus').value : 'active',
+            is_profile_complete: document.getElementById('studentProfileComplete') ? document.getElementById('studentProfileComplete').checked : true
         };
 
         const isEdit = Boolean(recordId);
@@ -675,7 +686,7 @@
             });
             const data = await res.json();
             if (res.ok && data.status === 'success') {
-                showAdminToast(data.message, 'success');
+                showAdminToast(data.message || (isEdit ? 'Student updated successfully.' : 'Student registered successfully.'), 'success');
                 studentFormModal.hide();
                 loadTabCounts();
                 loadStudents();
@@ -756,19 +767,41 @@
         const student = state.items.find(s => (s.enrollment_no || s.id) === enroll);
         if (!student) return;
 
-        document.getElementById('studentModalTitle').innerText = 'Edit Student Details';
+        document.getElementById('studentModalTitle').innerText = 'Edit Student';
+        const subtitle = document.getElementById('studentModalSubtitle');
+        if (subtitle) subtitle.innerText = 'Update complete academic and registration information';
+        const submitBtn = document.getElementById('studentSubmitBtn');
+        if (submitBtn) submitBtn.innerText = 'Save Changes';
+
         document.getElementById('studentFormRecordId').value = enroll;
         document.getElementById('studentEnrollment').value = student.enrollment_no || enroll;
         document.getElementById('studentEnrollment').disabled = true;
         document.getElementById('studentFullName').value = student.full_name || student.name || '';
         document.getElementById('studentEmail').value = student.email || '';
+        document.getElementById('studentPhone').value = student.phone || student.contact_number || '';
+        
+        const genderSelect = document.getElementById('studentGender');
+        if (genderSelect) genderSelect.value = student.gender || 'Male';
+
+        const dobInput = document.getElementById('studentDob');
+        if (dobInput) dobInput.value = student.dob || '';
+
+        const addrInput = document.getElementById('studentAddress');
+        if (addrInput) addrInput.value = student.address || '';
+
         document.getElementById('studentProgram').value = student.program || 'BE';
         document.getElementById('studentDepartment').value = student.department || 'Computer Engineering';
         document.getElementById('studentSemester').value = student.semester || 1;
         document.getElementById('studentDivision').value = student.division || '';
-        document.getElementById('studentPhone').value = student.phone || student.contact_number || '';
+
+        const batchInput = document.getElementById('studentBatch');
+        if (batchInput) batchInput.value = student.batch || '';
+
         const stSelect = document.getElementById('studentStatus');
         if (stSelect) stSelect.value = student.status || 'active';
+
+        const profChk = document.getElementById('studentProfileComplete');
+        if (profChk) profChk.checked = Boolean(student.is_profile_complete);
 
         studentFormModal.show();
     };

@@ -213,6 +213,10 @@
         if (openCreateBtn) {
             openCreateBtn.addEventListener('click', () => {
                 document.getElementById('facultyModalTitle').innerText = 'Add Faculty Member';
+                const subtitle = document.getElementById('facultyModalSubtitle');
+                if (subtitle) subtitle.innerText = 'Register new faculty profile and academic role';
+                const submitBtn = document.getElementById('facultySubmitBtn');
+                if (submitBtn) submitBtn.innerText = 'Register Faculty';
                 document.getElementById('facultyFormRecordId').value = '';
                 document.getElementById('facultyForm').reset();
                 document.getElementById('facultyIdInput').disabled = false;
@@ -712,13 +716,17 @@
         const payload = {
             faculty_id: document.getElementById('facultyIdInput').value.trim(),
             full_name: document.getElementById('facultyNameInput').value.trim(),
-            designation: document.getElementById('facultyDesigInput').value,
-            department: document.getElementById('facultyDeptInput').value,
-            subject: document.getElementById('facultySubjectInput').value.trim(),
             email: document.getElementById('facultyEmailInput').value.trim(),
             phone: document.getElementById('facultyPhoneInput').value.trim(),
+            designation: document.getElementById('facultyDesigInput').value,
+            department: document.getElementById('facultyDeptInput').value,
+            program: document.getElementById('facultyProgramInput') ? document.getElementById('facultyProgramInput').value : 'BE',
+            qualification: document.getElementById('facultyQualInput').value.trim(),
+            experience: document.getElementById('facultyExperienceInput') ? document.getElementById('facultyExperienceInput').value.trim() : '',
+            subject: document.getElementById('facultySubjectInput').value.trim(),
+            specialization: document.getElementById('facultySpecInput') ? document.getElementById('facultySpecInput').value.trim() : '',
             cabin: document.getElementById('facultyCabinInput').value.trim(),
-            qualification: document.getElementById('facultyQualInput').value.trim()
+            office_hours: document.getElementById('facultyOfficeHoursInput') ? document.getElementById('facultyOfficeHoursInput').value.trim() : ''
         };
 
         if (state.uploadedImageUrl) payload.image_url = state.uploadedImageUrl;
@@ -750,18 +758,38 @@
         const fac = state.items.find(f => (f.faculty_id || f.id) === fId);
         if (!fac) return;
 
-        document.getElementById('facultyModalTitle').innerText = 'Edit Faculty Profile';
+        document.getElementById('facultyModalTitle').innerText = 'Edit Faculty';
+        const subtitle = document.getElementById('facultyModalSubtitle');
+        if (subtitle) subtitle.innerText = 'Update complete faculty profile and academic information';
+        const submitBtn = document.getElementById('facultySubmitBtn');
+        if (submitBtn) submitBtn.innerText = 'Save Changes';
+
         document.getElementById('facultyFormRecordId').value = fId;
         document.getElementById('facultyIdInput').value = fac.faculty_id || fId;
         document.getElementById('facultyIdInput').disabled = true;
         document.getElementById('facultyNameInput').value = fac.full_name || fac.name || '';
-        document.getElementById('facultyDesigInput').value = fac.designation || 'Assistant Professor';
-        document.getElementById('facultyDeptInput').value = fac.department || 'Computer Engineering';
-        document.getElementById('facultySubjectInput').value = fac.subject || '';
         document.getElementById('facultyEmailInput').value = fac.email || '';
         document.getElementById('facultyPhoneInput').value = fac.phone || '';
-        document.getElementById('facultyCabinInput').value = fac.cabin || '';
+        document.getElementById('facultyDesigInput').value = fac.designation || 'Assistant Professor';
+        document.getElementById('facultyDeptInput').value = fac.department || 'Computer Engineering';
+        
+        const progSelect = document.getElementById('facultyProgramInput');
+        if (progSelect) progSelect.value = fac.program || 'BE';
+
         document.getElementById('facultyQualInput').value = fac.qualification || '';
+
+        const expInput = document.getElementById('facultyExperienceInput');
+        if (expInput) expInput.value = fac.experience || '';
+
+        document.getElementById('facultySubjectInput').value = fac.subject || '';
+
+        const specInput = document.getElementById('facultySpecInput');
+        if (specInput) specInput.value = fac.specialization || '';
+
+        document.getElementById('facultyCabinInput').value = fac.cabin || '';
+
+        const hoursInput = document.getElementById('facultyOfficeHoursInput');
+        if (hoursInput) hoursInput.value = fac.office_hours || '';
 
         state.uploadedImageUrl = fac.image_url || null;
         if (fac.image_url) {

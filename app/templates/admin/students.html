@@ -233,11 +233,14 @@
             </div>
 
             <div class="modal-header border-b border-[#E1E5F0] p-4 bg-[#F8F9FE]">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-lg bg-[#E8EBFA] text-[#8B5CF6] flex items-center justify-center">
-                        <i data-lucide="user-plus" class="w-4 h-4"></i>
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-[#E8EBFA] text-[#8B5CF6] flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <i data-lucide="user-check" class="w-4 h-4"></i>
                     </div>
-                    <h3 class="text-sm font-bold text-[#171D3A] mb-0" id="studentModalTitle">Register New Student</h3>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-[#171D3A] mb-0" id="studentModalTitle">Register New Student</h3>
+                        <p class="text-[11px] text-[#66708F] mb-0" id="studentModalSubtitle">Fill in complete academic and registration details</p>
+                    </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -246,7 +249,7 @@
                 <input type="hidden" id="studentFormRecordId">
                 
                 <div class="modal-body p-4 sm:p-5 space-y-5 overflow-y-auto">
-                    <!-- Section 1: Personal Details -->
+                    <!-- Section 1: Personal Information -->
                     <div class="form-group-section">
                         <div class="flex items-center gap-2 mb-3">
                             <span class="w-5 h-5 rounded-full bg-[#E8EBFA] text-[#8B5CF6] text-[11px] font-bold flex items-center justify-center">1</span>
@@ -265,10 +268,26 @@
                                 <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Contact Number</label>
                                 <input type="tel" id="studentPhone" placeholder="+91 9876543210" class="form-control-custom font-mono">
                             </div>
+                            <div>
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Gender</label>
+                                <select id="studentGender" class="form-control-custom">
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Date of Birth</label>
+                                <input type="date" id="studentDob" class="form-control-custom font-mono">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Residential Address</label>
+                                <textarea id="studentAddress" rows="2" placeholder="Street, City, Pin code" class="form-control-custom py-2 resize-none"></textarea>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Section 2: Academic Information -->
+                    <!-- Section 2: Academic Details -->
                     <div class="form-group-section pt-3 border-t border-[#E1E5F0]">
                         <div class="flex items-center gap-2 mb-3">
                             <span class="w-5 h-5 rounded-full bg-[#E8EBFA] text-[#8B5CF6] text-[11px] font-bold flex items-center justify-center">2</span>
@@ -314,33 +333,46 @@
                                     <option value="8">Semester 8</option>
                                 </select>
                             </div>
-                            <div class="sm:col-span-2 lg:col-span-2">
-                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Class Division / Batch</label>
-                                <input type="text" id="studentDivision" placeholder="e.g. Division A - Batch 1" class="form-control-custom">
+                            <div>
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Class Division</label>
+                                <input type="text" id="studentDivision" placeholder="e.g. Division A" class="form-control-custom">
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Batch</label>
+                                <input type="text" id="studentBatch" placeholder="e.g. Batch 1 (B1)" class="form-control-custom">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Section 3: Status & Account -->
+                    <!-- Section 3: Status & Verification -->
                     <div class="form-group-section pt-3 border-t border-[#E1E5F0]">
                         <div class="flex items-center gap-2 mb-3">
                             <span class="w-5 h-5 rounded-full bg-[#E8EBFA] text-[#8B5CF6] text-[11px] font-bold flex items-center justify-center">3</span>
                             <h4 class="text-xs font-bold text-[#171D3A] uppercase tracking-wider mb-0">Status &amp; Verification</h4>
                         </div>
-                        <div>
-                            <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Registration Status</label>
-                            <select id="studentStatus" class="form-control-custom">
-                                <option value="active">Active (Approved)</option>
-                                <option value="pending">Pending Review</option>
-                                <option value="rejected">Rejected</option>
-                            </select>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5 items-center">
+                            <div>
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Registration Status</label>
+                                <select id="studentStatus" class="form-control-custom">
+                                    <option value="active">Active (Approved)</option>
+                                    <option value="pending">Pending Review</option>
+                                    <option value="rejected">Rejected</option>
+                                </select>
+                            </div>
+                            <div class="pt-2 sm:pt-4">
+                                <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                                    <input type="checkbox" id="studentProfileComplete" class="w-4 h-4 rounded text-[#8B5CF6] focus:ring-[#8B5CF6]">
+                                    <span class="text-xs font-bold text-[#171D3A]">Mark Profile as Complete</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="modal-footer border-t border-[#E1E5F0] p-3.5 sm:p-4 bg-[#F8F9FE] flex items-center justify-end gap-2">
-                    <button type="button" class="px-4 py-2.5 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A] text-xs font-semibold" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn-primary-custom py-2.5 px-5 text-xs font-bold">Save Student</button>
+                <!-- Sticky Mobile Actions -->
+                <div class="modal-footer sticky-modal-footer border-t border-[#E1E5F0] p-3.5 sm:p-4 bg-[#F8F9FE] flex items-center justify-end gap-2">
+                    <button type="button" class="btn-modal-cancel px-4 py-2.5 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A] text-xs font-semibold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-modal-save btn-primary-custom py-2.5 px-5 text-xs font-bold" id="studentSubmitBtn">Save Student</button>
                 </div>
             </form>
         </div>
