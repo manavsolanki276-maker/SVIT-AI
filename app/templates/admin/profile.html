@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto space-y-6 text-white">
+<div class="max-w-4xl mx-auto space-y-6 text-[#171D3A]">
 
     <!-- Profile Hero Card -->
     <div class="profile-hero-card p-6 rounded-2xl flex flex-col sm:flex-row items-center gap-5">
@@ -17,18 +17,18 @@
         </div>
         <div class="space-y-1 text-center sm:text-left flex-1">
             <div class="flex items-center justify-center sm:justify-start gap-2.5 flex-wrap">
-                <h2 class="text-xl font-black text-white mb-0">{{ admin.name if hasattr(admin, 'name') and admin.name else admin.username }}</h2>
-                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                <h2 class="text-xl font-black text-[#171D3A] mb-0">{{ admin.name if hasattr(admin, 'name') and admin.name else admin.username }}</h2>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#E8EBFA] text-[#8B5CF6] border border-[#8B5CF6]/30">
                     {{ admin.role_display }}
                 </span>
-                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Active Session
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-[#16A34A] border border-emerald-200 flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#16A34A] animate-pulse"></span> Active Session
                 </span>
             </div>
-            <p class="text-xs text-gray-300 mb-0 font-mono">{{ admin.email }}</p>
-            <p class="text-[11px] text-gray-400 mb-0">Department: <strong class="text-white">{{ admin.department if hasattr(admin, 'department') and admin.department else 'Central Administration' }}</strong></p>
+            <p class="text-xs text-[#66708F] mb-0 font-mono">{{ admin.email }}</p>
+            <p class="text-[11px] text-[#8C95AD] mb-0">Department: <strong class="text-[#171D3A]">{{ admin.department if hasattr(admin, 'department') and admin.department else 'Central Administration' }}</strong></p>
         </div>
-        <a href="{{ url_for('admin.logout') }}" class="px-4 py-2 rounded-xl bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white border border-red-500/30 text-xs font-semibold transition text-decoration-none flex items-center gap-2">
+        <a href="{{ url_for('admin.logout') }}" class="px-4 py-2 rounded-xl bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 text-xs font-semibold transition text-decoration-none flex items-center gap-2">
             <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
         </a>
     </div>
@@ -38,62 +38,62 @@
         
         <!-- Account Details -->
         <div class="security-card space-y-4">
-            <div class="flex items-center gap-2.5 border-b border-[#1F2937] pb-3">
-                <i data-lucide="shield" class="w-5 h-5 text-indigo-400"></i>
-                <h3 class="text-sm font-bold text-white mb-0">Account Information</h3>
+            <div class="flex items-center gap-2.5 border-b border-[#E1E5F0] pb-3">
+                <i data-lucide="shield" class="w-5 h-5 text-[#8B5CF6]"></i>
+                <h3 class="text-sm font-bold text-[#171D3A] mb-0">Account Information</h3>
             </div>
 
             <div class="space-y-3 text-xs">
-                <div class="flex justify-between py-1.5 border-b border-gray-800">
-                    <span class="text-gray-400">Username</span>
-                    <span class="font-semibold text-white font-mono">{{ admin.username }}</span>
+                <div class="flex justify-between py-1.5 border-b border-[#E1E5F0]">
+                    <span class="text-[#66708F]">Username</span>
+                    <span class="font-semibold text-[#171D3A] font-mono">{{ admin.username }}</span>
                 </div>
-                <div class="flex justify-between py-1.5 border-b border-gray-800">
-                    <span class="text-gray-400">Email Address</span>
-                    <span class="font-semibold text-white">{{ admin.email }}</span>
+                <div class="flex justify-between py-1.5 border-b border-[#E1E5F0]">
+                    <span class="text-[#66708F]">Email Address</span>
+                    <span class="font-semibold text-[#171D3A]">{{ admin.email }}</span>
                 </div>
-                <div class="flex justify-between py-1.5 border-b border-gray-800">
-                    <span class="text-gray-400">Canonical Role</span>
-                    <span class="font-mono text-indigo-400 font-bold">{{ admin.role }}</span>
+                <div class="flex justify-between py-1.5 border-b border-[#E1E5F0]">
+                    <span class="text-[#66708F]">Canonical Role</span>
+                    <span class="font-mono text-[#8B5CF6] font-bold">{{ admin.role }}</span>
                 </div>
-                <div class="flex justify-between py-1.5 border-b border-gray-800">
-                    <span class="text-gray-400">Password Hashing</span>
-                    <span class="text-emerald-400 font-semibold flex items-center gap-1">
+                <div class="flex justify-between py-1.5 border-b border-[#E1E5F0]">
+                    <span class="text-[#66708F]">Password Hashing</span>
+                    <span class="text-[#16A34A] font-semibold flex items-center gap-1">
                         <i data-lucide="lock" class="w-3.5 h-3.5"></i> Salted PBKDF2 / Argon2
                     </span>
                 </div>
                 <div class="flex justify-between py-1.5">
-                    <span class="text-gray-400">Last Login</span>
-                    <span class="text-gray-300">{{ admin.last_login if hasattr(admin, 'last_login') and admin.last_login else 'Active Session' }}</span>
+                    <span class="text-[#66708F]">Last Login</span>
+                    <span class="text-[#171D3A]">{{ admin.last_login if hasattr(admin, 'last_login') and admin.last_login else 'Active Session' }}</span>
                 </div>
             </div>
         </div>
 
         <!-- Change Password Panel -->
         <div class="security-card space-y-4">
-            <div class="flex items-center gap-2.5 border-b border-[#1F2937] pb-3">
-                <i data-lucide="key" class="w-5 h-5 text-emerald-400"></i>
-                <h3 class="text-sm font-bold text-white mb-0">Security: Change Password</h3>
+            <div class="flex items-center gap-2.5 border-b border-[#E1E5F0] pb-3">
+                <i data-lucide="key" class="w-5 h-5 text-[#16A34A]"></i>
+                <h3 class="text-sm font-bold text-[#171D3A] mb-0">Security: Change Password</h3>
             </div>
 
             <form id="changePasswordForm" data-admin-id="{{ admin.id if hasattr(admin, 'id') else admin.username }}" class="space-y-3 text-xs">
                 <div>
-                    <label class="text-[11px] font-semibold text-gray-300">Current Password *</label>
+                    <label class="text-[11px] font-semibold text-[#171D3A]">Current Password *</label>
                     <input type="password" id="currentPassword" required placeholder="Enter current password" class="security-input">
                 </div>
 
                 <div>
-                    <label class="text-[11px] font-semibold text-gray-300">New Password *</label>
+                    <label class="text-[11px] font-semibold text-[#171D3A]">New Password *</label>
                     <input type="password" id="newPassword" minlength="6" required placeholder="Minimum 6 characters" class="security-input">
                 </div>
 
                 <div>
-                    <label class="text-[11px] font-semibold text-gray-300">Confirm New Password *</label>
+                    <label class="text-[11px] font-semibold text-[#171D3A]">Confirm New Password *</label>
                     <input type="password" id="confirmPassword" minlength="6" required placeholder="Re-enter new password" class="security-input">
                 </div>
 
                 <div class="pt-2 flex justify-end">
-                    <button type="submit" id="savePasswordBtn" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold flex items-center gap-2 shadow-lg shadow-indigo-600/30 transition">
+                    <button type="submit" id="savePasswordBtn" class="px-4 py-2 rounded-xl bg-[#8B5CF6] hover:bg-[#7C4FE8] text-white font-semibold flex items-center gap-2 shadow-lg shadow-[#8B5CF6]/25 transition">
                         <span id="savePassSpinner" class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin hidden"></span>
                         <span>Update Password</span>
                     </button>
@@ -103,89 +103,35 @@
 
     </div>
 
-    <!-- Appearance Settings -->
-    <div class="security-card space-y-4">
-        <div class="flex items-center gap-2.5 border-b border-[#1F2937] pb-3">
-            <i data-lucide="sun-moon" class="w-5 h-5 text-indigo-400"></i>
-            <div>
-                <h3 class="text-sm font-bold text-white mb-0">Appearance</h3>
-                <p class="text-[11px] text-gray-400 mb-0">Choose how the Admin Portal should look.</p>
-            </div>
-        </div>
-        <div class="theme-selector-grid grid grid-cols-1 sm:grid-cols-3 gap-3" role="radiogroup" aria-label="Appearance theme">
-            <!-- 1. Light Option -->
-            <div class="admin-theme-radio-card" data-admin-theme-choice="light" onclick="setAdminTheme('light')" role="radio" aria-checked="false" tabindex="0">
-                <div class="theme-card-top">
-                    <span class="theme-radio-indicator"><span class="theme-radio-dot"></span></span>
-                    <div class="theme-card-icon icon-light">
-                        <i data-lucide="sun" class="w-5 h-5"></i>
-                    </div>
-                </div>
-                <div class="theme-card-body">
-                    <strong class="theme-card-title">Light</strong>
-                    <span class="theme-card-desc">Clean and bright</span>
-                </div>
-            </div>
-
-            <!-- 2. Dark Option -->
-            <div class="admin-theme-radio-card" data-admin-theme-choice="dark" onclick="setAdminTheme('dark')" role="radio" aria-checked="false" tabindex="0">
-                <div class="theme-card-top">
-                    <span class="theme-radio-indicator"><span class="theme-radio-dot"></span></span>
-                    <div class="theme-card-icon icon-dark">
-                        <i data-lucide="moon" class="w-5 h-5"></i>
-                    </div>
-                </div>
-                <div class="theme-card-body">
-                    <strong class="theme-card-title">Dark</strong>
-                    <span class="theme-card-desc">Premium dark experience</span>
-                </div>
-            </div>
-
-            <!-- 3. Auto / System Option -->
-            <div class="admin-theme-radio-card" data-admin-theme-choice="system" onclick="setAdminTheme('system')" role="radio" aria-checked="false" tabindex="0">
-                <div class="theme-card-top">
-                    <span class="theme-radio-indicator"><span class="theme-radio-dot"></span></span>
-                    <div class="theme-card-icon icon-system">
-                        <i data-lucide="monitor" class="w-5 h-5"></i>
-                    </div>
-                </div>
-                <div class="theme-card-body">
-                    <strong class="theme-card-title">Auto / System</strong>
-                    <span class="theme-card-desc">Follow device preference</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Role Permissions Summary -->
     <div class="security-card space-y-4">
-        <div class="flex items-center gap-2.5 border-b border-[#1F2937] pb-3">
-            <i data-lucide="check-circle" class="w-5 h-5 text-indigo-400"></i>
-            <h3 class="text-sm font-bold text-white mb-0">Granted Role Privileges</h3>
+        <div class="flex items-center gap-2.5 border-b border-[#E1E5F0] pb-3">
+            <i data-lucide="check-circle" class="w-5 h-5 text-[#8B5CF6]"></i>
+            <h3 class="text-sm font-bold text-[#171D3A] mb-0">Granted Role Privileges</h3>
         </div>
 
-        <p class="text-xs text-gray-400 mb-2">
+        <p class="text-xs text-[#66708F] mb-2">
             Your authenticated session grants write, read, and operational privileges for the following functional scopes:
         </p>
 
         <div class="flex flex-wrap gap-2">
             {% if admin.role == 'super_admin' %}
-                <span class="perm-pill bg-indigo-600/30 text-indigo-200 border-indigo-500/50">
-                    <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i> Full Master Control (*)
+                <span class="perm-pill bg-[#E8EBFA] text-[#8B5CF6] border border-[#8B5CF6]/30 font-bold">
+                    <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#16A34A]"></i> Full Master Control (*)
                 </span>
-                <span class="perm-pill"><i data-lucide="check" class="w-3 h-3 text-emerald-400"></i> academic</span>
-                <span class="perm-pill"><i data-lucide="check" class="w-3 h-3 text-emerald-400"></i> admission</span>
-                <span class="perm-pill"><i data-lucide="check" class="w-3 h-3 text-emerald-400"></i> notices</span>
-                <span class="perm-pill"><i data-lucide="check" class="w-3 h-3 text-emerald-400"></i> events</span>
-                <span class="perm-pill"><i data-lucide="check" class="w-3 h-3 text-emerald-400"></i> bus</span>
-                <span class="perm-pill"><i data-lucide="check" class="w-3 h-3 text-emerald-400"></i> library</span>
-                <span class="perm-pill"><i data-lucide="check" class="w-3 h-3 text-emerald-400"></i> canteen</span>
-                <span class="perm-pill"><i data-lucide="check" class="w-3 h-3 text-emerald-400"></i> sports</span>
-                <span class="perm-pill"><i data-lucide="check" class="w-3 h-3 text-emerald-400"></i> admin_management</span>
+                <span class="perm-pill"><i data-lucide="check" class="w-3 h-3 text-[#16A34A]"></i> academic</span>
+                <span class="perm-pill"><i data-lucide="check" class="w-3 h-3 text-[#16A34A]"></i> admission</span>
+                <span class="perm-pill"><i data-lucide="check" class="w-3 h-3 text-[#16A34A]"></i> notices</span>
+                <span class="perm-pill"><i data-lucide="check" class="w-3 h-3 text-[#16A34A]"></i> events</span>
+                <span class="perm-pill"><i data-lucide="check" class="w-3 h-3 text-[#16A34A]"></i> bus</span>
+                <span class="perm-pill"><i data-lucide="check" class="w-3 h-3 text-[#16A34A]"></i> library</span>
+                <span class="perm-pill"><i data-lucide="check" class="w-3 h-3 text-[#16A34A]"></i> canteen</span>
+                <span class="perm-pill"><i data-lucide="check" class="w-3 h-3 text-[#16A34A]"></i> sports</span>
+                <span class="perm-pill"><i data-lucide="check" class="w-3 h-3 text-[#16A34A]"></i> admin_management</span>
             {% else %}
                 {% for perm in admin.permissions %}
                     <span class="perm-pill">
-                        <i data-lucide="check" class="w-3 h-3 text-emerald-400"></i> {{ perm }}
+                        <i data-lucide="check" class="w-3 h-3 text-[#16A34A]"></i> {{ perm }}
                     </span>
                 {% endfor %}
             {% endif %}

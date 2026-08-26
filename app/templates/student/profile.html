@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile - SVIT AI Assistant</title>
+    <!-- Theme System Stylesheet & Single Theme Enforcer -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/loader.js') }}"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/student/chat.css') }}">
@@ -16,17 +20,20 @@
             overflow-y: auto;
             flex: 1;
             box-sizing: border-box;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
         }
 
         .profile-card {
-            background: #ffffff;
+            background: var(--bg-card);
             border-radius: 16px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
             padding: 32px;
             margin-bottom: 24px;
             box-sizing: border-box;
             width: 100%;
+            color: var(--text-primary);
         }
 
         .profile-header-box {
@@ -34,7 +41,7 @@
             align-items: center;
             justify-content: space-between;
             padding-bottom: 24px;
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: 1px solid var(--border-color);
             margin-bottom: 24px;
             gap: 16px;
         }
@@ -49,7 +56,7 @@
             width: 58px;
             height: 58px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            background: var(--accent-gradient);
             color: #ffffff;
             font-size: 20px;
             font-weight: 700;
@@ -57,20 +64,20 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            box-shadow: 0 3px 12px rgba(99, 102, 241, 0.28);
+            box-shadow: 0 3px 12px var(--accent-glow);
         }
 
         .profile-title-info h2 {
             margin: 0 0 4px 0;
             font-size: 1.55rem;
-            color: #0f172a;
+            color: var(--text-primary);
             font-weight: 700;
             line-height: 1.25;
         }
 
         .profile-title-info p {
             margin: 0;
-            color: #64748b;
+            color: var(--text-secondary);
             font-size: 0.95rem;
             line-height: 1.35;
         }
@@ -79,8 +86,9 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: #dcfce7;
-            color: #166534;
+            background: var(--success-light);
+            color: var(--success);
+            border: 1px solid var(--success-border);
             padding: 6px 14px;
             border-radius: 20px;
             font-size: 0.85rem;
@@ -97,8 +105,8 @@
         }
 
         .info-chip-card {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
+            background: var(--bg-surface-raised);
+            border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 14px 18px;
             display: flex;
@@ -110,13 +118,13 @@
             font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            color: #64748b;
+            color: var(--text-muted);
             font-weight: 600;
         }
 
         .info-chip-card .chip-value {
             font-size: 1.05rem;
-            color: #1e293b;
+            color: var(--text-primary);
             font-weight: 600;
             word-break: break-word;
         }
@@ -124,7 +132,7 @@
         .section-heading {
             font-size: 1.2rem;
             font-weight: 700;
-            color: #1e293b;
+            color: var(--text-primary);
             margin-bottom: 18px;
             display: flex;
             align-items: center;
@@ -150,16 +158,16 @@
         .form-group label {
             font-size: 0.88rem;
             font-weight: 600;
-            color: #334155;
+            color: var(--text-primary);
         }
 
         .form-group input, .form-group select {
             padding: 11px 14px;
-            border: 1px solid #cbd5e1;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             font-size: 0.95rem;
-            background: #ffffff;
-            color: #1e293b;
+            background: var(--bg-input);
+            color: var(--text-primary);
             outline: none;
             transition: all 0.2s ease;
             box-sizing: border-box;
@@ -167,13 +175,13 @@
         }
 
         .form-group input:focus, .form-group select:focus {
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-light);
         }
 
         .form-group input[readonly] {
-            background: #f1f5f9;
-            color: #64748b;
+            background: var(--bg-surface-raised);
+            color: var(--text-muted);
             cursor: not-allowed;
         }
 
@@ -359,6 +367,9 @@
     </style>
 </head>
 <body>
+    <!-- GLOBAL ANIMATED LOADER -->
+    {% include "partials/loader.html" %}
+
     {# Prioritize explicit route context variables, then fallback to student/current_user objects #}
     {% set u = student or user or current_user %}
     {% set s_name = full_name or (u.full_name if u else '') or (u.name if u else '') or 'Student User' %}

@@ -1,0 +1,536 @@
+@import url('loader.css');
+@import url('brand_animation.css');
+
+/* ==========================================================================
+   SVIT AI — FINAL MASTER VISUAL DESIGN SYSTEM
+   Single Premium Unified Theme (Student + Admin + Entire Web Application)
+   Palette: White (#FFFFFF) + Soft Lavender (#E8EBFA) + Light Purple (#E7DDFB)
+            + Soft Pink (#E58AF0) + Primary Purple (#8B5CF6 / #7C4FE8)
+            + Periwinkle (#91A7EE) + Deep Navy (#171D3A) + Secondary Navy (#273052)
+   ONLY ONE THEME. NO DARK MODE.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Master CSS Custom Properties / Global Theme Variables
+   -------------------------------------------------------------------------- */
+
+:root {
+    /* Required Master Tokens from Design System Specification */
+    --svit-bg: #F8F9FE;
+    --svit-surface: #FFFFFF;
+    --svit-surface-soft: #E8EBFA;
+    --svit-purple-light: #E7DDFB;
+    --svit-primary: #8B5CF6;
+    --svit-primary-hover: #7C4FE8;
+    --svit-pink: #E58AF0;
+    --svit-periwinkle: #91A7EE;
+    --svit-navy: #171D3A;
+    --svit-navy-secondary: #273052;
+    --svit-text: #171D3A;
+    --svit-text-secondary: #66708F;
+    --svit-muted: #8C95AD;
+    --svit-border: #E1E5F0;
+    --svit-border-subtle: #EEF1F8;
+    --svit-border-strong: #CDD5E7;
+    --svit-success: #16A34A;
+    --svit-warning: #D97706;
+    --svit-danger: #DC2626;
+    --svit-info: #4F7CFF;
+
+    /* Primary Color Palette Aliases */
+    --color-bg-primary: var(--svit-bg);
+    --color-bg-secondary: var(--svit-surface-soft);
+    --color-surface: var(--svit-surface);
+    --color-surface-elevated: var(--svit-surface-soft);
+    --color-lavender: var(--svit-surface-soft);
+    --color-purple-light: var(--svit-purple-light);
+    --color-primary: var(--svit-primary);
+    --color-primary-hover: var(--svit-primary-hover);
+    --color-secondary: var(--svit-periwinkle);
+    --color-pink: var(--svit-pink);
+    --color-navy: var(--svit-navy);
+    --color-text-primary: var(--svit-text);
+    --color-text-secondary: var(--svit-text-secondary);
+    --color-text-muted: var(--svit-muted);
+    --color-border: var(--svit-border);
+    --color-border-subtle: var(--svit-border-subtle);
+    --color-border-strong: var(--svit-border-strong);
+    --color-hover: #F2EBFD;
+    --color-success: var(--svit-success);
+    --color-warning: var(--svit-warning);
+    --color-danger: var(--svit-danger);
+    --color-info: var(--svit-info);
+
+    /* Backgrounds & Surfaces */
+    --bg-primary: var(--svit-bg);
+    --bg-secondary: var(--svit-surface-soft);
+    --bg-card: var(--svit-surface);
+    --bg-card-hover: #FAF9FE;
+    --bg-surface-raised: var(--svit-surface);
+    --bg-surface-elevated: var(--svit-surface-soft);
+    --bg-input: #FFFFFF;
+    --bg-input-focus: #FFFFFF;
+    --bg-sidebar: #FFFFFF;
+    --bg-sidebar-card: #FFFFFF;
+    --bg-topbar: rgba(255, 255, 255, 0.95);
+    --bg-glass: rgba(255, 255, 255, 0.88);
+    --bg-modal: #FFFFFF;
+    --bg-dropdown: #FFFFFF;
+
+    /* Brand Accent Colors & Gradients */
+    --accent-primary: var(--svit-primary);
+    --accent-hover: var(--svit-primary-hover);
+    --accent-active: #6D3AE0;
+    --accent-secondary: var(--svit-periwinkle);
+    --accent-pink: var(--svit-pink);
+    --accent-light: rgba(139, 92, 246, 0.12);
+    --accent-subtle: rgba(139, 92, 246, 0.06);
+    --accent-border: rgba(139, 92, 246, 0.28);
+    --accent-glow: rgba(139, 92, 246, 0.18);
+    --accent-gradient: linear-gradient(135deg, #8B5CF6 0%, #91A7EE 100%);
+    --accent-gradient-pink: linear-gradient(135deg, #E58AF0 0%, #91A7EE 100%);
+    --accent-gradient-subtle: linear-gradient(135deg, #E8EBFA 0%, #FFFFFF 100%);
+    --hero-gradient: linear-gradient(135deg, #E8EBFA 0%, #FFFFFF 60%, #E7DDFB 100%);
+
+    /* Typography / Text */
+    --text-primary: var(--svit-text);
+    --text-secondary: var(--svit-text-secondary);
+    --text-muted: var(--svit-muted);
+    --text-navy: var(--svit-navy);
+    --text-inverse: #FFFFFF;
+    --text-highlight: var(--svit-primary);
+
+    /* Borders */
+    --border-color: var(--svit-border);
+    --border-subtle: var(--svit-border-subtle);
+    --border-strong: var(--svit-border-strong);
+    --border-focus: var(--svit-primary);
+
+    /* Semantic Status Colors */
+    --success: var(--svit-success);
+    --success-hover: #15803D;
+    --success-light: rgba(22, 163, 74, 0.12);
+    --success-border: rgba(22, 163, 74, 0.25);
+
+    --warning: var(--svit-warning);
+    --warning-hover: #B45309;
+    --warning-light: rgba(217, 119, 6, 0.12);
+    --warning-border: rgba(217, 119, 6, 0.25);
+
+    --danger: var(--svit-danger);
+    --danger-hover: #B91C1C;
+    --danger-light: rgba(220, 38, 38, 0.12);
+    --danger-border: rgba(220, 38, 38, 0.25);
+
+    --info: var(--svit-info);
+    --info-light: rgba(79, 124, 255, 0.12);
+    --info-border: rgba(79, 124, 255, 0.25);
+
+    /* Shadows & Radii */
+    --card-shadow: 0 4px 20px rgba(23, 29, 58, 0.06);
+    --card-shadow-hover: 0 8px 28px rgba(23, 29, 58, 0.1);
+    --dropdown-shadow: 0 16px 36px -4px rgba(23, 29, 58, 0.12), 0 0 0 1px rgba(225, 229, 240, 0.8);
+    --modal-shadow: 0 25px 50px -12px rgba(23, 29, 58, 0.18);
+    --btn-shadow: 0 2px 8px rgba(139, 92, 246, 0.25);
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-full: 9999px;
+
+    /* Admin Portal Compatibility Tokens */
+    --admin-bg: var(--svit-bg);
+    --admin-surface: var(--svit-surface);
+    --admin-surface-raised: var(--svit-surface-soft);
+    --admin-sidebar: #FFFFFF;
+    --admin-border: var(--svit-border);
+    --admin-text: var(--svit-text);
+    --admin-muted: var(--svit-text-secondary);
+    --admin-input: #FFFFFF;
+    --admin-primary: var(--svit-primary);
+    --admin-primary-hover: var(--svit-primary-hover);
+    --admin-secondary: var(--svit-periwinkle);
+    --admin-shadow: 0 4px 20px rgba(23, 29, 58, 0.06);
+
+    /* Student Notification Compatibility Tokens */
+    --notif-primary: var(--svit-primary);
+    --notif-primary-hover: var(--svit-primary-hover);
+    --notif-primary-light: var(--accent-light);
+    --notif-accent: var(--svit-periwinkle);
+    --notif-bg: var(--svit-bg);
+    --notif-card-bg: var(--svit-surface);
+    --notif-card-border: var(--svit-border);
+    --notif-text-primary: var(--svit-text);
+    --notif-text-secondary: var(--svit-text-secondary);
+    --notif-text-muted: var(--svit-muted);
+    --notif-unread-border: var(--svit-primary);
+    --notif-unread-bg: var(--svit-surface-soft);
+    --notif-unread-dot: var(--svit-primary);
+    --notif-header-border: var(--svit-border);
+
+    /* Global Compatibility Tokens */
+    --primary-color: var(--svit-primary);
+    --primary-hover: var(--svit-primary-hover);
+    --bg-main: var(--svit-bg);
+    --bg-portal: var(--svit-bg);
+    --text-dark: var(--svit-text);
+    --pill-bg: var(--svit-surface-soft);
+}
+
+/* --------------------------------------------------------------------------
+   2. Global Document & Reset Defaults
+   -------------------------------------------------------------------------- */
+
+html, body {
+    background-color: var(--svit-bg);
+    color: var(--svit-text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Universal Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #F1F3F9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #CDD5E7;
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #9FAECB;
+}
+
+/* --------------------------------------------------------------------------
+   3. Universal Card & Surface Components
+   -------------------------------------------------------------------------- */
+
+.svit-card,
+.bg-dark-card,
+.security-card,
+.stat-card-glow,
+.admin-card {
+    background-color: var(--svit-surface) !important;
+    border: 1px solid var(--svit-border) !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--card-shadow) !important;
+    color: var(--svit-text) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.svit-card:hover,
+.admin-card:hover {
+    box-shadow: var(--card-shadow-hover) !important;
+}
+
+.svit-card-soft {
+    background-color: var(--svit-surface-soft);
+    border: 1px solid var(--svit-border);
+    border-radius: var(--radius-lg);
+}
+
+/* --------------------------------------------------------------------------
+   4. Universal Form Elements (Inputs, Selects, Textareas, Focus Rings)
+   -------------------------------------------------------------------------- */
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="tel"],
+input[type="date"],
+input[type="time"],
+select,
+textarea,
+.form-control,
+.form-select,
+.admin-input-field {
+    background-color: #FFFFFF !important;
+    border: 1px solid var(--svit-border) !important;
+    color: var(--svit-text) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 0.65rem 0.95rem;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+input::placeholder,
+textarea::placeholder,
+.form-control::placeholder {
+    color: var(--svit-muted) !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+.form-control:focus,
+.form-select:focus,
+.admin-input-field:focus {
+    outline: none !important;
+    border-color: var(--svit-primary) !important;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.16) !important;
+    background-color: #FFFFFF !important;
+}
+
+/* --------------------------------------------------------------------------
+   5. Universal Buttons (Primary Purple, Secondary Lavender, Danger, Success)
+   -------------------------------------------------------------------------- */
+
+.btn-svit-primary,
+.btn-primary-theme,
+.submit-btn {
+    background-color: var(--svit-primary) !important;
+    border: 1px solid var(--svit-primary) !important;
+    color: #FFFFFF !important;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    padding: 0.65rem 1.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    box-shadow: var(--btn-shadow);
+    transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+}
+
+.btn-svit-primary:hover,
+.btn-primary-theme:hover,
+.submit-btn:hover {
+    background-color: var(--svit-primary-hover) !important;
+    border-color: var(--svit-primary-hover) !important;
+    color: #FFFFFF !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35);
+}
+
+.btn-svit-secondary,
+.btn-secondary-theme {
+    background-color: var(--svit-surface-soft) !important;
+    border: 1px solid var(--svit-border) !important;
+    color: var(--svit-navy) !important;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    padding: 0.65rem 1.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    text-decoration: none;
+}
+
+.btn-svit-secondary:hover,
+.btn-secondary-theme:hover {
+    background-color: #DDE2F7 !important;
+    border-color: #CDD5E7 !important;
+    color: var(--svit-navy) !important;
+}
+
+.btn-svit-danger {
+    background-color: var(--svit-danger) !important;
+    border: 1px solid var(--svit-danger) !important;
+    color: #FFFFFF !important;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    padding: 0.65rem 1.25rem;
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.btn-svit-danger:hover {
+    background-color: #B91C1C !important;
+}
+
+/* --------------------------------------------------------------------------
+   6. Universal Tables
+   -------------------------------------------------------------------------- */
+
+.table-dark-custom,
+.table-custom,
+.table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--svit-text);
+    --bs-table-border-color: var(--svit-border);
+    width: 100%;
+    margin-bottom: 0;
+    border-collapse: collapse;
+}
+
+.table-dark-custom th,
+.table-custom th,
+.table thead th {
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--svit-text-secondary) !important;
+    border-bottom: 1px solid var(--svit-border) !important;
+    padding: 12px 16px;
+    background-color: #F8F9FE !important;
+}
+
+.table-dark-custom td,
+.table-custom td,
+.table tbody td {
+    font-size: 0.85rem;
+    color: var(--svit-text) !important;
+    border-bottom: 1px solid var(--svit-border) !important;
+    padding: 12px 16px;
+    vertical-align: middle;
+    background-color: #FFFFFF;
+}
+
+.table-dark-custom tbody tr:hover,
+.table-custom tbody tr:hover,
+.table tbody tr:hover {
+    background-color: #F6F8FD !important;
+}
+
+.table-dark-custom tbody tr:hover td,
+.table-custom tbody tr:hover td,
+.table tbody tr:hover td {
+    background-color: #F6F8FD !important;
+}
+
+/* --------------------------------------------------------------------------
+   7. Universal Badges & Pills
+   -------------------------------------------------------------------------- */
+
+.badge-purple {
+    background-color: rgba(139, 92, 246, 0.12);
+    color: var(--svit-primary);
+    border: 1px solid rgba(139, 92, 246, 0.25);
+    border-radius: var(--radius-full);
+    padding: 0.25rem 0.65rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.badge-lavender {
+    background-color: var(--svit-surface-soft);
+    color: var(--svit-navy);
+    border: 1px solid var(--svit-border);
+    border-radius: var(--radius-full);
+    padding: 0.25rem 0.65rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+.badge-periwinkle {
+    background-color: rgba(145, 167, 238, 0.16);
+    color: #3B5AC7;
+    border: 1px solid rgba(145, 167, 238, 0.35);
+    border-radius: var(--radius-full);
+    padding: 0.25rem 0.65rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+.badge-success {
+    background-color: rgba(22, 163, 74, 0.12);
+    color: var(--svit-success);
+    border: 1px solid rgba(22, 163, 74, 0.25);
+    border-radius: var(--radius-full);
+    padding: 0.25rem 0.65rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.badge-warning {
+    background-color: rgba(217, 119, 6, 0.12);
+    color: var(--svit-warning);
+    border: 1px solid rgba(217, 119, 6, 0.25);
+    border-radius: var(--radius-full);
+    padding: 0.25rem 0.65rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.badge-danger {
+    background-color: rgba(220, 38, 38, 0.12);
+    color: var(--svit-danger);
+    border: 1px solid rgba(220, 38, 38, 0.25);
+    border-radius: var(--radius-full);
+    padding: 0.25rem 0.65rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   8. Universal Modals & Dropdowns
+   -------------------------------------------------------------------------- */
+
+.modal-content,
+.custom-modal-box {
+    background-color: #FFFFFF !important;
+    border: 1px solid var(--svit-border) !important;
+    border-radius: var(--radius-xl) !important;
+    box-shadow: var(--modal-shadow) !important;
+    color: var(--svit-text) !important;
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--svit-border) !important;
+    background-color: #FAFBFD;
+    padding: 1rem 1.25rem;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--svit-border) !important;
+    background-color: #FAFBFD;
+    padding: 1rem 1.25rem;
+}
+
+.dropdown-menu {
+    background-color: #FFFFFF !important;
+    border: 1px solid var(--svit-border) !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--dropdown-shadow) !important;
+    padding: 0.5rem;
+}
+
+.dropdown-item {
+    color: var(--svit-text) !important;
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.15s ease;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: var(--svit-surface-soft) !important;
+    color: var(--svit-primary) !important;
+}
+
+/* --------------------------------------------------------------------------
+   9. Mobile Responsiveness Helpers (Touch Targets & Overflow Guard)
+   -------------------------------------------------------------------------- */
+
+button,
+a,
+input,
+select,
+.touch-target {
+    min-height: 44px;
+    touch-action: manipulation;
+}
+
+.no-overflow-guard {
+    overflow-x: hidden;
+    max-width: 100%;
+}

@@ -1,41 +1,27 @@
 /* SVIT Admin - Weekly Timetable Matrix Responsive Stylesheet */
 :root {
-    --tt-hero-bg: linear-gradient(135deg, rgba(30, 27, 75, 0.75) 0%, rgba(15, 23, 42, 0.85) 100%);
-    --tt-hero-border: rgba(99, 102, 241, 0.35);
-    --tt-card-bg: #111827;
-    --tt-card-border: #1f2937;
-    --tt-slot-bg: rgba(15, 23, 42, 0.7);
-    --tt-slot-hover: #1e1b4b;
-    --tt-accent: #6366f1;
-    --tt-accent-light: #818cf8;
-    --tt-text-primary: #f8fafc;
-    --tt-text-muted: #94a3b8;
-}
-
-html[data-admin-theme="light"] {
-    --tt-hero-bg: linear-gradient(135deg, #eef2ff 0%, #ffffff 100%);
-    --tt-hero-border: #c7d2fe;
-    --tt-card-bg: #ffffff;
-    --tt-card-border: #e2e8f0;
-    --tt-slot-bg: #f8fafc;
-    --tt-slot-hover: #eef2ff;
-    --tt-accent: #4f46e5;
-    --tt-accent-light: #6366f1;
-    --tt-text-primary: #0f172a;
-    --tt-text-muted: #475569;
+    --tt-hero-bg: linear-gradient(135deg, #E8EBFA 0%, #FFFFFF 65%, #E7DDFB 100%);
+    --tt-hero-border: var(--svit-border);
+    --tt-card-bg: #FFFFFF;
+    --tt-card-border: var(--svit-border);
+    --tt-slot-bg: #F8F9FE;
+    --tt-slot-hover: #E8EBFA;
+    --tt-accent: var(--svit-primary);
+    --tt-accent-light: var(--svit-periwinkle);
+    --tt-text-primary: var(--svit-text);
+    --tt-text-muted: var(--svit-text-secondary);
 }
 
 .timetable-hero-card {
     background: var(--tt-hero-bg);
     border: 1px solid var(--tt-hero-border);
-    backdrop-filter: blur(12px);
-    box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.15);
+    box-shadow: 0 4px 20px rgba(23, 29, 58, 0.06);
     border-radius: 1rem;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .timetable-hero-card:hover {
-    box-shadow: 0 14px 30px -5px rgba(99, 102, 241, 0.25);
+    box-shadow: 0 8px 28px rgba(139, 92, 246, 0.12);
 }
 
 .timetable-matrix-wrapper {
@@ -44,6 +30,7 @@ html[data-admin-theme="light"] {
     border-radius: 1rem;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    box-shadow: 0 4px 20px rgba(23, 29, 58, 0.06);
 }
 
 .timetable-grid-table {
@@ -53,245 +40,27 @@ html[data-admin-theme="light"] {
 }
 
 .timetable-grid-table th {
-    background-color: rgba(15, 23, 42, 0.85);
+    background-color: #F8F9FE;
     color: var(--tt-text-muted);
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 800;
     letter-spacing: 0.05em;
     text-transform: uppercase;
-    padding: 0.75rem 0.85rem;
+    padding: 0.85rem;
     border-bottom: 1px solid var(--tt-card-border);
-    border-right: 1px solid var(--tt-card-border);
 }
 
-.timetable-grid-table td {
-    padding: 0.65rem;
-    border-bottom: 1px solid var(--tt-card-border);
-    border-right: 1px solid var(--tt-card-border);
-    vertical-align: top;
-    height: 90px;
-}
-
-.time-col {
-    background-color: rgba(15, 23, 42, 0.95);
-    color: var(--tt-accent-light);
-    font-size: 0.72rem;
-    font-weight: 700;
-    white-space: nowrap;
-    width: 130px;
-}
-
-.lecture-card {
-    background: var(--tt-slot-bg);
+.timetable-slot-card {
+    background-color: var(--tt-slot-bg);
     border: 1px solid var(--tt-card-border);
-    border-left: 3px solid var(--tt-accent);
     border-radius: 0.65rem;
-    padding: 0.55rem 0.65rem;
+    padding: 0.65rem;
     transition: all 0.2s ease;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
-    min-height: 72px;
 }
 
-.lecture-card:hover {
-    background: var(--tt-slot-hover);
+.timetable-slot-card:hover {
+    background-color: var(--tt-slot-hover);
     border-color: var(--tt-accent);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
-}
-
-.lecture-subject {
-    font-size: 0.75rem;
-    font-weight: 800;
-    color: var(--tt-text-primary);
-    line-height: 1.2;
-    margin-bottom: 0.25rem;
-}
-
-.lecture-meta {
-    font-size: 0.68rem;
-    color: var(--tt-text-muted);
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-}
-
-.lecture-room {
-    font-size: 0.65rem;
-    font-weight: 700;
-    color: var(--tt-accent-light);
-    background: rgba(99, 102, 241, 0.12);
-    padding: 0.15rem 0.4rem;
-    border-radius: 0.35rem;
-}
-
-.admin-mobile-schedule {
-    display: none;
-}
-
-.admin-mobile-schedule-card {
-    background: var(--tt-card-bg);
-    border: 1px solid var(--tt-card-border);
-    border-left: 4px solid var(--tt-accent);
-    border-radius: 0.875rem;
-    padding: 0.85rem 1rem;
-    margin-bottom: 0.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.schedule-time {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    font-size: 0.72rem;
-    font-weight: 800;
-    color: var(--tt-accent-light);
-    background: rgba(99, 102, 241, 0.1);
-    padding: 0.3rem 0.6rem;
-    border-radius: 0.5rem;
-    flex-shrink: 0;
-}
-
-.schedule-body {
-    flex: 1;
-    min-width: 0;
-}
-
-.schedule-body h3 {
-    font-size: 0.82rem;
-    font-weight: 800;
-    color: var(--tt-text-primary);
-    margin: 0 0 0.2rem 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.schedule-body p {
-    font-size: 0.68rem;
-    color: var(--tt-text-muted);
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-}
-
-.schedule-edit {
-    min-width: 44px;
-    min-height: 44px;
-    padding: 0.5rem;
-    border-radius: 0.65rem;
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid var(--tt-card-border);
-    color: var(--tt-text-muted);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    touch-action: manipulation;
-}
-
-.schedule-edit:hover {
-    color: var(--tt-text-primary);
-    background: var(--tt-accent);
-    border-color: var(--tt-accent);
-}
-
-@media (max-width: 1023.98px) {
-    .timetable-hero-card {
-        padding: 1.25rem !important;
-    }
-}
-
-@media (max-width: 767.98px) {
-    .timetable-hero-card {
-        padding: 1rem !important;
-        flex-direction: column;
-        align-items: stretch !important;
-        gap: 0.75rem;
-    }
-
-    .timetable-hero-card button#openAddSlotModalBtn {
-        width: 100%;
-        justify-content: center;
-        min-height: 44px;
-    }
-
-    .timetable-matrix-wrapper {
-        display: none !important;
-    }
-
-    .admin-mobile-schedule {
-        display: block !important;
-    }
-}
-
-@media (max-width: 480px) {
-    .timetable-hero-card h2 {
-        font-size: 1rem !important;
-    }
-
-    .admin-mobile-schedule-card {
-        padding: 0.75rem 0.85rem;
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .schedule-time {
-        align-self: flex-start;
-    }
-
-    .schedule-edit {
-        align-self: flex-end;
-    }
-}
-
-@media (max-width: 390px) {
-    .schedule-body h3 {
-        font-size: 0.78rem;
-    }
-}
-
-@media (max-width: 360px) {
-    .timetable-hero-card {
-        padding: 0.75rem !important;
-    }
-}
-
-html[data-admin-theme="light"] .timetable-grid-table th {
-    background-color: #f1f5f9;
-    color: #475569;
-    border-color: #e2e8f0;
-}
-
-html[data-admin-theme="light"] .time-col {
-    background-color: #f8fafc;
-    color: #4f46e5;
-}
-
-html[data-admin-theme="light"] .lecture-card {
-    background: #f8fafc;
-    border-color: #e2e8f0;
-}
-
-html[data-admin-theme="light"] .lecture-card:hover {
-    background: #eef2ff;
-}
-
-html[data-admin-theme="light"] .schedule-time {
-    background: #eef2ff;
-    color: #4f46e5;
-}
-
-html[data-admin-theme="light"] .schedule-edit {
-    background: #f8fafc;
-    border-color: #e2e8f0;
-    color: #475569;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
 }

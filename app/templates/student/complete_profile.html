@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Complete Profile - SVIT AI Assistant</title>
+    <!-- Theme System Stylesheet & Single Theme Enforcer -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/loader.js') }}"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/student/chat.css') }}">
@@ -13,17 +17,19 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #f8fafc;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             padding: 24px;
         }
         .onboarding-card {
-            background: #ffffff;
+            background: var(--bg-card);
             width: 100%;
             max-width: 680px;
             border-radius: 16px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
             padding: 36px 40px;
+            color: var(--text-primary);
         }
         .onboarding-header {
             text-align: center;
@@ -32,8 +38,8 @@
         .onboarding-icon {
             width: 60px;
             height: 60px;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
+            background: var(--bg-surface-raised);
+            border: 1px solid var(--border-color);
             border-radius: 14px;
             display: flex;
             align-items: center;
@@ -52,12 +58,12 @@
         .onboarding-header h2 {
             margin: 0 0 8px 0;
             font-size: 1.6rem;
-            color: #0f172a;
+            color: var(--text-primary);
             font-weight: 700;
         }
         .onboarding-header p {
             margin: 0;
-            color: #64748b;
+            color: var(--text-secondary);
             font-size: 0.95rem;
         }
         .form-grid {
@@ -76,27 +82,27 @@
         .form-group label {
             font-size: 0.88rem;
             font-weight: 600;
-            color: #334155;
+            color: var(--text-primary);
         }
         .form-group input, .form-group select {
             padding: 11px 14px;
-            border: 1px solid #cbd5e1;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             font-size: 0.95rem;
-            background: #ffffff;
-            color: #1e293b;
+            background: var(--bg-input);
+            color: var(--text-primary);
             outline: none;
             transition: all 0.2s ease;
         }
         .form-group input:focus, .form-group select:focus {
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-light);
         }
         .btn-submit-onboarding {
             width: 100%;
             margin-top: 24px;
             padding: 12px;
-            background: #4f46e5;
+            background: var(--accent-primary);
             color: #ffffff;
             border: none;
             border-radius: 8px;
@@ -108,9 +114,10 @@
             justify-content: center;
             gap: 8px;
             transition: background 0.2s ease;
+            box-shadow: 0 2px 8px var(--accent-glow);
         }
         .btn-submit-onboarding:hover {
-            background: #4338ca;
+            background: var(--accent-hover);
         }
         .error-banner {
             padding: 12px 16px;
@@ -140,6 +147,8 @@
     </style>
 </head>
 <body>
+    <!-- GLOBAL ANIMATED LOADER -->
+    {% include "partials/loader.html" %}
 
     <div class="onboarding-wrapper">
         <div class="onboarding-card">

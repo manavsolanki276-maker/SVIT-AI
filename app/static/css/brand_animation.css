@@ -1,0 +1,236 @@
+/* ==========================================================================
+   SVIT AI — Premium Animated Brand Text
+   Sequential character reveal: S -> V -> I -> T -> [pause] -> A -> I
+   Continuous Smooth Looping for Data Loading States
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Brand Text Container
+   -------------------------------------------------------------------------- */
+.svit-brand-animated,
+[data-svit-brand] {
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: flex-start;
+    vertical-align: baseline;
+    position: relative;
+    white-space: nowrap;
+    line-height: 1;
+    font-weight: inherit;
+    color: inherit;
+    letter-spacing: inherit;
+    text-decoration: none;
+}
+
+/* Word wrappers to preserve layout & word boundaries */
+.svit-brand-word {
+    display: inline-flex;
+    align-items: baseline;
+    white-space: nowrap;
+    position: relative;
+}
+
+.svit-brand-space {
+    display: inline-block;
+    width: 0.28em;
+    min-width: 4px;
+}
+
+/* --------------------------------------------------------------------------
+   2. Single Play (Header / Static Placement) Animation
+   -------------------------------------------------------------------------- */
+.svit-char {
+    display: inline-block;
+    position: relative;
+    opacity: 0;
+    transform: translateY(0.22em) scale(0.96);
+    filter: blur(6px);
+    will-change: transform, opacity, filter;
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
+    animation: svitCharRevealOnce 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.svit-char[style*="--char-idx: 0"],
+.svit-char:nth-child(1) { animation-delay: 0ms; }
+.svit-char[style*="--char-idx: 1"],
+.svit-char:nth-child(2) { animation-delay: 95ms; }
+.svit-char[style*="--char-idx: 2"],
+.svit-char:nth-child(3) { animation-delay: 190ms; }
+.svit-char[style*="--char-idx: 3"],
+.svit-char:nth-child(4) { animation-delay: 285ms; }
+.svit-word-ai .svit-char[style*="--char-idx: 4"],
+.svit-word-ai .svit-char:nth-child(1) { animation-delay: 600ms; }
+.svit-word-ai .svit-char[style*="--char-idx: 5"],
+.svit-word-ai .svit-char:nth-child(2) { animation-delay: 695ms; }
+
+@keyframes svitCharRevealOnce {
+    0% {
+        opacity: 0;
+        transform: translateY(0.22em) scale(0.96);
+        filter: blur(6px);
+    }
+    60% {
+        opacity: 0.92;
+        filter: blur(1px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+/* --------------------------------------------------------------------------
+   3. Continuous Looping Animation for Loading Screens / Active Data Fetching
+   -------------------------------------------------------------------------- */
+#svit-global-loader .svit-brand-animated,
+.svit-inline-loader .svit-brand-animated,
+.svit-brand-animated.is-looping {
+    animation: svitBrandLoopGlow 2.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+@keyframes svitBrandLoopGlow {
+    0%, 34% {
+        filter: drop-shadow(0 0 0 transparent);
+    }
+    48% {
+        filter: drop-shadow(0 4px 18px rgba(139, 92, 246, 0.42))
+                drop-shadow(0 0 8px rgba(145, 167, 238, 0.32));
+    }
+    74% {
+        filter: drop-shadow(0 2px 8px rgba(139, 92, 246, 0.18));
+    }
+    86%, 100% {
+        filter: drop-shadow(0 0 0 transparent);
+    }
+}
+
+/* S - Index 0 */
+#svit-global-loader .svit-char[style*="--char-idx: 0"],
+#svit-global-loader .svit-word-svit .svit-char:nth-child(1),
+.svit-inline-loader .svit-char[style*="--char-idx: 0"],
+.svit-inline-loader .svit-word-svit .svit-char:nth-child(1),
+.svit-brand-animated.is-looping .svit-char[style*="--char-idx: 0"] {
+    animation: svitCharLoop0 2.6s cubic-bezier(0.16, 1, 0.3, 1) infinite !important;
+}
+
+@keyframes svitCharLoop0 {
+    0% { opacity: 0; transform: translateY(0.22em) scale(0.96); filter: blur(6px); }
+    8% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    74% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    86% { opacity: 0; transform: translateY(-0.12em) scale(0.98); filter: blur(4px); }
+    100% { opacity: 0; transform: translateY(0.22em) scale(0.96); filter: blur(6px); }
+}
+
+/* V - Index 1 */
+#svit-global-loader .svit-char[style*="--char-idx: 1"],
+#svit-global-loader .svit-word-svit .svit-char:nth-child(2),
+.svit-inline-loader .svit-char[style*="--char-idx: 1"],
+.svit-inline-loader .svit-word-svit .svit-char:nth-child(2),
+.svit-brand-animated.is-looping .svit-char[style*="--char-idx: 1"] {
+    animation: svitCharLoop1 2.6s cubic-bezier(0.16, 1, 0.3, 1) infinite !important;
+}
+
+@keyframes svitCharLoop1 {
+    0%, 3.5% { opacity: 0; transform: translateY(0.22em) scale(0.96); filter: blur(6px); }
+    11.5% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    74% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    86% { opacity: 0; transform: translateY(-0.12em) scale(0.98); filter: blur(4px); }
+    100% { opacity: 0; transform: translateY(0.22em) scale(0.96); filter: blur(6px); }
+}
+
+/* I - Index 2 */
+#svit-global-loader .svit-char[style*="--char-idx: 2"],
+#svit-global-loader .svit-word-svit .svit-char:nth-child(3),
+.svit-inline-loader .svit-char[style*="--char-idx: 2"],
+.svit-inline-loader .svit-word-svit .svit-char:nth-child(3),
+.svit-brand-animated.is-looping .svit-char[style*="--char-idx: 2"] {
+    animation: svitCharLoop2 2.6s cubic-bezier(0.16, 1, 0.3, 1) infinite !important;
+}
+
+@keyframes svitCharLoop2 {
+    0%, 7% { opacity: 0; transform: translateY(0.22em) scale(0.96); filter: blur(6px); }
+    15% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    74% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    86% { opacity: 0; transform: translateY(-0.12em) scale(0.98); filter: blur(4px); }
+    100% { opacity: 0; transform: translateY(0.22em) scale(0.96); filter: blur(6px); }
+}
+
+/* T - Index 3 */
+#svit-global-loader .svit-char[style*="--char-idx: 3"],
+#svit-global-loader .svit-word-svit .svit-char:nth-child(4),
+.svit-inline-loader .svit-char[style*="--char-idx: 3"],
+.svit-inline-loader .svit-word-svit .svit-char:nth-child(4),
+.svit-brand-animated.is-looping .svit-char[style*="--char-idx: 3"] {
+    animation: svitCharLoop3 2.6s cubic-bezier(0.16, 1, 0.3, 1) infinite !important;
+}
+
+@keyframes svitCharLoop3 {
+    0%, 10.5% { opacity: 0; transform: translateY(0.22em) scale(0.96); filter: blur(6px); }
+    18.5% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    74% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    86% { opacity: 0; transform: translateY(-0.12em) scale(0.98); filter: blur(4px); }
+    100% { opacity: 0; transform: translateY(0.22em) scale(0.96); filter: blur(6px); }
+}
+
+/* A - Index 4 (After ~300ms pause) */
+#svit-global-loader .svit-word-ai .svit-char[style*="--char-idx: 4"],
+#svit-global-loader .svit-word-ai .svit-char:nth-child(1),
+.svit-inline-loader .svit-word-ai .svit-char[style*="--char-idx: 4"],
+.svit-inline-loader .svit-word-ai .svit-char:nth-child(1),
+.svit-brand-animated.is-looping .svit-word-ai .svit-char[style*="--char-idx: 4"] {
+    animation: svitCharLoop4 2.6s cubic-bezier(0.16, 1, 0.3, 1) infinite !important;
+}
+
+@keyframes svitCharLoop4 {
+    0%, 22% { opacity: 0; transform: translateY(0.22em) scale(0.96); filter: blur(6px); }
+    30% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    74% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    86% { opacity: 0; transform: translateY(-0.12em) scale(0.98); filter: blur(4px); }
+    100% { opacity: 0; transform: translateY(0.22em) scale(0.96); filter: blur(6px); }
+}
+
+/* I - Index 5 */
+#svit-global-loader .svit-word-ai .svit-char[style*="--char-idx: 5"],
+#svit-global-loader .svit-word-ai .svit-char:nth-child(2),
+.svit-inline-loader .svit-word-ai .svit-char[style*="--char-idx: 5"],
+.svit-inline-loader .svit-word-ai .svit-char:nth-child(2),
+.svit-brand-animated.is-looping .svit-word-ai .svit-char[style*="--char-idx: 5"] {
+    animation: svitCharLoop5 2.6s cubic-bezier(0.16, 1, 0.3, 1) infinite !important;
+}
+
+@keyframes svitCharLoop5 {
+    0%, 25.5% { opacity: 0; transform: translateY(0.22em) scale(0.96); filter: blur(6px); }
+    33.5% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    74% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    86% { opacity: 0; transform: translateY(-0.12em) scale(0.98); filter: blur(4px); }
+    100% { opacity: 0; transform: translateY(0.22em) scale(0.96); filter: blur(6px); }
+}
+
+/* --------------------------------------------------------------------------
+   4. Color Variants Matching SVIT Visual Theme
+   -------------------------------------------------------------------------- */
+.svit-word-svit {
+    color: var(--svit-navy, #171D3A);
+}
+
+.svit-word-ai,
+.svit-char-accent {
+    color: var(--svit-primary, #8B5CF6);
+}
+
+/* --------------------------------------------------------------------------
+   5. Accessibility: Reduced Motion
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    .svit-brand-animated,
+    [data-svit-brand],
+    .svit-char {
+        opacity: 1 !important;
+        transform: none !important;
+        filter: none !important;
+        animation: none !important;
+        transition: none !important;
+    }
+}

@@ -55,7 +55,7 @@ class TestFinalProductionVerification(unittest.TestCase):
         cls.server_thread.join()
 
     def test_01_theme_system_and_persistence(self):
-        """Tests Dark, Light, System themes, LocalStorage persistence, and radio cards."""
+        """Tests Dark & Light unified theme system, LocalStorage persistence, and cross-portal synchronization."""
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
             context = browser.new_context(viewport={"width": 1280, "height": 800})
@@ -80,7 +80,7 @@ class TestFinalProductionVerification(unittest.TestCase):
             page.wait_for_timeout(200)
 
             theme_after_light = page.evaluate("() => document.documentElement.getAttribute('data-admin-theme')")
-            pref_after_light = page.evaluate("() => localStorage.getItem('svit_admin_theme')")
+            pref_after_light = page.evaluate("() => localStorage.getItem('svit_theme') || localStorage.getItem('svit_admin_theme')")
             self.assertEqual(theme_after_light, "light")
             self.assertEqual(pref_after_light, "light")
 
@@ -99,11 +99,10 @@ class TestFinalProductionVerification(unittest.TestCase):
             theme_after_dark_reload = page.evaluate("() => document.documentElement.getAttribute('data-admin-theme')")
             self.assertEqual(theme_after_dark_reload, "dark", "Dark theme must persist across page reload")
 
-            # 5. Switch to Auto / System Theme
-            page.click('.admin-theme-radio-card[data-admin-theme-choice="system"]')
-            page.wait_for_timeout(200)
-            pref_after_system = page.evaluate("() => localStorage.getItem('svit_admin_theme')")
-            self.assertEqual(pref_after_system, "system")
+            # 5. Verify Student Portal reflects the same dark theme
+            page.goto(f"{BASE_URL}/student/chat", wait_until="networkidle")
+            student_theme = page.evaluate("() => document.documentElement.getAttribute('data-theme')")
+            self.assertEqual(student_theme, "dark", "Student portal must share the exact same theme preference")
 
             browser.close()
 

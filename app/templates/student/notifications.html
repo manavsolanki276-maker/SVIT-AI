@@ -4,12 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Notifications - SVIT AI Assistant</title>
+    <!-- Theme System Stylesheet & Single Theme Enforcer -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/loader.js') }}"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Linked Stylesheet -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/student/notifications.css') }}">
 </head>
 <body>
+    <!-- GLOBAL ANIMATED LOADER -->
+    {% include "partials/loader.html" %}
 
     <!-- Top Navigation Header Bar -->
     <header class="top-navbar">

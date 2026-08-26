@@ -1,3 +1,5 @@
+@import url('../theme.css');
+
 /* ==========================================================================
    SVIT AI Assistant - Split-Screen Login Page Stylesheet
    ========================================================================== */
@@ -777,3 +779,141 @@ body {
         gap: 8px;
     }
 }
+
+/* ==========================================================================
+   UNIFIED SINGLE THEME RULES FOR AUTH PAGES
+   ========================================================================== */
+body {
+    background-color: var(--svit-bg) !important;
+    color: var(--svit-text) !important;
+}
+
+.login-wrapper {
+    background-color: var(--svit-bg) !important;
+}
+
+.form-section {
+    background-color: var(--svit-bg) !important;
+}
+
+.form-card {
+    background-color: #FFFFFF !important;
+    border: 1px solid var(--svit-border) !important;
+    color: var(--svit-text) !important;
+    box-shadow: var(--card-shadow) !important;
+    border-radius: var(--radius-xl) !important;
+}
+
+.form-logo-box {
+    background-color: var(--svit-surface-soft) !important;
+    border-color: var(--svit-border) !important;
+}
+
+.form-header h2 {
+    color: var(--svit-text) !important;
+    font-weight: 800 !important;
+}
+
+.form-header p {
+    color: var(--svit-text-secondary) !important;
+}
+
+.role-tabs {
+    background: var(--svit-surface-soft) !important;
+    border: 1px solid var(--svit-border) !important;
+    border-radius: 12px !important;
+}
+
+.tab-btn {
+    color: var(--svit-text-secondary) !important;
+    font-weight: 600 !important;
+}
+
+.tab-btn.active {
+    background: #FFFFFF !important;
+    color: var(--svit-primary) !important;
+    box-shadow: 0 2px 8px rgba(23, 29, 58, 0.08) !important;
+    font-weight: 700 !important;
+}
+
+.input-group label {
+    color: var(--svit-text) !important;
+    font-weight: 600 !important;
+}
+
+.input-field input {
+    background-color: #FFFFFF !important;
+    border: 1px solid var(--svit-border) !important;
+    color: var(--svit-text) !important;
+}
+
+.input-field input:focus {
+    background-color: #FFFFFF !important;
+    border-color: var(--svit-primary) !important;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15) !important;
+}
+
+.submit-btn {
+    background-color: var(--svit-primary) !important;
+    color: #FFFFFF !important;
+    box-shadow: var(--btn-shadow) !important;
+}
+
+.submit-btn:hover {
+    background-color: var(--svit-primary-hover) !important;
+    box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35) !important;
+}
+
+.divider::before {
+    background-color: var(--svit-border) !important;
+}
+
+.divider span {
+    background-color: #FFFFFF !important;
+    color: var(--svit-muted) !important;
+}
+
+.sso-btn {
+    background-color: #FFFFFF !important;
+    border: 1px solid var(--svit-border) !important;
+    color: var(--svit-text) !important;
+}
+
+.sso-btn:hover {
+    background-color: var(--svit-surface-soft) !important;
+    border-color: rgba(139, 92, 246, 0.3) !important;
+}
+
+.register-prompt {
+    color: var(--svit-text-secondary) !important;
+}
+
+.register-prompt a {
+    color: var(--svit-primary) !important;
+    font-weight: 600 !important;
+}
+
+.status-container {
+    background: #FFFFFF !important;
+    border: 1px solid var(--svit-border) !important;
+    border-radius: var(--radius-xl) !important;
+    box-shadow: var(--card-shadow) !important;
+}
+
+.details-card {
+    background: var(--svit-surface-soft) !important;
+    border: 1px solid var(--svit-border) !important;
+    border-radius: var(--radius-lg) !important;
+}
+
+.details-row {
+    border-bottom: 1px solid var(--svit-border-subtle) !important;
+}
+
+.details-label {
+    color: var(--svit-text-secondary) !important;
+}
+
+.details-val {
+    color: var(--svit-text) !important;
+}

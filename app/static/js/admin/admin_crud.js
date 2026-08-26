@@ -247,14 +247,11 @@
         const tbody = document.getElementById('tableBody');
         if (!tbody) return;
 
-        // Render loading state
+        // Render SVIT inline loading state
         tbody.innerHTML = `
             <tr>
-                <td colspan="12" class="text-center py-12 text-gray-400 text-xs">
-                    <div class="inline-flex items-center gap-3">
-                        <div class="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-                        <span>Loading records...</span>
-                    </div>
+                <td colspan="12" class="text-center py-10 text-[#66708F]">
+                    ${window.SVITLoader ? window.SVITLoader.renderInline() : '<span class="text-xs text-[#8B5CF6] font-semibold">Loading data...</span>'}
                 </td>
             </tr>
         `;

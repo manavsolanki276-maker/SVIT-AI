@@ -1,83 +1,410 @@
-{% extends "base.html" %}
-{% block title %}Settings - SVIT AI Assistant{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preferences & Settings - SVIT AI Assistant</title>
+    
+    <!-- Theme System Stylesheet & Single Theme Enforcer -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/loader.js') }}"></script>
 
-{% block content %}
-<div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="glass-panel p-4">
-                <h4 class="fw-bold mb-4"><i class="bi bi-gear-fill me-2"></i>Preferences & Settings</h4>
-                
-                <div class="setting-row">
-                    <div>
-                        <h6 class="mb-0 font-bold">Appearance Theme</h6>
-                        <small class="text-muted">Choose your preferred visual mode.</small>
-                    </div>
-                    <select class="form-select w-auto" id="settingTheme" onchange="updateSetting('theme', this.value)">
-                        <option value="light" {% if settings.theme == 'light' %}selected{% endif %}>Light Mode</option>
-                        <option value="dark" {% if settings.theme == 'dark' %}selected{% endif %}>Dark Mode</option>
-                        <option value="system" {% if settings.theme == 'system' %}selected{% endif %}>System Default</option>
-                    </select>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Global Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/student/phase2.css') }}">
+
+    <style>
+        body {
+            background-color: var(--svit-bg);
+            color: var(--svit-text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .settings-nav {
+            height: 64px;
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 1px solid var(--svit-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 1px 3px rgba(23, 29, 58, 0.04);
+        }
+
+        .settings-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--svit-text);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .brand-logo-box {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--svit-border);
+            padding: 3px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(23, 29, 58, 0.04);
+        }
+
+        .brand-logo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .btn-back-chat {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 10px;
+            background: var(--svit-primary);
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            box-shadow: var(--btn-shadow);
+        }
+
+        .btn-back-chat:hover {
+            background: var(--svit-primary-hover);
+            transform: translateY(-1px);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35);
+        }
+
+        .settings-container {
+            max-width: 760px;
+            width: 100%;
+            margin: 32px auto;
+            padding: 0 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .settings-card {
+            background: var(--svit-surface);
+            border: 1px solid var(--svit-border);
+            border-radius: var(--radius-xl);
+            padding: 28px 32px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .settings-card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--svit-border);
+        }
+
+        .settings-card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--svit-surface-soft);
+            color: var(--svit-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            flex-shrink: 0;
+        }
+
+        .settings-card-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--svit-text);
+            margin: 0;
+        }
+
+        .settings-card-header p {
+            font-size: 0.85rem;
+            color: var(--svit-text-secondary);
+            margin: 2px 0 0 0;
+        }
+
+        .setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 0;
+            border-bottom: 1px solid var(--svit-border-subtle);
+            gap: 16px;
+        }
+
+        .setting-row:last-child {
+            border-bottom: none;
+            padding-bottom: 4px;
+        }
+
+        .setting-info h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--svit-text);
+            margin: 0 0 3px 0;
+        }
+
+        .setting-info p {
+            font-size: 0.82rem;
+            color: var(--svit-text-secondary);
+            margin: 0;
+        }
+
+        .custom-select {
+            background-color: #FFFFFF;
+            border: 1px solid var(--svit-border);
+            color: var(--svit-text);
+            border-radius: var(--radius-md);
+            padding: 8px 14px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            min-width: 170px;
+        }
+
+        .custom-select:focus {
+            border-color: var(--svit-primary);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: #E2E8F0;
+            border: 1px solid var(--svit-border);
+            transition: .25s ease;
+            border-radius: 26px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #FFFFFF;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+            transition: .25s ease;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--svit-primary);
+            border-color: var(--svit-primary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+            background-color: #ffffff;
+        }
+
+        /* Toast notification */
+        .toast-banner {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #FFFFFF;
+            border: 1px solid var(--svit-border);
+            color: var(--svit-text);
+            padding: 12px 20px;
+            border-radius: 12px;
+            box-shadow: var(--dropdown-shadow);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1000;
+        }
+
+        .toast-banner.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        @media (max-width: 640px) {
+            .settings-container {
+                margin: 16px auto;
+                padding: 0 14px;
+            }
+            .settings-card {
+                padding: 20px 16px;
+            }
+            .setting-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .custom-select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- GLOBAL ANIMATED LOADER -->
+    {% include "partials/loader.html" %}
+
+    <!-- Top Navigation -->
+    <header class="settings-nav">
+        <a href="/student/chat" class="settings-brand">
+            <div class="brand-logo-box">
+                <img src="{{ url_for('static', filename='logo/svit logo u.png') }}" alt="SVIT Logo">
+            </div>
+            <span>SVIT AI Settings</span>
+        </a>
+        <a href="/student/chat" class="btn-back-chat">
+            <i data-lucide="message-square" style="width: 16px; height: 16px;"></i>
+            <span>Return to Chat</span>
+        </a>
+    </header>
+
+    <!-- Main Settings Container -->
+    <main class="settings-container">
+
+        <!-- Card: Assistant Preferences -->
+        <div class="settings-card">
+            <div class="settings-card-header">
+                <div class="settings-card-icon">
+                    <i data-lucide="sliders" style="width:22px; height:22px;"></i>
                 </div>
-
-                <div class="setting-row">
-                    <div>
-                        <h6 class="mb-0 font-bold">Language / ભાષા</h6>
-                        <small class="text-muted">Primary language for assistant responses.</small>
-                    </div>
-                    <select class="form-select w-auto" id="settingLang" onchange="updateSetting('language', this.value)">
-                        <option value="en" {% if settings.language == 'en' %}selected{% endif %}>English</option>
-                        <option value="gu" {% if settings.language == 'gu' %}selected{% endif %}>Gujarati (ગુજરાતી)</option>
-                        <option value="hi" {% if settings.language == 'hi' %}selected{% endif %}>Hindi (हिंदी)</option>
-                    </select>
-                </div>
-
-                <div class="setting-row">
-                    <div>
-                        <h6 class="mb-0 font-bold">Text Font Size</h6>
-                        <small class="text-muted">Adjust chat conversation text scaling.</small>
-                    </div>
-                    <select class="form-select w-auto" id="settingFont" onchange="updateSetting('font_size', this.value)">
-                        <option value="small" {% if settings.font_size == 'small' %}selected{% endif %}>Small</option>
-                        <option value="medium" {% if settings.font_size == 'medium' %}selected{% endif %}>Medium</option>
-                        <option value="large" {% if settings.font_size == 'large' %}selected{% endif %}>Large</option>
-                    </select>
-                </div>
-
-                <div class="setting-row">
-                    <div>
-                        <h6 class="mb-0 font-bold">Auto-Read Voice Output</h6>
-                        <small class="text-muted">Automatically speak AI responses using Text-to-Speech.</small>
-                    </div>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="settingVoice" 
-                               {% if settings.auto_read_response %}checked{% endif %} 
-                               onchange="updateSetting('auto_read_response', this.checked)">
-                    </div>
+                <div>
+                    <h2>AI Assistant Preferences</h2>
+                    <p>Configure response language, font scaling, and voice features.</p>
                 </div>
             </div>
+
+            <!-- Language -->
+            <div class="setting-row">
+                <div class="setting-info">
+                    <h3>Language / ભાષા</h3>
+                    <p>Primary language for assistant explanations.</p>
+                </div>
+                <select class="custom-select" id="settingLang" onchange="updateSetting('language', this.value)">
+                    <option value="en" {% if settings.language == 'en' %}selected{% endif %}>English</option>
+                    <option value="gu" {% if settings.language == 'gu' %}selected{% endif %}>Gujarati (ગુજરાતી)</option>
+                    <option value="hi" {% if settings.language == 'hi' %}selected{% endif %}>Hindi (हिंदी)</option>
+                </select>
+            </div>
+
+            <!-- Font Size -->
+            <div class="setting-row">
+                <div class="setting-info">
+                    <h3>Text Font Size</h3>
+                    <p>Adjust conversation text size for comfortable reading.</p>
+                </div>
+                <select class="custom-select" id="settingFont" onchange="updateSetting('font_size', this.value)">
+                    <option value="small" {% if settings.font_size == 'small' %}selected{% endif %}>Small</option>
+                    <option value="medium" {% if settings.font_size == 'medium' %}selected{% endif %}>Medium (Default)</option>
+                    <option value="large" {% if settings.font_size == 'large' %}selected{% endif %}>Large</option>
+                </select>
+            </div>
+
+            <!-- Voice Output -->
+            <div class="setting-row">
+                <div class="setting-info">
+                    <h3>Auto-Read Voice Output</h3>
+                    <p>Automatically narrate responses using text-to-speech audio.</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="settingVoice" 
+                           {% if settings.auto_read_response %}checked{% endif %} 
+                           onchange="updateSetting('auto_read_response', this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </div>
         </div>
+
+    </main>
+
+    <!-- Toast Notification Banner -->
+    <div id="toastBanner" class="toast-banner">
+        <i data-lucide="check-circle-2" style="width: 18px; height: 18px; color: var(--svit-success);"></i>
+        <span id="toastMessage">Preference saved</span>
     </div>
-</div>
 
-<script>
-async function updateSetting(key, value) {
-    if (key === 'theme') applyTheme(value);
+    <script>
+        lucide.createIcons();
 
-    const payload = {};
-    payload[key] = value;
+        function showToast(msg) {
+            const toast = document.getElementById('toastBanner');
+            const toastMsg = document.getElementById('toastMessage');
+            if (toast && toastMsg) {
+                toastMsg.textContent = msg;
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 2500);
+            }
+        }
 
-    try {
-        const res = await fetch('/student/settings/save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        if (data.status === 'success') showToast('Preference updated.', 'success');
-    } catch(e) {
-        showToast('Failed to save setting.', 'danger');
-    }
-}
-</script>
-{% endblock %}
+        async function updateSetting(key, value) {
+            const payload = {};
+            payload[key] = value;
+
+            try {
+                const res = await fetch('/student/settings/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    showToast('Settings updated successfully');
+                }
+            } catch(e) {
+                showToast('Failed to save settings');
+            }
+        }
+    </script>
+</body>
+</html>

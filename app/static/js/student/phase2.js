@@ -4,26 +4,26 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    initTheme();
+    if (window.svitTheme) {
+        window.svitTheme.initTheme();
+    }
     loadNotifications();
     loadChatHistory();
 });
 
 /* -------------------------------------------------------------------------
-   1. Theme & Appearance Manager
+   1. Theme & Appearance Manager (Centralized Wrapper)
    ------------------------------------------------------------------------- */
 function initTheme() {
-    const savedTheme = localStorage.getItem('svit_theme') || 'system';
-    applyTheme(savedTheme);
+    if (window.svitTheme) {
+        window.svitTheme.initTheme();
+    }
 }
 
 function applyTheme(theme) {
-    let activeTheme = theme;
-    if (theme === 'system') {
-        activeTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    if (window.svitTheme) {
+        window.svitTheme.setTheme('light');
     }
-    document.documentElement.setAttribute('data-theme', activeTheme);
-    localStorage.setItem('svit_theme', theme);
 }
 
 /* -------------------------------------------------------------------------
