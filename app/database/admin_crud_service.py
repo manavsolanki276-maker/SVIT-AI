@@ -1057,6 +1057,8 @@ class AdminCRUDService:
         if coll is not None:
             try:
                 coll.insert_one(clean_data)
+                # Dispatch student notification if applicable for this admin action
+                AdminCRUDService._dispatch_admin_action_notification(module_key, item_id, clean_data, is_update=False)
                 # Read back clean doc
                 created = AdminCRUDService.get_item(module_key, item_id)
                 return True, "Record created successfully.", created
@@ -1066,6 +1068,7 @@ class AdminCRUDService:
             if module_key not in _LOCAL_DATA_STORE:
                 _LOCAL_DATA_STORE[module_key] = {}
             _LOCAL_DATA_STORE[module_key][item_id] = clean_data
+            AdminCRUDService._dispatch_admin_action_notification(module_key, item_id, clean_data, is_update=False)
             return True, "Record created successfully.", clean_data
 
     @staticmethod
@@ -1081,6 +1084,129 @@ class AdminCRUDService:
         if os.path.exists(file_url):
             return file_url
         return None
+
+    @staticmethod
+    def _dispatch_admin_action_notification(module_key: str, item_id: str, clean_data: Dict[str, Any], is_update: bool = False):
+        """
+        Creates real MongoDB student notifications when applicable Admin actions take place.
+        Avoids spamming for unrelated CRUD ops, and targets applicable student audiences.
+        """
+        try:
+            from app.database.mongo_models import MongoNotificationService
+            
+            # 1. Notices & Emergency Announcements
+            if module_key in ("notices", "admission_notices"):
+                status = str(clean_data.get("status", "Published")).strip()
+                if status.lower() in ("published", "active", ""):
+                    title = clean_data.get("title") or "New Campus Notice"
+                    prefix = "Update: " if is_update else ""
+                    MongoNotificationService.notify_audience(
+                        title=f"{prefix}{title}",
+                        message=clean_data.get("description", title),
+                        category="notice",
+                        target_audience=clean_data.get("target_audience", "All Students"),
+                        department=clean_data.get("department"),
+                        data={
+                            "notice_id": item_id,
+                            "module": module_key,
+                            "priority": clean_data.get("priority", "Normal"),
+                            "is_urgent": bool(clean_data.get("is_urgent", False))
+                        },
+                        link="/student/chat"
+                    )
+
+            # 2. College & Sports Events
+            elif module_key in ("events", "sports_events"):
+                status = str(clean_data.get("status", "Upcoming")).strip().lower()
+                if status in ("upcoming", "ongoing", "active", ""):
+                    ev_name = clean_data.get("event_name") or clean_data.get("title") or "College Event"
+                    ev_date = clean_data.get("event_date", "")
+                    ev_venue = clean_data.get("venue", "Campus")
+                    prefix = "Event Update: " if is_update else "New Event: "
+                    MongoNotificationService.notify_audience(
+                        title=f"{prefix}{ev_name}",
+                        message=f"{clean_data.get('category', 'College Event')} on {ev_date} at {ev_venue}." if ev_date else f"Event scheduled at {ev_venue}.",
+                        category="event",
+                        target_audience="All Students",
+                        department=clean_data.get("department"),
+                        data={
+                            "event_id": item_id,
+                            "module": module_key,
+                            "event_date": ev_date,
+                            "venue": ev_venue
+                        },
+                        link="/student/chat"
+                    )
+
+            # 3. Timetable Schedules
+            elif module_key == "timetable":
+                subj = clean_data.get("subject", "Class Schedule")
+                sem = clean_data.get("semester", "")
+                div = clean_data.get("division", "")
+                day = clean_data.get("day", "")
+                time_str = clean_data.get("start_time", "")
+                room = clean_data.get("room", "")
+                prefix = "Timetable Update: " if is_update else "Timetable Schedule: "
+                MongoNotificationService.notify_audience(
+                    title=f"{prefix}{subj}",
+                    message=f"{subj} on {day} at {time_str} in Room {room} (Sem {sem} Div {div}).",
+                    category="academic",
+                    target_audience=clean_data.get("department", "All Students"),
+                    department=clean_data.get("department"),
+                    semester=sem,
+                    data={
+                        "schedule_id": item_id,
+                        "subject": subj,
+                        "room": room,
+                        "day": day,
+                        "time": time_str
+                    },
+                    link="/student/chat"
+                )
+
+            # 4. Academic Documents
+            elif module_key in ("academic_documents", "admission_documents"):
+                doc_title = clean_data.get("title", "Academic Document")
+                cat = clean_data.get("category", clean_data.get("document_type", "Document"))
+                dept = clean_data.get("department")
+                prefix = "Updated Document: " if is_update else "New Document: "
+                MongoNotificationService.notify_audience(
+                    title=f"{prefix}{doc_title}",
+                    message=f"{cat} has been published for {dept or 'all students'}.",
+                    category="academic",
+                    target_audience="All Students",
+                    department=dept,
+                    data={
+                        "document_id": item_id,
+                        "file_url": clean_data.get("file_url")
+                    },
+                    link=clean_data.get("file_url") or "/student/chat"
+                )
+
+            # 5. Placement Drives
+            elif module_key == "placements":
+                status = str(clean_data.get("status", "Upcoming")).strip().lower()
+                if status in ("upcoming", "registration open", "in progress", ""):
+                    company = clean_data.get("company_name", "Placement Drive")
+                    role = clean_data.get("job_role", "Position")
+                    pkg = clean_data.get("package_lpa", "")
+                    date_str = clean_data.get("drive_date", "")
+                    prefix = "Placement Update: " if is_update else "Placement Drive: "
+                    MongoNotificationService.notify_audience(
+                        title=f"{prefix}{company}",
+                        message=f"{role} (Package: {pkg} LPA). Date: {date_str}.",
+                        category="placement",
+                        target_audience="All Students",
+                        department=clean_data.get("department"),
+                        data={
+                            "placement_id": item_id,
+                            "company_name": company,
+                            "package_lpa": pkg
+                        },
+                        link="/student/chat"
+                    )
+        except Exception as notif_err:
+            logger.warning(f"Notice/Notification dispatch notice: {notif_err}")
 
     @staticmethod
     def update_item(module_key: str, item_id: str, data: Dict[str, Any], admin_user: Any = None) -> Tuple[bool, str, Optional[Dict[str, Any]]]:
@@ -1166,6 +1292,7 @@ class AdminCRUDService:
                     {"$or": [{"id": item_id}, {id_field: item_id}, {"_id": ObjectId(item_id) if ObjectId.is_valid(item_id) else None}]},
                     {"$set": clean_data}
                 )
+                AdminCRUDService._dispatch_admin_action_notification(module_key, item_id, clean_data, is_update=True)
                 updated = AdminCRUDService.get_item(module_key, item_id)
                 return True, "Record updated successfully.", updated
             except Exception as e:
@@ -1175,6 +1302,7 @@ class AdminCRUDService:
                 _LOCAL_DATA_STORE[module_key][item_id].update(clean_data)
             else:
                 _LOCAL_DATA_STORE.setdefault(module_key, {})[item_id] = clean_data
+            AdminCRUDService._dispatch_admin_action_notification(module_key, item_id, clean_data, is_update=True)
             return True, "Record updated successfully.", clean_data
 
     @staticmethod

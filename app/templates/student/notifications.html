@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Notifications - SVIT AI Assistant</title>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Linked Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/student/notifications.css') }}">
+</head>
+<body>
+
+    <!-- Top Navigation Header Bar -->
+    <header class="top-navbar">
+        <a href="/student/chat" class="portal-brand">
+            <div class="brand-icon-sm">
+                <img src="{{ url_for('static', filename='logo/svit logo u.png') }}" alt="SVIT Logo" class="portal-logo-img">
+            </div>
+            <span>SVIT AI Assistant</span>
+        </a>
+
+        <div class="nav-actions">
+            <a href="/student/chat" class="btn-back-chat">
+                <i data-lucide="message-square" style="width: 16px; height: 16px;"></i>
+                <span>Back to Chat</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content Layout -->
+    <main class="notifications-container">
+
+        <!-- Page Header -->
+        <div class="notif-header">
+            <div class="notif-header-left">
+                <a href="/student/chat" class="btn-back-icon" title="Back to Chat">
+                    <i data-lucide="arrow-left" style="width: 20px; height: 20px;"></i>
+                </a>
+                <div class="notif-title-wrap">
+                    <h1 class="notif-page-title">Notifications</h1>
+                    <span class="notif-count-badge" id="notifCountBadge">0 unread</span>
+                </div>
+            </div>
+
+            <div class="notif-header-actions">
+                <button class="btn-mark-all-read" id="btnMarkAllRead" onclick="markAllRead()" title="Mark all as read">
+                    <i data-lucide="check-check" style="width: 16px; height: 16px;"></i>
+                    <span>Mark all as read</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Filter Pills Bar -->
+        <div class="filter-pills-bar">
+            <button class="filter-pill active" id="pill-all" onclick="setFilter('all')">All</button>
+            <button class="filter-pill" id="pill-unread" onclick="setFilter('unread')">Unread</button>
+            <button class="filter-pill" id="pill-notice" onclick="setFilter('notice')">Notices</button>
+            <button class="filter-pill" id="pill-academic" onclick="setFilter('academic')">Academic</button>
+            <button class="filter-pill" id="pill-event" onclick="setFilter('event')">Events</button>
+        </div>
+
+        <!-- Dynamic Notifications List Container -->
+        <div class="notifications-list" id="notificationsList">
+            <!-- Dynamically populated via loadNotifications() -->
+            <div class="notif-empty-state">
+                <div class="empty-icon-circle">
+                    <i data-lucide="loader" class="spin-icon" style="width: 28px; height: 28px;"></i>
+                </div>
+                <h3 class="empty-title">Loading Notifications...</h3>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Client-Side JavaScript Logic -->
+    <script>
+        let currentFilter = 'all';
+        let allNotifications = [];
+        let totalUnread = 0;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadNotifications();
+            if (window.lucide) lucide.createIcons();
+        });
+
+        // Auto-refresh when tab comes into focus
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                loadNotifications();
+            }
+        });
+
+        async function loadNotifications() {
+            try {
+                const res = await fetch('/api/notifications');
+                const data = await res.json();
+
+                if (data.status === 'success') {
+                    allNotifications = data.notifications || [];
+                    totalUnread = data.unread_count || 0;
+                    updateUnreadBadge(totalUnread);
+                    renderNotifications();
+                } else {
+                    renderEmptyState("Unable to load notifications. Please try again.");
+                }
+            } catch (err) {
+                console.error("Error loading notifications:", err);
+                renderEmptyState("Connection error. Please check your network.");
+            }
+        }
+
+        function updateUnreadBadge(count) {
+            const badge = document.getElementById('notifCountBadge');
+            const markAllBtn = document.getElementById('btnMarkAllRead');
+            if (badge) {
+                badge.innerText = `${count} unread`;
+                if (count === 0) {
+                    badge.style.display = 'none';
+                    if (markAllBtn) markAllBtn.disabled = true;
+                } else {
+                    badge.style.display = 'inline-flex';
+                    if (markAllBtn) markAllBtn.disabled = false;
+                }
+            }
+        }
+
+        function setFilter(filterType) {
+            currentFilter = filterType;
+            document.querySelectorAll('.filter-pill').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById(`pill-${filterType}`);
+            if (activeBtn) activeBtn.classList.add('active');
+            renderNotifications();
+        }
+
+        function renderNotifications() {
+            const container = document.getElementById('notificationsList');
+            if (!container) return;
+
+            let filtered = allNotifications.filter(item => {
+                if (currentFilter === 'all') return true;
+                if (currentFilter === 'unread') return !item.is_read;
+                const cat = (item.category || item.type || '').toLowerCase();
+                if (currentFilter === 'notice') return cat.includes('notice') || cat.includes('circular');
+                if (currentFilter === 'academic') return cat.includes('academic') || cat.includes('timetable') || cat.includes('exam');
+                if (currentFilter === 'event') return cat.includes('event') || cat.includes('sport');
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                renderEmptyState();
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(item => {
+                const isUnread = !item.is_read;
+                const cat = (item.category || item.type || 'general').toLowerCase();
+                
+                let iconName = 'bell';
+                let iconClass = 'icon-general';
+
+                if (cat.includes('approval')) {
+                    iconName = 'check-circle';
+                    iconClass = 'icon-approval';
+                } else if (cat.includes('rejection')) {
+                    iconName = 'alert-circle';
+                    iconClass = 'icon-rejection';
+                } else if (cat.includes('notice') || cat.includes('circular')) {
+                    iconName = 'megaphone';
+                    iconClass = 'icon-notice';
+                } else if (cat.includes('event') || cat.includes('sport')) {
+                    iconName = 'calendar';
+                    iconClass = 'icon-event';
+                } else if (cat.includes('timetable')) {
+                    iconName = 'clock';
+                    iconClass = 'icon-timetable';
+                } else if (cat.includes('academic') || cat.includes('exam')) {
+                    iconName = 'book-open';
+                    iconClass = 'icon-academic';
+                } else if (cat.includes('placement') || cat.includes('job')) {
+                    iconName = 'briefcase';
+                    iconClass = 'icon-placement';
+                }
+
+                const timeStr = formatRelativeTime(item.created_at);
+
+                html += `
+                    <div class="notif-card ${isUnread ? 'unread' : 'read'}" id="notif-${item.id}" onclick="handleCardClick('${item.id}', '${escapeHtml(item.link || '')}')">
+                        <div class="notif-icon-box ${iconClass}">
+                            <i data-lucide="${iconName}" style="width: 22px; height: 22px;"></i>
+                        </div>
+                        <div class="notif-content-wrap">
+                            <div class="notif-top-meta">
+                                <span class="notif-card-title">${escapeHtml(item.title || 'Notification')}</span>
+                                ${isUnread ? '<span class="notif-unread-dot"></span>' : ''}
+                            </div>
+                            <p class="notif-card-message">${escapeHtml(item.message || '')}</p>
+                            <div class="notif-footer-meta">
+                                <span class="notif-time-badge">
+                                    <i data-lucide="clock" style="width: 13px; height: 13px;"></i>
+                                    ${timeStr}
+                                </span>
+                                <span class="notif-category-tag">${escapeHtml(item.category || item.type || 'General')}</span>
+                            </div>
+                        </div>
+                        <div class="notif-actions">
+                            <button type="button" class="btn-notif-delete" title="Delete notification" onclick="deleteNotification('${item.id}', event)">
+                                <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function renderEmptyState(customMsg) {
+            const container = document.getElementById('notificationsList');
+            const msg = customMsg || (currentFilter === 'unread' 
+                ? "You've read all your notifications!" 
+                : "You're all caught up! Official university notices, academic alerts, and timetable updates will appear here.");
+
+            container.innerHTML = `
+                <div class="notif-empty-state">
+                    <div class="empty-icon-circle">
+                        <i data-lucide="bell-off" style="width: 32px; height: 32px;"></i>
+                    </div>
+                    <h3 class="empty-title">No notifications yet</h3>
+                    <p class="empty-subtitle">${escapeHtml(msg)}</p>
+                    <a href="/student/chat" class="btn-back-chat">
+                        <i data-lucide="message-square" style="width: 16px; height: 16px;"></i>
+                        <span>Return to Student Chat</span>
+                    </a>
+                </div>
+            `;
+            if (window.lucide) lucide.createIcons();
+        }
+
+        async function handleCardClick(notifId, linkUrl) {
+            // Mark as read locally and remotely
+            const card = document.getElementById(`notif-${notifId}`);
+            if (card && card.classList.contains('unread')) {
+                card.classList.remove('unread');
+                card.classList.add('read');
+                const dot = card.querySelector('.notif-unread-dot');
+                if (dot) dot.remove();
+
+                if (totalUnread > 0) {
+                    totalUnread -= 1;
+                    updateUnreadBadge(totalUnread);
+                }
+
+                // Update item in memory
+                const found = allNotifications.find(n => String(n.id) === String(notifId));
+                if (found) found.is_read = true;
+
+                try {
+                    await fetch(`/api/notifications/${notifId}/read`, { method: 'POST' });
+                } catch (err) {
+                    console.error("Error marking read:", err);
+                }
+            }
+
+            if (linkUrl && linkUrl !== '#' && linkUrl !== 'null' && linkUrl !== '') {
+                window.location.href = linkUrl;
+            }
+        }
+
+        async function markAllRead() {
+            const btn = document.getElementById('btnMarkAllRead');
+            if (btn) btn.disabled = true;
+
+            allNotifications.forEach(n => n.is_read = true);
+            totalUnread = 0;
+            updateUnreadBadge(0);
+            renderNotifications();
+
+            try {
+                await fetch('/api/notifications/read-all', { method: 'POST' });
+            } catch (err) {
+                console.error("Error marking all read:", err);
+            }
+        }
+
+        async function deleteNotification(notifId, event) {
+            event.stopPropagation();
+            const card = document.getElementById(`notif-${notifId}`);
+            if (card) {
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.95)';
+                setTimeout(() => { card.remove(); }, 200);
+            }
+
+            // Remove from memory
+            const idx = allNotifications.findIndex(n => String(n.id) === String(notifId));
+            if (idx !== -1) {
+                if (!allNotifications[idx].is_read && totalUnread > 0) {
+                    totalUnread -= 1;
+                    updateUnreadBadge(totalUnread);
+                }
+                allNotifications.splice(idx, 1);
+            }
+
+            if (allNotifications.length === 0) {
+                renderEmptyState();
+            }
+
+            try {
+                await fetch(`/api/notifications/${notifId}`, { method: 'DELETE' });
+            } catch (err) {
+                console.error("Error deleting notification:", err);
+            }
+        }
+
+        function formatRelativeTime(dateStr) {
+            if (!dateStr) return '';
+            try {
+                const date = new Date(dateStr);
+                if (isNaN(date.getTime())) return String(dateStr);
+                const now = new Date();
+                const diffMs = now - date;
+                const diffMins = Math.floor(diffMs / 60000);
+                const diffHours = Math.floor(diffMs / 3600000);
+                const diffDays = Math.floor(diffMs / 86400000);
+
+                if (diffMins < 1) return 'Just now';
+                if (diffMins < 60) return `${diffMins}m ago`;
+                if (diffHours < 24) return `${diffHours}h ago`;
+                if (diffDays === 1) return 'Yesterday';
+                if (diffDays < 7) return `${diffDays}d ago`;
+                return date.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+            } catch (e) {
+                return dateStr;
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return String(str).replace(/[&<>"']/g, m => map[m]);
+        }
+    </script>
+</body>
+</html>

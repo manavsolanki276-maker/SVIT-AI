@@ -131,7 +131,9 @@
             .recording-active {
                 animation: none !important;
             }
-        /* --- Student Notification Dropdown Styles --- */
+        }
+
+        /* --- Student Notification Dropdown & Drawer Styles --- */
         .student-notif-wrapper {
             position: relative;
             display: inline-block;
@@ -144,7 +146,7 @@
             width: 320px;
             background: #ffffff;
             border: 1px solid #e2e8f0;
-            border-radius: 12px;
+            border-radius: 14px;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
             z-index: 1000;
             overflow: hidden;
@@ -168,12 +170,14 @@
             align-items: flex-start;
             gap: 10px;
             transition: background 0.15s;
+            cursor: pointer;
         }
         .student-notif-item:hover {
             background: #f8fafc;
         }
         .student-notif-item.unread {
             background: #f5f3ff;
+            border-left: 3px solid #6366f1;
         }
         .student-notif-icon {
             width: 28px;
@@ -184,6 +188,90 @@
             justify-content: center;
             flex-shrink: 0;
             font-size: 12px;
+        }
+        .student-notif-footer {
+            padding: 8px 14px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+        }
+        .view-all-notifs-link {
+            font-size: 12px;
+            color: #4f46e5;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .view-all-notifs-link:hover {
+            color: #4338ca;
+        }
+
+        /* Mobile Notification Drawer Sheet */
+        .mobile-notif-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 1100;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .mobile-notif-backdrop.active {
+            display: block;
+            opacity: 1;
+        }
+        .mobile-notif-drawer {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-height: 82vh;
+            background: #ffffff;
+            border-radius: 20px 20px 0 0;
+            z-index: 1200;
+            transform: translateY(100%);
+            transition: transform 0.28s cubic-bezier(0.2, 0, 0, 1);
+            box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.18);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .mobile-notif-drawer.active {
+            display: flex;
+            transform: translateY(0);
+        }
+        .mobile-notif-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            background: #ffffff;
+            flex-shrink: 0;
+        }
+        .mobile-notif-body {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            max-height: 60vh;
+        }
+        .mobile-notif-footer {
+            padding: 12px 16px;
+            border-top: 1px solid #f1f5f9;
+            background: #ffffff;
+            flex-shrink: 0;
+            padding-bottom: max(16px, env(safe-area-inset-bottom));
+        }
+
+        @media (min-width: 769px) {
+            .mobile-notif-drawer, .mobile-notif-backdrop, .drawer-bottom-actions {
+                display: none !important;
+            }
         }
 
         @media print {
@@ -323,19 +411,21 @@
                         <span>Loading chats...</span>
                     </div>
                 </div>
-                <!-- Mobile Drawer View All Chats Button -->
+            </div>
+
+            <!-- Mobile Drawer Dedicated Bottom Action Area (Anchored to Bottom) -->
+            <div class="drawer-bottom-actions" id="drawerBottomActions">
                 <a href="/chat/history-page" class="drawer-view-all-chats-btn" onclick="toggleMobileSidebar(false);" title="View All Chats">
                     <i data-lucide="message-circle"></i>
                     <span>View All Chats &gt;</span>
                 </a>
-                <!-- Mobile Drawer Dedicated Exit App Button -->
                 <a href="/auth/logout" class="drawer-exit-chat-btn" onclick="toggleMobileSidebar(false);" title="Exit App">
                     <i data-lucide="log-out"></i>
                     <span>🚪 Exit App</span>
                 </a>
             </div>
 
-            <!-- 4. Sidebar Bottom: Student User Card & Logout -->
+            <!-- 4. Sidebar Bottom: Student User Card & Logout (Desktop View) -->
             <div class="sidebar-footer">
                 <a href="/student/profile/" class="sidebar-user-card" title="View & Edit Profile">
                     <div class="sidebar-collapsed-user-icon">
@@ -371,7 +461,7 @@
                 </div>
                 <div class="mobile-top-actions">
                     <div class="student-notif-wrapper">
-                        <button type="button" class="mobile-action-btn" id="mobileNotifBellBtn" onclick="toggleStudentNotifDropdown(event)" aria-label="Notifications" title="Notifications" style="position: relative;">
+                        <button type="button" class="mobile-action-btn" id="mobileNotifBellBtn" onclick="toggleMobileNotifDrawer(true)" aria-label="Notifications" title="Notifications" style="position: relative;">
                             <i data-lucide="bell"></i>
                             <span id="mobileStudentUnreadBadge" style="display:none; position:absolute; top:2px; right:2px; background:#ef4444; color:#fff; font-size:9px; font-weight:700; border-radius:50%; width:14px; height:14px; line-height:14px; text-align:center;">0</span>
                         </button>
@@ -399,6 +489,12 @@
                         </div>
                         <div id="studentNotifList" class="student-notif-list">
                             <div style="padding: 20px; text-align: center; color: #94a3b8; font-size: 12px;">Loading alerts...</div>
+                        </div>
+                        <div class="student-notif-footer">
+                            <a href="/notifications" class="view-all-notifs-link">
+                                <span>View all notifications</span>
+                                <i data-lucide="arrow-right" style="width: 13px; height: 13px;"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -881,6 +977,33 @@
         </div>
     </div>
 
+    <!-- Mobile Dedicated Notification Slide-in Drawer / Sheet -->
+    <div class="mobile-notif-backdrop" id="mobileNotifBackdrop" onclick="toggleMobileNotifDrawer(false)"></div>
+    <div class="mobile-notif-drawer" id="mobileNotifDrawer">
+        <div class="mobile-notif-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="bell" style="width: 18px; height: 18px; color: #4f46e5;"></i>
+                <span style="font-size: 15px; font-weight: 700; color: #0f172a;">Notifications</span>
+                <span id="mobileDrawerUnreadPill" style="font-size: 11px; background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 12px; font-weight: 700;">0 unread</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button type="button" onclick="markAllStudentNotifsRead()" style="background:none; border:none; color:#4f46e5; font-size:12px; font-weight:600; cursor:pointer;">Mark all read</button>
+                <button type="button" onclick="toggleMobileNotifDrawer(false)" aria-label="Close notifications" style="background:#f1f5f9; border:none; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#64748b;">
+                    <i data-lucide="x" style="width:16px; height:16px;"></i>
+                </button>
+            </div>
+        </div>
+        <div class="mobile-notif-body" id="mobileDrawerNotifList">
+            <div style="padding: 28px; text-align: center; color: #94a3b8; font-size: 13px;">Loading alerts...</div>
+        </div>
+        <div class="mobile-notif-footer">
+            <a href="/notifications" class="btn-full-notif-center" style="display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 11px; background: #4f46e5; color: #ffffff; font-size: 13px; font-weight: 600; border-radius: 10px; text-decoration: none; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);">
+                <span>View Full Notification Center</span>
+                <i data-lucide="arrow-right" style="width: 15px; height: 15px;"></i>
+            </a>
+        </div>
+    </div>
+
     <!-- Script Imports with Cache Busting -->
     <script src="{{ url_for('static', filename='js/student/chat.js') }}?v={{ range(1000, 99999) | random }}"></script>
     <script>
@@ -889,17 +1012,93 @@
         }
 
         // --- Student Notification Center Engine ---
+        function renderNotifItemsHtml(notifs) {
+            if (!notifs || notifs.length === 0) {
+                return `
+                    <div style="padding: 28px 16px; text-align: center; color: #94a3b8; font-size: 12.5px;">
+                        <i data-lucide="bell-off" style="width: 24px; height: 24px; margin: 0 auto 8px auto; display: block; color: #cbd5e1;"></i>
+                        No notifications yet.
+                    </div>
+                `;
+            }
+
+            return notifs.map(n => {
+                const isRead = n.is_read;
+                const cat = (n.category || n.type || '').toLowerCase();
+                const isApproval = cat === 'approval';
+                const isRejection = cat === 'rejection';
+                const isNotice = cat === 'notices' || cat === 'notice';
+                const isAcademic = cat === 'academic' || cat === 'timetable';
+                const isEvent = cat === 'events' || cat === 'event';
+
+                let iconBg = '#e0e7ff';
+                let iconColor = '#4338ca';
+                let iconName = 'bell';
+
+                if (isApproval) {
+                    iconBg = '#d1fae5';
+                    iconColor = '#059669';
+                    iconName = 'check-circle';
+                } else if (isRejection) {
+                    iconBg = '#fee2e2';
+                    iconColor = '#dc2626';
+                    iconName = 'alert-triangle';
+                } else if (isNotice) {
+                    iconBg = '#fef3c7';
+                    iconColor = '#d97706';
+                    iconName = 'info';
+                } else if (isAcademic) {
+                    iconBg = '#e0e7ff';
+                    iconColor = '#4338ca';
+                    iconName = 'book-open';
+                } else if (isEvent) {
+                    iconBg = '#ede9fe';
+                    iconColor = '#7c3aed';
+                    iconName = 'calendar';
+                }
+
+                const timeStr = n.created_at ? new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }) : '';
+                const linkAttr = n.link ? `data-link="${n.link}"` : '';
+
+                return `
+                    <div class="student-notif-item ${!isRead ? 'unread' : ''}" onclick="markSingleStudentNotifRead('${n.id}', '${n.link || ''}')" ${linkAttr}>
+                        <div class="student-notif-icon" style="background: ${iconBg}; color: ${iconColor};">
+                            <i data-lucide="${iconName}" style="width: 15px; height: 15px;"></i>
+                        </div>
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 2px;">
+                                <strong style="font-size: 12.5px; color: #1e293b; font-weight: 600;">${n.title}</strong>
+                                ${!isRead ? '<span style="width: 6px; height: 6px; background: #6366f1; border-radius: 50%; display: inline-block; flex-shrink:0;"></span>' : ''}
+                            </div>
+                            <p style="margin: 0 0 4px 0; font-size: 11.5px; color: #475569; line-height: 1.35; word-break: break-word;">${n.message}</p>
+                            <span style="font-size: 10px; color: #94a3b8;">${timeStr}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
         async function loadStudentNotifications() {
             try {
-                const res = await fetch('/notifications/');
+                let res = await fetch('/api/notifications', {
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!res.ok) {
+                    res = await fetch('/notifications/', {
+                        headers: { 'Accept': 'application/json' }
+                    });
+                }
                 if (!res.ok) return;
                 const data = await res.json();
                 const unread = data.unread_count || 0;
+                const notifs = data.notifications || [];
 
                 const dBadge = document.getElementById('desktopStudentUnreadBadge');
                 const mBadge = document.getElementById('mobileStudentUnreadBadge');
                 const countText = document.getElementById('studentDropdownUnreadCount');
+                const mCountText = document.getElementById('mobileDrawerUnreadPill');
                 const listEl = document.getElementById('studentNotifList');
+                const mListEl = document.getElementById('mobileDrawerNotifList');
 
                 if (dBadge) {
                     dBadge.innerText = unread;
@@ -910,66 +1109,20 @@
                     mBadge.style.display = unread > 0 ? 'inline-block' : 'none';
                 }
                 if (countText) {
-                    countText.innerText = `${unread} unread`;
+                    countText.innerText = `${unread}`;
+                }
+                if (mCountText) {
+                    mCountText.innerText = `${unread} unread`;
                 }
 
-                if (!listEl) return;
-                const notifs = data.notifications || [];
-
-                if (notifs.length === 0) {
-                    listEl.innerHTML = `
-                        <div style="padding: 24px; text-align: center; color: #94a3b8; font-size: 12px;">
-                            <i data-lucide="bell-off" style="width: 20px; height: 20px; margin: 0 auto 6px auto; display: block; color: #cbd5e1;"></i>
-                            No notifications yet.
-                        </div>
-                    `;
-                    lucide.createIcons();
-                    return;
+                const renderedHtml = renderNotifItemsHtml(notifs);
+                if (listEl) {
+                    listEl.innerHTML = renderedHtml;
                 }
-
-                listEl.innerHTML = notifs.map(n => {
-                    const isRead = n.is_read;
-                    const isApproval = n.category === 'approval';
-                    const isRejection = n.category === 'rejection';
-                    const isReg = n.category === 'registration';
-
-                    let iconBg = '#e0e7ff';
-                    let iconColor = '#4338ca';
-                    let iconName = 'bell';
-
-                    if (isApproval) {
-                        iconBg = '#d1fae5';
-                        iconColor = '#059669';
-                        iconName = 'check-circle';
-                    } else if (isRejection) {
-                        iconBg = '#fee2e2';
-                        iconColor = '#dc2626';
-                        iconName = 'alert-triangle';
-                    } else if (isReg) {
-                        iconBg = '#fef3c7';
-                        iconColor = '#d97706';
-                        iconName = 'clock';
-                    }
-
-                    const timeStr = n.created_at ? new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }) : '';
-
-                    return `
-                        <div class="student-notif-item ${!isRead ? 'unread' : ''}" onclick="markSingleStudentNotifRead('${n.id}')" style="cursor: pointer;">
-                            <div class="student-notif-icon" style="background: ${iconBg}; color: ${iconColor};">
-                                <i data-lucide="${iconName}" style="width: 15px; height: 15px;"></i>
-                            </div>
-                            <div style="flex: 1; min-width: 0;">
-                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 2px;">
-                                    <strong style="font-size: 12px; color: #1e293b; font-weight: 600;">${n.title}</strong>
-                                    ${!isRead ? '<span style="width: 6px; height: 6px; background: #6366f1; border-radius: 50%; display: inline-block;"></span>' : ''}
-                                </div>
-                                <p style="margin: 0 0 3px 0; font-size: 11px; color: #475569; line-height: 1.35;">${n.message}</p>
-                                <span style="font-size: 10px; color: #94a3b8;">${timeStr}</span>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                lucide.createIcons();
+                if (mListEl) {
+                    mListEl.innerHTML = renderedHtml;
+                }
+                if (window.lucide) lucide.createIcons();
             } catch (e) {
                 console.error('Failed to load student notifications:', e);
             }
@@ -988,27 +1141,67 @@
             }
         }
 
-        async function markSingleStudentNotifRead(id) {
-            try {
-                await fetch(`/notifications/${id}/read`, { method: 'PATCH' });
+        function toggleMobileNotifDrawer(isOpen) {
+            const drawer = document.getElementById('mobileNotifDrawer');
+            const backdrop = document.getElementById('mobileNotifBackdrop');
+            if (!drawer || !backdrop) return;
+            if (isOpen) {
+                drawer.classList.add('active');
+                backdrop.classList.add('active');
                 loadStudentNotifications();
-            } catch (e) {}
+            } else {
+                drawer.classList.remove('active');
+                backdrop.classList.remove('active');
+            }
+        }
+
+        async function markSingleStudentNotifRead(id, link) {
+            try {
+                await fetch(`/api/notifications/${id}/read`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+            } catch (e) {
+                try {
+                    await fetch(`/notifications/${id}/read`, { method: 'PATCH' });
+                } catch (err) {}
+            }
+            await loadStudentNotifications();
+            if (link && link !== '' && link !== 'null' && link !== 'undefined') {
+                window.location.href = link;
+            }
         }
 
         async function markAllStudentNotifsRead() {
             try {
-                await fetch('/notifications/read-all', { method: 'POST' });
-                loadStudentNotifications();
-            } catch (e) {}
+                await fetch('/api/notifications/read-all', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+            } catch (e) {
+                try {
+                    await fetch('/notifications/read-all', { method: 'POST' });
+                } catch (err) {}
+            }
+            await loadStudentNotifications();
         }
 
         document.addEventListener('click', (e) => {
             const dropdown = document.getElementById('studentNotifDropdown');
             const dBtn = document.getElementById('desktopStudentNotifBtn');
-            const mBtn = document.getElementById('mobileNotifBellBtn');
-            if (dropdown && dropdown.style.display === 'block' && !dropdown.contains(e.target) && (!dBtn || !dBtn.contains(e.target)) && (!mBtn || !mBtn.contains(e.target))) {
+            if (dropdown && dropdown.style.display === 'block' && !dropdown.contains(e.target) && (!dBtn || !dBtn.contains(e.target))) {
                 dropdown.style.display = 'none';
             }
+        });
+
+        // Real-Time Notification Refreshing
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                loadStudentNotifications();
+            }
+        });
+        window.addEventListener('focus', () => {
+            loadStudentNotifications();
         });
 
         document.addEventListener('DOMContentLoaded', () => {

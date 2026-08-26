@@ -706,83 +706,266 @@ class MongoUserSettingsService:
 
 class MongoNotificationService:
     @staticmethod
-    def create_notification(user_id: Any, title: str, message: str, category: str = "general", data: Optional[Dict[str, Any]] = None, is_admin: bool = False) -> Optional[str]:
+    def create_notification(
+        user_id: Any = None,
+        title: str = "",
+        message: str = "",
+        category: str = "general",
+        data: Optional[Dict[str, Any]] = None,
+        is_admin: bool = False,
+        recipient_id: Optional[str] = None,
+        recipient_type: str = "student",
+        target_audience: Optional[str] = None,
+        department: Optional[str] = None,
+        semester: Optional[Any] = None,
+        program: Optional[str] = None,
+        batch: Optional[str] = None,
+        link: Optional[str] = None
+    ) -> Optional[str]:
         coll = get_collection('notifications')
         if coll is None:
             return None
+        now = datetime.utcnow()
+        doc_user_id = str(user_id) if user_id is not None else str(recipient_id or "all")
+        doc_recipient_id = str(recipient_id if recipient_id is not None else (user_id or "all"))
         doc = {
-            "user_id": str(user_id),
+            "user_id": doc_user_id,
+            "recipient_id": doc_recipient_id,
+            "recipient_type": "admin" if is_admin else recipient_type,
             "title": title,
             "message": message,
             "category": category,
+            "type": category,
+            "target_audience": target_audience or ("All Students" if not is_admin and doc_recipient_id in ("all", "all_students") else None),
+            "department": department,
+            "semester": semester,
+            "program": program,
+            "batch": batch,
+            "link": link or "",
             "data": data or {},
+            "metadata": data or {},
             "is_admin": is_admin,
             "is_read": False,
-            "created_at": datetime.utcnow()
+            "read_by": [],
+            "deleted_by": [],
+            "created_at": now.isoformat(),
+            "updated_at": now.isoformat()
         }
         res = coll.insert_one(doc)
         return str(res.inserted_id)
 
     @staticmethod
-    def notify_admins(title: str, message: str, category: str = "registration", data: Optional[Dict[str, Any]] = None) -> Optional[str]:
+    def notify_admins(title: str, message: str, category: str = "registration", data: Optional[Dict[str, Any]] = None, link: Optional[str] = None) -> Optional[str]:
         """Creates a broadcast/admin notification for pending registrations or alerts."""
         return MongoNotificationService.create_notification(
             user_id="admin",
+            recipient_id="admin",
             title=title,
             message=message,
             category=category,
             data=data,
-            is_admin=True
+            is_admin=True,
+            link=link or "/admin/dashboard"
         )
 
     @staticmethod
-    def notify_student(student_id: Any, title: str, message: str, category: str = "registration", data: Optional[Dict[str, Any]] = None) -> Optional[str]:
-        """Creates a targeted notification for a student."""
+    def notify_student(student_id: Any, title: str, message: str, category: str = "registration", data: Optional[Dict[str, Any]] = None, link: Optional[str] = None) -> Optional[str]:
+        """Creates a targeted notification for a specific student."""
         return MongoNotificationService.create_notification(
             user_id=str(student_id),
+            recipient_id=str(student_id),
+            recipient_type="student",
             title=title,
             message=message,
             category=category,
             data=data,
-            is_admin=False
+            is_admin=False,
+            link=link or "/student/chat"
         )
 
     @staticmethod
-    def get_notifications(user_id: Any, limit: int = 30) -> Dict[str, Any]:
-        coll = get_collection('notifications')
-        if coll is None:
-            return {"status": "success", "unread_count": 0, "notifications": []}
-
-        uid_str = str(user_id)
-        # Also support numeric / enrollment ID variants
-        query = {"$or": [{"user_id": uid_str}, {"user_id": user_id}]}
-        cursor = coll.find(query).sort("created_at", -1).limit(limit)
-        notifs = []
-        unread = 0
-        for doc in cursor:
-            is_read = bool(doc.get("is_read", False))
-            if not is_read:
-                unread += 1
-            notifs.append({
-                "id": str(doc.get("_id")),
-                "user_id": str(user_id),
-                "title": doc.get("title", ""),
-                "message": doc.get("message", ""),
-                "category": doc.get("category", "general"),
-                "data": doc.get("data", {}),
-                "is_read": is_read,
-                "created_at": doc.get("created_at").isoformat() if hasattr(doc.get("created_at"), 'isoformat') else str(doc.get("created_at", ""))
-            })
-
-        return {"status": "success", "unread_count": unread, "notifications": notifs}
+    def notify_audience(title: str, message: str, category: str = "general", target_audience: str = "All Students", department: Optional[str] = None, semester: Optional[Any] = None, program: Optional[str] = None, batch: Optional[str] = None, data: Optional[Dict[str, Any]] = None, link: Optional[str] = None) -> Optional[str]:
+        """Creates a group/broadcast notification for student audience targeting."""
+        return MongoNotificationService.create_notification(
+            user_id=department or "all",
+            recipient_id="all_students" if not department else department,
+            recipient_type="student",
+            title=title,
+            message=message,
+            category=category,
+            target_audience=target_audience,
+            department=department,
+            semester=semester,
+            program=program,
+            batch=batch,
+            data=data,
+            is_admin=False,
+            link=link or "/student/chat"
+        )
 
     @staticmethod
-    def get_admin_notifications(limit: int = 30) -> Dict[str, Any]:
+    def _extract_student_context(user_or_id: Any) -> Dict[str, Any]:
+        """Extracts student identification candidates and academic profile."""
+        student_id = ""
+        enrollment_no = ""
+        department = ""
+        semester = None
+        program = ""
+        batch = ""
+
+        if hasattr(user_or_id, 'id') or hasattr(user_or_id, 'enrollment_no'):
+            raw_id = getattr(user_or_id, 'id', '')
+            student_id = str(raw_id).split('_', 1)[1] if str(raw_id).startswith('student_') else str(raw_id)
+            enrollment_no = str(getattr(user_or_id, 'enrollment_no', getattr(user_or_id, 'enrollment_number', ''))).strip()
+            department = str(getattr(user_or_id, 'department', '')).strip()
+            semester = getattr(user_or_id, 'semester', None)
+            program = str(getattr(user_or_id, 'program', '')).strip()
+            batch = str(getattr(user_or_id, 'batch', '')).strip()
+        elif isinstance(user_or_id, dict):
+            raw_id = user_or_id.get('id') or user_or_id.get('_id', '')
+            student_id = str(raw_id).split('_', 1)[1] if str(raw_id).startswith('student_') else str(raw_id)
+            enrollment_no = str(user_or_id.get('enrollment_no') or user_or_id.get('enrollment_number', '')).strip()
+            department = str(user_or_id.get('department', '')).strip()
+            semester = user_or_id.get('semester')
+            program = str(user_or_id.get('program', '')).strip()
+            batch = str(user_or_id.get('batch', '')).strip()
+        else:
+            raw_str = str(user_or_id or '').strip()
+            student_id = raw_str.split('_', 1)[1] if raw_str.startswith('student_') else raw_str
+            enrollment_no = student_id
+
+        # If we have an ID/enrollment, try resolving full student profile if department is missing
+        if student_id and not department:
+            coll_s = get_collection('students')
+            if coll_s is not None:
+                try:
+                    from bson import ObjectId
+                    s_doc = coll_s.find_one({
+                        "$or": [
+                            {"enrollment_no": student_id},
+                            {"enrollment_number": student_id},
+                            {"id": student_id},
+                            {"id": int(student_id) if student_id.isdigit() else -1},
+                            {"_id": ObjectId(student_id) if ObjectId.is_valid(student_id) else None}
+                        ]
+                    })
+                    if s_doc:
+                        enrollment_no = enrollment_no or str(s_doc.get('enrollment_no', '')).strip()
+                        department = department or str(s_doc.get('department', '')).strip()
+                        semester = semester or s_doc.get('semester')
+                        program = program or str(s_doc.get('program', '')).strip()
+                        batch = batch or str(s_doc.get('batch', '')).strip()
+                except Exception:
+                    pass
+
+        cands = set()
+        for v in [student_id, enrollment_no]:
+            if v:
+                cands.add(str(v))
+                if str(v).isdigit():
+                    cands.add(int(v))
+
+        return {
+            "student_id": student_id,
+            "enrollment_no": enrollment_no,
+            "candidates": list(cands),
+            "department": department,
+            "semester": semester,
+            "program": program,
+            "batch": batch
+        }
+
+    @staticmethod
+    def get_notifications(user_id: Any, limit: int = 50) -> Dict[str, Any]:
+        """
+        Returns only notifications belonging to the specified student user.
+        Combines direct student notifications with audience/broadcast notifications.
+        Enforces strict student isolation.
+        """
         coll = get_collection('notifications')
         if coll is None:
             return {"status": "success", "unread_count": 0, "notifications": []}
 
-        query = {"$or": [{"is_admin": True}, {"user_id": "admin"}, {"category": "registration"}]}
+        ctx = MongoNotificationService._extract_student_context(user_id)
+        cands = ctx["candidates"]
+        cands_str = [str(c) for c in cands]
+        dept = ctx["department"]
+
+        # Audience matching conditions
+        or_clauses: List[Dict[str, Any]] = [
+            {"user_id": {"$in": cands + cands_str}},
+            {"recipient_id": {"$in": cands + cands_str}},
+            {"recipient_id": {"$in": ["all", "all_students", "All Students", "All Students & Faculty"]}},
+            {"target_audience": {"$in": ["all", "all_students", "All Students", "All Students & Faculty", "All Students & Staff"]}}
+        ]
+
+        if dept:
+            or_clauses.append({"department": dept, "target_audience": {"$ne": "Faculty Only"}})
+            or_clauses.append({"target_department": dept})
+            or_clauses.append({"target_audience": dept})
+
+        # Query MongoDB
+        query = {
+            "$and": [
+                {"$or": or_clauses},
+                {"is_admin": {"$ne": True}},
+                {"deleted_by": {"$nin": cands_str}}
+            ]
+        }
+
+        try:
+            cursor = coll.find(query).sort("created_at", -1).limit(limit)
+            notifs = []
+            unread = 0
+
+            for doc in cursor:
+                doc_id = str(doc.get("_id") or doc.get("id"))
+                read_list = [str(r) for r in doc.get("read_by", [])]
+                
+                # Check direct read flag or student in read_by array
+                is_read = bool(doc.get("is_read", False)) or any(c in read_list for c in cands_str)
+                if not is_read:
+                    unread += 1
+
+                created_at_val = doc.get("created_at")
+                if hasattr(created_at_val, "isoformat"):
+                    created_at_str = created_at_val.isoformat()
+                else:
+                    created_at_str = str(created_at_val or "")
+
+                notifs.append({
+                    "id": doc_id,
+                    "_id": doc_id,
+                    "user_id": str(doc.get("user_id", "")),
+                    "recipient_id": str(doc.get("recipient_id", doc.get("user_id", ""))),
+                    "recipient_type": str(doc.get("recipient_type", "student")),
+                    "title": doc.get("title", ""),
+                    "message": doc.get("message", ""),
+                    "category": doc.get("category", doc.get("type", "general")),
+                    "type": doc.get("type", doc.get("category", "general")),
+                    "target_audience": doc.get("target_audience", "All Students"),
+                    "department": doc.get("department"),
+                    "is_read": is_read,
+                    "link": doc.get("link", ""),
+                    "data": doc.get("data", doc.get("metadata", {})),
+                    "metadata": doc.get("metadata", doc.get("data", {})),
+                    "created_at": created_at_str,
+                    "updated_at": str(doc.get("updated_at", created_at_str))
+                })
+
+            return {"status": "success", "unread_count": unread, "notifications": notifs}
+        except Exception as e:
+            logger.warning(f"Error fetching notifications: {e}")
+            return {"status": "success", "unread_count": 0, "notifications": []}
+
+    @staticmethod
+    def get_admin_notifications(limit: int = 50) -> Dict[str, Any]:
+        """Returns admin-only notifications and registration alerts."""
+        coll = get_collection('notifications')
+        if coll is None:
+            return {"status": "success", "unread_count": 0, "notifications": []}
+
+        query = {"$or": [{"is_admin": True}, {"user_id": "admin"}, {"recipient_id": "admin"}, {"category": "registration"}]}
         cursor = coll.find(query).sort("created_at", -1).limit(limit)
         notifs = []
         unread = 0
@@ -790,40 +973,76 @@ class MongoNotificationService:
             is_read = bool(doc.get("is_read", False))
             if not is_read:
                 unread += 1
+            created_at_val = doc.get("created_at")
+            created_at_str = created_at_val.isoformat() if hasattr(created_at_val, 'isoformat') else str(created_at_val or "")
             notifs.append({
-                "id": str(doc.get("_id")),
+                "id": str(doc.get("_id") or doc.get("id")),
+                "_id": str(doc.get("_id") or doc.get("id")),
                 "user_id": str(doc.get("user_id", "admin")),
+                "recipient_id": str(doc.get("recipient_id", "admin")),
+                "recipient_type": "admin",
                 "title": doc.get("title", ""),
                 "message": doc.get("message", ""),
                 "category": doc.get("category", "general"),
+                "type": doc.get("type", doc.get("category", "general")),
                 "data": doc.get("data", {}),
+                "metadata": doc.get("data", {}),
                 "is_admin": True,
                 "is_read": is_read,
-                "created_at": doc.get("created_at").isoformat() if hasattr(doc.get("created_at"), 'isoformat') else str(doc.get("created_at", ""))
+                "created_at": created_at_str
             })
 
         return {"status": "success", "unread_count": unread, "notifications": notifs}
 
     @staticmethod
     def mark_read(notification_id: str, user_id: Any = None) -> bool:
+        """
+        Marks a single notification as read for the authenticated student or admin.
+        For direct notifications: sets is_read=True.
+        For broadcast/group notifications: adds student identifier to read_by array.
+        """
         coll = get_collection('notifications')
-        if coll is not None:
-            from bson import ObjectId
-            query: Dict[str, Any] = {}
-            if ObjectId.is_valid(notification_id):
-                query["_id"] = ObjectId(notification_id)
-            else:
-                query["id"] = notification_id
+        if coll is None or not notification_id:
+            return False
 
-            if user_id is not None and user_id != "admin":
-                query["user_id"] = {"$in": [str(user_id), user_id]}
+        from bson import ObjectId
+        doc_query = {}
+        if ObjectId.is_valid(notification_id):
+            doc_query["_id"] = ObjectId(notification_id)
+        else:
+            doc_query["$or"] = [{"id": notification_id}, {"_id": str(notification_id)}]
 
-            try:
-                coll.update_one(query, {"$set": {"is_read": True}})
+        try:
+            doc = coll.find_one(doc_query)
+            if not doc:
+                return False
+
+            now_str = datetime.utcnow().isoformat()
+
+            if user_id == "admin":
+                coll.update_one({"_id": doc["_id"]}, {"$set": {"is_read": True, "updated_at": now_str}})
                 return True
-            except Exception:
-                pass
-        return False
+
+            ctx = MongoNotificationService._extract_student_context(user_id) if user_id is not None else None
+            student_ident = ctx["enrollment_no"] or ctx["student_id"] if ctx else str(user_id or "")
+
+            doc_recipient = str(doc.get("recipient_id") or doc.get("user_id") or "")
+            is_direct = ctx and (doc_recipient in ctx["candidates"] or str(doc.get("user_id")) in ctx["candidates"])
+
+            if is_direct:
+                coll.update_one({"_id": doc["_id"]}, {"$set": {"is_read": True, "updated_at": now_str}})
+            else:
+                coll.update_one(
+                    {"_id": doc["_id"]},
+                    {
+                        "$addToSet": {"read_by": str(student_ident)},
+                        "$set": {"updated_at": now_str}
+                    }
+                )
+            return True
+        except Exception as e:
+            logger.warning(f"Error marking notification read: {e}")
+            return False
 
     @staticmethod
     def mark_admin_notification_read(notification_id: str) -> bool:
@@ -831,39 +1050,109 @@ class MongoNotificationService:
 
     @staticmethod
     def mark_all_read(user_id: Any) -> bool:
+        """Marks all notifications for the authenticated student as read."""
         coll = get_collection('notifications')
-        if coll is not None:
-            query = {"$or": [{"user_id": str(user_id)}, {"user_id": user_id}], "is_read": False}
-            coll.update_many(query, {"$set": {"is_read": True}})
+        if coll is None:
+            return False
+
+        now_str = datetime.utcnow().isoformat()
+
+        if user_id == "admin":
+            return MongoNotificationService.mark_all_admin_notifications_read()
+
+        ctx = MongoNotificationService._extract_student_context(user_id)
+        cands = ctx["candidates"]
+        cands_str = [str(c) for c in cands]
+        student_ident = ctx["enrollment_no"] or ctx["student_id"]
+        dept = ctx["department"]
+
+        try:
+            # 1. Mark direct notifications as read
+            coll.update_many(
+                {
+                    "$or": [
+                        {"user_id": {"$in": cands + cands_str}},
+                        {"recipient_id": {"$in": cands + cands_str}}
+                    ],
+                    "is_admin": {"$ne": True}
+                },
+                {"$set": {"is_read": True, "updated_at": now_str}}
+            )
+
+            # 2. Add student to read_by array for audience/broadcast notifications
+            audience_clauses: List[Dict[str, Any]] = [
+                {"recipient_id": {"$in": ["all", "all_students", "All Students", "All Students & Faculty"]}},
+                {"target_audience": {"$in": ["all", "all_students", "All Students", "All Students & Faculty", "All Students & Staff"]}}
+            ]
+            if dept:
+                audience_clauses.append({"department": dept, "target_audience": {"$ne": "Faculty Only"}})
+                audience_clauses.append({"target_department": dept})
+
+            coll.update_many(
+                {
+                    "$or": audience_clauses,
+                    "is_admin": {"$ne": True}
+                },
+                {
+                    "$addToSet": {"read_by": str(student_ident)},
+                    "$set": {"updated_at": now_str}
+                }
+            )
             return True
-        return False
+        except Exception as e:
+            logger.warning(f"Error marking all notifications read: {e}")
+            return False
 
     @staticmethod
     def mark_all_admin_notifications_read() -> bool:
         coll = get_collection('notifications')
         if coll is not None:
-            query = {"$or": [{"is_admin": True}, {"user_id": "admin"}, {"category": "registration"}], "is_read": False}
-            coll.update_many(query, {"$set": {"is_read": True}})
+            now_str = datetime.utcnow().isoformat()
+            query = {"$or": [{"is_admin": True}, {"user_id": "admin"}, {"recipient_id": "admin"}, {"category": "registration"}], "is_read": False}
+            coll.update_many(query, {"$set": {"is_read": True, "updated_at": now_str}})
             return True
         return False
 
     @staticmethod
     def delete_notification(notification_id: str, user_id: Any = None) -> bool:
+        """
+        Deletes or dismisses a notification for the current user.
+        Direct notifications are deleted; broadcast notifications are added to deleted_by.
+        """
         coll = get_collection('notifications')
-        if coll is not None:
-            from bson import ObjectId
-            query: Dict[str, Any] = {}
-            if ObjectId.is_valid(notification_id):
-                query["_id"] = ObjectId(notification_id)
-            else:
-                query["id"] = notification_id
+        if coll is None or not notification_id:
+            return False
 
-            if user_id is not None and user_id != "admin":
-                query["user_id"] = {"$in": [str(user_id), user_id]}
+        from bson import ObjectId
+        doc_query = {}
+        if ObjectId.is_valid(notification_id):
+            doc_query["_id"] = ObjectId(notification_id)
+        else:
+            doc_query["$or"] = [{"id": notification_id}, {"_id": str(notification_id)}]
 
-            try:
-                coll.delete_one(query)
+        try:
+            doc = coll.find_one(doc_query)
+            if not doc:
+                return False
+
+            if user_id == "admin":
+                coll.delete_one({"_id": doc["_id"]})
                 return True
-            except Exception:
-                pass
-        return False
+
+            ctx = MongoNotificationService._extract_student_context(user_id) if user_id is not None else None
+            student_ident = ctx["enrollment_no"] or ctx["student_id"] if ctx else str(user_id or "")
+
+            doc_recipient = str(doc.get("recipient_id") or doc.get("user_id") or "")
+            is_direct = ctx and (doc_recipient in ctx["candidates"] or str(doc.get("user_id")) in ctx["candidates"])
+
+            if is_direct:
+                coll.delete_one({"_id": doc["_id"]})
+            else:
+                coll.update_one(
+                    {"_id": doc["_id"]},
+                    {"$addToSet": {"deleted_by": str(student_ident)}}
+                )
+            return True
+        except Exception as e:
+            logger.warning(f"Error deleting notification: {e}")
+            return False

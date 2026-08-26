@@ -502,6 +502,10 @@ body {
     color: #F5F5F7;
 }
 
+.drawer-bottom-actions {
+    display: none;
+}
+
 /* 3. Recents Section with Compact, Polished ChatGPT-Style Density */
 .sidebar-recents-section {
     flex: 1;
@@ -2452,6 +2456,9 @@ body {
         left: 0;
         top: 0;
         bottom: 0;
+        height: 100vh;
+        height: 100dvh;
+        max-height: 100dvh;
         z-index: 1000;
         transform: translateX(-100%);
         width: 86vw !important;
@@ -2461,8 +2468,11 @@ body {
         border-radius: 0 20px 20px 0;
         box-shadow: 10px 0 36px rgba(0, 0, 0, 0.55);
         padding: 14px 12px;
+        padding-bottom: max(14px, env(safe-area-inset-bottom));
         display: flex;
         flex-direction: column;
+        overflow: hidden;
+        box-sizing: border-box;
         transition: transform 0.26s cubic-bezier(0.2, 0, 0, 1);
     }
 
@@ -2632,11 +2642,11 @@ body {
     }
 
     .sidebar-recents-section {
-        flex: 1;
-        overflow-y: auto;
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: hidden;
         display: flex;
         flex-direction: column;
-        min-height: 0;
         margin-top: 4px;
         border-top: 1px solid rgba(255, 255, 255, 0.06);
         padding-top: 8px;
@@ -2651,8 +2661,10 @@ body {
     }
 
     .recents-list {
-        flex: 1;
+        flex: 1 1 auto;
+        min-height: 0;
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
         display: flex;
         flex-direction: column;
         gap: 2px;
@@ -2706,13 +2718,22 @@ body {
         flex-shrink: 0;
     }
 
+    .drawer-bottom-actions {
+        margin-top: auto;
+        flex-shrink: 0;
+        padding-top: 8px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex !important;
+        flex-direction: column;
+        gap: 6px;
+    }
+
     .drawer-view-all-chats-btn {
         display: flex !important;
         align-items: center;
         justify-content: center;
         gap: 6px;
         padding: 9px 12px;
-        margin-top: 8px;
         background: #1c1d22;
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 10px;
