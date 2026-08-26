@@ -618,19 +618,42 @@
                             </div>
                         </div>
 
-                        <!-- Action Buttons (>= 44px) -->
+                        <!-- Action Buttons (Clean Balanced SaaS Layout, >= 44px touch targets) -->
                         <div class="faculty-card-actions">
                             <button type="button" class="faculty-action-btn is-primary" onclick="window.viewFaculty('${escapeQuotes(fId)}')" title="View Profile">
                                 <i data-lucide="eye" class="w-4 h-4"></i>
                                 <span>View Profile</span>
                             </button>
-                            <button type="button" class="faculty-action-btn" onclick="window.editFaculty('${escapeQuotes(fId)}')" title="Edit Faculty">
+                            <button type="button" class="faculty-action-btn is-secondary" onclick="window.editFaculty('${escapeQuotes(fId)}')" title="Edit Faculty">
                                 <i data-lucide="edit-2" class="w-4 h-4"></i>
                                 <span>Edit</span>
                             </button>
-                            <button type="button" class="faculty-action-btn is-danger is-icon-only" onclick="window.deleteFaculty('${escapeQuotes(fId)}')" title="Delete Faculty">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
+                            <div class="dropdown faculty-more-dropdown">
+                                <button type="button" class="faculty-action-btn is-icon-only is-more" data-bs-toggle="dropdown" aria-expanded="false" title="More options">
+                                    <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-xl border border-[#E1E5F0] rounded-2xl p-1.5 text-xs">
+                                    <li>
+                                        <button type="button" class="dropdown-item rounded-xl flex items-center gap-2 py-2 px-3 text-[#171D3A] hover:bg-[#E8EBFA] font-medium" onclick="window.viewFaculty('${escapeQuotes(fId)}')">
+                                            <i data-lucide="user-check" class="w-3.5 h-3.5 text-[#8B5CF6]"></i>
+                                            <span>Full Profile</span>
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button type="button" class="dropdown-item rounded-xl flex items-center gap-2 py-2 px-3 text-[#171D3A] hover:bg-[#E8EBFA] font-medium" onclick="window.editFaculty('${escapeQuotes(fId)}')">
+                                            <i data-lucide="edit-2" class="w-3.5 h-3.5 text-[#8B5CF6]"></i>
+                                            <span>Edit Details</span>
+                                        </button>
+                                    </li>
+                                    <li><hr class="dropdown-divider my-1 border-[#E1E5F0]"></li>
+                                    <li>
+                                        <button type="button" class="dropdown-item rounded-xl flex items-center gap-2 py-2 px-3 text-red-600 hover:bg-red-50 font-bold" onclick="window.deleteFaculty('${escapeQuotes(fId)}')">
+                                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                            <span>Delete Faculty</span>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </article>
                 `;

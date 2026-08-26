@@ -282,18 +282,19 @@
     text-overflow: ellipsis;
 }
 
-/* Bottom Action Buttons (Touch Target >= 44px) */
+/* Bottom Action Buttons (Clean Balanced SaaS Layout, >= 44px Touch Targets) */
 .faculty-card-actions {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding-top: 2px;
+    gap: 8px;
+    padding-top: 4px;
+    margin-top: auto;
 }
 
 .faculty-action-btn {
     min-height: 44px;
-    padding: 0 14px;
-    border-radius: 10px;
+    height: 44px;
+    border-radius: 12px;
     font-size: 12px;
     font-weight: 700;
     display: inline-flex;
@@ -306,15 +307,18 @@
     cursor: pointer;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
-    transition: all 0.15s ease;
-    flex: 1;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .faculty-action-btn:active {
     transform: scale(0.97);
 }
 
+/* Primary Action: View Profile */
 .faculty-action-btn.is-primary {
+    flex: 1;
+    min-width: 0;
+    padding: 0 14px;
     background: var(--fac-primary);
     border-color: var(--fac-primary);
     color: #FFFFFF;
@@ -324,24 +328,75 @@
 .faculty-action-btn.is-primary:hover {
     background: var(--fac-primary-hover);
     border-color: var(--fac-primary-hover);
+    color: #FFFFFF;
 }
 
-.faculty-action-btn.is-danger {
+.faculty-action-btn.is-primary span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Secondary Action: Edit */
+.faculty-action-btn.is-secondary {
+    flex: 0 0 auto;
+    padding: 0 14px;
     background: #FFFFFF;
     border-color: var(--fac-border);
-    color: #DC2626;
+    color: var(--fac-text-main);
 }
 
-.faculty-action-btn.is-danger:hover,
-.faculty-action-btn.is-danger:active {
-    background: #FEE2E2;
-    border-color: #FCA5A5;
+.faculty-action-btn.is-secondary:hover {
+    background: var(--fac-primary-soft);
+    border-color: var(--fac-primary);
+    color: var(--fac-primary);
 }
 
+/* More Options / Icon-only Button */
 .faculty-action-btn.is-icon-only {
     flex: 0 0 44px;
     width: 44px;
+    min-width: 44px;
     padding: 0;
+}
+
+.faculty-action-btn.is-more {
+    background: #F8F9FE;
+    border-color: var(--fac-border);
+    color: var(--fac-text-muted);
+}
+
+.faculty-action-btn.is-more:hover,
+.faculty-action-btn.is-more[aria-expanded="true"] {
+    background: var(--fac-primary-soft);
+    border-color: var(--fac-primary);
+    color: var(--fac-primary);
+}
+
+.faculty-more-dropdown {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.faculty-more-dropdown .dropdown-menu {
+    min-width: 175px;
+    background: #FFFFFF;
+    border: 1px solid var(--fac-border);
+    border-radius: 16px;
+    padding: 6px;
+    box-shadow: 0 10px 30px rgba(23, 29, 58, 0.12);
+    z-index: 25;
+}
+
+.faculty-more-dropdown .dropdown-item {
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.faculty-more-dropdown .dropdown-item:active {
+    transform: scale(0.98);
 }
 
 /* ==========================================================================
@@ -514,8 +569,22 @@
     }
 
     .faculty-action-btn {
-        font-size: 11px;
-        padding: 0 8px;
+        font-size: 11.5px;
+        gap: 4px;
+    }
+
+    .faculty-action-btn.is-primary {
+        padding: 0 10px;
+    }
+
+    .faculty-action-btn.is-secondary {
+        padding: 0 10px;
+    }
+
+    .faculty-action-btn.is-icon-only {
+        flex: 0 0 40px;
+        width: 40px;
+        min-width: 40px;
     }
 }
 
