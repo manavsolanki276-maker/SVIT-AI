@@ -265,6 +265,36 @@
                 </tbody>
             </table>
         </div>
+        <div id="dashboardRecentNoticesMobileCards" class="admin-mobile-record-list p-3">
+            {% if stats and stats.recent_notices and stats.recent_notices|length > 0 %}
+                {% for n in stats.recent_notices %}
+                <article class="admin-mobile-record-card">
+                    <div class="admin-record-heading">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="admin-record-icon">
+                                <i data-lucide="megaphone"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <h3>{{ n.title or n.notice_title or 'Notice' }}</h3>
+                                <p>{{ n.publish_date or n.date or 'Recent' }}</p>
+                            </div>
+                        </div>
+                        {% if n.is_urgent or n.priority == 'Emergency' or n.priority == 'High' %}
+                            <span class="badge-emergency-pulse">{{ n.priority or 'High' }}</span>
+                        {% else %}
+                            <span class="badge-priority-normal">{{ n.priority or 'Normal' }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="admin-record-meta">
+                        <span><b>Category</b>{{ n.category or 'General' }}</span>
+                        <span><b>Audience</b>{{ n.target_audience or 'All Students' }}</span>
+                    </div>
+                </article>
+                {% endfor %}
+            {% else %}
+                <div class="admin-mobile-empty">No notices available.</div>
+            {% endif %}
+        </div>
     </div>
 
 </div>

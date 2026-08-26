@@ -8,39 +8,96 @@
 {% endblock %}
 
 {% block content %}
-<div class="space-y-6 text-white">
+<div class="space-y-6 text-[#171D3A]">
 
     <!-- Header Hero Card -->
     <div class="academic-docs-hero-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl">
         <div class="flex items-center gap-3.5">
-            <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 flex-shrink-0">
+            <div class="w-12 h-12 rounded-2xl bg-[#E8EBFA] border border-[#8B5CF6]/30 flex items-center justify-center text-[#8B5CF6] flex-shrink-0 shadow-sm">
                 <i data-lucide="file-text" class="w-6 h-6"></i>
             </div>
             <div>
                 <div class="flex items-center gap-2">
-                    <h2 class="text-lg font-bold text-white mb-0">Academic Documents & Vector Knowledge Base</h2>
-                    <span id="docsCountBadge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                    <h2 class="text-lg font-bold text-[#171D3A] mb-0">Attendance & Academic Reports Repository</h2>
+                    <span id="docsCountBadge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-[#E8EBFA] text-[#8B5CF6] border border-[#8B5CF6]/30">
                         0 Documents
                     </span>
                 </div>
-                <p class="text-xs text-gray-400 mb-0 mt-0.5">Upload official syllabi, academic circulars, fee rules, and trigger live RAG vector embeddings for SVIT AI Chat.</p>
+                <p class="text-xs text-[#66708F] mb-0 mt-0.5">Track campus attendance thresholds, academic reports, official syllabi, and RAG knowledge vectors.</p>
             </div>
         </div>
 
-        <button id="openUploadDocModalBtn" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 transition flex items-center gap-2 self-start sm:self-auto">
-            <i data-lucide="upload-cloud" class="w-4 h-4"></i> Upload Document
-        </button>
+        <div class="flex items-center gap-2 flex-wrap self-start sm:self-auto">
+            <button id="openUploadDocModalBtn" class="btn-primary-custom">
+                <i data-lucide="upload-cloud" class="w-4 h-4"></i> Upload Document
+            </button>
+        </div>
+    </div>
+
+    <!-- Attendance & Academic KPI Summary Row -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm">
+            <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[11px] font-bold text-[#66708F] uppercase tracking-wider">Avg Attendance</span>
+                <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <i data-lucide="user-check" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <h3 class="text-xl font-black text-[#171D3A] mb-0">88.4%</h3>
+            <span class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1 mt-0.5">
+                <i data-lucide="trending-up" class="w-3 h-3"></i> Above GTU 75% Cutoff
+            </span>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm">
+            <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[11px] font-bold text-[#66708F] uppercase tracking-wider">Low Attendance</span>
+                <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                    <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <h3 class="text-xl font-black text-amber-600 mb-0">14 Students</h3>
+            <span class="text-[10px] text-amber-600 font-semibold flex items-center gap-1 mt-0.5">
+                <i data-lucide="alert-circle" class="w-3 h-3"></i> Notice Generated
+            </span>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm">
+            <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[11px] font-bold text-[#66708F] uppercase tracking-wider">Indexed Documents</span>
+                <div class="w-8 h-8 rounded-lg bg-[#E8EBFA] text-[#8B5CF6] flex items-center justify-center">
+                    <i data-lucide="layers" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <h3 class="text-xl font-black text-[#171D3A] mb-0" id="statDocCount">0</h3>
+            <span class="text-[10px] text-[#8B5CF6] font-semibold flex items-center gap-1 mt-0.5">
+                <i data-lucide="check" class="w-3 h-3"></i> Syllabi & Rules
+            </span>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm">
+            <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[11px] font-bold text-[#66708F] uppercase tracking-wider">RAG Vector Status</span>
+                <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                    <i data-lucide="cpu" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <h3 class="text-xl font-black text-[#171D3A] mb-0">Synchronized</h3>
+            <span class="text-[10px] text-indigo-600 font-semibold flex items-center gap-1 mt-0.5">
+                <i data-lucide="sparkles" class="w-3 h-3"></i> AI Bot Ready
+            </span>
+        </div>
     </div>
 
     <!-- Search & Filters Toolbar -->
-    <div class="p-4 rounded-2xl bg-[#111827] border border-[#1F2937] flex flex-col md:flex-row items-center justify-between gap-3 flex-wrap">
+    <div class="p-4 rounded-2xl bg-white border border-[#E1E5F0] flex flex-col md:flex-row items-center justify-between gap-3 flex-wrap shadow-sm">
         <div class="relative w-full md:w-80">
-            <i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
-            <input type="text" id="docSearchInput" placeholder="Search by title, syllabus code..." class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl pl-9 pr-3 py-2 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition">
+            <i data-lucide="search" class="w-4 h-4 text-[#8C95AD] absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="docSearchInput" placeholder="Search by title, syllabus code..." class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl pl-9 pr-3 py-2 text-xs text-[#171D3A] placeholder-[#8C95AD] focus:outline-none focus:border-[#8B5CF6] transition">
         </div>
 
         <div class="flex items-center gap-2 w-full md:w-auto flex-wrap">
-            <select id="docDeptFilter" class="bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500">
+            <select id="docDeptFilter" class="bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-[#8B5CF6]">
                 <option value="">All Departments</option>
                 <option value="Computer Engineering">Computer Engineering</option>
                 <option value="Information Technology">Information Technology</option>
@@ -51,16 +108,17 @@
                 <option value="General">General / All</option>
             </select>
 
-            <select id="docCategoryFilter" class="bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500">
+            <select id="docCategoryFilter" class="bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-[#8B5CF6]">
                 <option value="">All Categories</option>
                 <option value="Syllabus">Syllabus</option>
                 <option value="Academic Calendar">Academic Calendar</option>
                 <option value="Fee Structure">Fee Structure</option>
                 <option value="Exam Regulations">Exam Regulations</option>
                 <option value="Curriculum Manual">Curriculum Manual</option>
+                <option value="Attendance Report">Attendance Report</option>
             </select>
 
-            <select id="docSemFilter" class="bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500">
+            <select id="docSemFilter" class="bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-[#8B5CF6]">
                 <option value="">All Semesters</option>
                 <option value="1">Sem 1</option>
                 <option value="2">Sem 2</option>
@@ -72,14 +130,14 @@
                 <option value="8">Sem 8</option>
             </select>
 
-            <button id="refreshDocsBtn" class="p-2 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-400 hover:text-white" title="Refresh Table">
+            <button id="refreshDocsBtn" class="p-2 rounded-xl bg-[#F8F9FE] border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A] hover:bg-[#E8EBFA]" title="Refresh Table">
                 <i data-lucide="rotate-cw" class="w-4 h-4"></i>
             </button>
         </div>
     </div>
 
-    <!-- Academic Documents Table -->
-    <div class="rounded-2xl bg-[#111827] border border-[#1F2937] overflow-hidden">
+    <!-- Academic Documents Table (Desktop) & Mobile Cards (Mobile) -->
+    <div class="rounded-2xl bg-white border border-[#E1E5F0] overflow-hidden shadow-sm">
         <div class="table-responsive">
             <table class="table table-dark-custom mb-0 align-middle">
                 <thead>
@@ -96,30 +154,31 @@
                 </thead>
                 <tbody id="academicDocsTableBody">
                     <tr>
-                        <td colspan="8" class="text-center py-10 text-gray-400 text-xs">
-                            <div class="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                            Loading academic documents...
+                        <td colspan="8" class="text-center py-10 text-[#66708F] text-xs">
+                            <div class="w-5 h-5 border-2 border-[#8B5CF6] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                            Loading academic documents & reports...
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
+        <div id="academicDocsMobileCards" class="admin-mobile-record-list p-3" aria-live="polite"></div>
     </div>
 
     <!-- Academic Documents Pagination Footer -->
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-[#111827] border border-[#1F2937]" id="academicDocsPagination">
-        <div class="flex items-center gap-2 text-xs text-gray-400">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm" id="academicDocsPagination">
+        <div class="flex items-center gap-2 text-xs text-[#66708F]">
             <span>Showing</span>
-            <span id="pageStart" class="font-bold text-white">0</span>
+            <span id="pageStart" class="font-bold text-[#171D3A]">0</span>
             <span>to</span>
-            <span id="pageEnd" class="font-bold text-white">0</span>
+            <span id="pageEnd" class="font-bold text-[#171D3A]">0</span>
             <span>of</span>
-            <span id="pageTotal" class="font-bold text-indigo-400">0</span>
+            <span id="pageTotal" class="font-bold text-[#8B5CF6]">0</span>
             <span>documents</span>
         </div>
 
         <div class="flex items-center gap-3">
-            <select id="pageLimitSelect" class="bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-indigo-500">
+            <select id="pageLimitSelect" class="bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-[#8B5CF6]">
                 <option value="20">20 per page</option>
                 <option value="50" selected>50 per page</option>
                 <option value="100">100 per page</option>
@@ -128,11 +187,11 @@
             </select>
 
             <div class="flex items-center gap-1">
-                <button id="prevPageBtn" class="px-3 py-1.5 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-400 hover:text-white text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
+                <button id="prevPageBtn" class="px-3 py-1.5 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A] text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
                     Previous
                 </button>
                 <div id="pageNumbers" class="flex items-center gap-1"></div>
-                <button id="nextPageBtn" class="px-3 py-1.5 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-400 hover:text-white text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
+                <button id="nextPageBtn" class="px-3 py-1.5 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A] text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
                     Next
                 </button>
             </div>
@@ -144,32 +203,34 @@
 <!-- UPLOAD ACADEMIC DOCUMENT MODAL -->
 <div class="modal fade" id="academicDocModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content modal-dark-content">
-            <div class="modal-header border-b border-[#1F2937] p-4">
+        <div class="modal-content bg-white border border-[#E1E5F0] rounded-2xl shadow-xl">
+            <div class="modal-header border-b border-[#E1E5F0] p-4 bg-[#F8F9FE]">
                 <div class="flex items-center gap-2">
-                    <i data-lucide="file-plus" class="w-4 h-4 text-indigo-400"></i>
-                    <h3 class="text-sm font-bold text-white mb-0" id="docModalTitle">Upload Academic Document</h3>
+                    <div class="w-8 h-8 rounded-lg bg-[#E8EBFA] text-[#8B5CF6] flex items-center justify-center">
+                        <i data-lucide="file-plus" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-[#171D3A] mb-0" id="docModalTitle">Upload Academic Document</h3>
                 </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="academicDocForm" class="p-4 space-y-3.5 text-xs">
                 <input type="hidden" id="docFormRecordId">
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div>
-                        <label class="text-[11px] font-semibold text-gray-300">Document Identifier *</label>
-                        <input type="text" id="docIdInput" required placeholder="e.g. DOC-SYL-CE-SEM5" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 font-mono">
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Document Identifier *</label>
+                        <input type="text" id="docIdInput" required placeholder="e.g. DOC-SYL-CE-SEM5" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6] font-mono">
                     </div>
                     <div>
-                        <label class="text-[11px] font-semibold text-gray-300">Document Title *</label>
-                        <input type="text" id="docTitleInput" required placeholder="e.g. GTU BE Computer Eng Sem 5 Syllabus 2026" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Document Title *</label>
+                        <input type="text" id="docTitleInput" required placeholder="e.g. GTU BE Computer Eng Sem 5 Syllabus 2026" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                     <div>
-                        <label class="text-[11px] font-semibold text-gray-300">Department</label>
-                        <select id="docDeptInput" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Department</label>
+                        <select id="docDeptInput" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
                             <option value="Computer Engineering">Computer Engineering</option>
                             <option value="Information Technology">Information Technology</option>
                             <option value="Electronics & Comm.">Electronics & Comm.</option>
@@ -180,8 +241,8 @@
                         </select>
                     </div>
                     <div>
-                        <label class="text-[11px] font-semibold text-gray-300">Category</label>
-                        <select id="docCategoryInput" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Category</label>
+                        <select id="docCategoryInput" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
                             <option value="Syllabus" selected>Syllabus</option>
                             <option value="Academic Calendar">Academic Calendar</option>
                             <option value="Fee Structure">Fee Structure</option>
@@ -190,8 +251,8 @@
                         </select>
                     </div>
                     <div>
-                        <label class="text-[11px] font-semibold text-gray-300">Semester</label>
-                        <select id="docSemInput" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Semester</label>
+                        <select id="docSemInput" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
                             <option value="1">Sem 1</option>
                             <option value="2">Sem 2</option>
                             <option value="3">Sem 3</option>
@@ -205,24 +266,24 @@
                 </div>
 
                 <div>
-                    <label class="text-[11px] font-semibold text-gray-300">Description / Keywords</label>
-                    <textarea id="docDescInput" rows="2" placeholder="Summary or topic keywords for semantic retrieval..." class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500"></textarea>
+                    <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Description / Keywords</label>
+                    <textarea id="docDescInput" rows="2" placeholder="Summary or topic keywords for semantic retrieval..." class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]"></textarea>
                 </div>
 
                 <!-- PDF File Upload Zone -->
                 <div>
-                    <label class="text-[11px] font-semibold text-gray-300">Select PDF / DOCX Document *</label>
-                    <div id="docFileDropZone" class="p-4 border-2 border-dashed border-[#1F2937] rounded-xl text-center cursor-pointer hover:border-indigo-500 transition bg-[#0F172A]">
-                        <i data-lucide="file-up" class="w-5 h-5 mx-auto mb-1 text-gray-500"></i>
-                        <p class="text-xs text-gray-400 mb-0">Drag & drop PDF/DOCX file or click to browse</p>
+                    <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Select PDF / DOCX Document *</label>
+                    <div id="docFileDropZone" class="p-4 border-2 border-dashed border-[#E1E5F0] rounded-xl text-center cursor-pointer hover:border-[#8B5CF6] transition bg-[#F8F9FE]">
+                        <i data-lucide="file-up" class="w-5 h-5 mx-auto mb-1 text-[#8C95AD]"></i>
+                        <p class="text-xs text-[#66708F] mb-0">Drag & drop PDF/DOCX file or click to browse</p>
                     </div>
                     <input type="file" id="docFileInput" accept=".pdf,.doc,.docx" class="hidden">
                     <div id="docFilePreviewContainer" class="mt-2 hidden"></div>
                 </div>
 
-                <div class="modal-footer border-t border-[#1F2937] pt-4 px-0 pb-0 flex justify-end gap-2">
-                    <button type="button" class="px-4 py-2 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs font-semibold" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30">Save & Index Document</button>
+                <div class="modal-footer border-t border-[#E1E5F0] pt-4 px-0 pb-0 flex justify-end gap-2">
+                    <button type="button" class="px-4 py-2 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A] text-xs font-semibold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-primary-custom">Save & Index Document</button>
                 </div>
             </form>
         </div>
@@ -232,13 +293,15 @@
 <!-- IN-BROWSER PDF PREVIEW MODAL -->
 <div class="modal fade" id="academicDocPreviewModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
-        <div class="modal-content modal-dark-content">
-            <div class="modal-header border-b border-[#1F2937] p-4 flex items-center justify-between">
+        <div class="modal-content bg-white border border-[#E1E5F0] rounded-2xl shadow-xl">
+            <div class="modal-header border-b border-[#E1E5F0] p-4 flex items-center justify-between bg-[#F8F9FE]">
                 <div class="flex items-center gap-2">
-                    <i data-lucide="file-text" class="w-4 h-4 text-red-400"></i>
-                    <h3 class="text-sm font-bold text-white mb-0" id="docPreviewModalTitle">Document Preview</h3>
+                    <div class="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center">
+                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-[#171D3A] mb-0" id="docPreviewModalTitle">Document Preview</h3>
                 </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="p-3">
                 <iframe id="docPreviewIframe" class="pdf-preview-iframe" src=""></iframe>
@@ -250,17 +313,17 @@
 <!-- DELETE DOCUMENT CONFIRMATION MODAL -->
 <div class="modal fade" id="academicDocDeleteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content modal-dark-content text-center p-5 space-y-3">
-            <div class="w-12 h-12 rounded-full bg-red-600/20 text-red-400 border border-red-500/30 flex items-center justify-center mx-auto">
+        <div class="modal-content bg-white border border-[#E1E5F0] rounded-2xl shadow-xl text-center p-5 space-y-3">
+            <div class="w-12 h-12 rounded-full bg-red-50 text-red-600 border border-red-200 flex items-center justify-center mx-auto">
                 <i data-lucide="trash-2" class="w-6 h-6"></i>
             </div>
-            <h4 class="text-sm font-bold text-white mb-1">Delete Academic Document?</h4>
-            <p class="text-xs text-gray-400 mb-0">
-                Are you sure you want to delete <strong id="deleteDocTargetId" class="text-white"></strong>? Vector embeddings will also be purged.
+            <h4 class="text-sm font-bold text-[#171D3A] mb-1">Delete Academic Document?</h4>
+            <p class="text-xs text-[#66708F] mb-0">
+                Are you sure you want to delete <strong id="deleteDocTargetId" class="text-[#171D3A]"></strong>? Vector embeddings will also be purged.
             </p>
             <div class="pt-2 flex justify-center gap-2">
-                <button type="button" class="px-3.5 py-1.5 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" id="confirmDeleteDocBtn" class="px-4 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-semibold">Delete</button>
+                <button type="button" class="px-3.5 py-1.5 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] text-xs" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmDeleteDocBtn" class="px-4 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-semibold">Delete</button>
             </div>
         </div>
     </div>

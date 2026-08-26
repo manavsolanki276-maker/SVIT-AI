@@ -5,165 +5,118 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/students.css') }}">
-<style>
-    .status-tab-btn {
-        padding: 6px 14px;
-        border-radius: 10px;
-        font-size: 12px;
-        font-weight: 600;
-        color: #94a3b8;
-        background: transparent;
-        border: 1px solid transparent;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-    .status-tab-btn:hover {
-        color: #ffffff;
-        background: #1e293b;
-    }
-    .status-tab-btn.active {
-        background: #1e1b4b;
-        color: #818cf8;
-        border-color: rgba(99, 102, 241, 0.4);
-    }
-    .status-tab-btn.active[data-status="pending"] {
-        background: #451a03;
-        color: #fbbf24;
-        border-color: rgba(245, 158, 11, 0.4);
-    }
-    .status-tab-btn.active[data-status="active"] {
-        background: #064e3b;
-        color: #34d399;
-        border-color: rgba(16, 185, 129, 0.4);
-    }
-    .status-tab-btn.active[data-status="rejected"] {
-        background: #4c0519;
-        color: #fb7185;
-        border-color: rgba(244, 63, 94, 0.4);
-    }
-    .badge-status-pending {
-        background: rgba(245, 158, 11, 0.15);
-        color: #fbbf24;
-        border: 1px solid rgba(245, 158, 11, 0.35);
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 700;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-    }
-    .badge-status-active {
-        background: rgba(16, 185, 129, 0.15);
-        color: #34d399;
-        border: 1px solid rgba(16, 185, 129, 0.35);
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 700;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-    }
-    .badge-status-rejected {
-        background: rgba(239, 68, 68, 0.15);
-        color: #f87171;
-        border: 1px solid rgba(239, 68, 68, 0.35);
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 700;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-    }
-</style>
 {% endblock %}
 
 {% block content %}
-<div class="space-y-6 text-white">
+<div class="students-page-wrapper space-y-4 sm:space-y-6 text-[#171D3A]">
 
-    <!-- Header Hero Card -->
-    <div class="students-hero-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl">
-        <div class="flex items-center gap-3.5">
-            <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 flex-shrink-0">
-                <i data-lucide="users" class="w-6 h-6"></i>
+    <!-- 1. Header Section (Desktop Hero Card / Mobile Streamlined Header) -->
+    <div class="students-hero-card p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+        <div class="flex items-center gap-3 sm:gap-3.5">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-[#E8EBFA] border border-[#8B5CF6]/30 flex items-center justify-center text-[#8B5CF6] flex-shrink-0 shadow-sm">
+                <i data-lucide="users" class="w-5 h-5 sm:w-6 sm:h-6"></i>
             </div>
-            <div>
+            <div class="min-w-0">
                 <div class="flex items-center gap-2 flex-wrap">
-                    <h2 class="text-lg font-bold text-white mb-0">Student Registry &amp; Approvals</h2>
-                    <span id="studentsCountBadge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                    <h2 class="text-base sm:text-lg font-bold text-[#171D3A] mb-0 truncate">Students</h2>
+                    <span id="studentsCountBadge" class="px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-bold bg-[#E8EBFA] text-[#8B5CF6] border border-[#8B5CF6]/30">
                         0 Students
                     </span>
                 </div>
-                <p class="text-xs text-gray-400 mb-0 mt-0.5">Review registration requests, approve new student accounts, and manage student profiles.</p>
+                <p class="text-xs text-[#66708F] mb-0 mt-0.5 truncate sm:whitespace-normal">Manage student registrations and academic profiles</p>
             </div>
         </div>
 
-        <button id="openCreateStudentModalBtn" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 transition flex items-center gap-2 self-start sm:self-auto">
-            <i data-lucide="user-plus" class="w-4 h-4"></i> Add Student
+        <button id="openCreateStudentModalBtn" class="btn-primary-custom w-full sm:w-auto justify-center self-stretch sm:self-auto flex items-center gap-2 text-xs font-bold">
+            <i data-lucide="user-plus" class="w-4 h-4"></i>
+            <span>Add Student</span>
         </button>
     </div>
 
-    <!-- Status Filter Tab Bar -->
-    <div class="flex items-center gap-2 p-1.5 rounded-2xl bg-[#111827] border border-[#1F2937] overflow-x-auto">
-        <button type="button" class="status-tab-btn active" data-status="">
-            <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i> All Students (<span id="countAll">0</span>)
-        </button>
-        <button type="button" class="status-tab-btn" data-status="pending">
-            <i data-lucide="clock" class="w-3.5 h-3.5 text-amber-400"></i> Pending (<span id="countPending">0</span>)
-        </button>
-        <button type="button" class="status-tab-btn" data-status="active">
-            <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-400"></i> Active (<span id="countActive">0</span>)
-        </button>
-        <button type="button" class="status-tab-btn" data-status="rejected">
-            <i data-lucide="x-circle" class="w-3.5 h-3.5 text-red-400"></i> Rejected (<span id="countRejected">0</span>)
-        </button>
+    <!-- 2. Status Filter Pill Tabs (Compact Horizontal Scrollable Row) -->
+    <div class="status-tabs-scroll-wrapper">
+        <div class="status-tabs-scroll-container" role="tablist" aria-label="Student status filters">
+            <button type="button" class="status-tab-btn active" data-status="" role="tab" aria-selected="true">
+                <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+                <span>All</span>
+                <span class="status-pill-counter" id="countAll">0</span>
+            </button>
+            <button type="button" class="status-tab-btn" data-status="pending" role="tab" aria-selected="false">
+                <i data-lucide="clock" class="w-3.5 h-3.5 status-icon-pending"></i>
+                <span>Pending</span>
+                <span class="status-pill-counter" id="countPending">0</span>
+            </button>
+            <button type="button" class="status-tab-btn" data-status="active" role="tab" aria-selected="false">
+                <i data-lucide="check-circle" class="w-3.5 h-3.5 status-icon-active"></i>
+                <span>Active</span>
+                <span class="status-pill-counter" id="countActive">0</span>
+            </button>
+            <button type="button" class="status-tab-btn" data-status="rejected" role="tab" aria-selected="false">
+                <i data-lucide="x-circle" class="w-3.5 h-3.5 status-icon-rejected"></i>
+                <span>Rejected</span>
+                <span class="status-pill-counter" id="countRejected">0</span>
+            </button>
+        </div>
     </div>
 
-    <!-- Search & Filter Toolbar -->
-    <div class="p-4 rounded-2xl bg-[#111827] border border-[#1F2937] flex flex-col md:flex-row items-center justify-between gap-3 flex-wrap">
+    <!-- 3. Search & Filter Bar (Mobile-Optimized Toolbar) -->
+    <div class="students-toolbar-card p-3 sm:p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm flex flex-col md:flex-row items-center justify-between gap-2.5 sm:gap-3">
+        <!-- Search Input with Clear Button -->
         <div class="relative w-full md:w-80">
-            <i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
-            <input type="text" id="studentSearchInput" placeholder="Search by enrollment, name, email..." class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl pl-9 pr-3 py-2 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition">
+            <i data-lucide="search" class="w-4 h-4 text-[#8C95AD] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+            <input type="text" id="studentSearchInput" placeholder="Search enrollment, name, email..." class="student-search-input w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl pl-9 pr-9 py-2.5 text-xs sm:text-xs text-[#171D3A] placeholder-[#8C95AD] focus:outline-none focus:border-[#8B5CF6] transition">
+            <button type="button" id="clearSearchBtn" class="clear-search-btn hidden absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[#8C95AD] hover:text-[#171D3A]" title="Clear search">
+                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+            </button>
         </div>
 
-        <div class="flex items-center gap-2 w-full md:w-auto flex-wrap">
-            <select id="deptFilter" class="bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500">
-                <option value="">All Departments</option>
-                <option value="Computer Engineering">Computer Engineering</option>
-                <option value="Information Technology">Information Technology</option>
-                <option value="Electronics & Comm.">Electronics & Comm.</option>
-                <option value="Mechanical Eng.">Mechanical Eng.</option>
-                <option value="Civil Eng.">Civil Eng.</option>
-                <option value="Electrical Eng.">Electrical Eng.</option>
-                <option value="Aeronautical Eng.">Aeronautical Eng.</option>
-            </select>
+        <!-- Mobile Filter Button & Desktop Filter Dropdowns -->
+        <div class="flex items-center gap-2 w-full md:w-auto">
+            <!-- Mobile Filter Trigger Button (Visible on Mobile Only) -->
+            <button type="button" id="openMobileFilterBtn" class="mobile-filter-trigger-btn md:hidden flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs font-semibold hover:bg-[#E8EBFA]">
+                <i data-lucide="sliders-horizontal" class="w-4 h-4 text-[#8B5CF6]"></i>
+                <span>Filters</span>
+                <span id="mobileFilterActiveBadge" class="hidden px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-[#8B5CF6] text-white">0</span>
+            </button>
 
-            <select id="semFilter" class="bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500">
-                <option value="">All Semesters</option>
-                <option value="1">Sem 1</option>
-                <option value="2">Sem 2</option>
-                <option value="3">Sem 3</option>
-                <option value="4">Sem 4</option>
-                <option value="5">Sem 5</option>
-                <option value="6">Sem 6</option>
-                <option value="7">Sem 7</option>
-                <option value="8">Sem 8</option>
-            </select>
+            <!-- Desktop Filters (Visible on Tablet & Desktop) -->
+            <div class="hidden md:flex items-center gap-2">
+                <select id="deptFilter" class="bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-[#8B5CF6]">
+                    <option value="">All Departments</option>
+                    <option value="Computer Engineering">Computer Engineering</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="Electronics & Comm.">Electronics &amp; Comm.</option>
+                    <option value="Mechanical Eng.">Mechanical Eng.</option>
+                    <option value="Civil Eng.">Civil Eng.</option>
+                    <option value="Electrical Eng.">Electrical Eng.</option>
+                    <option value="Aeronautical Eng.">Aeronautical Eng.</option>
+                </select>
 
-            <button id="refreshStudentsBtn" class="p-2 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-400 hover:text-white" title="Refresh Table">
+                <select id="semFilter" class="bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-[#8B5CF6]">
+                    <option value="">All Semesters</option>
+                    <option value="1">Sem 1</option>
+                    <option value="2">Sem 2</option>
+                    <option value="3">Sem 3</option>
+                    <option value="4">Sem 4</option>
+                    <option value="5">Sem 5</option>
+                    <option value="6">Sem 6</option>
+                    <option value="7">Sem 7</option>
+                    <option value="8">Sem 8</option>
+                </select>
+            </div>
+
+            <!-- Refresh Button -->
+            <button id="refreshStudentsBtn" class="p-2.5 rounded-xl bg-[#F8F9FE] border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A] hover:bg-[#E8EBFA] flex-shrink-0" title="Refresh Table">
                 <i data-lucide="rotate-cw" class="w-4 h-4"></i>
             </button>
         </div>
     </div>
 
-    <!-- Students Data Table Card -->
-    <div class="rounded-2xl bg-[#111827] border border-[#1F2937] overflow-hidden">
+    <!-- 4. Students Data Container: Desktop Table vs Mobile Cards -->
+    <div class="students-data-container rounded-2xl bg-white border border-[#E1E5F0] overflow-hidden shadow-sm">
+        <!-- Desktop Table (Hidden on Mobile < 768px) -->
         <div class="table-responsive">
-            <table class="mobile-card-table table table-dark-custom mb-0 align-middle">
+            <table class="table table-dark-custom mb-0 align-middle">
                 <thead>
                     <tr>
                         <th>ENROLLMENT NO</th>
@@ -178,24 +131,28 @@
                 </thead>
                 <tbody id="studentsTableBody">
                     <tr>
-                        <td colspan="8" class="text-center py-10 text-gray-400 text-xs">
-                            <div class="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                        <td colspan="8" class="text-center py-10 text-[#66708F] text-xs">
+                            <div class="w-5 h-5 border-2 border-[#8B5CF6] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
                             Loading students...
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        <div id="studentsMobileCards" class="admin-mobile-record-list" aria-live="polite"></div>
+        
+        <!-- Mobile Student Cards List (Visible on Mobile < 768px) -->
+        <div id="studentsMobileCards" class="admin-mobile-record-list p-3 space-y-3" aria-live="polite"></div>
 
         <!-- Pagination Footer -->
-        <div class="p-4 border-t border-[#1F2937] bg-[#090D16] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-400">
-            <div id="paginationInfo">Showing 0 - 0 of 0 students</div>
-            <div class="flex items-center gap-1.5">
-                <button id="prevPageBtn" class="p-1.5 rounded-lg bg-[#111827] border border-[#1F2937] hover:border-gray-500 disabled:opacity-40 disabled:cursor-not-allowed">
+        <div class="p-3 sm:p-4 border-t border-[#E1E5F0] bg-[#F8F9FE] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#66708F]">
+            <div id="paginationInfo" class="font-medium text-center sm:text-left">Showing 0 - 0 of 0 students</div>
+            <div class="flex items-center gap-2">
+                <button id="prevPageBtn" class="px-3 py-1.5 rounded-xl bg-white border border-[#E1E5F0] hover:border-[#8B5CF6] text-[#171D3A] font-semibold text-xs disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1">
                     <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                    <span>Prev</span>
                 </button>
-                <button id="nextPageBtn" class="p-1.5 rounded-lg bg-[#111827] border border-[#1F2937] hover:border-gray-500 disabled:opacity-40 disabled:cursor-not-allowed">
+                <button id="nextPageBtn" class="px-3 py-1.5 rounded-xl bg-white border border-[#E1E5F0] hover:border-[#8B5CF6] text-[#171D3A] font-semibold text-xs disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1">
+                    <span>Next</span>
                     <i data-lucide="chevron-right" class="w-4 h-4"></i>
                 </button>
             </div>
@@ -204,98 +161,186 @@
 
 </div>
 
+<!-- MOBILE FILTER BOTTOM SHEET MODAL -->
+<div class="modal fade" id="studentMobileFilterModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content mobile-bottom-sheet-content bg-white border border-[#E1E5F0] rounded-t-3xl sm:rounded-2xl shadow-2xl">
+            <!-- Sheet Drag Handle -->
+            <div class="sheet-drag-handle-bar sm:hidden pt-3 pb-1 flex justify-center">
+                <div class="w-10 h-1.5 rounded-full bg-[#CBD5E1]"></div>
+            </div>
+
+            <div class="modal-header border-b border-[#E1E5F0] p-4 bg-[#F8F9FE]">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-[#E8EBFA] text-[#8B5CF6] flex items-center justify-center">
+                        <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-[#171D3A] mb-0">Filter Students</h3>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="p-4 space-y-4 text-xs">
+                <div>
+                    <label class="text-[11px] font-bold text-[#66708F] uppercase tracking-wider block mb-1.5">Department</label>
+                    <select id="mobileDeptFilter" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3.5 py-2.5 text-xs text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                        <option value="">All Departments</option>
+                        <option value="Computer Engineering">Computer Engineering</option>
+                        <option value="Information Technology">Information Technology</option>
+                        <option value="Electronics & Comm.">Electronics &amp; Comm.</option>
+                        <option value="Mechanical Eng.">Mechanical Eng.</option>
+                        <option value="Civil Eng.">Civil Eng.</option>
+                        <option value="Electrical Eng.">Electrical Eng.</option>
+                        <option value="Aeronautical Eng.">Aeronautical Eng.</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="text-[11px] font-bold text-[#66708F] uppercase tracking-wider block mb-1.5">Semester</label>
+                    <select id="mobileSemFilter" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3.5 py-2.5 text-xs text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                        <option value="">All Semesters</option>
+                        <option value="1">Semester 1</option>
+                        <option value="2">Semester 2</option>
+                        <option value="3">Semester 3</option>
+                        <option value="4">Semester 4</option>
+                        <option value="5">Semester 5</option>
+                        <option value="6">Semester 6</option>
+                        <option value="7">Semester 7</option>
+                        <option value="8">Semester 8</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="modal-footer border-t border-[#E1E5F0] p-3.5 bg-[#F8F9FE] flex items-center justify-between gap-2">
+                <button type="button" id="resetMobileFilterBtn" class="px-4 py-2.5 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A] text-xs font-semibold">
+                    Reset
+                </button>
+                <button type="button" id="applyMobileFilterBtn" class="btn-primary-custom flex-1 justify-center py-2.5 text-xs font-bold">
+                    Apply Filters
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- CREATE / EDIT STUDENT MODAL -->
 <div class="modal fade" id="studentFormModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content modal-dark-content">
-            <div class="modal-header border-b border-[#1F2937] p-4">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="user-plus" class="w-4 h-4 text-indigo-400"></i>
-                    <h3 class="text-sm font-bold text-white mb-0" id="studentModalTitle">Register New Student</h3>
-                </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content mobile-bottom-sheet-content bg-white border border-[#E1E5F0] rounded-t-3xl sm:rounded-2xl shadow-2xl">
+            <!-- Sheet Drag Handle (Mobile) -->
+            <div class="sheet-drag-handle-bar sm:hidden pt-3 pb-1 flex justify-center">
+                <div class="w-10 h-1.5 rounded-full bg-[#CBD5E1]"></div>
             </div>
-            <form id="studentForm" class="p-4 space-y-3.5 text-xs">
+
+            <div class="modal-header border-b border-[#E1E5F0] p-4 bg-[#F8F9FE]">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-[#E8EBFA] text-[#8B5CF6] flex items-center justify-center">
+                        <i data-lucide="user-plus" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-[#171D3A] mb-0" id="studentModalTitle">Register New Student</h3>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form id="studentForm" class="flex flex-col flex-1 overflow-hidden text-xs">
                 <input type="hidden" id="studentFormRecordId">
                 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                    <div>
-                        <label class="text-[11px] font-semibold text-gray-300">Enrollment Number *</label>
-                        <input type="text" id="studentEnrollment" required placeholder="e.g. 210410107001" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 font-mono">
+                <div class="modal-body p-4 sm:p-5 space-y-5 overflow-y-auto">
+                    <!-- Section 1: Personal Details -->
+                    <div class="form-group-section">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="w-5 h-5 rounded-full bg-[#E8EBFA] text-[#8B5CF6] text-[11px] font-bold flex items-center justify-center">1</span>
+                            <h4 class="text-xs font-bold text-[#171D3A] uppercase tracking-wider mb-0">Personal Information</h4>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5">
+                            <div class="sm:col-span-2">
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Full Legal Name *</label>
+                                <input type="text" id="studentFullName" required placeholder="e.g. Patel Rahul Kumar" class="form-control-custom">
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Email Address *</label>
+                                <input type="email" id="studentEmail" required placeholder="student@svitvasad.ac.in" class="form-control-custom">
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Contact Number</label>
+                                <input type="tel" id="studentPhone" placeholder="+91 9876543210" class="form-control-custom font-mono">
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label class="text-[11px] font-semibold text-gray-300">Full Name *</label>
-                        <input type="text" id="studentFullName" required placeholder="Student legal name" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+
+                    <!-- Section 2: Academic Information -->
+                    <div class="form-group-section pt-3 border-t border-[#E1E5F0]">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="w-5 h-5 rounded-full bg-[#E8EBFA] text-[#8B5CF6] text-[11px] font-bold flex items-center justify-center">2</span>
+                            <h4 class="text-xs font-bold text-[#171D3A] uppercase tracking-wider mb-0">Academic Details</h4>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-3.5">
+                            <div>
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Enrollment Number *</label>
+                                <input type="text" id="studentEnrollment" required placeholder="e.g. 210410107001" class="form-control-custom font-mono">
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Degree Program *</label>
+                                <select id="studentProgram" required class="form-control-custom">
+                                    <option value="BE">BE / BTech</option>
+                                    <option value="ME">ME / MTech</option>
+                                    <option value="MCA">MCA</option>
+                                    <option value="BCA">BCA</option>
+                                    <option value="Diploma">Diploma</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Department *</label>
+                                <select id="studentDepartment" required class="form-control-custom">
+                                    <option value="Computer Engineering">Computer Engineering</option>
+                                    <option value="Information Technology">Information Technology</option>
+                                    <option value="Electronics & Comm.">Electronics &amp; Comm.</option>
+                                    <option value="Mechanical Eng.">Mechanical Eng.</option>
+                                    <option value="Civil Eng.">Civil Eng.</option>
+                                    <option value="Electrical Eng.">Electrical Eng.</option>
+                                    <option value="Aeronautical Eng.">Aeronautical Eng.</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Semester *</label>
+                                <select id="studentSemester" required class="form-control-custom">
+                                    <option value="1">Semester 1</option>
+                                    <option value="2">Semester 2</option>
+                                    <option value="3">Semester 3</option>
+                                    <option value="4">Semester 4</option>
+                                    <option value="5">Semester 5</option>
+                                    <option value="6">Semester 6</option>
+                                    <option value="7">Semester 7</option>
+                                    <option value="8">Semester 8</option>
+                                </select>
+                            </div>
+                            <div class="sm:col-span-2 lg:col-span-2">
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Class Division / Batch</label>
+                                <input type="text" id="studentDivision" placeholder="e.g. Division A - Batch 1" class="form-control-custom">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 3: Status & Account -->
+                    <div class="form-group-section pt-3 border-t border-[#E1E5F0]">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="w-5 h-5 rounded-full bg-[#E8EBFA] text-[#8B5CF6] text-[11px] font-bold flex items-center justify-center">3</span>
+                            <h4 class="text-xs font-bold text-[#171D3A] uppercase tracking-wider mb-0">Status &amp; Verification</h4>
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Registration Status</label>
+                            <select id="studentStatus" class="form-control-custom">
+                                <option value="active">Active (Approved)</option>
+                                <option value="pending">Pending Review</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                    <div>
-                        <label class="text-[11px] font-semibold text-gray-300">Email Address *</label>
-                        <input type="email" id="studentEmail" required placeholder="student@svitvasad.ac.in" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
-                    </div>
-                    <div>
-                        <label class="text-[11px] font-semibold text-gray-300">Contact Number</label>
-                        <input type="text" id="studentPhone" placeholder="+91 9876543210" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 font-mono">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                    <div>
-                        <label class="text-[11px] font-semibold text-gray-300">Degree Program *</label>
-                        <select id="studentProgram" required class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
-                            <option value="BE">BE / BTech</option>
-                            <option value="ME">ME / MTech</option>
-                            <option value="MCA">MCA</option>
-                            <option value="BCA">BCA</option>
-                            <option value="Diploma">Diploma</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-[11px] font-semibold text-gray-300">Department *</label>
-                        <select id="studentDepartment" required class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
-                            <option value="Computer Engineering">Computer Engineering</option>
-                            <option value="Information Technology">Information Technology</option>
-                            <option value="Electronics & Comm.">Electronics & Comm.</option>
-                            <option value="Mechanical Eng.">Mechanical Eng.</option>
-                            <option value="Civil Eng.">Civil Eng.</option>
-                            <option value="Electrical Eng.">Electrical Eng.</option>
-                            <option value="Aeronautical Eng.">Aeronautical Eng.</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-[11px] font-semibold text-gray-300">Semester *</label>
-                        <select id="studentSemester" required class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
-                            <option value="1">Semester 1</option>
-                            <option value="2">Semester 2</option>
-                            <option value="3">Semester 3</option>
-                            <option value="4">Semester 4</option>
-                            <option value="5">Semester 5</option>
-                            <option value="6">Semester 6</option>
-                            <option value="7">Semester 7</option>
-                            <option value="8">Semester 8</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                    <div>
-                        <label class="text-[11px] font-semibold text-gray-300">Class Division / Batch</label>
-                        <input type="text" id="studentDivision" placeholder="e.g. Division A - Batch 1" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
-                    </div>
-                    <div>
-                        <label class="text-[11px] font-semibold text-gray-300">Status</label>
-                        <select id="studentStatus" class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
-                            <option value="active">Active (Approved)</option>
-                            <option value="pending">Pending Review</option>
-                            <option value="rejected">Rejected</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="modal-footer border-t border-[#1F2937] pt-4 px-0 pb-0 flex justify-end gap-2">
-                    <button type="button" class="px-4 py-2 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs font-semibold" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30">Save Student</button>
+                <div class="modal-footer border-t border-[#E1E5F0] p-3.5 sm:p-4 bg-[#F8F9FE] flex items-center justify-end gap-2">
+                    <button type="button" class="px-4 py-2.5 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A] text-xs font-semibold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-primary-custom py-2.5 px-5 text-xs font-bold">Save Student</button>
                 </div>
             </form>
         </div>
@@ -304,19 +349,28 @@
 
 <!-- VIEW STUDENT & AUDIT TRAIL MODAL -->
 <div class="modal fade" id="studentViewModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content modal-dark-content">
-            <div class="modal-header border-b border-[#1F2937] p-4">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="user-check" class="w-4 h-4 text-indigo-400"></i>
-                    <h3 class="text-sm font-bold text-white mb-0">Student Profile &amp; Approval Overview</h3>
-                </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content mobile-bottom-sheet-content bg-white border border-[#E1E5F0] rounded-t-3xl sm:rounded-2xl shadow-2xl">
+            <!-- Sheet Drag Handle (Mobile) -->
+            <div class="sheet-drag-handle-bar sm:hidden pt-3 pb-1 flex justify-center">
+                <div class="w-10 h-1.5 rounded-full bg-[#CBD5E1]"></div>
             </div>
-            <div class="p-4" id="studentViewContent"></div>
-            <div class="modal-footer border-t border-[#1F2937] p-3 flex justify-between items-center" id="studentViewModalFooter">
-                <div id="studentViewQuickActions" class="flex items-center gap-2"></div>
-                <button type="button" class="px-4 py-1.5 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs font-semibold" data-bs-dismiss="modal">Close</button>
+
+            <div class="modal-header border-b border-[#E1E5F0] p-4 bg-[#F8F9FE]">
+                <div class="flex items-center gap-2 min-w-0">
+                    <div class="w-8 h-8 rounded-lg bg-[#E8EBFA] text-[#8B5CF6] flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="user-check" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-[#171D3A] mb-0 truncate">Student Profile &amp; Audit Trail</h3>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body p-4 sm:p-5 overflow-y-auto" id="studentViewContent"></div>
+
+            <div class="modal-footer border-t border-[#E1E5F0] p-3.5 bg-[#F8F9FE] flex flex-wrap items-center justify-between gap-2" id="studentViewModalFooter">
+                <div id="studentViewQuickActions" class="flex items-center gap-2 flex-wrap"></div>
+                <button type="button" class="px-4 py-2 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A] text-xs font-semibold" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -325,21 +379,21 @@
 <!-- ACCEPT CONFIRMATION MODAL -->
 <div class="modal fade" id="studentAcceptModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content modal-dark-content text-center p-5 space-y-3">
-            <div class="w-12 h-12 rounded-full bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center mx-auto">
+        <div class="modal-content mobile-bottom-sheet-content bg-white border border-[#E1E5F0] rounded-t-3xl sm:rounded-2xl shadow-2xl text-center p-5 space-y-3">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center mx-auto shadow-sm">
                 <i data-lucide="check" class="w-6 h-6"></i>
             </div>
-            <h4 class="text-sm font-bold text-white mb-1">Approve Student Registration?</h4>
-            <p class="text-xs text-gray-300 mb-0">
-                Are you sure you want to approve <strong id="acceptStudentTargetName" class="text-white"></strong> (<span id="acceptStudentTargetEnroll" class="text-indigo-400 font-mono"></span>)?
+            <h4 class="text-sm font-bold text-[#171D3A] mb-1">Approve Registration?</h4>
+            <p class="text-xs text-[#66708F] mb-0">
+                Approve <strong id="acceptStudentTargetName" class="text-[#171D3A]"></strong> (<span id="acceptStudentTargetEnroll" class="text-[#8B5CF6] font-mono"></span>)?
             </p>
-            <p class="text-[11px] text-gray-400 mb-0">
-                The student account will become active and receive an approval notification.
+            <p class="text-[11px] text-[#8C95AD] mb-0">
+                The student account will be activated immediately.
             </p>
-            <div class="pt-2 flex justify-center gap-2">
-                <button type="button" class="px-3.5 py-1.5 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" id="confirmAcceptStudentBtn" class="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/30">
-                    Approve Student
+            <div class="pt-2 flex justify-center gap-2 w-full">
+                <button type="button" class="px-4 py-2.5 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] text-xs font-semibold flex-1" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmAcceptStudentBtn" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm flex-1">
+                    Approve
                 </button>
             </div>
         </div>
@@ -349,28 +403,28 @@
 <!-- REJECT STUDENT MODAL (With optional reason) -->
 <div class="modal fade" id="studentRejectModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content modal-dark-content p-4 space-y-3">
+        <div class="modal-content mobile-bottom-sheet-content bg-white border border-[#E1E5F0] rounded-t-3xl sm:rounded-2xl shadow-2xl p-4 sm:p-5 space-y-3">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-red-600/20 text-red-400 border border-red-500/30 flex items-center justify-center flex-shrink-0">
+                <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 border border-red-200 flex items-center justify-center flex-shrink-0">
                     <i data-lucide="x-circle" class="w-5 h-5"></i>
                 </div>
-                <div>
-                    <h4 class="text-sm font-bold text-white mb-0.5">Reject Student Registration</h4>
-                    <p class="text-xs text-gray-400 mb-0">
-                        Rejecting <strong id="rejectStudentTargetName" class="text-white"></strong> (<span id="rejectStudentTargetEnroll" class="text-indigo-400 font-mono"></span>)
+                <div class="min-w-0">
+                    <h4 class="text-sm font-bold text-[#171D3A] mb-0.5 truncate">Reject Registration</h4>
+                    <p class="text-xs text-[#66708F] mb-0 truncate">
+                        Rejecting <strong id="rejectStudentTargetName" class="text-[#171D3A]"></strong> (<span id="rejectStudentTargetEnroll" class="text-[#8B5CF6] font-mono"></span>)
                     </p>
                 </div>
             </div>
 
-            <div class="space-y-1.5 pt-2 text-xs">
-                <label class="font-semibold text-gray-300">Rejection Reason (Optional)</label>
-                <textarea id="studentRejectReason" rows="3" placeholder="Enter reason for rejection (e.g. Invalid enrollment number or details mismatch)..." class="w-full bg-[#0F172A] border border-[#1F2937] rounded-xl p-3 text-white text-xs focus:outline-none focus:border-red-500"></textarea>
-                <p class="text-[11px] text-gray-400 mb-0">The entered reason will be stored in the audit trail and sent to the student.</p>
+            <div class="space-y-1.5 pt-1 text-xs">
+                <label class="font-semibold text-[#66708F] block mb-1">Reason for Rejection (Optional)</label>
+                <textarea id="studentRejectReason" rows="3" placeholder="e.g. Enrollment ID mismatch or incomplete application..." class="form-control-custom"></textarea>
+                <p class="text-[11px] text-[#8C95AD] mb-0">Stored in the audit trail and visible to the student.</p>
             </div>
 
             <div class="pt-2 flex justify-end gap-2">
-                <button type="button" class="px-4 py-2 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs font-semibold" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" id="confirmRejectStudentBtn" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-semibold shadow-lg shadow-red-600/30">
+                <button type="button" class="px-4 py-2.5 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] text-xs font-semibold" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmRejectStudentBtn" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-sm">
                     Confirm Rejection
                 </button>
             </div>
@@ -381,17 +435,17 @@
 <!-- DELETE CONFIRMATION MODAL -->
 <div class="modal fade" id="studentDeleteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content modal-dark-content text-center p-5 space-y-3">
-            <div class="w-12 h-12 rounded-full bg-red-600/20 text-red-400 border border-red-500/30 flex items-center justify-center mx-auto">
+        <div class="modal-content mobile-bottom-sheet-content bg-white border border-[#E1E5F0] rounded-t-3xl sm:rounded-2xl shadow-2xl text-center p-5 space-y-3">
+            <div class="w-12 h-12 rounded-2xl bg-red-50 text-red-600 border border-red-200 flex items-center justify-center mx-auto shadow-sm">
                 <i data-lucide="trash-2" class="w-6 h-6"></i>
             </div>
-            <h4 class="text-sm font-bold text-white mb-1">Delete Student Record?</h4>
-            <p class="text-xs text-gray-400 mb-0">
-                Are you sure you want to delete enrollment <strong id="deleteStudentTargetEnroll" class="text-white"></strong>?
+            <h4 class="text-sm font-bold text-[#171D3A] mb-1">Delete Student?</h4>
+            <p class="text-xs text-[#66708F] mb-0">
+                Are you sure you want to permanently delete enrollment <strong id="deleteStudentTargetEnroll" class="text-[#171D3A]"></strong>?
             </p>
-            <div class="pt-2 flex justify-center gap-2">
-                <button type="button" class="px-3.5 py-1.5 rounded-xl bg-[#0F172A] border border-[#1F2937] text-gray-300 text-xs" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" id="confirmDeleteStudentBtn" class="px-4 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-semibold">Delete</button>
+            <div class="pt-2 flex justify-center gap-2 w-full">
+                <button type="button" class="px-4 py-2.5 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] text-xs font-semibold flex-1" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmDeleteStudentBtn" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-sm flex-1">Delete</button>
             </div>
         </div>
     </div>

@@ -1,113 +1,623 @@
-/* SVIT Admin - Students Management Responsive Stylesheet */
+/* ==========================================================================
+   SVIT Admin - Student Management Mobile-First Stylesheet
+   Color System: SVIT Light SaaS (#F8F9FE background, #FFFFFF cards, #8B5CF6 purple)
+   ========================================================================== */
+
 :root {
-    --stu-hero-bg: linear-gradient(135deg, #E8EBFA 0%, #FFFFFF 65%, #E7DDFB 100%);
-    --stu-hero-border: var(--svit-border);
+    --stu-bg: #F8F9FE;
     --stu-card-bg: #FFFFFF;
-    --stu-card-border: var(--svit-border);
-    --stu-card-hover: #F8F9FE;
-    --stu-accent: var(--svit-primary);
-    --stu-accent-light: var(--svit-periwinkle);
-    --stu-text-primary: var(--svit-text);
-    --stu-text-muted: var(--svit-text-secondary);
-    --stu-active-color: var(--svit-success);
-    --stu-pending-color: var(--svit-warning);
-    --stu-rejected-color: var(--svit-danger);
+    --stu-border: #E1E5F0;
+    --stu-primary: #8B5CF6;
+    --stu-primary-soft: #E8EBFA;
+    --stu-primary-hover: #7C4FE8;
+    --stu-text-main: #171D3A;
+    --stu-text-muted: #66708F;
+    --stu-text-subtle: #8C95AD;
+    --stu-success: #15803D;
+    --stu-success-bg: #DCFCE7;
+    --stu-success-border: #86EFAC;
+    --stu-warning: #B45309;
+    --stu-warning-bg: #FEF3C7;
+    --stu-warning-border: #FCD34D;
+    --stu-danger: #B91C1C;
+    --stu-danger-bg: #FEE2E2;
+    --stu-danger-border: #FCA5A5;
+    --stu-shadow-sm: 0 2px 8px rgba(23, 29, 58, 0.04);
+    --stu-shadow-md: 0 4px 16px rgba(23, 29, 58, 0.08);
 }
 
+.students-page-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
+}
+
+/* ==========================================================================
+   1. Header Section
+   ========================================================================== */
+
 .students-hero-card {
-    background: var(--stu-hero-bg);
-    border: 1px solid var(--stu-hero-border);
-    box-shadow: 0 4px 20px rgba(23, 29, 58, 0.06);
-    border-radius: 1rem;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: linear-gradient(135deg, #FFFFFF 0%, #F8F9FE 60%, #E8EBFA 100%);
+    border: 1px solid var(--stu-border);
+    box-shadow: var(--stu-shadow-sm);
+    transition: box-shadow 0.2s ease;
 }
 
 .students-hero-card:hover {
-    box-shadow: 0 8px 28px rgba(139, 92, 246, 0.12);
+    box-shadow: var(--stu-shadow-md);
+}
+
+/* ==========================================================================
+   2. Horizontal Scrollable Status Filter Tabs
+   ========================================================================== */
+
+.status-tabs-scroll-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.status-tabs-scroll-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 2px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+    touch-action: pan-x;
+}
+
+.status-tabs-scroll-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
 }
 
 .status-tab-btn {
     min-height: 44px;
-    padding: 0.5rem 1rem;
-    border-radius: 0.75rem;
-    font-size: 0.75rem;
+    padding: 8px 14px;
+    border-radius: 9999px;
+    font-size: 12px;
     font-weight: 700;
     color: var(--stu-text-muted);
     background: #FFFFFF;
-    border: 1px solid var(--stu-card-border);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--stu-border);
+    box-shadow: var(--stu-shadow-sm);
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 6px;
+    white-space: nowrap;
     cursor: pointer;
-    touch-action: manipulation;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
 }
 
 .status-tab-btn:hover {
-    color: var(--stu-text-primary);
+    color: var(--stu-text-main);
     background: #F8F9FE;
-    border-color: var(--stu-accent);
+    border-color: var(--stu-primary);
 }
 
+.status-tab-btn:active {
+    transform: scale(0.97);
+}
+
+.status-pill-counter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 7px;
+    border-radius: 9999px;
+    font-size: 10.5px;
+    font-weight: 800;
+    background: rgba(23, 29, 58, 0.06);
+    color: inherit;
+    min-width: 20px;
+}
+
+/* Active Filter Tab States */
 .status-tab-btn.active {
-    background: #E8EBFA;
-    color: var(--stu-accent);
-    border-color: var(--stu-accent);
-    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.15);
+    background: var(--stu-primary);
+    color: #FFFFFF;
+    border-color: var(--stu-primary);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+}
+
+.status-tab-btn.active .status-pill-counter {
+    background: rgba(255, 255, 255, 0.25);
+    color: #FFFFFF;
 }
 
 .status-tab-btn.active[data-status="pending"] {
-    background: #FEF3C7;
-    color: #B45309;
-    border-color: #F59E0B;
+    background: #D97706;
+    border-color: #D97706;
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
 }
 
 .status-tab-btn.active[data-status="active"] {
-    background: #DCFCE7;
-    color: #15803D;
-    border-color: #22C55E;
+    background: #16A34A;
+    border-color: #16A34A;
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
 }
 
 .status-tab-btn.active[data-status="rejected"] {
+    background: #DC2626;
+    border-color: #DC2626;
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+}
+
+/* Tab Icon Colors in inactive state */
+.status-icon-pending { color: #D97706; }
+.status-icon-active { color: #16A34A; }
+.status-icon-rejected { color: #DC2626; }
+.status-tab-btn.active i { color: #FFFFFF !important; }
+
+/* ==========================================================================
+   3. Search & Toolbar Controls
+   ========================================================================== */
+
+.students-toolbar-card {
+    background: #FFFFFF;
+    border: 1px solid var(--stu-border);
+}
+
+.student-search-input {
+    min-height: 44px;
+    font-size: 14px;
+}
+
+@media (max-width: 767.98px) {
+    .student-search-input {
+        font-size: 16px !important; /* Prevents auto-zoom in iOS Safari */
+    }
+}
+
+.clear-search-btn {
+    min-width: 32px;
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.mobile-filter-trigger-btn {
+    min-height: 44px;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.mobile-filter-trigger-btn:active {
+    background-color: var(--stu-primary-soft);
+    border-color: var(--stu-primary);
+}
+
+/* ==========================================================================
+   4. Student Mobile Record Card
+   ========================================================================== */
+
+.student-mobile-card {
+    background: #FFFFFF;
+    border: 1px solid var(--stu-border);
+    border-radius: 16px;
+    padding: 14px 15px;
+    box-shadow: var(--stu-shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.student-mobile-card:active {
+    transform: scale(0.99);
+}
+
+/* Pending Review Card Accent */
+.student-mobile-card.is-pending-card {
+    border-left: 4px solid #F59E0B;
+    background: linear-gradient(180deg, #FFFDF8 0%, #FFFFFF 100%);
+}
+
+/* Card Header */
+.student-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.student-card-identity {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    flex: 1;
+}
+
+.student-card-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: var(--stu-primary-soft);
+    color: var(--stu-primary);
+    font-weight: 800;
+    font-size: 13.5px;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.student-card-avatar.is-pending {
+    background: #FEF3C7;
+    color: #B45309;
+    border-color: #FCD34D;
+}
+
+.student-card-name-group {
+    min-width: 0;
+    flex: 1;
+}
+
+.student-card-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--stu-text-main);
+    margin: 0 0 2px 0;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.student-card-enroll {
+    font-size: 11.5px;
+    font-weight: 600;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    color: var(--stu-primary);
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* Card Metadata Grid (2-Column Structured Pill Cells) */
+.student-card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    background: #F8F9FE;
+    border: 1px solid var(--stu-border);
+    border-radius: 12px;
+    padding: 10px 12px;
+}
+
+.student-grid-item {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.student-grid-label {
+    font-size: 9.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--stu-text-subtle);
+}
+
+.student-grid-value {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--stu-text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Card Action Target Bar */
+.student-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding-top: 4px;
+    border-top: 1px dashed var(--stu-border);
+}
+
+.student-action-btn {
+    min-height: 44px;
+    padding: 8px 14px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex: 1;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: all 0.15s ease;
+    border: 1px solid var(--stu-border);
+    background: #FFFFFF;
+    color: var(--stu-text-main);
+}
+
+.student-action-btn:active {
+    transform: scale(0.97);
+    background: #F8F9FE;
+}
+
+.student-action-btn.is-primary {
+    background: var(--stu-primary-soft);
+    color: var(--stu-primary);
+    border-color: rgba(139, 92, 246, 0.3);
+}
+
+.student-action-btn.is-primary:hover,
+.student-action-btn.is-primary:active {
+    background: var(--stu-primary);
+    color: #FFFFFF;
+}
+
+.student-action-btn.is-success {
+    background: #DCFCE7;
+    color: #15803D;
+    border-color: #86EFAC;
+}
+
+.student-action-btn.is-success:active {
+    background: #16A34A;
+    color: #FFFFFF;
+}
+
+.student-action-btn.is-danger {
     background: #FEE2E2;
     color: #B91C1C;
-    border-color: #EF4444;
+    border-color: #FCA5A5;
+}
+
+.student-action-btn.is-danger:active {
+    background: #DC2626;
+    color: #FFFFFF;
+}
+
+.student-action-btn.is-icon-only {
+    flex: 0 0 44px;
+    padding: 0;
+    min-width: 44px;
+    max-width: 44px;
+}
+
+/* ==========================================================================
+   5. Status Badges
+   ========================================================================== */
+
+.badge-status-pending,
+.badge-status-active,
+.badge-status-rejected {
+    padding: 3.5px 8px;
+    border-radius: 9999px;
+    font-weight: 700;
+    font-size: 10.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .badge-status-pending {
-    background: #FEF3C7;
-    color: #B45309;
-    border: 1px solid #FCD34D;
-    padding: 0.3rem 0.65rem;
-    border-radius: 9999px;
-    font-weight: 700;
-    font-size: 0.7rem;
+    background: var(--stu-warning-bg) !important;
+    color: var(--stu-warning) !important;
+    border: 1px solid var(--stu-warning-border) !important;
 }
 
 .badge-status-active {
-    background: #DCFCE7;
-    color: #15803D;
-    border: 1px solid #86EFAC;
-    padding: 0.3rem 0.65rem;
-    border-radius: 9999px;
-    font-weight: 700;
-    font-size: 0.7rem;
+    background: var(--stu-success-bg) !important;
+    color: var(--stu-success) !important;
+    border: 1px solid var(--stu-success-border) !important;
 }
 
 .badge-status-rejected {
-    background: #FEE2E2;
-    color: #B91C1C;
-    border: 1px solid #FCA5A5;
-    padding: 0.3rem 0.65rem;
-    border-radius: 9999px;
-    font-weight: 700;
-    font-size: 0.7rem;
+    background: var(--stu-danger-bg) !important;
+    color: var(--stu-danger) !important;
+    border: 1px solid var(--stu-danger-border) !important;
 }
 
-.student-record-card {
+/* ==========================================================================
+   6. Skeleton Card Loading State
+   ========================================================================== */
+
+.student-skeleton-card {
     background: #FFFFFF;
-    border: 1px solid var(--stu-card-border);
-    border-radius: 0.85rem;
-    padding: 1rem;
-    box-shadow: 0 2px 8px rgba(23, 29, 58, 0.04);
+    border: 1px solid var(--stu-border);
+    border-radius: 16px;
+    padding: 14px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: var(--stu-shadow-sm);
 }
+
+.skeleton-shimmer {
+    background: linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.5s infinite;
+    border-radius: 8px;
+}
+
+@keyframes skeletonShimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ==========================================================================
+   7. Mobile Empty State
+   ========================================================================== */
+
+.student-mobile-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 36px 16px;
+    text-align: center;
+    background: #FFFFFF;
+    border: 1px dashed var(--stu-border);
+    border-radius: 16px;
+    gap: 10px;
+}
+
+.student-mobile-empty-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    background: #F8F9FE;
+    border: 1px solid var(--stu-border);
+    color: var(--stu-text-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.student-mobile-empty h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--stu-text-main);
+    margin: 0;
+}
+
+.student-mobile-empty p {
+    font-size: 12px;
+    color: var(--stu-text-muted);
+    max-width: 260px;
+    margin: 0;
+}
+
+/* ==========================================================================
+   8. Bottom-Sheet Modals & Form Controls
+   ========================================================================== */
+
+.form-control-custom {
+    width: 100%;
+    background-color: #F8F9FE;
+    border: 1px solid var(--stu-border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: var(--stu-text-main);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    min-height: 44px;
+}
+
+.form-control-custom:focus {
+    border-color: var(--stu-primary);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+    background-color: #FFFFFF;
+}
+
+@media (max-width: 767.98px) {
+    .form-control-custom {
+        font-size: 16px !important; /* No iOS zoom */
+    }
+
+    .mobile-bottom-sheet-content {
+        border-radius: 24px 24px 0 0 !important;
+        max-height: 88vh !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+        box-shadow: 0 -10px 30px rgba(23, 29, 58, 0.15) !important;
+    }
+
+    .modal.fade .modal-dialog {
+        transform: translateY(100%);
+        transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        margin: 0 !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    .modal.show .modal-dialog {
+        transform: translateY(0);
+    }
+}
+
+/* ==========================================================================
+   9. Precise Responsive Breakpoints
+   ========================================================================== */
+
+/* Compact Viewports (320px - 360px: iPhone SE, Galaxy Fold) */
+@media (max-width: 360px) {
+    .students-page-wrapper {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .student-mobile-card {
+        padding: 12px 10px;
+    }
+
+    .student-card-grid {
+        grid-template-columns: 1fr;
+        padding: 8px 10px;
+    }
+
+    .student-card-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 12px;
+    }
+
+    .student-card-name {
+        font-size: 13px;
+    }
+
+    .student-action-btn {
+        font-size: 11px;
+        padding: 6px 8px;
+    }
+
+    .status-tab-btn {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+}
+
+/* Standard Mobile Viewports (361px - 430px) */
+@media (min-width: 361px) and (max-width: 430px) {
+    .student-card-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Desktop Visibility Safety */
+@media (min-width: 768px) {
+    .students-data-container .admin-mobile-record-list {
+        display: none !important;
+    }
+
+    .students-data-container .table-responsive {
+        display: block !important;
+    }
+}
+

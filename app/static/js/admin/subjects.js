@@ -23,6 +23,22 @@
     let deleteModal = null;
     let searchDebounce = null;
 
+    function escapeHtml(value) {
+        return String(value || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function escapeQuotes(value) {
+        return String(value || '')
+            .replace(/\\/g, '\\\\')
+            .replace(/'/g, "\\'")
+            .replace(/"/g, '&quot;');
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         const modalEl = document.getElementById('subjectFormModal');
         const delEl = document.getElementById('subjectDeleteModal');
@@ -65,6 +81,15 @@
             });
         }
 
+        const typeFilter = document.getElementById('subjectTypeFilter');
+        if (typeFilter) {
+            typeFilter.addEventListener('change', (e) => {
+                state.subjectType = e.target.value;
+                state.page = 1;
+                loadSubjects();
+            });
+        }
+
         const refreshBtn = document.getElementById('refreshSubjectsBtn');
         if (refreshBtn) refreshBtn.addEventListener('click', loadSubjects);
 
@@ -77,31 +102,10 @@
             });
         }
 
-        const prevBtn = document.getElementById('prevPageBtn');
-        if (prevBtn) {
-            prevBtn.addEventListener('click', () => {
-                if (state.page > 1) {
-                    state.page--;
-                    loadSubjects();
-                }
-            });
-        }
-
-        const nextBtn = document.getElementById('nextPageBtn');
-        if (nextBtn) {
-            nextBtn.addEventListener('click', () => {
-                const totalPages = Math.ceil(state.total / state.limit) || 1;
-                if (state.page < totalPages) {
-                    state.page++;
-                    loadSubjects();
-                }
-            });
-        }
-
-        const createBtn = document.getElementById('openCreateSubjectModalBtn');
-        if (createBtn) {
-            createBtn.addEventListener('click', () => {
-                document.getElementById('subjectModalTitle').innerText = 'Add New Subject';
+        const addBtn = document.getElementById('addSubjectBtn');
+        if (addBtn) {
+            addBtn.addEventListener('click', () => {
+                document.getElementById('subjectModalTitle').innerText = 'Add Subject';
                 document.getElementById('subjectFormRecordId').value = '';
                 document.getElementById('subjectForm').reset();
                 document.getElementById('subjectIdInput').disabled = false;
@@ -122,61 +126,85 @@
 
         tbody.innerHTML = `
             <tr>
-                <td colspan="7" class="text-center py-10 text-gray-400 text-xs">
-                    <div class="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                    Loading subjects catalog...
+                <td colspan="7" class="text-center py-12 text-[#66708F] text-xs">
+                    <div class="inline-block animate-spin rounded-full h-5 w-5 border-2 border-[#8B5CF6] border-t-transparent mb-2"></div>
+                    <p class="mb-0">Loading subjects catalog...</p>
                 </td>
             </tr>
         `;
 
         const params = new URLSearchParams({
             page: state.page,
-            limit: state.limit,
-            search: state.search
+            limit: state.limit
         });
-        if (state.department) params.append('filter_department', state.department);
-        if (state.semester) params.append('filter_semester', state.semester);
+        if (state.search) params.append('search', state.search);
+        if (state.department) params.append('department', state.department);
+        if (state.semester) params.append('semester', state.semester);
+        if (state.subjectType) params.append('subject_type', state.subjectType);
 
         try {
             const res = await fetch(`/admin/api/crud/subjects?${params.toString()}`);
             const data = await res.json();
-            if (data.status === 'success') {
-                state.items = data.items || [];
-                state.total = data.total || 0;
+            if (res.ok && (data.status === 'success' || Array.isArray(data.items))) {
+                state.items = Array.isArray(data.items)
+                    ? data.items
+                    : (Array.isArray(data?.data?.items) ? data.data.items : (Array.isArray(data?.data) ? data.data : []));
+                state.total = typeof data.total === 'number'
+                    ? data.total
+                    : (typeof data?.data?.total === 'number' ? data.data.total : state.items.length);
                 renderSubjectsTable();
-                renderPagination(data);
+                renderPagination(data.pages || data?.data?.pages || 1);
             } else {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-red-400 text-xs">${data.message}</td></tr>`;
+                showAdminToast(data.message || 'Failed to load subjects.', 'error');
             }
         } catch (err) {
-            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-red-400 text-xs">${err.message}</td></tr>`;
+            showAdminToast(err.message, 'error');
         }
-        lucide.createIcons();
     }
 
-    function renderPagination(data) {
-        const start = state.total === 0 ? 0 : (state.page - 1) * state.limit + 1;
+    function renderPagination(totalPages) {
+        const pagWrapper = document.getElementById('subjectsPagination');
+        if (!pagWrapper) return;
+
+        if (totalPages <= 1) {
+            pagWrapper.classList.add('hidden');
+            return;
+        }
+
+        pagWrapper.classList.remove('hidden');
+        const start = (state.page - 1) * state.limit + 1;
         const end = Math.min(state.page * state.limit, state.total);
-        const totalPages = data.pages || Math.ceil(state.total / state.limit) || 1;
+        const infoEl = document.getElementById('subjectsPaginationInfo');
+        if (infoEl) infoEl.innerText = `Showing ${start}-${end} of ${state.total} subjects`;
 
-        const startEl = document.getElementById('pageStart');
-        const endEl = document.getElementById('pageEnd');
-        const totalEl = document.getElementById('pageTotal');
-        const prevBtn = document.getElementById('prevPageBtn');
-        const nextBtn = document.getElementById('nextPageBtn');
-        const numbersContainer = document.getElementById('pageNumbers');
+        const prevBtn = document.getElementById('subjectsPrevPageBtn');
+        const nextBtn = document.getElementById('subjectsNextPageBtn');
 
-        if (startEl) startEl.innerText = start;
-        if (endEl) endEl.innerText = end;
-        if (totalEl) totalEl.innerText = state.total;
+        if (prevBtn) {
+            prevBtn.disabled = state.page <= 1;
+            prevBtn.onclick = () => {
+                if (state.page > 1) {
+                    state.page--;
+                    loadSubjects();
+                }
+            };
+        }
 
-        if (prevBtn) prevBtn.disabled = (state.page <= 1);
-        if (nextBtn) nextBtn.disabled = (state.page >= totalPages);
+        if (nextBtn) {
+            nextBtn.disabled = state.page >= totalPages;
+            nextBtn.onclick = () => {
+                if (state.page < totalPages) {
+                    state.page++;
+                    loadSubjects();
+                }
+            };
+        }
 
+        const numbersContainer = document.getElementById('subjectsPageNumbers');
         if (numbersContainer) {
             numbersContainer.innerHTML = '';
             const maxVisible = 5;
-            let startP = Math.max(1, state.page - 2);
+            let startP = Math.max(1, state.page - Math.floor(maxVisible / 2));
             let endP = Math.min(totalPages, startP + maxVisible - 1);
             if (endP - startP < maxVisible - 1) {
                 startP = Math.max(1, endP - maxVisible + 1);
@@ -185,7 +213,7 @@
             for (let i = startP; i <= endP; i++) {
                 const btn = document.createElement('button');
                 btn.innerText = i;
-                btn.className = `px-2 py-1 rounded-lg text-xs font-semibold transition ${state.page === i ? 'bg-indigo-600 text-white' : 'bg-[#111827] border border-[#1F2937] text-gray-400 hover:text-white'}`;
+                btn.className = `px-2 py-1 rounded-lg text-xs font-semibold transition ${state.page === i ? 'bg-[#8B5CF6] text-white' : 'bg-white border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A]'}`;
                 btn.onclick = () => {
                     state.page = i;
                     loadSubjects();
@@ -204,8 +232,8 @@
         if (state.items.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="7" class="text-center py-12 text-gray-400 text-xs">
-                        <i data-lucide="book" class="w-8 h-8 mx-auto mb-2 text-gray-600"></i>
+                    <td colspan="7" class="text-center py-12 text-[#66708F] text-xs">
+                        <i data-lucide="book" class="w-8 h-8 mx-auto mb-2 text-[#8C95AD]"></i>
                         <p class="mb-0">No subject records found.</p>
                     </td>
                 </tr>
@@ -227,29 +255,29 @@
             return `
                 <tr>
                     <td>
-                        <span class="font-mono text-indigo-400 font-bold text-xs">${code}</span>
+                        <span class="font-mono text-[#8B5CF6] font-bold text-xs">${escapeHtml(code)}</span>
                     </td>
                     <td>
                         <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-lg bg-indigo-600/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-xs">
+                            <div class="w-8 h-8 rounded-lg bg-[#E8EBFA] border border-[#8B5CF6]/30 text-[#8B5CF6] flex items-center justify-center font-bold text-xs">
                                 <i data-lucide="book-open" class="w-4 h-4"></i>
                             </div>
                             <div>
-                                <p class="text-xs font-bold text-white mb-0">${name}</p>
-                                <span class="text-[10px] text-gray-500">${s.program || 'BE'}</span>
+                                <p class="text-xs font-bold text-[#171D3A] mb-0">${escapeHtml(name)}</p>
+                                <span class="text-[10px] text-[#66708F]">${escapeHtml(s.program || 'BE')}</span>
                             </div>
                         </div>
                     </td>
-                    <td class="text-gray-300 text-xs">${dept}</td>
-                    <td><span class="px-2 py-0.5 rounded text-[10px] bg-indigo-500/20 text-indigo-300 font-semibold">${sem}</span></td>
-                    <td><span class="badge-subject-type">${type}</span></td>
-                    <td><span class="badge-credits">${credits} Credits</span></td>
+                    <td class="text-[#171D3A] text-xs">${escapeHtml(dept)}</td>
+                    <td><span class="badge-sem">${escapeHtml(sem)}</span></td>
+                    <td><span class="badge-subject-type">${escapeHtml(type)}</span></td>
+                    <td><span class="badge-credits">${escapeHtml(String(credits))} Credits</span></td>
                     <td class="text-end">
                         <div class="inline-flex items-center gap-1.5">
-                            <button class="p-1.5 rounded-lg bg-[#0F172A] border border-[#1F2937] text-gray-300 hover:text-white" onclick="window.editSubject('${id}')" title="Edit Subject">
+                            <button class="p-1.5 rounded-lg bg-white border border-[#E1E5F0] text-[#171D3A] hover:bg-[#E8EBFA]" onclick="window.editSubject('${escapeQuotes(id)}')" title="Edit Subject">
                                 <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
                             </button>
-                            <button class="p-1.5 rounded-lg bg-[#0F172A] border border-[#1F2937] text-red-400 hover:bg-red-500/20" onclick="window.deleteSubject('${id}')" title="Delete">
+                            <button class="p-1.5 rounded-lg bg-white border border-[#E1E5F0] text-red-600 hover:bg-red-50" onclick="window.deleteSubject('${escapeQuotes(id)}')" title="Delete">
                                 <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                             </button>
                         </div>

@@ -351,6 +351,22 @@
 
     <!-- Global Layout Scripts -->
     <script>
+        window.escapeHtml = function(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        };
+
+        window.escapeQuotes = function(value) {
+            return String(value || '')
+                .replace(/\\/g, '\\\\')
+                .replace(/'/g, "\\'")
+                .replace(/"/g, '&quot;');
+        };
+
         document.body.dataset.adminModule = window.location.pathname.replace(/^\/admin\//, '').split('/')[0] || 'dashboard';
 
         function buildAdminMobileCards() {

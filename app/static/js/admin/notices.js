@@ -24,6 +24,22 @@
     let noticeDeleteModal = null;
     let searchDebounce = null;
 
+    function escapeHtml(value) {
+        return String(value || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function escapeQuotes(value) {
+        return String(value || '')
+            .replace(/\\/g, '\\\\')
+            .replace(/'/g, "\\'")
+            .replace(/"/g, '&quot;');
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         const formEl = document.getElementById('noticeFormModal');
         const viewEl = document.getElementById('noticeViewModal');
@@ -128,11 +144,11 @@
 
         if (dropZone && fileInput) {
             dropZone.addEventListener('click', () => fileInput.click());
-            dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-amber-500'); });
-            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-amber-500'));
+            dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-[#8B5CF6]'); });
+            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-[#8B5CF6]'));
             dropZone.addEventListener('drop', (e) => {
                 e.preventDefault();
-                dropZone.classList.remove('border-amber-500');
+                dropZone.classList.remove('border-[#8B5CF6]');
                 if (e.dataTransfer.files.length) uploadCircularDoc(e.dataTransfer.files[0]);
             });
             fileInput.addEventListener('change', (e) => {
@@ -148,7 +164,7 @@
 
         const preview = document.getElementById('circularFilePreviewContainer');
         if (preview) {
-            preview.innerHTML = '<span class="text-xs text-amber-400">Uploading document...</span>';
+            preview.innerHTML = '<span class="text-xs text-[#8B5CF6]">Uploading document...</span>';
             preview.classList.remove('hidden');
         }
 
@@ -159,10 +175,10 @@
                 state.uploadedDocData = data.file;
                 if (preview) {
                     preview.innerHTML = `
-                        <div class="flex items-center gap-2 p-2 rounded-lg bg-[#0F172A] border border-amber-500/50 text-xs">
-                            <i data-lucide="file-text" class="w-4 h-4 text-amber-400"></i>
-                            <span class="text-white font-medium">${data.file.file_name}</span>
-                            <span class="text-gray-400 text-[10px]">(${data.file.file_size_formatted})</span>
+                        <div class="flex items-center gap-2 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs">
+                            <i data-lucide="file-text" class="w-4 h-4 text-emerald-600"></i>
+                            <span class="text-[#171D3A] font-semibold">${escapeHtml(data.file.file_name)}</span>
+                            <span class="text-[#66708F] text-[10px]">(${escapeHtml(data.file.file_size_formatted || '')})</span>
                         </div>
                     `;
                     lucide.createIcons();
@@ -188,66 +204,96 @@
 
     async function loadNotices() {
         const tbody = document.getElementById('noticesTableBody');
+        const mobileCards = document.getElementById('noticesMobileCards');
         if (!tbody) return;
 
         tbody.innerHTML = `
             <tr>
-                <td colspan="7" class="text-center py-10 text-gray-400 text-xs">
-                    <div class="w-5 h-5 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                    Loading published notices...
+                <td colspan="7" class="text-center py-12 text-[#66708F] text-xs">
+                    <div class="inline-block animate-spin rounded-full h-5 w-5 border-2 border-[#8B5CF6] border-t-transparent mb-2"></div>
+                    <p class="mb-0">Loading published notices...</p>
                 </td>
             </tr>
         `;
+        if (mobileCards) mobileCards.innerHTML = '<div class="admin-mobile-empty">Loading notices...</div>';
 
         const params = new URLSearchParams({
             page: state.page,
-            limit: state.limit,
-            search: state.search
+            limit: state.limit
         });
+        if (state.search) params.append('search', state.search);
         if (state.priority) params.append('filter_priority', state.priority);
         if (state.target) params.append('filter_target_audience', state.target);
 
         try {
             const res = await fetch(`/admin/api/crud/notices?${params.toString()}`);
             const data = await res.json();
-            if (data.status === 'success') {
-                state.items = data.items || [];
-                state.total = data.total || 0;
+            if (res.ok && (data.status === 'success' || Array.isArray(data.items))) {
+                state.items = Array.isArray(data.items)
+                    ? data.items
+                    : (Array.isArray(data?.data?.items) ? data.data.items : (Array.isArray(data?.data) ? data.data : []));
+                state.total = typeof data.total === 'number'
+                    ? data.total
+                    : (typeof data?.data?.total === 'number' ? data.data.total : state.items.length);
                 renderNoticesTable();
-                renderPagination(data);
+                renderPagination(data.pages || data?.data?.pages || 1);
                 updateEmergencyTicker();
             } else {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-red-400 text-xs">${data.message}</td></tr>`;
+                showAdminToast(data.message || 'Failed to load notices.', 'error');
             }
         } catch (err) {
-            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-red-400 text-xs">${err.message}</td></tr>`;
+            showAdminToast(err.message, 'error');
         }
         lucide.createIcons();
     }
 
-    function renderPagination(data) {
-        const start = state.total === 0 ? 0 : (state.page - 1) * state.limit + 1;
-        const end = Math.min(state.page * state.limit, state.total);
-        const totalPages = data.pages || Math.ceil(state.total / state.limit) || 1;
+    function renderPagination(totalPages) {
+        const pagWrapper = document.getElementById('noticesPagination');
+        if (!pagWrapper) return;
 
+        if (totalPages <= 1) {
+            pagWrapper.classList.add('hidden');
+            return;
+        }
+
+        pagWrapper.classList.remove('hidden');
+        const start = (state.page - 1) * state.limit + 1;
+        const end = Math.min(state.page * state.limit, state.total);
         const startEl = document.getElementById('pageStart');
         const endEl = document.getElementById('pageEnd');
         const totalEl = document.getElementById('pageTotal');
-        const prevBtn = document.getElementById('prevPageBtn');
-        const nextBtn = document.getElementById('nextPageBtn');
-        const numbersContainer = document.getElementById('pageNumbers');
-
         if (startEl) startEl.innerText = start;
         if (endEl) endEl.innerText = end;
         if (totalEl) totalEl.innerText = state.total;
 
-        if (prevBtn) prevBtn.disabled = (state.page <= 1);
-        if (nextBtn) nextBtn.disabled = (state.page >= totalPages);
+        const prevBtn = document.getElementById('prevPageBtn');
+        const nextBtn = document.getElementById('nextPageBtn');
 
+        if (prevBtn) {
+            prevBtn.disabled = state.page <= 1;
+            prevBtn.onclick = () => {
+                if (state.page > 1) {
+                    state.page--;
+                    loadNotices();
+                }
+            };
+        }
+
+        if (nextBtn) {
+            nextBtn.disabled = state.page >= totalPages;
+            nextBtn.onclick = () => {
+                if (state.page < totalPages) {
+                    state.page++;
+                    loadNotices();
+                }
+            };
+        }
+
+        const numbersContainer = document.getElementById('pageNumbers');
         if (numbersContainer) {
             numbersContainer.innerHTML = '';
             const maxVisible = 5;
-            let startP = Math.max(1, state.page - 2);
+            let startP = Math.max(1, state.page - Math.floor(maxVisible / 2));
             let endP = Math.min(totalPages, startP + maxVisible - 1);
             if (endP - startP < maxVisible - 1) {
                 startP = Math.max(1, endP - maxVisible + 1);
@@ -256,7 +302,7 @@
             for (let i = startP; i <= endP; i++) {
                 const btn = document.createElement('button');
                 btn.innerText = i;
-                btn.className = `px-2 py-1 rounded-lg text-xs font-semibold transition ${state.page === i ? 'bg-amber-600 text-white' : 'bg-[#111827] border border-[#1F2937] text-gray-400 hover:text-white'}`;
+                btn.className = `px-2 py-1 rounded-lg text-xs font-semibold transition ${state.page === i ? 'bg-[#8B5CF6] text-white' : 'bg-white border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A]'}`;
                 btn.onclick = () => {
                     state.page = i;
                     loadNotices();
@@ -270,16 +316,16 @@
         const ticker = document.getElementById('emergencyNoticeTicker');
         if (!ticker) return;
 
-        const emergency = state.items.find(n => n.priority === 'Emergency' || n.priority === 'emergency');
+        const emergency = state.items.find(n => (n.priority || '').toLowerCase() === 'emergency');
         if (emergency) {
             ticker.innerHTML = `
-                <div class="notice-ticker-preview flex items-center justify-between gap-3">
-                    <div class="flex items-center gap-3">
+                <div class="flex items-center justify-between gap-3 p-3.5 rounded-2xl bg-red-50 border border-red-200 text-[#171D3A] shadow-sm">
+                    <div class="flex items-center gap-3 flex-wrap">
                         <span class="badge-emergency-pulse"><i data-lucide="alert-octagon" class="w-3.5 h-3.5"></i> ACTIVE EMERGENCY</span>
-                        <span class="text-xs font-bold text-white">${emergency.title}</span>
-                        <span class="text-xs text-red-200">${emergency.publish_date || 'Today'}</span>
+                        <span class="text-xs font-bold text-[#171D3A]">${escapeHtml(emergency.title)}</span>
+                        <span class="text-xs text-red-600">${escapeHtml(emergency.publish_date || 'Today')}</span>
                     </div>
-                    <button class="px-2.5 py-1 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-semibold" onclick="window.viewNotice('${emergency.id}')">View</button>
+                    <button class="px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-semibold flex-shrink-0" onclick="window.viewNotice('${escapeQuotes(emergency.id || emergency.notice_id)}')">View</button>
                 </div>
             `;
             ticker.classList.remove('hidden');
@@ -291,18 +337,21 @@
 
     function renderNoticesTable() {
         const tbody = document.getElementById('noticesTableBody');
+        const mobileCards = document.getElementById('noticesMobileCards');
         const countBadge = document.getElementById('noticesCountBadge');
         if (countBadge) countBadge.innerText = `${state.total} Notices`;
 
         if (state.items.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="7" class="text-center py-12 text-gray-400 text-xs">
-                        <i data-lucide="megaphone" class="w-8 h-8 mx-auto mb-2 text-gray-600"></i>
+                    <td colspan="7" class="text-center py-12 text-[#66708F] text-xs">
+                        <i data-lucide="megaphone" class="w-8 h-8 mx-auto mb-2 text-[#8C95AD]"></i>
                         <p class="mb-0">No notices or announcements found.</p>
                     </td>
                 </tr>
             `;
+            if (mobileCards) mobileCards.innerHTML = '<div class="admin-mobile-empty">No notices found matching active filters.</div>';
+            lucide.createIcons();
             return;
         }
 
@@ -310,17 +359,17 @@
             const id = n.notice_id || n.id || '-';
             const title = n.title || 'Notice';
             const cat = n.category || 'General Circular';
-            const priority = n.priority || 'Normal';
+            const priority = (n.priority || 'Normal').toLowerCase();
             const target = n.target_audience || 'All';
             const date = n.publish_date || 'Recent';
             const fileUrl = n.file_url;
 
             let badgeHtml = '';
-            if (priority === 'Emergency' || priority === 'emergency') {
+            if (priority === 'emergency') {
                 badgeHtml = '<span class="badge-emergency-pulse"><i data-lucide="alert-triangle" class="w-3 h-3"></i> EMERGENCY</span>';
-            } else if (priority === 'High' || priority === 'high') {
+            } else if (priority === 'high') {
                 badgeHtml = '<span class="badge-priority-high">High</span>';
-            } else if (priority === 'Low' || priority === 'low') {
+            } else if (priority === 'low') {
                 badgeHtml = '<span class="badge-priority-low">Low</span>';
             } else {
                 badgeHtml = '<span class="badge-priority-normal">Normal</span>';
@@ -330,35 +379,35 @@
                 <tr>
                     <td>
                         <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-lg bg-amber-600/10 border border-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs">
+                            <div class="pdf-icon-badge">
                                 <i data-lucide="megaphone" class="w-4 h-4"></i>
                             </div>
                             <div>
-                                <p class="text-xs font-bold text-white mb-0">${title}</p>
-                                <span class="text-[10px] text-gray-400 font-mono">${id}</span>
+                                <p class="text-xs font-bold text-[#171D3A] mb-0">${escapeHtml(title)}</p>
+                                <span class="text-[10px] text-[#66708F] font-mono">${escapeHtml(id)}</span>
                             </div>
                         </div>
                     </td>
-                    <td class="text-gray-300 text-xs">${cat}</td>
+                    <td class="text-[#171D3A] text-xs">${escapeHtml(cat)}</td>
                     <td>${badgeHtml}</td>
-                    <td class="text-gray-300 text-xs">${target}</td>
-                    <td class="text-gray-400 text-xs">${date}</td>
+                    <td class="text-[#66708F] text-xs">${escapeHtml(target)}</td>
+                    <td class="text-[#66708F] text-xs">${escapeHtml(date)}</td>
                     <td>
                         ${fileUrl ? `
-                            <a href="${fileUrl}" target="_blank" class="text-amber-400 hover:text-amber-300 text-xs font-semibold flex items-center gap-1 text-decoration-none">
+                            <a href="${fileUrl}" target="_blank" class="text-[#8B5CF6] hover:underline text-xs font-semibold flex items-center gap-1 text-decoration-none">
                                 <i data-lucide="paperclip" class="w-3.5 h-3.5"></i> File
                             </a>
-                        ` : '<span class="text-gray-600 text-xs">-</span>'}
+                        ` : '<span class="text-[#8C95AD] text-xs">-</span>'}
                     </td>
                     <td class="text-end">
                         <div class="inline-flex items-center gap-1.5">
-                            <button class="p-1.5 rounded-lg bg-[#0F172A] border border-[#1F2937] text-gray-300 hover:text-white" onclick="window.viewNotice('${id}')" title="View Notice">
+                            <button class="p-1.5 rounded-lg bg-white border border-[#E1E5F0] text-[#171D3A] hover:bg-[#E8EBFA]" onclick="window.viewNotice('${escapeQuotes(id)}')" title="View Notice">
                                 <i data-lucide="eye" class="w-3.5 h-3.5"></i>
                             </button>
-                            <button class="p-1.5 rounded-lg bg-[#0F172A] border border-[#1F2937] text-gray-300 hover:text-white" onclick="window.editNotice('${id}')" title="Edit Notice">
+                            <button class="p-1.5 rounded-lg bg-white border border-[#E1E5F0] text-[#171D3A] hover:bg-[#E8EBFA]" onclick="window.editNotice('${escapeQuotes(id)}')" title="Edit Notice">
                                 <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
                             </button>
-                            <button class="p-1.5 rounded-lg bg-[#0F172A] border border-[#1F2937] text-red-400 hover:bg-red-500/20" onclick="window.deleteNotice('${id}')" title="Delete">
+                            <button class="p-1.5 rounded-lg bg-white border border-[#E1E5F0] text-red-600 hover:bg-red-50" onclick="window.deleteNotice('${escapeQuotes(id)}')" title="Delete">
                                 <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                             </button>
                         </div>
@@ -366,6 +415,60 @@
                 </tr>
             `;
         }).join('');
+
+        if (mobileCards) {
+            mobileCards.innerHTML = state.items.map(n => {
+                const id = n.notice_id || n.id || '-';
+                const title = n.title || 'Notice';
+                const cat = n.category || 'General Circular';
+                const priority = (n.priority || 'Normal').toLowerCase();
+                const target = n.target_audience || 'All';
+                const date = n.publish_date || 'Recent';
+                const fileUrl = n.file_url;
+                const badge = priority === 'emergency' ? 'badge-emergency-pulse' : priority === 'high' ? 'badge-priority-high' : priority === 'low' ? 'badge-priority-low' : 'badge-priority-normal';
+                const priorityLabel = priority === 'emergency' ? 'EMERGENCY' : priority.toUpperCase();
+
+                return `
+                    <article class="admin-mobile-record-card">
+                        <div class="admin-record-heading">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="admin-record-icon">
+                                    <i data-lucide="megaphone"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h3>${escapeHtml(title)}</h3>
+                                    <p>${escapeHtml(id)}</p>
+                                </div>
+                            </div>
+                            <span class="${badge}">${priorityLabel}</span>
+                        </div>
+                        <div class="admin-record-meta">
+                            <span><b>Category</b>${escapeHtml(cat)}</span>
+                            <span><b>Audience</b>${escapeHtml(target)}</span>
+                            <span><b>Published</b>${escapeHtml(date)}</span>
+                        </div>
+                        <div class="admin-record-actions">
+                            <button type="button" onclick="window.viewNotice('${escapeQuotes(id)}')" title="View Notice">
+                                <i data-lucide="eye"></i> <span>View</span>
+                            </button>
+                            ${fileUrl ? `
+                                <a href="${fileUrl}" target="_blank" class="p-2 rounded-xl bg-white border border-[#E1E5F0] text-[#171D3A] text-xs font-semibold hover:bg-[#E8EBFA] inline-flex items-center gap-1 text-decoration-none" title="Attachment">
+                                    <i data-lucide="paperclip" class="w-3.5 h-3.5"></i> <span>File</span>
+                                </a>
+                            ` : ''}
+                            <button type="button" onclick="window.editNotice('${escapeQuotes(id)}')" title="Edit Notice">
+                                <i data-lucide="edit-2"></i> <span>Edit</span>
+                            </button>
+                            <button type="button" class="is-danger" onclick="window.deleteNotice('${escapeQuotes(id)}')" title="Delete Notice">
+                                <i data-lucide="trash-2"></i>
+                            </button>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        lucide.createIcons();
     }
 
     async function handleNoticeFormSubmit(e) {
@@ -437,18 +540,19 @@
         container.innerHTML = `
             <div class="space-y-3">
                 <div class="flex items-center justify-between">
-                    <span class="px-2 py-0.5 rounded text-xs font-bold bg-amber-500/20 text-amber-300">${item.category || 'Circular'}</span>
-                    <span class="text-xs text-gray-400">${item.publish_date || 'Today'}</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#E8EBFA] text-[#8B5CF6]">${escapeHtml(item.category || 'Circular')}</span>
+                    <span class="text-xs text-[#66708F]">${escapeHtml(item.publish_date || 'Today')}</span>
                 </div>
-                <h3 class="text-base font-bold text-white mb-1">${item.title}</h3>
-                <p class="text-xs text-gray-300 leading-relaxed">${item.description || 'No content provided.'}</p>
-                <div class="pt-2 border-t border-[#1F2937] flex justify-between items-center text-xs text-gray-400">
-                    <span>Target: <strong class="text-white">${item.target_audience || 'All'}</strong></span>
-                    ${item.file_url ? `<a href="${item.file_url}" target="_blank" class="text-amber-400 font-semibold">View Attachment</a>` : ''}
+                <h3 class="text-base font-bold text-[#171D3A] mb-1">${escapeHtml(item.title)}</h3>
+                <p class="text-xs text-[#66708F] leading-relaxed">${escapeHtml(item.description || 'No content provided.')}</p>
+                <div class="pt-3 border-t border-[#E1E5F0] flex justify-between items-center text-xs text-[#66708F]">
+                    <span>Target: <strong class="text-[#171D3A]">${escapeHtml(item.target_audience || 'All')}</strong></span>
+                    ${item.file_url ? `<a href="${item.file_url}" target="_blank" class="text-[#8B5CF6] font-semibold hover:underline flex items-center gap-1"><i data-lucide="paperclip" class="w-3.5 h-3.5"></i> View Attachment</a>` : ''}
                 </div>
             </div>
         `;
 
+        lucide.createIcons();
         noticeViewModal.show();
     };
 
