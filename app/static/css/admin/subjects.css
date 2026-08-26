@@ -358,57 +358,6 @@
     box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
 }
 
-/* Mobile Program Selection Card */
-.mobile-program-card {
-    background-color: #FFFFFF;
-    border: 1.5px solid var(--subj-border);
-    border-radius: 1rem;
-    padding: 0.875rem 1rem;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    min-height: 56px;
-    display: flex;
-    align-items: center;
-    box-shadow: 0 2px 8px rgba(23, 29, 58, 0.03);
-}
-
-.mobile-program-card:hover {
-    border-color: rgba(139, 92, 246, 0.4);
-    background-color: #F8F9FE;
-    transform: translateY(-1px);
-}
-
-.mobile-program-card.active {
-    background-color: #FFFFFF;
-    border-color: #8B5CF6;
-    box-shadow: 0 4px 16px rgba(139, 92, 246, 0.15);
-}
-
-.mobile-program-card .program-icon-box {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 0.75rem;
-    background-color: #E8EBFA;
-    color: #8B5CF6;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.mobile-program-card.active .program-icon-box {
-    background-color: #8B5CF6;
-    color: #FFFFFF;
-}
-
-.badge-selected-pill {
-    background-color: #E8EBFA;
-    color: #8B5CF6;
-    border: 1px solid rgba(139, 92, 246, 0.3);
-    padding: 0.2rem 0.5rem;
-    border-radius: 9999px;
-    font-weight: 700;
-}
 
 /* Mobile Bottom Sheet Modal Styling */
 @media (max-width: 767.98px) {

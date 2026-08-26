@@ -119,23 +119,15 @@
             </div>
         </div>
 
-        <!-- Level 1: Program Selector Section (Mobile-First Architecture) -->
-        <div class="space-y-2.5">
-            <div class="flex items-center justify-between">
-                <div>
-                    <span class="text-[11px] font-bold text-[#8C95AD] uppercase tracking-wider block">Select Academic Program</span>
-                    <span class="text-[11px] text-[#66708F] font-medium hidden sm:block">Choose an academic program to explore departments and subjects</span>
-                </div>
-                <span class="badge-svit-purple text-[11px] font-bold" id="programInfoLabel">5 Degree Programs</span>
+        <!-- Level 1: Program Selector Pills / Cards -->
+        <div>
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold text-[#8C95AD] uppercase tracking-wider">Select Academic Program:</span>
+                <span class="text-[11px] text-[#66708F] font-semibold" id="programInfoLabel">5 Degree Programs Available</span>
             </div>
 
-            <!-- Mobile Vertical Program Card List (320px - 639px) -->
-            <div class="grid grid-cols-1 gap-2 sm:hidden" id="mobileProgramCardList">
-                <!-- Dynamically populated from live MongoDB data -->
-            </div>
-
-            <!-- Desktop & Tablet Horizontal Scrollable Pills (>= 640px) -->
-            <div class="hidden sm:block overflow-x-auto pb-1 no-scrollbar">
+            <!-- Horizontal Scrollable Program Navigation Bar -->
+            <div class="overflow-x-auto pb-1 no-scrollbar">
                 <div class="flex items-center gap-2 min-w-max" id="programSelectorContainer">
                     <!-- Dynamically populated from live MongoDB data -->
                 </div>

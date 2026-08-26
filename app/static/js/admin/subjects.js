@@ -355,8 +355,8 @@
     // =========================================================================
 
     function renderProgramPills() {
-        const mobileContainer = document.getElementById('mobileProgramCardList');
-        const desktopContainer = document.getElementById('programSelectorContainer');
+        const container = document.getElementById('programSelectorContainer');
+        if (!container) return;
 
         // Group subjects by Program dynamically
         const programMap = {};
@@ -382,59 +382,24 @@
             progInfo.innerText = `${progList.length} Degree Programs Available`;
         }
 
-        // 1. Mobile Vertical Program Cards (320px - 639px)
-        if (mobileContainer) {
-            mobileContainer.innerHTML = progList.map(prog => {
-                const item = programMap[prog];
-                const isActive = prog.toLowerCase() === state.selectedProgram.toLowerCase();
-                const iconName = PROGRAM_ICONS[prog] || 'award';
-                const title = PROGRAM_NAMES[prog] || prog;
-                const courseCount = item.courses.size;
-                const subCount = item.subjectsCount;
+        container.innerHTML = progList.map(prog => {
+            const item = programMap[prog];
+            const isActive = prog.toLowerCase() === state.selectedProgram.toLowerCase();
+            const iconName = PROGRAM_ICONS[prog] || 'award';
+            const title = PROGRAM_NAMES[prog] || prog;
+            const courseCount = item.courses.size;
+            const subCount = item.subjectsCount;
 
-                return `
-                    <div class="mobile-program-card ${isActive ? 'active' : ''}" onclick="window.selectProgram('${escapeQuotes(prog)}')">
-                        <div class="flex items-center justify-between w-full gap-2">
-                            <div class="flex items-center gap-3 truncate">
-                                <div class="program-icon-box">
-                                    <i data-lucide="${iconName}" class="w-5 h-5"></i>
-                                </div>
-                                <div class="text-left truncate">
-                                    <h4 class="text-xs font-bold text-[#171D3A] mb-0.5 leading-snug truncate">${escapeHtml(title)}</h4>
-                                    <p class="text-[11px] text-[#66708F] mb-0 font-medium truncate">${courseCount} ${courseCount === 1 ? 'Course' : 'Courses'} • ${subCount} Subjects</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-2 flex-shrink-0">
-                                ${isActive ? `<span class="badge-selected-pill text-[10px] font-bold">Selected</span>` : ''}
-                                <i data-lucide="chevron-right" class="w-4 h-4 text-[#8C95AD]"></i>
-                            </div>
-                        </div>
+            return `
+                <button type="button" class="program-nav-pill ${isActive ? 'active' : ''}" data-program="${escapeHtml(prog)}" onclick="window.selectProgram('${escapeQuotes(prog)}')">
+                    <div class="pill-badge-icon"><i data-lucide="${iconName}" class="w-4 h-4"></i></div>
+                    <div class="text-left">
+                        <span class="program-title">${escapeHtml(title)}</span>
+                        <span class="program-sub">${courseCount} ${courseCount === 1 ? 'Course' : 'Courses'} • ${subCount} Subjects</span>
                     </div>
-                `;
-            }).join('');
-        }
-
-        // 2. Desktop Horizontal Pills (>= 640px)
-        if (desktopContainer) {
-            desktopContainer.innerHTML = progList.map(prog => {
-                const item = programMap[prog];
-                const isActive = prog.toLowerCase() === state.selectedProgram.toLowerCase();
-                const iconName = PROGRAM_ICONS[prog] || 'award';
-                const title = PROGRAM_NAMES[prog] || prog;
-                const courseCount = item.courses.size;
-                const subCount = item.subjectsCount;
-
-                return `
-                    <button type="button" class="program-nav-pill ${isActive ? 'active' : ''}" data-program="${escapeHtml(prog)}" onclick="window.selectProgram('${escapeQuotes(prog)}')">
-                        <div class="pill-badge-icon"><i data-lucide="${iconName}" class="w-4 h-4"></i></div>
-                        <div class="text-left">
-                            <span class="program-title">${escapeHtml(title)}</span>
-                            <span class="program-sub">${courseCount} ${courseCount === 1 ? 'Course' : 'Courses'} • ${subCount} Subjects</span>
-                        </div>
-                    </button>
-                `;
-            }).join('');
-        }
+                </button>
+            `;
+        }).join('');
 
         if (window.lucide) lucide.createIcons();
     }
