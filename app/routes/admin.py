@@ -587,7 +587,7 @@ def api_list_items(module_name: str):
         if k.startswith('filter_') and v:
             actual_key = k.replace('filter_', '', 1)
             filters[actual_key] = v
-        elif k in ['department', 'category', 'status', 'priority', 'program', 'semester', 'division', 'day', 'year', 'faculty', 'room', 'is_urgent'] and v:
+        elif k in ['department', 'category', 'status', 'priority', 'program', 'semester', 'division', 'day', 'year', 'faculty', 'room', 'is_urgent', 'subject_type', 'credits', 'subject_code'] and v:
             filters[k] = v
 
     result = AdminCRUDService.list_items(

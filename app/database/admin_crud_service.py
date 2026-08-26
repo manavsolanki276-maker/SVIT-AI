@@ -129,24 +129,27 @@ MODULE_CONFIGS: Dict[str, Dict[str, Any]] = {
     },
     "subjects": {
         "title": "Subjects & Curriculum",
-        "description": "Manage academic subjects, syllabus codes, credit schemes, and electives.",
+        "description": "Manage academic programs, courses, semesters, subjects, syllabus codes, and credit schemes.",
         "icon": "book",
         "required_permission": "academic",
         "id_field": "subject_id",
-        "search_fields": ["subject_id", "subject_code", "subject_name", "department", "program"],
-        "filter_fields": ["department", "program", "semester", "subject_type"],
-        "sort_fields": ["subject_code", "subject_name", "semester", "credits"],
+        "search_fields": ["subject_id", "subject_code", "subject_name", "department", "program", "faculty", "year", "semester"],
+        "filter_fields": ["department", "program", "year", "semester", "subject_type", "credits", "faculty"],
+        "sort_fields": ["subject_code", "subject_name", "semester", "credits", "department", "program"],
         "default_sort": ("subject_code", 1),
         "source_csv": "subjects.csv",
         "fields": [
             {"key": "subject_id", "label": "Subject ID", "type": "text", "required": True, "table": True},
             {"key": "subject_code", "label": "Subject Code", "type": "text", "required": True, "table": True},
             {"key": "subject_name", "label": "Subject Name", "type": "text", "required": True, "table": True},
-            {"key": "program", "label": "Program", "type": "select", "options": ["BE", "BTech", "ME", "MCA", "Diploma"], "required": True, "table": True},
-            {"key": "department", "label": "Department", "type": "select", "options": ["Computer Engineering", "Information Technology", "Electronics & Comm.", "Mechanical Eng.", "Civil Eng.", "Electrical Eng."], "required": True, "table": True},
+            {"key": "program", "label": "Program", "type": "select", "options": ["Diploma", "BE", "BCA", "MCA", "ME"], "required": True, "table": True},
+            {"key": "department", "label": "Course / Department", "type": "select", "options": ["Computer Engineering", "Information Technology", "Artificial Intelligence & Machine Learning", "Data Science", "Electronics & Communication", "Mechanical Engineering", "Civil Engineering", "Electrical Engineering", "Automobile Engineering", "Computer Applications"], "required": True, "table": True},
+            {"key": "year", "label": "Academic Year", "type": "select", "options": ["FY", "SY", "TY", "LY"], "required": False, "table": True},
             {"key": "semester", "label": "Semester", "type": "number", "min": 1, "max": 8, "required": True, "table": True},
-            {"key": "subject_type", "label": "Subject Type", "type": "select", "options": ["Core Theory", "Practical / Lab", "Elective", "Open Elective", "Project / Seminar"], "required": True, "table": True},
-            {"key": "credits", "label": "Credits", "type": "number", "min": 1, "max": 10, "required": True, "table": True}
+            {"key": "subject_type", "label": "Subject Type", "type": "select", "options": ["Theory", "Practical", "Elective", "Core Theory", "Project / Seminar"], "required": True, "table": True},
+            {"key": "credits", "label": "Credits", "type": "number", "min": 1, "max": 10, "required": True, "table": True},
+            {"key": "faculty", "label": "Assigned Faculty", "type": "text", "required": False, "table": True},
+            {"key": "description", "label": "Syllabus / Course Description", "type": "textarea", "required": False, "table": False}
         ]
     },
     "placements": {

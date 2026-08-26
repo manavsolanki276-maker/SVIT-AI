@@ -1,195 +1,361 @@
 {% extends "layouts/admin_base.html" %}
 
-{% block title %}Subjects Management{% endblock %}
-{% block header_title %}Academic Administration: Subjects & Curriculum{% endblock %}
+{% block title %}Subjects & Curriculum Management{% endblock %}
+{% block header_title %}Academic Administration: Subjects &amp; Courses{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/subjects.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class="space-y-6 text-[#171D3A]">
+<div class="subjects-page-wrapper space-y-5 text-[#171D3A]">
 
-    <!-- Header Hero Card -->
-    <div class="subjects-hero-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl">
+    <!-- =========================================================================
+         1. HERO HEADER & ACTION BAR
+         ========================================================================= -->
+    <div class="subjects-hero-card p-4 sm:p-6 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div class="flex items-center gap-3.5">
-            <div class="w-12 h-12 rounded-2xl bg-[#E8EBFA] border border-[#8B5CF6]/30 flex items-center justify-center text-[#8B5CF6] flex-shrink-0 shadow-sm">
-                <i data-lucide="book" class="w-6 h-6"></i>
+            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-[#E8EBFA] border border-[#8B5CF6]/30 flex items-center justify-center text-[#8B5CF6] flex-shrink-0 shadow-sm">
+                <i data-lucide="book-open" class="w-5 h-5 sm:w-6 sm:h-6"></i>
             </div>
             <div>
                 <div class="flex items-center gap-2">
-                    <h2 class="text-lg font-bold text-[#171D3A] mb-0">Academic Curriculum & Subjects</h2>
-                    <span id="subjectsCountBadge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-[#E8EBFA] text-[#8B5CF6] border border-[#8B5CF6]/30">
-                        0 Subjects
-                    </span>
+                    <h1 class="text-base sm:text-xl font-bold text-[#171D3A] mb-0 tracking-tight">Subjects &amp; Courses</h1>
+                    <span class="badge-svit-purple hidden sm:inline-flex" id="heroTotalBadge">640 Subjects</span>
                 </div>
-                <p class="text-xs text-[#66708F] mb-0 mt-0.5">Manage syllabus codes, credit distributions, core theories, electives, and practical labs.</p>
+                <p class="text-xs text-[#66708F] mb-0 mt-0.5">Manage academic programs, courses, semesters and subjects</p>
             </div>
         </div>
 
-        <button id="openCreateSubjectModalBtn" class="btn-primary-custom self-start sm:self-auto">
-            <i data-lucide="plus-circle" class="w-4 h-4"></i> Add Subject
-        </button>
-    </div>
+        <div class="flex items-center gap-2 flex-wrap self-stretch sm:self-auto justify-end">
+            <!-- Mobile Filter Trigger (< 768px) -->
+            <button type="button" id="mobileFilterDrawerBtn" class="sm:hidden flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-white border border-[#E1E5F0] text-xs font-semibold text-[#171D3A] hover:bg-[#F8F9FE] shadow-sm">
+                <i data-lucide="sliders-horizontal" class="w-4 h-4 text-[#8B5CF6]"></i>
+                <span>Filters</span>
+                <span id="mobileActiveFilterCount" class="w-4 h-4 rounded-full bg-[#8B5CF6] text-white text-[10px] font-bold flex items-center justify-center hidden">0</span>
+            </button>
 
-    <!-- Search & Filter Bar -->
-    <div class="p-4 rounded-2xl bg-white border border-[#E1E5F0] flex flex-col md:flex-row items-center justify-between gap-3 flex-wrap shadow-sm">
-        <div class="relative w-full md:w-80">
-            <i data-lucide="search" class="w-4 h-4 text-[#8C95AD] absolute left-3 top-1/2 -translate-y-1/2"></i>
-            <input type="text" id="subjectSearchInput" placeholder="Search by subject code, title..." class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl pl-9 pr-3 py-2 text-xs text-[#171D3A] placeholder-[#8C95AD] focus:outline-none focus:border-[#8B5CF6] transition">
-        </div>
-
-        <div class="flex items-center gap-2 w-full md:w-auto flex-wrap">
-            <select id="subjectDeptFilter" class="bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-[#8B5CF6]">
-                <option value="">All Departments</option>
-                <option value="Computer Engineering">Computer Engineering</option>
-                <option value="Information Technology">Information Technology</option>
-                <option value="Electronics & Comm.">Electronics & Comm.</option>
-                <option value="Mechanical Eng.">Mechanical Eng.</option>
-                <option value="Civil Eng.">Civil Eng.</option>
-                <option value="Electrical Eng.">Electrical Eng.</option>
-            </select>
-
-            <select id="subjectSemFilter" class="bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-[#8B5CF6]">
-                <option value="">All Semesters</option>
-                <option value="1">Sem 1</option>
-                <option value="2">Sem 2</option>
-                <option value="3">Sem 3</option>
-                <option value="4">Sem 4</option>
-                <option value="5">Sem 5</option>
-                <option value="6">Sem 6</option>
-                <option value="7">Sem 7</option>
-                <option value="8">Sem 8</option>
-            </select>
-
-            <button id="refreshSubjectsBtn" class="p-2 rounded-xl bg-[#F8F9FE] border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A] hover:bg-[#E8EBFA]" title="Refresh Table">
+            <!-- Refresh Button -->
+            <button type="button" id="refreshSubjectsBtn" class="p-2.5 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A] hover:bg-[#E8EBFA] transition shadow-sm" title="Refresh Curriculum Data">
                 <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+            </button>
+
+            <!-- Add Subject Primary CTA -->
+            <button type="button" id="openAddSubjectModalBtn" class="btn-primary-custom flex items-center gap-1.5 py-2.5 px-4 text-xs font-bold shadow-sm">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>Add Subject</span>
             </button>
         </div>
     </div>
 
-    <!-- Subjects Data Table (Desktop) & Mobile Cards (Mobile) -->
-    <div class="rounded-2xl bg-white border border-[#E1E5F0] overflow-hidden shadow-sm">
-        <div class="table-responsive">
-            <table class="mobile-card-table table table-dark-custom mb-0 align-middle">
-                <thead>
-                    <tr>
-                        <th>SUBJECT CODE</th>
-                        <th>SUBJECT NAME</th>
-                        <th>DEPARTMENT</th>
-                        <th>SEMESTER</th>
-                        <th>TYPE</th>
-                        <th>CREDITS</th>
-                        <th class="text-end">ACTIONS</th>
-                    </tr>
-                </thead>
-                <tbody id="subjectsTableBody">
-                    <tr>
-                        <td colspan="7" class="text-center py-10 text-[#66708F] text-xs">
-                            <div class="w-5 h-5 border-2 border-[#8B5CF6] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                            Loading subjects...
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div id="subjectsMobileCards" class="admin-mobile-record-list p-3" aria-live="polite"></div>
-    </div>
-
-    <!-- Subjects Pagination Footer -->
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm" id="subjectsPagination">
-        <div class="flex items-center gap-2 text-xs text-[#66708F]">
-            <span>Showing</span>
-            <span id="pageStart" class="font-bold text-[#171D3A]">0</span>
-            <span>to</span>
-            <span id="pageEnd" class="font-bold text-[#171D3A]">0</span>
-            <span>of</span>
-            <span id="pageTotal" class="font-bold text-[#8B5CF6]">0</span>
-            <span>subjects</span>
-        </div>
-
-        <div class="flex items-center gap-3">
-            <select id="pageLimitSelect" class="bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-[#8B5CF6]">
-                <option value="20">20 per page</option>
-                <option value="50" selected>50 per page</option>
-                <option value="100">100 per page</option>
-                <option value="250">250 per page</option>
-                <option value="10000">Show All</option>
-            </select>
-
-            <div class="flex items-center gap-1">
-                <button id="prevPageBtn" class="px-3 py-1.5 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A] text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
-                    Previous
-                </button>
-                <div id="pageNumbers" class="flex items-center gap-1"></div>
-                <button id="nextPageBtn" class="px-3 py-1.5 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A] text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
-                    Next
-                </button>
+    <!-- =========================================================================
+         2. LIVE CURRICULUM KPI / OVERVIEW CARDS
+         ========================================================================= -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4" id="subjectsKpiGrid">
+        <div class="kpi-stat-card p-3.5 sm:p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-[#E8EBFA] text-[#8B5CF6] flex items-center justify-center flex-shrink-0">
+                <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+            </div>
+            <div class="min-w-0">
+                <p class="text-[10px] uppercase font-bold text-[#8C95AD] tracking-wider mb-0.5">Programs</p>
+                <h3 class="text-base sm:text-lg font-bold text-[#171D3A] mb-0 truncate" id="kpiProgramsCount">5</h3>
             </div>
         </div>
+
+        <div class="kpi-stat-card p-3.5 sm:p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="layers" class="w-5 h-5"></i>
+            </div>
+            <div class="min-w-0">
+                <p class="text-[10px] uppercase font-bold text-[#8C95AD] tracking-wider mb-0.5">Total Courses</p>
+                <h3 class="text-base sm:text-lg font-bold text-purple-600 mb-0 truncate" id="kpiCoursesCount">20</h3>
+            </div>
+        </div>
+
+        <div class="kpi-stat-card p-3.5 sm:p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="book-open" class="w-5 h-5"></i>
+            </div>
+            <div class="min-w-0">
+                <p class="text-[10px] uppercase font-bold text-[#8C95AD] tracking-wider mb-0.5">Total Subjects</p>
+                <h3 class="text-base sm:text-lg font-bold text-emerald-600 mb-0 truncate" id="kpiSubjectsCount">640</h3>
+            </div>
+        </div>
+
+        <div class="kpi-stat-card p-3.5 sm:p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="award" class="w-5 h-5"></i>
+            </div>
+            <div class="min-w-0">
+                <p class="text-[10px] uppercase font-bold text-[#8C95AD] tracking-wider mb-0.5">Total Credits</p>
+                <h3 class="text-base sm:text-lg font-bold text-[#171D3A] mb-0 truncate" id="kpiCreditsCount">2,080</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         3. SEARCH & LEVEL 1: PROGRAM SELECTOR BAR
+         ========================================================================= -->
+    <div class="bg-white border border-[#E1E5F0] rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
+        <!-- Global Search Row -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div class="relative flex-1">
+                <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8C95AD]"></i>
+                <input type="text" id="subjectSearchInput" placeholder="Search subject name, code (e.g. DICO101, CE501), course, faculty..." class="form-control-custom pl-10 pr-8 text-xs">
+                <button type="button" id="subjectSearchClearBtn" class="absolute right-3 top-1/2 -translate-y-1/2 text-[#8C95AD] hover:text-[#171D3A] hidden">
+                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+
+            <!-- Quick Type Filter (Desktop / Tablet) -->
+            <div class="hidden sm:flex items-center gap-2">
+                <label class="text-[11px] font-semibold text-[#66708F] whitespace-nowrap">Type:</label>
+                <select id="desktopTypeFilter" class="form-control-custom select-sm text-xs font-semibold w-auto min-w-[130px]">
+                    <option value="">All Types</option>
+                    <option value="Theory">Theory</option>
+                    <option value="Practical">Practical</option>
+                    <option value="Elective">Elective</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Level 1: Program Selector Pills / Cards -->
+        <div>
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold text-[#8C95AD] uppercase tracking-wider">Select Academic Program:</span>
+                <span class="text-[11px] text-[#66708F] font-semibold" id="programInfoLabel">5 Degree Programs Available</span>
+            </div>
+
+            <!-- Horizontal Scrollable Program Navigation Bar -->
+            <div class="overflow-x-auto pb-1 no-scrollbar">
+                <div class="flex items-center gap-2 min-w-max" id="programSelectorContainer">
+                    <button type="button" class="program-nav-pill active" data-program="Diploma">
+                        <div class="pill-badge-icon"><i data-lucide="award" class="w-4 h-4"></i></div>
+                        <div class="text-left">
+                            <span class="program-title">Diploma Engineering</span>
+                            <span class="program-sub" id="pillCountDiploma">7 Courses • 210 Subjects</span>
+                        </div>
+                    </button>
+
+                    <button type="button" class="program-nav-pill" data-program="BE">
+                        <div class="pill-badge-icon"><i data-lucide="graduation-cap" class="w-4 h-4"></i></div>
+                        <div class="text-left">
+                            <span class="program-title">BE / B.Tech (Degree)</span>
+                            <span class="program-sub" id="pillCountBE">8 Courses • 320 Subjects</span>
+                        </div>
+                    </button>
+
+                    <button type="button" class="program-nav-pill" data-program="BCA">
+                        <div class="pill-badge-icon"><i data-lucide="code-2" class="w-4 h-4"></i></div>
+                        <div class="text-left">
+                            <span class="program-title">BCA (Computer App)</span>
+                            <span class="program-sub" id="pillCountBCA">1 Course • 30 Subjects</span>
+                        </div>
+                    </button>
+
+                    <button type="button" class="program-nav-pill" data-program="MCA">
+                        <div class="pill-badge-icon"><i data-lucide="laptop" class="w-4 h-4"></i></div>
+                        <div class="text-left">
+                            <span class="program-title">MCA (Master of App)</span>
+                            <span class="program-sub" id="pillCountMCA">1 Course • 20 Subjects</span>
+                        </div>
+                    </button>
+
+                    <button type="button" class="program-nav-pill" data-program="ME">
+                        <div class="pill-badge-icon"><i data-lucide="book-marked" class="w-4 h-4"></i></div>
+                        <div class="text-left">
+                            <span class="program-title">ME / M.Tech (Master)</span>
+                            <span class="program-sub" id="pillCountME">3 Courses • 60 Subjects</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Filter Chips Bar -->
+        <div id="subjectActiveChipsBar" class="pt-2 border-t border-[#E1E5F0] flex items-center gap-2 flex-wrap text-xs hidden">
+            <span class="text-[11px] font-bold text-[#8C95AD] uppercase tracking-wider">Active:</span>
+            <div id="subjectActiveChipsContainer" class="flex items-center gap-1.5 flex-wrap"></div>
+            <button type="button" id="subjectClearAllChipsBtn" class="text-[11px] text-[#8B5CF6] hover:underline font-bold ml-auto">Reset</button>
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         4. GLOBAL SEARCH RESULTS VIEW (When Search Query is Active)
+         ========================================================================= -->
+    <div id="globalSearchResultsSection" class="space-y-3.5 hidden">
+        <div class="p-3.5 sm:p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-[#8B5CF6]"></span>
+                <h3 class="text-xs sm:text-sm font-bold text-[#171D3A] mb-0" id="searchResultsHeader">
+                    Search Results
+                </h3>
+            </div>
+            <button type="button" id="exitSearchBtn" class="text-xs text-[#8B5CF6] font-bold hover:underline">
+                Back to Curriculum
+            </button>
+        </div>
+
+        <div id="searchResultsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            <!-- Dynamically populated via subjects.js -->
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         5. HIERARCHICAL CURRICULUM VIEW (PROGRAM -> COURSE -> SEMESTER -> SUBJECTS)
+         ========================================================================= -->
+    <div id="curriculumHierarchySection" class="space-y-4">
+
+        <!-- Level 2: Courses Grid within Selected Program -->
+        <div id="courseSelectionContainer" class="space-y-3">
+            <div class="flex items-center justify-between px-1">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="layers" class="w-4 h-4 text-[#8B5CF6]"></i>
+                    <h3 class="text-xs sm:text-sm font-bold text-[#171D3A] uppercase tracking-wider mb-0" id="courseSectionTitle">
+                        Diploma Engineering Courses
+                    </h3>
+                </div>
+                <span class="text-xs font-semibold text-[#66708F]" id="courseSectionSubtitle">7 Courses Available</span>
+            </div>
+
+            <!-- Course Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4" id="coursesCardGrid">
+                <!-- Dynamically rendered via subjects.js -->
+            </div>
+        </div>
+
+        <!-- Level 3 & 4: Selected Course Detail & Semester Subject List -->
+        <div id="courseDetailSubjectSection" class="space-y-4 hidden">
+            
+            <!-- Breadcrumb & Course Header Bar -->
+            <div class="p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm space-y-3">
+                <!-- Breadcrumb Row with Back Button -->
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                    <button type="button" id="backToCoursesBtn" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F8F9FE] border border-[#E1E5F0] text-xs font-bold text-[#171D3A] hover:bg-[#E8EBFA] hover:text-[#8B5CF6] transition shadow-sm">
+                        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                        <span>All Courses</span>
+                    </button>
+
+                    <div class="flex items-center gap-1.5 text-xs text-[#66708F] font-semibold" id="courseBreadcrumbPath">
+                        <span id="bcProgramName">Diploma</span>
+                        <span>›</span>
+                        <span class="text-[#171D3A] font-bold" id="bcCourseName">Computer Engineering</span>
+                    </div>
+                </div>
+
+                <!-- Course Title & Meta Stats -->
+                <div class="pt-2 border-t border-[#E1E5F0] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-base sm:text-lg font-bold text-[#171D3A] mb-0.5" id="activeCourseTitle">
+                            Computer Engineering
+                        </h2>
+                        <p class="text-xs text-[#66708F] mb-0" id="activeCourseMeta">
+                            Diploma Program • 6 Semesters • 30 Total Subjects
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-2 self-start sm:self-auto">
+                        <span class="badge-svit-purple font-bold text-xs" id="activeCourseCreditsBadge">108 Credits</span>
+                        <button type="button" class="btn-primary-custom text-xs font-bold py-2 px-3.5" id="addSubjectToActiveCourseBtn">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Subject
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Level 3: Semester Tabs Selector (Swipeable & Touch Friendly) -->
+            <div class="space-y-2">
+                <span class="text-[11px] font-bold text-[#8C95AD] uppercase tracking-wider block px-1">Select Semester:</span>
+                
+                <div class="overflow-x-auto pb-1 no-scrollbar">
+                    <div class="flex items-center gap-2 p-1.5 bg-white border border-[#E1E5F0] rounded-2xl shadow-sm min-w-max" id="semesterTabsContainer">
+                        <!-- Dynamically populated via subjects.js -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Level 4: Subject Cards Grid -->
+            <div class="space-y-3">
+                <div class="flex items-center justify-between px-1">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-[#8B5CF6]"></span>
+                        <h3 class="text-xs sm:text-sm font-bold text-[#171D3A] mb-0" id="semesterSubjectsHeader">
+                            Semester 1 Subjects (5)
+                        </h3>
+                    </div>
+                    <span class="text-xs text-[#66708F] font-semibold" id="semesterCreditSum">Total Credits: 18</span>
+                </div>
+
+                <!-- Subjects Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4" id="subjectsCardGrid">
+                    <!-- Dynamically populated via subjects.js -->
+                </div>
+            </div>
+
+        </div>
+
     </div>
 
 </div>
 
-<!-- CREATE / EDIT SUBJECT MODAL -->
-<div class="modal fade" id="subjectFormModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content bg-white border border-[#E1E5F0] rounded-2xl shadow-xl">
+<!-- =========================================================================
+     6. MOBILE FILTER BOTTOM SHEET DRAWER (< 768px)
+     ========================================================================= -->
+<div class="modal fade" id="subjectMobileFilterModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content mobile-bottom-sheet-content bg-white border border-[#E1E5F0] rounded-t-3xl shadow-2xl">
+            <!-- Sheet Drag Handle -->
+            <div class="sheet-drag-handle-bar pt-3 pb-1 flex justify-center">
+                <div class="w-10 h-1.5 rounded-full bg-[#CBD5E1]"></div>
+            </div>
+
             <div class="modal-header border-b border-[#E1E5F0] p-4 bg-[#F8F9FE]">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-lg bg-[#E8EBFA] text-[#8B5CF6] flex items-center justify-center">
-                        <i data-lucide="book-plus" class="w-4 h-4"></i>
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-[#E8EBFA] text-[#8B5CF6] flex items-center justify-center shadow-sm">
+                        <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
                     </div>
-                    <h3 class="text-sm font-bold text-[#171D3A] mb-0" id="subjectModalTitle">Add Subject</h3>
+                    <div>
+                        <h3 class="text-sm font-bold text-[#171D3A] mb-0">Curriculum Filters</h3>
+                        <p class="text-[11px] text-[#66708F] mb-0">Filter by program, course, semester and type</p>
+                    </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="subjectForm" class="p-4 space-y-3.5 text-xs">
-                <input type="hidden" id="subjectFormRecordId">
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                    <div>
-                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Subject ID *</label>
-                        <input type="text" id="subjectIdInput" required placeholder="e.g. SUB-3150701" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6] font-mono">
-                    </div>
-                    <div>
-                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">GTU Subject Code *</label>
-                        <input type="text" id="subjectCodeInput" required placeholder="e.g. 3150701" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6] font-mono">
-                    </div>
+
+            <div class="modal-body p-4 space-y-3.5 overflow-y-auto max-h-[75vh]">
+                <div>
+                    <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Degree Program</label>
+                    <select id="mFilterProgram" class="form-control-custom font-semibold">
+                        <option value="Diploma">Diploma Engineering</option>
+                        <option value="BE">BE / B.Tech</option>
+                        <option value="BCA">BCA</option>
+                        <option value="MCA">MCA</option>
+                        <option value="ME">ME / M.Tech</option>
+                    </select>
                 </div>
 
                 <div>
-                    <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Subject Name / Title *</label>
-                    <input type="text" id="subjectNameInput" required placeholder="e.g. Software Engineering" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                    <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Course / Department</label>
+                    <select id="mFilterDept" class="form-control-custom font-semibold">
+                        <option value="">All Courses</option>
+                        <option value="Computer Engineering">Computer Engineering</option>
+                        <option value="Information Technology">Information Technology</option>
+                        <option value="Artificial Intelligence & Machine Learning">AI &amp; Machine Learning</option>
+                        <option value="Data Science">Data Science</option>
+                        <option value="Electronics & Communication">Electronics &amp; Comm.</option>
+                        <option value="Mechanical Engineering">Mechanical Eng.</option>
+                        <option value="Civil Engineering">Civil Eng.</option>
+                        <option value="Electrical Engineering">Electrical Eng.</option>
+                        <option value="Automobile Engineering">Automobile Eng.</option>
+                        <option value="Computer Applications">Computer Applications</option>
+                    </select>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Department *</label>
-                        <select id="subjectDeptInput" required class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
-                            <option value="Computer Engineering">Computer Engineering</option>
-                            <option value="Information Technology">Information Technology</option>
-                            <option value="Electronics & Comm.">Electronics & Comm.</option>
-                            <option value="Mechanical Eng.">Mechanical Eng.</option>
-                            <option value="Civil Eng.">Civil Eng.</option>
-                            <option value="Electrical Eng.">Electrical Eng.</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Program *</label>
-                        <select id="subjectProgramInput" required class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
-                            <option value="BE">BE / BTech</option>
-                            <option value="ME">ME / MTech</option>
-                            <option value="MCA">MCA</option>
-                            <option value="Diploma">Diploma</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                    <div>
-                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Semester *</label>
-                        <select id="subjectSemInput" required class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Semester</label>
+                        <select id="mFilterSem" class="form-control-custom font-semibold">
+                            <option value="">All Semesters</option>
                             <option value="1">Sem 1</option>
                             <option value="2">Sem 2</option>
                             <option value="3">Sem 3</option>
@@ -200,45 +366,238 @@
                             <option value="8">Sem 8</option>
                         </select>
                     </div>
+
                     <div>
-                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Subject Type *</label>
-                        <select id="subjectTypeInput" required class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
-                            <option value="Core Theory">Core Theory</option>
-                            <option value="Practical / Lab">Practical / Lab</option>
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Subject Type</label>
+                        <select id="mFilterType" class="form-control-custom font-semibold">
+                            <option value="">All Types</option>
+                            <option value="Theory">Theory</option>
+                            <option value="Practical">Practical</option>
                             <option value="Elective">Elective</option>
-                            <option value="Open Elective">Open Elective</option>
-                            <option value="Project / Seminar">Project / Seminar</option>
                         </select>
-                    </div>
-                    <div>
-                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Credits *</label>
-                        <input type="number" id="subjectCreditsInput" min="1" max="10" value="4" required class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
                     </div>
                 </div>
 
-                <div class="modal-footer border-t border-[#E1E5F0] pt-4 px-0 pb-0 flex justify-end gap-2">
-                    <button type="button" class="px-4 py-2 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A] text-xs font-semibold" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn-primary-custom">Save Subject</button>
+                <div>
+                    <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Filter by Credits</label>
+                    <select id="mFilterCredits" class="form-control-custom">
+                        <option value="">All Credits</option>
+                        <option value="2">2 Credits (Practical/Lab)</option>
+                        <option value="3">3 Credits</option>
+                        <option value="4">4 Credits (Core Theory)</option>
+                        <option value="5">5 Credits</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="modal-footer sticky-modal-footer border-t border-[#E1E5F0] p-3.5 bg-[#F8F9FE] flex items-center gap-2">
+                <button type="button" id="mFilterResetBtn" class="btn-modal-cancel px-4 py-2.5 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] text-xs font-semibold">Reset</button>
+                <button type="button" id="mFilterApplyBtn" class="btn-modal-save btn-primary-custom py-2.5 px-5 text-xs font-bold">Apply Filters</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================================
+     7. ADD / EDIT SUBJECT MODAL
+     ========================================================================= -->
+<div class="modal fade" id="subjectFormModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content mobile-bottom-sheet-content bg-white border border-[#E1E5F0] rounded-t-3xl sm:rounded-2xl shadow-2xl">
+            <!-- Sheet Drag Handle (Mobile) -->
+            <div class="sheet-drag-handle-bar sm:hidden pt-3 pb-1 flex justify-center">
+                <div class="w-10 h-1.5 rounded-full bg-[#CBD5E1]"></div>
+            </div>
+
+            <div class="modal-header border-b border-[#E1E5F0] p-4 bg-[#F8F9FE]">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-[#E8EBFA] text-[#8B5CF6] flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <i data-lucide="book-plus" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-[#171D3A] mb-0" id="subjectModalTitle">Add Subject</h3>
+                        <p class="text-[11px] text-[#66708F] mb-0" id="subjectModalSubtitle">Assign subject code, credit distribution, and curriculum mapping</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form id="subjectForm" class="flex flex-col flex-1 overflow-hidden text-xs">
+                <input type="hidden" id="subjectRecordId">
+                
+                <div class="modal-body p-4 sm:p-5 space-y-4 overflow-y-auto">
+                    <!-- Section 1: Academic Hierarchy Placement -->
+                    <div class="form-group-section">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="w-5 h-5 rounded-full bg-[#E8EBFA] text-[#8B5CF6] text-[11px] font-bold flex items-center justify-center">1</span>
+                            <h4 class="text-xs font-bold text-[#171D3A] uppercase tracking-wider mb-0">Academic Hierarchy</h4>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3.5">
+                            <div>
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Degree Program *</label>
+                                <select id="formProgram" required class="form-control-custom font-semibold">
+                                    <option value="Diploma">Diploma</option>
+                                    <option value="BE" selected>BE / B.Tech</option>
+                                    <option value="BCA">BCA</option>
+                                    <option value="MCA">MCA</option>
+                                    <option value="ME">ME / M.Tech</option>
+                                </select>
+                            </div>
+
+                            <div class="sm:col-span-2">
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Course / Department *</label>
+                                <select id="formDepartment" required class="form-control-custom font-semibold">
+                                    <option value="Computer Engineering" selected>Computer Engineering</option>
+                                    <option value="Information Technology">Information Technology</option>
+                                    <option value="Artificial Intelligence & Machine Learning">Artificial Intelligence &amp; ML</option>
+                                    <option value="Data Science">Data Science</option>
+                                    <option value="Electronics & Communication">Electronics &amp; Communication</option>
+                                    <option value="Mechanical Engineering">Mechanical Engineering</option>
+                                    <option value="Civil Engineering">Civil Engineering</option>
+                                    <option value="Electrical Engineering">Electrical Engineering</option>
+                                    <option value="Automobile Engineering">Automobile Engineering</option>
+                                    <option value="Computer Applications">Computer Applications</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Academic Year</label>
+                                <select id="formYear" class="form-control-custom">
+                                    <option value="FY">First Year (FY)</option>
+                                    <option value="SY">Second Year (SY)</option>
+                                    <option value="TY">Third Year (TY)</option>
+                                    <option value="LY">Final Year (LY)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Semester *</label>
+                                <select id="formSemester" required class="form-control-custom font-semibold">
+                                    <option value="1">Sem 1</option>
+                                    <option value="2">Sem 2</option>
+                                    <option value="3">Sem 3</option>
+                                    <option value="4">Sem 4</option>
+                                    <option value="5">Sem 5</option>
+                                    <option value="6">Sem 6</option>
+                                    <option value="7">Sem 7</option>
+                                    <option value="8">Sem 8</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Subject Code *</label>
+                                <input type="text" id="formSubjectCode" required placeholder="e.g. CE501 / DICO101" class="form-control-custom font-mono uppercase">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Subject Details & Credit Scheme -->
+                    <div class="form-group-section pt-3 border-t border-[#E1E5F0]">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="w-5 h-5 rounded-full bg-[#E8EBFA] text-[#8B5CF6] text-[11px] font-bold flex items-center justify-center">2</span>
+                            <h4 class="text-xs font-bold text-[#171D3A] uppercase tracking-wider mb-0">Subject &amp; Credit Scheme</h4>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3.5">
+                            <div class="sm:col-span-3">
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Subject Name / Title *</label>
+                                <input type="text" id="formSubjectName" required placeholder="e.g. Database Management Systems" class="form-control-custom">
+                            </div>
+
+                            <div>
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Subject Type *</label>
+                                <select id="formSubjectType" required class="form-control-custom font-semibold">
+                                    <option value="Theory" selected>Theory</option>
+                                    <option value="Practical">Practical / Lab</option>
+                                    <option value="Elective">Elective</option>
+                                    <option value="Core Theory">Core Theory</option>
+                                    <option value="Project / Seminar">Project / Seminar</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Credits *</label>
+                                <input type="number" id="formCredits" required min="1" max="12" value="4" class="form-control-custom font-mono">
+                            </div>
+
+                            <div>
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Assigned Faculty</label>
+                                <input type="text" id="formFaculty" placeholder="e.g. Prof. Faculty 085" class="form-control-custom">
+                            </div>
+
+                            <div class="sm:col-span-3">
+                                <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Syllabus Overview / Notes</label>
+                                <textarea id="formDescription" rows="2" placeholder="Course syllabus outline, pre-requisites, or references..." class="form-control-custom"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sticky Mobile Form Actions -->
+                <div class="modal-footer sticky-modal-footer border-t border-[#E1E5F0] p-3.5 sm:p-4 bg-[#F8F9FE] flex items-center justify-end gap-2">
+                    <button type="button" class="btn-modal-cancel px-4 py-2.5 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A] text-xs font-semibold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-modal-save btn-primary-custom py-2.5 px-5 text-xs font-bold" id="subjectFormSubmitBtn">Save Subject</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- DELETE CONFIRMATION MODAL -->
+<!-- =========================================================================
+     8. SUBJECT DETAILS MODAL
+     ========================================================================= -->
+<div class="modal fade" id="subjectDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content mobile-bottom-sheet-content bg-white border border-[#E1E5F0] rounded-t-3xl sm:rounded-2xl shadow-2xl">
+            <!-- Sheet Drag Handle -->
+            <div class="sheet-drag-handle-bar sm:hidden pt-3 pb-1 flex justify-center">
+                <div class="w-10 h-1.5 rounded-full bg-[#CBD5E1]"></div>
+            </div>
+
+            <div class="modal-header border-b border-[#E1E5F0] p-4 bg-[#F8F9FE]">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-[#E8EBFA] text-[#8B5CF6] flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <i data-lucide="book-open" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-[#171D3A] mb-0 truncate">Subject Details</h3>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body p-4 sm:p-5 overflow-y-auto" id="subjectDetailsContent"></div>
+
+            <div class="modal-footer border-t border-[#E1E5F0] p-3.5 bg-[#F8F9FE] flex items-center justify-between gap-2">
+                <button type="button" id="detailsDeleteBtn" class="px-3.5 py-2 rounded-xl bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 text-xs font-bold">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5 d-inline"></i> Delete
+                </button>
+                <div class="flex items-center gap-2">
+                    <button type="button" class="px-4 py-2 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A] text-xs font-semibold" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="detailsEditBtn" class="btn-primary-custom px-4 py-2 text-xs font-bold">
+                        <i data-lucide="pencil" class="w-3.5 h-3.5 d-inline mr-1"></i> Edit Subject
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================================
+     9. DELETE SUBJECT CONFIRMATION MODAL
+     ========================================================================= -->
 <div class="modal fade" id="subjectDeleteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content bg-white border border-[#E1E5F0] rounded-2xl shadow-xl text-center p-5 space-y-3">
-            <div class="w-12 h-12 rounded-full bg-red-50 text-red-600 border border-red-200 flex items-center justify-center mx-auto">
+        <div class="modal-content mobile-bottom-sheet-content bg-white border border-[#E1E5F0] rounded-t-3xl sm:rounded-2xl shadow-2xl text-center p-5 space-y-3">
+            <div class="w-12 h-12 rounded-2xl bg-red-50 text-red-600 border border-red-200 flex items-center justify-center mx-auto shadow-sm">
                 <i data-lucide="trash-2" class="w-6 h-6"></i>
             </div>
             <h4 class="text-sm font-bold text-[#171D3A] mb-1">Delete Subject?</h4>
-            <p class="text-xs text-[#66708F] mb-0">
-                Are you sure you want to delete subject <strong id="deleteSubjectTargetId" class="text-[#171D3A]"></strong>?
+            <p class="text-xs text-[#66708F] mb-0" id="deleteSubjectDetailsText">
+                Are you sure you want to remove this academic subject?
             </p>
-            <div class="pt-2 flex justify-center gap-2">
-                <button type="button" class="px-3.5 py-1.5 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] text-xs" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" id="confirmDeleteSubjectBtn" class="px-4 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-semibold">Delete</button>
+            <div class="pt-2 flex justify-center gap-2 w-full">
+                <button type="button" class="px-4 py-2.5 rounded-xl bg-white border border-[#E1E5F0] text-[#66708F] text-xs font-semibold flex-1" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmDeleteSubjectBtn" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-sm flex-1">
+                    Delete Subject
+                </button>
             </div>
         </div>
     </div>
