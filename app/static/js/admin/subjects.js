@@ -197,6 +197,7 @@
 
     function renderSubjectsTable() {
         const tbody = document.getElementById('subjectsTableBody');
+        const mobileCards = document.getElementById('subjectsMobileCards');
         const countBadge = document.getElementById('subjectsCountBadge');
         if (countBadge) countBadge.innerText = `${state.total} Subjects`;
 
@@ -209,6 +210,7 @@
                     </td>
                 </tr>
             `;
+            if (mobileCards) mobileCards.innerHTML = '<div class="admin-mobile-empty">No subject records found.</div>';
             lucide.createIcons();
             return;
         }
@@ -255,6 +257,15 @@
                 </tr>
             `;
         }).join('');
+
+        if (mobileCards) {
+            mobileCards.innerHTML = state.items.map(s => {
+                const code = s.subject_code || s.subject_id || '-';
+                const name = s.subject_name || s.title || 'Subject';
+                const id = s.subject_id || code;
+                return `<article class="admin-mobile-record-card subject-mobile-card"><div class="admin-record-heading"><div class="flex items-center gap-3 min-w-0"><div class="admin-record-icon"><i data-lucide="book-open"></i></div><div class="min-w-0"><h3>${escapeHtml(name)}</h3><p>${escapeHtml(s.program || 'BE')}</p></div></div><span class="badge-credits">${escapeHtml(String(s.credits || 4))} Credits</span></div><div class="admin-record-meta"><span><b>Subject Code</b>${escapeHtml(code)}</span><span><b>Department</b>${escapeHtml(s.department || '-')}</span><span><b>Semester</b>Sem ${escapeHtml(String(s.semester || 1))}</span><span><b>Type</b>${escapeHtml(s.subject_type || 'Core Theory')}</span></div><div class="admin-record-actions"><button type="button" onclick="window.editSubject('${escapeQuotes(id)}')" aria-label="Edit ${escapeQuotes(name)}"><i data-lucide="edit-2"></i></button><button type="button" class="is-danger" onclick="window.deleteSubject('${escapeQuotes(id)}')" aria-label="Delete ${escapeQuotes(name)}"><i data-lucide="trash-2"></i></button></div></article>`;
+            }).join('');
+        }
 
         lucide.createIcons();
     }

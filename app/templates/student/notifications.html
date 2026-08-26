@@ -55,6 +55,7 @@
         <div class="filter-pills-bar">
             <button class="filter-pill active" id="pill-all" onclick="setFilter('all')">All</button>
             <button class="filter-pill" id="pill-unread" onclick="setFilter('unread')">Unread</button>
+            <button class="filter-pill" id="pill-read" onclick="setFilter('read')">Read</button>
             <button class="filter-pill" id="pill-notice" onclick="setFilter('notice')">Notices</button>
             <button class="filter-pill" id="pill-academic" onclick="setFilter('academic')">Academic</button>
             <button class="filter-pill" id="pill-event" onclick="setFilter('event')">Events</button>
@@ -140,6 +141,7 @@
             let filtered = allNotifications.filter(item => {
                 if (currentFilter === 'all') return true;
                 if (currentFilter === 'unread') return !item.is_read;
+                if (currentFilter === 'read') return !!item.is_read;
                 const cat = (item.category || item.type || '').toLowerCase();
                 if (currentFilter === 'notice') return cat.includes('notice') || cat.includes('circular');
                 if (currentFilter === 'academic') return cat.includes('academic') || cat.includes('timetable') || cat.includes('exam');

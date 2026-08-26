@@ -59,7 +59,7 @@
     </div>
 
     <!-- 3. ROLE-CUSTOMIZED STAT CARDS GRID -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="dashboard-stat-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {% if stats and stats.counters %}
             {% for label, val in stats.counters.items() %}
             <a href="{% if label == 'pending_registrations' %}{{ url_for('admin.students', status='pending') }}{% elif label == 'total_students' %}{{ url_for('admin.students') }}{% elif label == 'faculty_members' %}{{ url_for('admin.faculty') }}{% elif label == 'active_notices' or label == 'total_notices' %}{{ url_for('admin.notices') }}{% elif label == 'library_books' %}{{ url_for('admin.library_books') }}{% elif label == 'bus_routes' %}{{ url_for('admin.buses') }}{% elif label == 'events_count' %}{{ url_for('admin.events') }}{% elif label == 'subjects' %}{{ url_for('admin.subjects') }}{% elif label == 'academic_documents' %}{{ url_for('admin.academic_documents') }}{% elif label == 'menu_items' %}{{ url_for('admin.canteen') }}{% else %}#{% endif %}"

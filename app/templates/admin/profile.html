@@ -103,6 +103,60 @@
 
     </div>
 
+    <!-- Appearance Settings -->
+    <div class="security-card space-y-4">
+        <div class="flex items-center gap-2.5 border-b border-[#1F2937] pb-3">
+            <i data-lucide="sun-moon" class="w-5 h-5 text-indigo-400"></i>
+            <div>
+                <h3 class="text-sm font-bold text-white mb-0">Appearance</h3>
+                <p class="text-[11px] text-gray-400 mb-0">Choose how the Admin Portal should look.</p>
+            </div>
+        </div>
+        <div class="theme-selector-grid grid grid-cols-1 sm:grid-cols-3 gap-3" role="radiogroup" aria-label="Appearance theme">
+            <!-- 1. Light Option -->
+            <div class="admin-theme-radio-card" data-admin-theme-choice="light" onclick="setAdminTheme('light')" role="radio" aria-checked="false" tabindex="0">
+                <div class="theme-card-top">
+                    <span class="theme-radio-indicator"><span class="theme-radio-dot"></span></span>
+                    <div class="theme-card-icon icon-light">
+                        <i data-lucide="sun" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="theme-card-body">
+                    <strong class="theme-card-title">Light</strong>
+                    <span class="theme-card-desc">Clean and bright</span>
+                </div>
+            </div>
+
+            <!-- 2. Dark Option -->
+            <div class="admin-theme-radio-card" data-admin-theme-choice="dark" onclick="setAdminTheme('dark')" role="radio" aria-checked="false" tabindex="0">
+                <div class="theme-card-top">
+                    <span class="theme-radio-indicator"><span class="theme-radio-dot"></span></span>
+                    <div class="theme-card-icon icon-dark">
+                        <i data-lucide="moon" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="theme-card-body">
+                    <strong class="theme-card-title">Dark</strong>
+                    <span class="theme-card-desc">Premium dark experience</span>
+                </div>
+            </div>
+
+            <!-- 3. Auto / System Option -->
+            <div class="admin-theme-radio-card" data-admin-theme-choice="system" onclick="setAdminTheme('system')" role="radio" aria-checked="false" tabindex="0">
+                <div class="theme-card-top">
+                    <span class="theme-radio-indicator"><span class="theme-radio-dot"></span></span>
+                    <div class="theme-card-icon icon-system">
+                        <i data-lucide="monitor" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="theme-card-body">
+                    <strong class="theme-card-title">Auto / System</strong>
+                    <span class="theme-card-desc">Follow device preference</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Role Permissions Summary -->
     <div class="security-card space-y-4">
         <div class="flex items-center gap-2.5 border-b border-[#1F2937] pb-3">

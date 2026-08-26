@@ -1,9 +1,26 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" class="dark" data-admin-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Admin Panel{% endblock %} - SVIT Vasad</title>
+
+    <script>
+        (function () {
+            const rawTheme = localStorage.getItem('svit_admin_theme') || 'dark';
+            const savedTheme = ['light', 'dark', 'system'].includes(rawTheme) ? rawTheme : 'dark';
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const resolvedTheme = savedTheme === 'system'
+                ? (prefersDark ? 'dark' : 'light')
+                : savedTheme;
+            document.documentElement.dataset.adminTheme = resolvedTheme;
+            document.documentElement.dataset.theme = resolvedTheme;
+            document.documentElement.setAttribute('data-admin-theme', resolvedTheme);
+            document.documentElement.setAttribute('data-theme', resolvedTheme);
+            document.documentElement.classList.toggle('dark', resolvedTheme === 'dark');
+            document.documentElement.dataset.adminThemePreference = savedTheme;
+        }());
+    </script>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -143,12 +160,13 @@
             animation: pulseBorder 2s infinite;
         }
     </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/admin_portal.css') }}">
     {% block extra_css %}{% endblock %}
 </head>
 <body class="bg-[#0B0F19] text-gray-200 antialiased min-h-screen flex flex-col">
 
     <!-- MOBILE OVERLAY BACKDROP -->
-    <div id="sidebarOverlay" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 lg:hidden hidden"></div>
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 lg:hidden hidden" aria-hidden="true"></div>
 
     <!-- SIDEBAR -->
     {% include "partials/sidebar.html" %}
@@ -157,17 +175,18 @@
     <div class="lg:pl-64 flex-1 flex flex-col min-w-0">
         
         <!-- TOP NAVIGATION BAR -->
-        <header class="h-16 border-b border-[#1F2937] bg-[#090D16]/90 backdrop-blur sticky top-0 z-30 px-4 sm:px-6 flex items-center justify-between">
+        <header class="admin-topbar h-16 border-b border-[#1F2937] bg-[#090D16]/90 backdrop-blur sticky top-0 z-30 px-4 sm:px-6 flex items-center justify-between">
             
             <!-- Left: Mobile Toggle & Breadcrumb -->
             <div class="flex items-center gap-3">
-                <button id="mobileSidebarToggle" class="lg:hidden p-2 rounded-lg bg-[#111827] border border-[#1F2937] text-gray-400 hover:text-white">
+                <button id="mobileSidebarToggle" type="button" aria-controls="adminSidebar" aria-expanded="false" aria-label="Open navigation menu" class="lg:hidden p-2 rounded-lg bg-[#111827] border border-[#1F2937] text-gray-400 hover:text-white">
                     <i data-lucide="menu" class="w-5 h-5"></i>
                 </button>
-                <div>
-                    <h1 class="text-sm sm:text-base font-bold text-white tracking-wide leading-none m-0">
+                <div class="admin-topbar-title">
+                    <h1 class="admin-page-title text-sm sm:text-base font-bold text-white tracking-wide leading-none m-0">
                         {% block header_title %}SVIT Admin Panel{% endblock %}
                     </h1>
+                    <span class="admin-mobile-page-title" aria-hidden="true"></span>
                     <span class="text-[11px] text-gray-400">Shardar Vallabhbhai Patel Institute of Technology</span>
                 </div>
             </div>
@@ -236,6 +255,22 @@
             </div>
         </header>
 
+        <!-- MOBILE PRIMARY NAVIGATION -->
+        <nav class="admin-mobile-bottom-nav" aria-label="Primary mobile navigation">
+            <a href="{{ url_for('admin.dashboard') }}" class="{% if request.endpoint == 'admin.dashboard' %}is-active{% endif %}">
+                <i data-lucide="layout-dashboard"></i><span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('admin.students') }}" class="{% if request.path == '/admin/students' %}is-active{% endif %}">
+                <i data-lucide="users"></i><span>Students</span>
+            </a>
+            <button type="button" id="mobileNotificationsNavBtn" aria-label="Open notifications">
+                <i data-lucide="bell"></i><span>Notifications</span>
+            </button>
+            <button type="button" id="mobileMoreNavBtn" aria-label="Open more navigation" aria-controls="adminSidebar">
+                <i data-lucide="menu"></i><span>More</span>
+            </button>
+        </nav>
+
         <!-- FLASH MESSAGES / TOASTS -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -281,28 +316,111 @@
 
     <!-- Global Layout Scripts -->
     <script>
+        document.body.dataset.adminModule = window.location.pathname.replace(/^\/admin\//, '').split('/')[0] || 'dashboard';
+
+        function buildAdminMobileCards() {
+            if (window.innerWidth >= 768) return;
+            document.querySelectorAll('main .table-responsive table:not(.mobile-card-table)').forEach((table) => {
+                const headers = [...table.querySelectorAll('thead th')].map((header) => header.innerText.trim());
+                const rows = [...table.querySelectorAll('tbody tr')].filter((row) => row.children.length > 1);
+                if (!rows.length || !headers.length) return;
+
+                const signature = rows.map((row) => row.innerText).join('|');
+                if (table.dataset.mobileCardsBuilt === 'true' && table.dataset.mobileCardsSignature === signature) return;
+                const previousList = table.closest('.table-responsive')?.nextElementSibling;
+                if (previousList?.classList.contains('admin-auto-card-list')) previousList.remove();
+
+                const list = document.createElement('div');
+                list.className = `admin-auto-card-list admin-auto-card-list-${document.body.dataset.adminModule}`;
+                rows.forEach((row) => {
+                    const card = document.createElement('article');
+                    card.className = 'admin-auto-card';
+                    [...row.children].forEach((cell, index) => {
+                        if (!cell.innerText.trim() && !cell.querySelector('button,a')) return;
+                        const item = document.createElement('div');
+                        item.className = index === 0 ? 'admin-auto-card-primary' : 'admin-auto-card-field';
+                        if (index !== row.children.length - 1) {
+                            const label = document.createElement('span');
+                            label.className = 'admin-auto-card-label';
+                            label.textContent = headers[index] || 'Details';
+                            item.appendChild(label);
+                        }
+                        const value = document.createElement('div');
+                        value.className = 'admin-auto-card-value';
+                        value.innerHTML = cell.innerHTML;
+                        item.appendChild(value);
+                        card.appendChild(item);
+                    });
+                    list.appendChild(card);
+                });
+                table.closest('.table-responsive').after(list);
+                table.dataset.mobileCardsBuilt = 'true';
+                table.dataset.mobileCardsSignature = signature;
+            });
+        }
+
+        function refreshAdminMobileCards() {
+            document.querySelectorAll('.admin-auto-card-list').forEach((list) => list.remove());
+            document.querySelectorAll('table[data-mobile-cards-built]').forEach((table) => delete table.dataset.mobileCardsBuilt);
+            buildAdminMobileCards();
+        }
+
+        window.addEventListener('resize', refreshAdminMobileCards);
+        document.addEventListener('DOMContentLoaded', () => {
+            buildAdminMobileCards();
+            const observer = new MutationObserver(buildAdminMobileCards);
+            observer.observe(document.querySelector('main') || document.body, { childList: true, subtree: true });
+        });
+
         document.addEventListener('DOMContentLoaded', function() {
             lucide.createIcons();
 
             // Mobile Sidebar Toggle
             const toggleBtn = document.getElementById('mobileSidebarToggle');
+            const moreBtn = document.getElementById('mobileMoreNavBtn');
+            const notificationsBtn = document.getElementById('mobileNotificationsNavBtn');
             const closeBtn = document.getElementById('closeSidebarBtn');
             const sidebar = document.getElementById('adminSidebar');
             const overlay = document.getElementById('sidebarOverlay');
 
             if (toggleBtn && sidebar && overlay) {
-                toggleBtn.addEventListener('click', () => {
+                const closeSidebar = () => {
+                    sidebar.classList.remove('is-open');
+                    sidebar.classList.add('-translate-x-full');
+                    overlay.classList.remove('is-visible');
+                    overlay.classList.add('hidden');
+                    overlay.setAttribute('aria-hidden', 'true');
+                    toggleBtn.setAttribute('aria-expanded', 'false');
+                    toggleBtn.setAttribute('aria-label', 'Open navigation menu');
+                    document.body.classList.remove('admin-drawer-open');
+                };
+
+                const openSidebar = () => {
+                    sidebar.classList.add('is-open');
                     sidebar.classList.remove('-translate-x-full');
                     overlay.classList.remove('hidden');
-                });
-
-                const closeSidebar = () => {
-                    sidebar.classList.add('-translate-x-full');
-                    overlay.classList.add('hidden');
+                    requestAnimationFrame(() => overlay.classList.add('is-visible'));
+                    overlay.setAttribute('aria-hidden', 'false');
+                    toggleBtn.setAttribute('aria-expanded', 'true');
+                    toggleBtn.setAttribute('aria-label', 'Close navigation menu');
+                    document.body.classList.add('admin-drawer-open');
                 };
+
+                toggleBtn.addEventListener('click', () => {
+                    sidebar.classList.contains('is-open') ? closeSidebar() : openSidebar();
+                });
+                if (moreBtn) moreBtn.addEventListener('click', openSidebar);
+                if (notificationsBtn) notificationsBtn.addEventListener('click', () => {
+                    const notificationButton = document.getElementById('adminNotifBellBtn');
+                    if (notificationButton) notificationButton.click();
+                });
 
                 if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
                 overlay.addEventListener('click', closeSidebar);
+                sidebar.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeSidebar));
+                window.addEventListener('keydown', (event) => {
+                    if (event.key === 'Escape' && sidebar.classList.contains('is-open')) closeSidebar();
+                });
             }
 
             // Keyboard shortcut for search
@@ -313,6 +431,59 @@
                     if (s) s.focus();
                 }
             });
+        });
+
+        function setAdminTheme(theme) {
+            const validTheme = ['light', 'dark', 'system'].includes(theme) ? theme : 'dark';
+            const resolvedTheme = validTheme === 'system'
+                ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+                : validTheme;
+            localStorage.setItem('svit_admin_theme', validTheme);
+            document.documentElement.dataset.adminThemePreference = validTheme;
+            document.documentElement.dataset.adminTheme = resolvedTheme;
+            document.documentElement.dataset.theme = resolvedTheme;
+            document.documentElement.setAttribute('data-admin-theme', resolvedTheme);
+            document.documentElement.setAttribute('data-theme', resolvedTheme);
+            document.documentElement.classList.toggle('dark', resolvedTheme === 'dark');
+            document.querySelectorAll('[data-admin-theme-choice]').forEach((el) => {
+                const isActive = el.dataset.adminThemeChoice === validTheme;
+                el.classList.toggle('is-active', isActive);
+                el.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                el.setAttribute('aria-checked', isActive ? 'true' : 'false');
+            });
+        }
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            if ((localStorage.getItem('svit_admin_theme') || 'dark') === 'system') setAdminTheme('system');
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setAdminTheme(localStorage.getItem('svit_admin_theme') || 'dark');
+            const pageTitle = document.querySelector('.admin-page-title');
+            const mobileTitle = document.querySelector('.admin-mobile-page-title');
+            if (pageTitle && mobileTitle) {
+                const titles = {
+                    '/admin/dashboard': 'Dashboard',
+                    '/admin/students': 'Students',
+                    '/admin/faculty': 'Faculty',
+                    '/admin/timetable': 'Timetable',
+                    '/admin/subjects': 'Subjects',
+                    '/admin/rooms': 'Rooms',
+                    '/admin/placements': 'Placements',
+                    '/admin/documents': 'Documents',
+                    '/admin/academic-documents': 'Documents',
+                    '/admin/admission': 'Admission',
+                    '/admin/notices': 'Notices',
+                    '/admin/events': 'Events',
+                    '/admin/transport': 'Transport',
+                    '/admin/buses': 'Transport',
+                    '/admin/library': 'Library',
+                    '/admin/canteen': 'Canteen',
+                    '/admin/sports': 'Sports',
+                    '/admin/profile': 'Settings'
+                };
+                mobileTitle.textContent = titles[window.location.pathname] || pageTitle.textContent.trim();
+            }
         });
 
         // Universal Toast Dispatcher

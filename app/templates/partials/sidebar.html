@@ -1,5 +1,5 @@
 <!-- ROLE-BASED DYNAMIC ADMIN SIDEBAR -->
-<aside id="adminSidebar" class="w-64 bg-[#090D16] border-r border-[#1F2937] flex flex-col fixed inset-y-0 left-0 z-50 transition-transform duration-300 lg:translate-x-0 -translate-x-full">
+<aside id="adminSidebar" aria-label="Admin navigation" class="w-64 bg-[#090D16] border-r border-[#1F2937] flex flex-col fixed inset-y-0 left-0 z-50 transition-transform duration-300 lg:translate-x-0 -translate-x-full">
     
     <!-- BRAND HEADER -->
     <div class="p-4 border-b border-[#1F2937] flex items-center justify-between">
@@ -12,7 +12,7 @@
                 <span class="text-[10px] font-semibold text-indigo-400 tracking-wider">ADMIN PORTAL</span>
             </div>
         </a>
-        <button id="closeSidebarBtn" class="lg:hidden text-gray-400 hover:text-white p-1 rounded-lg">
+        <button id="closeSidebarBtn" type="button" aria-label="Close navigation menu" class="lg:hidden text-gray-400 hover:text-white p-2 rounded-lg">
             <i data-lucide="x" class="w-5 h-5"></i>
         </button>
     </div>
@@ -310,6 +310,14 @@
 
     <!-- FOOTER PROFILE & LOGOUT -->
     <div class="p-3 border-t border-[#1F2937] space-y-2 bg-[#060A14]">
+        <div class="admin-drawer-theme flex items-center justify-between gap-2">
+            <span class="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Theme</span>
+            <div class="flex items-center gap-1">
+                <button type="button" class="admin-drawer-theme-btn" data-admin-theme-choice="light" onclick="setAdminTheme('light')" aria-label="Use light theme">Light</button>
+                <button type="button" class="admin-drawer-theme-btn" data-admin-theme-choice="dark" onclick="setAdminTheme('dark')" aria-label="Use dark theme">Dark</button>
+                <button type="button" class="admin-drawer-theme-btn" data-admin-theme-choice="system" onclick="setAdminTheme('system')" aria-label="Use system theme">Auto</button>
+            </div>
+        </div>
         <div class="p-2.5 rounded-xl bg-[#0F172A] border border-[#1F2937] flex items-center gap-3">
             <div class="relative">
                 <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white font-bold text-xs uppercase shadow">
@@ -324,6 +332,7 @@
                 <p class="text-[10px] text-gray-400 truncate m-0">
                     {{ current_user.role_display if current_user.is_authenticated else 'Admin' }}
                 </p>
+                <span class="admin-drawer-campus">SVIT, VASAD</span>
             </div>
         </div>
 

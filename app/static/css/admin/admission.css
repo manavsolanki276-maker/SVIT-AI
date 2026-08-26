@@ -1,57 +1,273 @@
-/* ==========================================================================
-   SVIT Admin - Page 12: Admission CMS Styles (4 Tabs)
-   ========================================================================== */
+/* SVIT Admin - Admission CMS Responsive Stylesheet */
+:root {
+    --adm-hero-bg: linear-gradient(135deg, rgba(6, 78, 59, 0.75) 0%, rgba(15, 23, 42, 0.85) 100%);
+    --adm-hero-border: rgba(16, 185, 129, 0.35);
+    --adm-card-bg: #111827;
+    --adm-card-border: #1f2937;
+    --adm-card-hover: #064e3b;
+    --adm-accent: #10b981;
+    --adm-accent-light: #34d399;
+    --adm-text-primary: #f8fafc;
+    --adm-text-muted: #94a3b8;
+}
+
+html[data-admin-theme="light"] {
+    --adm-hero-bg: linear-gradient(135deg, #ecfdf5 0%, #ffffff 100%);
+    --adm-hero-border: #a7f3d0;
+    --adm-card-bg: #ffffff;
+    --adm-card-border: #e2e8f0;
+    --adm-card-hover: #f0fdf4;
+    --adm-accent: #059669;
+    --adm-accent-light: #10b981;
+    --adm-text-primary: #0f172a;
+    --adm-text-muted: #475569;
+}
 
 .admission-hero-card {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(17, 24, 39, 0.95) 100%);
-    border: 1px solid rgba(16, 185, 129, 0.25);
+    background: var(--adm-hero-bg);
+    border: 1px solid var(--adm-hero-border);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.15);
+    border-radius: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admission-hero-card:hover {
+    box-shadow: 0 14px 30px -5px rgba(16, 185, 129, 0.25);
 }
 
 .adm-nav-tab {
-    padding: 0.65rem 1.1rem;
-    border-radius: 12px;
-    background: #0F172A;
-    border: 1px solid #1F2937;
-    color: #9CA3AF;
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
+    min-height: 44px;
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--adm-text-muted);
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--adm-card-border);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    cursor: pointer;
+    touch-action: manipulation;
+    white-space: nowrap;
 }
 
 .adm-nav-tab:hover {
-    border-color: #10B981;
-    color: #FFFFFF;
-    background: #064E3B;
+    color: var(--adm-text-primary);
+    background: rgba(6, 78, 59, 0.4);
+    border-color: var(--adm-accent);
 }
 
 .adm-nav-tab.active {
-    background: #10B981;
-    border-color: #10B981;
-    color: #FFFFFF;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+    background: rgba(16, 185, 129, 0.18);
+    color: var(--adm-accent-light);
+    border-color: var(--adm-accent);
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
 }
 
-.adm-step-card {
-    background: #111827;
-    border: 1px solid #1F2937;
-    border-radius: 16px;
-    padding: 1.25rem;
-    position: relative;
+.admission-program-card {
+    background: var(--adm-card-bg);
+    border: 1px solid var(--adm-card-border);
+    border-radius: 1rem;
+    padding: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.2);
 }
 
-.adm-step-num {
-    width: 32px;
-    height: 32px;
-    border-radius: 10px;
-    background: #10B981;
-    color: #FFFFFF;
-    font-weight: 800;
-    font-size: 0.85rem;
+.admission-program-card:hover {
+    border-color: var(--adm-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px -4px rgba(16, 185, 129, 0.2);
+}
+
+.admission-seat-matrix {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid var(--adm-card-border);
+}
+
+.admission-cutoff-badge {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--adm-accent-light);
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.375rem;
+}
+
+.admission-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem 0.75rem;
+    padding: 0.65rem;
+    background: rgba(15, 23, 42, 0.4);
+    border-radius: 0.75rem;
+    border: 1px solid rgba(31, 41, 55, 0.6);
+}
+
+.admission-meta-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.admission-meta-label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--adm-text-muted);
+}
+
+.admission-meta-val {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--adm-text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admission-action-btn-group {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.45rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid var(--adm-card-border);
+}
+
+.admission-action-btn {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0.5rem;
+    border-radius: 0.65rem;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--adm-card-border);
+    color: var(--adm-text-muted);
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.admission-action-btn:hover {
+    color: var(--adm-text-primary);
+    background: var(--adm-accent);
+    border-color: var(--adm-accent);
+}
+
+@media (max-width: 1023.98px) {
+    .admission-hero-card {
+        padding: 1.25rem !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .admission-hero-card {
+        padding: 1rem !important;
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 0.75rem;
+    }
+
+    .admission-hero-card button#openCreateAdmissionModalBtn {
+        width: 100%;
+        justify-content: center;
+        min-height: 44px;
+    }
+
+    .adm-nav-tab {
+        flex: 1 1 calc(50% - 0.5rem);
+        justify-content: center;
+        font-size: 0.7rem;
+        padding: 0.5rem 0.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .admission-hero-card h2 {
+        font-size: 1rem !important;
+    }
+
+    .admission-program-card {
+        padding: 0.85rem;
+    }
+
+    .admission-meta-grid {
+        grid-template-columns: 1fr;
+        gap: 0.4rem;
+    }
+
+    .admission-action-btn {
+        min-width: 40px;
+        min-height: 40px;
+    }
+}
+
+@media (max-width: 390px) {
+    .adm-nav-tab {
+        flex: 1 1 100%;
+    }
+}
+
+@media (max-width: 360px) {
+    .admission-hero-card {
+        padding: 0.75rem !important;
+    }
+
+    .admission-meta-val {
+        font-size: 0.7rem;
+    }
+}
+
+html[data-admin-theme="light"] .adm-nav-tab {
+    background: #f1f5f9;
+    color: #475569;
+    border-color: #e2e8f0;
+}
+
+html[data-admin-theme="light"] .adm-nav-tab:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+html[data-admin-theme="light"] .adm-nav-tab.active {
+    background: #ecfdf5;
+    color: #059669;
+    border-color: #10b981;
+}
+
+html[data-admin-theme="light"] .admission-seat-matrix {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+}
+
+html[data-admin-theme="light"] .admission-cutoff-badge {
+    background: #ecfdf5;
+    color: #047857;
+    border-color: #a7f3d0;
+}
+
+html[data-admin-theme="light"] .admission-meta-grid {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+}
+
+html[data-admin-theme="light"] .admission-action-btn {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+    color: #475569;
 }

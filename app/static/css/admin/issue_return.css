@@ -1,56 +1,293 @@
-/* ==========================================================================
-   SVIT Admin - Page 22: Issue / Return Circulation Desk Styles
-   ========================================================================== */
+/* SVIT Admin - Library Circulation Desk Responsive Stylesheet */
+:root {
+    --circ-hero-bg: linear-gradient(135deg, rgba(19, 78, 74, 0.75) 0%, rgba(15, 23, 42, 0.85) 100%);
+    --circ-hero-border: rgba(20, 184, 166, 0.35);
+    --circ-card-bg: #111827;
+    --circ-card-border: #1f2937;
+    --circ-card-hover: #134e4a;
+    --circ-accent: #14b8a6;
+    --circ-accent-light: #2dd4bf;
+    --circ-text-primary: #f8fafc;
+    --circ-text-muted: #94a3b8;
+}
+
+html[data-admin-theme="light"] {
+    --circ-hero-bg: linear-gradient(135deg, #f0fdfa 0%, #ffffff 100%);
+    --circ-hero-border: #99f6e4;
+    --circ-card-bg: #ffffff;
+    --circ-card-border: #e2e8f0;
+    --circ-card-hover: #f0fdfa;
+    --circ-accent: #0d9488;
+    --circ-accent-light: #14b8a6;
+    --circ-text-primary: #0f172a;
+    --circ-text-muted: #475569;
+}
 
 .circulation-hero-card {
-    background: linear-gradient(135deg, rgba(20, 184, 166, 0.15) 0%, rgba(17, 24, 39, 0.95) 100%);
-    border: 1px solid rgba(20, 184, 166, 0.25);
+    background: var(--circ-hero-bg);
+    border: 1px solid var(--circ-hero-border);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 25px -5px rgba(20, 184, 166, 0.15);
+    border-radius: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.circulation-hero-card:hover {
+    box-shadow: 0 14px 30px -5px rgba(20, 184, 166, 0.25);
 }
 
 .circ-nav-tab {
-    padding: 0.65rem 1.1rem;
-    border-radius: 12px;
-    background: #0F172A;
-    border: 1px solid #1F2937;
-    color: #9CA3AF;
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
+    min-height: 44px;
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--circ-text-muted);
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--circ-card-border);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    cursor: pointer;
+    touch-action: manipulation;
+    white-space: nowrap;
 }
 
 .circ-nav-tab:hover {
-    border-color: #14B8A6;
-    color: #FFFFFF;
-    background: #115E59;
+    color: var(--circ-text-primary);
+    background: rgba(19, 78, 74, 0.4);
+    border-color: var(--circ-accent);
 }
 
 .circ-nav-tab.active {
-    background: #14B8A6;
-    border-color: #14B8A6;
-    color: #FFFFFF;
-    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.35);
+    background: rgba(20, 184, 166, 0.18);
+    color: var(--circ-accent-light);
+    border-color: var(--circ-accent);
+    box-shadow: 0 0 12px rgba(20, 184, 166, 0.25);
 }
 
-.badge-overdue {
-    font-size: 10px;
+.loan-status-badge {
+    font-size: 0.68rem;
     font-weight: 800;
-    padding: 2px 7px;
-    border-radius: 6px;
-    background: rgba(239, 68, 68, 0.15);
-    color: #F87171;
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    padding: 0.25rem 0.6rem;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
 }
 
-.badge-on-time {
-    font-size: 10px;
-    font-weight: 600;
-    padding: 2px 7px;
-    border-radius: 6px;
+.loan-issued {
+    background: rgba(99, 102, 241, 0.15);
+    color: #818cf8;
+    border: 1px solid rgba(99, 102, 241, 0.35);
+}
+
+.loan-returned {
     background: rgba(16, 185, 129, 0.15);
-    color: #34D399;
-    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.loan-overdue {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    animation: pulseBorder 2s infinite;
+}
+
+.loan-card-item {
+    background: var(--circ-card-bg);
+    border: 1px solid var(--circ-card-border);
+    border-radius: 1rem;
+    padding: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.2);
+}
+
+.loan-card-item:hover {
+    border-color: var(--circ-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px -4px rgba(20, 184, 166, 0.2);
+}
+
+.loan-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem 0.75rem;
+    padding: 0.65rem;
+    background: rgba(15, 23, 42, 0.4);
+    border-radius: 0.75rem;
+    border: 1px solid rgba(31, 41, 55, 0.6);
+}
+
+.loan-meta-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.loan-meta-label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--circ-text-muted);
+}
+
+.loan-meta-val {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--circ-text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.loan-action-btn-group {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.45rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid var(--circ-card-border);
+}
+
+.loan-action-btn {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0.5rem;
+    border-radius: 0.65rem;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--circ-card-border);
+    color: var(--circ-text-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.loan-action-btn:hover {
+    color: var(--circ-text-primary);
+    background: var(--circ-accent);
+    border-color: var(--circ-accent);
+}
+
+@media (max-width: 1023.98px) {
+    .circulation-hero-card {
+        padding: 1.25rem !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .circulation-hero-card {
+        padding: 1rem !important;
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 0.75rem;
+    }
+
+    .circ-nav-tab {
+        flex: 1 1 calc(50% - 0.5rem);
+        justify-content: center;
+        font-size: 0.7rem;
+        padding: 0.5rem 0.25rem;
+    }
+
+    #loansTableBody tr {
+        display: flex;
+        flex-direction: column;
+        gap: 0.65rem;
+        padding: 0.95rem;
+        margin-bottom: 0.75rem;
+        background: var(--circ-card-bg);
+        border: 1px solid var(--circ-card-border);
+        border-radius: 1rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    #loansTableBody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.25rem 0 !important;
+        border: none !important;
+        font-size: 0.75rem;
+    }
+
+    #loansTableBody td:last-child {
+        justify-content: flex-end;
+        padding-top: 0.65rem !important;
+        border-top: 1px solid var(--circ-card-border) !important;
+        margin-top: 0.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .circulation-hero-card h2 {
+        font-size: 1rem !important;
+    }
+
+    .loan-card-item {
+        padding: 0.85rem;
+    }
+
+    .loan-meta-grid {
+        grid-template-columns: 1fr;
+        gap: 0.4rem;
+    }
+
+    .loan-action-btn {
+        min-width: 40px;
+        min-height: 40px;
+    }
+}
+
+@media (max-width: 390px) {
+    .circ-nav-tab {
+        flex: 1 1 100%;
+    }
+}
+
+@media (max-width: 360px) {
+    .circulation-hero-card {
+        padding: 0.75rem !important;
+    }
+
+    .loan-meta-val {
+        font-size: 0.7rem;
+    }
+}
+
+html[data-admin-theme="light"] .circ-nav-tab {
+    background: #f1f5f9;
+    color: #475569;
+    border-color: #e2e8f0;
+}
+
+html[data-admin-theme="light"] .circ-nav-tab:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+html[data-admin-theme="light"] .circ-nav-tab.active {
+    background: #f0fdfa;
+    color: #0d9488;
+    border-color: #14b8a6;
+}
+
+html[data-admin-theme="light"] .loan-meta-grid {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+}
+
+html[data-admin-theme="light"] .loan-action-btn {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+    color: #475569;
 }

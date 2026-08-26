@@ -248,6 +248,7 @@
 
     function renderStudentsTable() {
         const tbody = document.getElementById('studentsTableBody');
+        const mobileCards = document.getElementById('studentsMobileCards');
         const countBadge = document.getElementById('studentsCountBadge');
         if (countBadge) countBadge.innerText = `${state.total} Students`;
 
@@ -260,6 +261,7 @@
                     </td>
                 </tr>
             `;
+            if (mobileCards) mobileCards.innerHTML = '<div class="admin-mobile-empty">No student records found matching the active filter.</div>';
             lucide.createIcons();
             return;
         }
@@ -341,6 +343,21 @@
                 </tr>
             `;
         }).join('');
+
+        if (mobileCards) {
+            mobileCards.innerHTML = state.items.map(s => {
+                const name = s.full_name || s.name || 'Unnamed Student';
+                const enroll = s.enrollment_no || s.id || '-';
+                const status = (s.status || 'active').toLowerCase();
+                const badge = status === 'pending' ? 'badge-status-pending' : status === 'rejected' ? 'badge-status-rejected' : 'badge-status-active';
+                const statusLabel = status.toUpperCase();
+                return `<article class="admin-mobile-record-card student-mobile-card">
+                    <div class="admin-record-heading"><div class="flex items-center gap-3 min-w-0"><div class="student-avatar">${name.slice(0, 2).toUpperCase()}</div><div class="min-w-0"><h3>${escapeHtml(name)}</h3><p>${escapeHtml(enroll)}</p></div></div><span class="${badge}">${statusLabel}</span></div>
+                    <div class="admin-record-meta"><span><b>Program</b>${escapeHtml(s.program || 'BE')}</span><span><b>Department</b>${escapeHtml(s.department || '-')}</span><span><b>Semester</b>Sem ${escapeHtml(String(s.semester || 1))}</span><span><b>Email</b>${escapeHtml(s.email || '-')}</span><span><b>Phone</b>${escapeHtml(s.phone || s.contact_number || '-')}</span></div>
+                    <div class="admin-record-actions"><button type="button" onclick="window.viewStudent('${escapeQuotes(enroll)}')" aria-label="View ${escapeQuotes(name)}"><i data-lucide="eye"></i></button><button type="button" onclick="window.editStudent('${escapeQuotes(enroll)}')" aria-label="Edit ${escapeQuotes(name)}"><i data-lucide="edit-2"></i></button><button type="button" class="is-danger" onclick="window.deleteStudent('${escapeQuotes(enroll)}')" aria-label="Delete ${escapeQuotes(name)}"><i data-lucide="trash-2"></i></button></div>
+                </article>`;
+            }).join('');
+        }
 
         lucide.createIcons();
     }

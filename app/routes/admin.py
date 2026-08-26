@@ -737,6 +737,7 @@ def api_approve_student(student_id):
     student_name = student_doc.get("full_name") or student_doc.get("name") if student_doc else "Student"
 
     # Send Student Notification
+    # Send Student Notification
     MongoNotificationService.notify_student(
         student_id=target_enroll,
         title="Registration Approved",
@@ -749,6 +750,21 @@ def api_approve_student(student_id):
             "approved_by": admin_identifier,
             "department": student_doc.get("department", "SVIT Vasad") if student_doc else "SVIT Vasad"
         }
+    )
+
+    # Dispatch Admin Notification Log
+    MongoNotificationService.notify_admins(
+        title="Student Registration Approved",
+        message=f"Student {student_name} ({target_enroll}) registration was approved by {admin_identifier}.",
+        category="registration",
+        data={
+            "student_name": student_name,
+            "enrollment_no": target_enroll,
+            "status": "approved",
+            "approved_by": admin_identifier,
+            "approved_at": now.isoformat()
+        },
+        link="/admin/students"
     )
 
     return jsonify({
@@ -852,6 +868,22 @@ def api_reject_student(student_id):
             "rejected_by": admin_identifier,
             "rejection_reason": reason
         }
+    )
+
+    # Dispatch Admin Notification Log
+    MongoNotificationService.notify_admins(
+        title="Student Registration Rejected",
+        message=f"Student {student_name} ({target_enroll}) registration was rejected by {admin_identifier}." + (f" Reason: {reason}" if reason else ""),
+        category="registration",
+        data={
+            "student_name": student_name,
+            "enrollment_no": target_enroll,
+            "status": "rejected",
+            "rejected_by": admin_identifier,
+            "rejection_reason": reason,
+            "rejected_at": now.isoformat()
+        },
+        link="/admin/students?status=rejected"
     )
 
     return jsonify({

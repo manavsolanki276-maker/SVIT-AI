@@ -1,77 +1,234 @@
-/* ==========================================================================
-   SVIT Admin - Page 2: Admin Management Styles
-   ========================================================================== */
+/* SVIT Admin - Administrator Accounts Management Responsive Stylesheet */
+:root {
+    --adm-hero-bg: linear-gradient(135deg, rgba(30, 27, 75, 0.75) 0%, rgba(15, 23, 42, 0.85) 100%);
+    --adm-hero-border: rgba(99, 102, 241, 0.35);
+    --adm-card-bg: #111827;
+    --adm-card-border: #1f2937;
+    --adm-card-hover: #1e1b4b;
+    --adm-accent: #6366f1;
+    --adm-accent-light: #818cf8;
+    --adm-text-primary: #f8fafc;
+    --adm-text-muted: #94a3b8;
+}
+
+html[data-admin-theme="light"] {
+    --adm-hero-bg: linear-gradient(135deg, #eef2ff 0%, #ffffff 100%);
+    --adm-hero-border: #c7d2fe;
+    --adm-card-bg: #ffffff;
+    --adm-card-border: #e2e8f0;
+    --adm-card-hover: #f8faff;
+    --adm-accent: #4f46e5;
+    --adm-accent-light: #6366f1;
+    --adm-text-primary: #0f172a;
+    --adm-text-muted: #475569;
+}
 
 .admin-mgmt-hero {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(17, 24, 39, 0.95) 100%);
-    border: 1px solid rgba(99, 102, 241, 0.25);
+    background: var(--adm-hero-bg);
+    border: 1px solid var(--adm-hero-border);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.15);
+    border-radius: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.admin-avatar-pill {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #4F46E5, #7C3AED);
-    color: #FFFFFF;
+.admin-mgmt-hero:hover {
+    box-shadow: 0 14px 30px -5px rgba(99, 102, 241, 0.25);
+}
+
+.admin-role-badge {
+    font-size: 0.68rem;
+    font-weight: 800;
+    color: var(--adm-accent-light);
+    background: rgba(99, 102, 241, 0.12);
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    padding: 0.25rem 0.55rem;
+    border-radius: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.admin-user-card {
+    background: var(--adm-card-bg);
+    border: 1px solid var(--adm-card-border);
+    border-radius: 1rem;
+    padding: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.2);
+}
+
+.admin-user-card:hover {
+    border-color: var(--adm-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px -4px rgba(99, 102, 241, 0.2);
+}
+
+.admin-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem 0.75rem;
+    padding: 0.65rem;
+    background: rgba(15, 23, 42, 0.4);
+    border-radius: 0.75rem;
+    border: 1px solid rgba(31, 41, 55, 0.6);
+}
+
+.admin-meta-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.admin-meta-label {
+    font-size: 0.62rem;
     font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--adm-text-muted);
+}
+
+.admin-meta-val {
     font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--adm-text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-action-btn-group {
     display: flex;
     align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
-}
-
-.badge-role {
-    font-size: 10px;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 6px;
-    background: rgba(99, 102, 241, 0.15);
-    color: #A5B4FC;
-    border: 1px solid rgba(99, 102, 241, 0.3);
-}
-
-.badge-status-active {
-    font-size: 10px;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 6px;
-    background: rgba(16, 185, 129, 0.15);
-    color: #34D399;
-    border: 1px solid rgba(16, 185, 129, 0.3);
-}
-
-.badge-status-disabled {
-    font-size: 10px;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 6px;
-    background: rgba(239, 68, 68, 0.15);
-    color: #F87171;
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    justify-content: flex-end;
+    gap: 0.45rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid var(--adm-card-border);
 }
 
 .admin-action-btn {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    background: #0F172A;
-    border: 1px solid #1F2937;
-    color: #9CA3AF;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0.5rem;
+    border-radius: 0.65rem;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--adm-card-border);
+    color: var(--adm-text-muted);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
+    cursor: pointer;
+    touch-action: manipulation;
 }
 
 .admin-action-btn:hover {
-    border-color: #6366F1;
-    color: #FFFFFF;
-    background: #1E1B4B;
+    color: var(--adm-text-primary);
+    background: var(--adm-accent);
+    border-color: var(--adm-accent);
 }
 
-.admin-action-btn.btn-danger-hover:hover {
-    border-color: #EF4444;
-    color: #FFFFFF;
-    background: rgba(239, 68, 68, 0.2);
+@media (max-width: 1023.98px) {
+    .admin-mgmt-hero {
+        padding: 1.25rem !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .admin-mgmt-hero {
+        padding: 1rem !important;
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 0.75rem;
+    }
+
+    .admin-mgmt-hero button#openCreateAdminModalBtn {
+        width: 100%;
+        justify-content: center;
+        min-height: 44px;
+    }
+
+    #adminTableBody tr {
+        display: flex;
+        flex-direction: column;
+        gap: 0.65rem;
+        padding: 0.95rem;
+        margin-bottom: 0.75rem;
+        background: var(--adm-card-bg);
+        border: 1px solid var(--adm-card-border);
+        border-radius: 1rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    #adminTableBody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.25rem 0 !important;
+        border: none !important;
+        font-size: 0.75rem;
+    }
+
+    #adminTableBody td:last-child {
+        justify-content: flex-end;
+        padding-top: 0.65rem !important;
+        border-top: 1px solid var(--adm-card-border) !important;
+        margin-top: 0.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-mgmt-hero h2 {
+        font-size: 1rem !important;
+    }
+
+    .admin-user-card {
+        padding: 0.85rem;
+    }
+
+    .admin-meta-grid {
+        grid-template-columns: 1fr;
+        gap: 0.4rem;
+    }
+
+    .admin-action-btn {
+        min-width: 40px;
+        min-height: 40px;
+    }
+}
+
+@media (max-width: 390px) {
+    .admin-role-badge {
+        font-size: 0.65rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .admin-mgmt-hero {
+        padding: 0.75rem !important;
+    }
+
+    .admin-meta-val {
+        font-size: 0.7rem;
+    }
+}
+
+html[data-admin-theme="light"] .admin-role-badge {
+    background: #eef2ff;
+    color: #4f46e5;
+    border-color: #c7d2fe;
+}
+
+html[data-admin-theme="light"] .admin-meta-grid {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+}
+
+html[data-admin-theme="light"] .admin-action-btn {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+    color: #475569;
 }

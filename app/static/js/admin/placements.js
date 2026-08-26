@@ -279,6 +279,7 @@
 
     function renderPlacementsTable() {
         const tbody = document.getElementById('placementsTableBody');
+        const mobileCards = document.getElementById('placementsMobileCards');
         if (!tbody) return;
 
         if (state.items.length === 0) {
@@ -290,6 +291,7 @@
                     </td>
                 </tr>
             `;
+            if (mobileCards) mobileCards.innerHTML = '<div class="admin-mobile-empty">No placement drives found.</div>';
             return;
         }
 
@@ -341,6 +343,19 @@
                 </tr>
             `;
         }).join('');
+
+        if (mobileCards) {
+            mobileCards.innerHTML = state.items.map(p => {
+                const id = p.placement_id || p.id || '-';
+                const company = p.company_name || p.title || 'Company';
+                const role = p.job_role || '-';
+                const status = p.status || 'Upcoming';
+                const statusClass = status === 'Registration Open' ? 'status-open' : status === 'Completed' ? 'status-completed' : 'status-upcoming';
+                return `<article class="admin-mobile-record-card placement-mobile-card"><div class="admin-record-heading"><div class="flex items-center gap-3 min-w-0"><div class="company-logo-box"><i data-lucide="building-2"></i></div><div class="min-w-0"><h3>${escapeHtml(company)}</h3><p>${escapeHtml(id)}</p></div></div><span class="badge-drive-status ${statusClass}">${escapeHtml(status)}</span></div><div class="admin-record-primary">${escapeHtml(role)}</div><div class="admin-record-meta"><span><b>Package</b>${escapeHtml(p.package_lpa ? `${p.package_lpa} LPA` : '-')}</span><span><b>Departments</b>${escapeHtml(p.department || '-')}</span><span><b>Drive Date</b>${escapeHtml(p.drive_date || '-')}</span><span><b>Deadline</b>${escapeHtml(p.registration_deadline || '-')}</span></div><div class="admin-record-actions"><button type="button" onclick="window.viewPlacement('${escapeQuotes(id)}')" aria-label="View ${escapeQuotes(company)}"><i data-lucide="eye"></i><span>View</span></button><button type="button" onclick="window.editPlacement('${escapeQuotes(id)}')" aria-label="Edit ${escapeQuotes(company)}"><i data-lucide="edit-2"></i><span>Edit</span></button><button type="button" class="is-danger" onclick="window.deletePlacement('${escapeQuotes(id)}')" aria-label="Delete ${escapeQuotes(company)}"><i data-lucide="trash-2"></i><span>Delete</span></button></div></article>`;
+            }).join('');
+        }
+
+        lucide.createIcons();
     }
 
     async function handlePlacementFormSubmit(e) {

@@ -1,84 +1,232 @@
-/* ==========================================================================
-   SVIT Admin - Page 24: Canteen Menu Styles (Visual Food Dish Cards)
-   ========================================================================== */
+/* SVIT Admin - Canteen Menu Cards Responsive Stylesheet */
+:root {
+    --menu-hero-bg: linear-gradient(135deg, rgba(124, 45, 18, 0.75) 0%, rgba(15, 23, 42, 0.85) 100%);
+    --menu-hero-border: rgba(249, 115, 22, 0.35);
+    --menu-card-bg: #111827;
+    --menu-card-border: #1f2937;
+    --menu-card-hover: #7c2d12;
+    --menu-accent: #f97316;
+    --menu-accent-light: #fb923c;
+    --menu-text-primary: #f8fafc;
+    --menu-text-muted: #94a3b8;
+}
+
+html[data-admin-theme="light"] {
+    --menu-hero-bg: linear-gradient(135deg, #fff7ed 0%, #ffffff 100%);
+    --menu-hero-border: #fed7aa;
+    --menu-card-bg: #ffffff;
+    --menu-card-border: #e2e8f0;
+    --menu-card-hover: #fff7ed;
+    --menu-accent: #ea580c;
+    --menu-accent-light: #f97316;
+    --menu-text-primary: #0f172a;
+    --menu-text-muted: #475569;
+}
 
 .canteen-menu-hero-card {
-    background: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(17, 24, 39, 0.95) 100%);
-    border: 1px solid rgba(249, 115, 22, 0.25);
+    background: var(--menu-hero-bg);
+    border: 1px solid var(--menu-hero-border);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 25px -5px rgba(249, 115, 22, 0.15);
+    border-radius: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.food-card-box {
-    background: #111827;
-    border: 1px solid #1F2937;
-    border-radius: 16px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    transition: all 0.2s ease;
-}
-
-.food-card-box:hover {
-    border-color: #F97316;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 15px rgba(249, 115, 22, 0.2);
-}
-
-.food-card-img-wrapper {
-    height: 140px;
-    background: #0F172A;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-
-.food-card-img-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.veg-symbol {
-    width: 16px;
-    height: 16px;
-    border: 1.5px solid #10B981;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.veg-symbol::after {
-    content: '';
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #10B981;
+.canteen-menu-hero-card:hover {
+    box-shadow: 0 14px 30px -5px rgba(249, 115, 22, 0.25);
 }
 
 .food-cat-btn {
-    padding: 0.55rem 1rem;
-    border-radius: 12px;
-    background: #0F172A;
-    border: 1px solid #1F2937;
-    color: #9CA3AF;
-    font-size: 0.78rem;
-    font-weight: 600;
+    min-height: 44px;
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--menu-text-muted);
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--menu-card-border);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    touch-action: manipulation;
+    white-space: nowrap;
 }
 
 .food-cat-btn:hover {
-    border-color: #F97316;
-    color: #FFFFFF;
-    background: #431407;
+    color: var(--menu-text-primary);
+    background: rgba(124, 45, 18, 0.4);
+    border-color: var(--menu-accent);
 }
 
 .food-cat-btn.active {
-    background: #F97316;
-    border-color: #F97316;
-    color: #FFFFFF;
-    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+    background: rgba(249, 115, 22, 0.18);
+    color: var(--menu-accent-light);
+    border-color: var(--menu-accent);
+    box-shadow: 0 0 12px rgba(249, 115, 22, 0.25);
+}
+
+.dish-card {
+    background: var(--menu-card-bg);
+    border: 1px solid var(--menu-card-border);
+    border-radius: 1rem;
+    padding: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.2);
+}
+
+.dish-card:hover {
+    border-color: var(--menu-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px -4px rgba(249, 115, 22, 0.2);
+}
+
+.dish-price-tag {
+    font-size: 0.85rem;
+    font-weight: 900;
+    color: #34d399;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    padding: 0.25rem 0.6rem;
+    border-radius: 0.5rem;
+}
+
+.dish-veg-indicator {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #10b981;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    padding: 1px;
+}
+
+.dish-veg-dot {
+    width: 6px;
+    height: 6px;
+    background: #10b981;
+    border-radius: 50%;
+}
+
+.dish-action-btn-group {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.45rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid var(--menu-card-border);
+}
+
+.dish-action-btn {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0.5rem;
+    border-radius: 0.65rem;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--menu-card-border);
+    color: var(--menu-text-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.dish-action-btn:hover {
+    color: var(--menu-text-primary);
+    background: var(--menu-accent);
+    border-color: var(--menu-accent);
+}
+
+@media (max-width: 1023.98px) {
+    .canteen-menu-hero-card {
+        padding: 1.25rem !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .canteen-menu-hero-card {
+        padding: 1rem !important;
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 0.75rem;
+    }
+
+    .canteen-menu-hero-card button#openCreateFoodModalBtn {
+        width: 100%;
+        justify-content: center;
+        min-height: 44px;
+    }
+
+    .food-cat-btn {
+        flex: 1 1 calc(50% - 0.5rem);
+        justify-content: center;
+        font-size: 0.7rem;
+        padding: 0.5rem 0.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .canteen-menu-hero-card h2 {
+        font-size: 1rem !important;
+    }
+
+    .dish-card {
+        padding: 0.85rem;
+    }
+
+    .dish-action-btn {
+        min-width: 40px;
+        min-height: 40px;
+    }
+}
+
+@media (max-width: 390px) {
+    .food-cat-btn {
+        flex: 1 1 100%;
+    }
+}
+
+@media (max-width: 360px) {
+    .canteen-menu-hero-card {
+        padding: 0.75rem !important;
+    }
+
+    .dish-price-tag {
+        font-size: 0.78rem;
+    }
+}
+
+html[data-admin-theme="light"] .food-cat-btn {
+    background: #f1f5f9;
+    color: #475569;
+    border-color: #e2e8f0;
+}
+
+html[data-admin-theme="light"] .food-cat-btn:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+html[data-admin-theme="light"] .food-cat-btn.active {
+    background: #fff7ed;
+    color: #ea580c;
+    border-color: #f97316;
+}
+
+html[data-admin-theme="light"] .dish-card {
+    background: #ffffff;
+    border-color: #e2e8f0;
+}
+
+html[data-admin-theme="light"] .dish-action-btn {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+    color: #475569;
 }

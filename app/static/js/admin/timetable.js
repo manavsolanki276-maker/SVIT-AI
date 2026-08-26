@@ -132,6 +132,7 @@
 
     function renderTimetableGrid() {
         const gridBody = document.getElementById('timetableGridBody');
+        const mobileSchedule = document.getElementById('timetableMobileSchedule');
         if (!gridBody) return;
 
         const activeDays = state.dayFilter ? [state.dayFilter] : DAYS;
@@ -198,7 +199,22 @@
             `;
         }).join('');
 
+        if (mobileSchedule) {
+            const mobileItems = state.items
+                .filter(item => !state.dayFilter || String(item.day || '').toLowerCase() === state.dayFilter.toLowerCase())
+                .sort((a, b) => String(a.start_time || '').localeCompare(String(b.start_time || '')));
+            mobileSchedule.innerHTML = mobileItems.length ? mobileItems.map(item => `<article class="admin-mobile-schedule-card"><div class="schedule-time"><i data-lucide="clock"></i><span>${escapeHtml(item.start_time || '-')} - ${escapeHtml(item.end_time || '-')}</span></div><div class="schedule-body"><h3>${escapeHtml(item.subject || 'Lecture')}</h3><p><i data-lucide="user"></i>${escapeHtml(item.faculty || 'Faculty')}</p><p><i data-lucide="map-pin"></i>${escapeHtml(item.room || 'Room')}</p></div><button type="button" class="schedule-edit" onclick="window.editSlot('${escapeQuotes(item.id)}')" aria-label="Edit ${escapeQuotes(item.subject || 'lecture')}"><i data-lucide="edit-2"></i></button></article>`).join('') : '<div class="admin-mobile-empty">No lecture slots found for this selection.</div>';
+        }
+
         lucide.createIcons();
+    }
+
+    function escapeHtml(value) {
+        return String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
+    function escapeQuotes(value) {
+        return String(value || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
     }
 
     window.quickAddSlot = function(day, startTime, endTime) {

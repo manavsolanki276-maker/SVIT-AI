@@ -1114,6 +1114,13 @@ class AdminCRUDService:
                         },
                         link="/student/chat"
                     )
+                    MongoNotificationService.notify_admins(
+                        title=f"{'Notice Updated' if is_update else 'Notice Published'}: {title}",
+                        message=clean_data.get("description", title),
+                        category="notice",
+                        data={"notice_id": item_id, "module": module_key},
+                        link="/admin/notices"
+                    )
 
             # 2. College & Sports Events
             elif module_key in ("events", "sports_events"):
@@ -1136,6 +1143,13 @@ class AdminCRUDService:
                             "venue": ev_venue
                         },
                         link="/student/chat"
+                    )
+                    MongoNotificationService.notify_admins(
+                        title=f"{'Event Updated' if is_update else 'Event Published'}: {ev_name}",
+                        message=f"{clean_data.get('category', 'College Event')} on {ev_date} at {ev_venue}." if ev_date else f"Event scheduled at {ev_venue}.",
+                        category="event",
+                        data={"event_id": item_id, "module": module_key},
+                        link="/admin/events"
                     )
 
             # 3. Timetable Schedules

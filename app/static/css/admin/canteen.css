@@ -1,22 +1,276 @@
-/* ==========================================================================
-   SVIT Admin - Page 23: Canteen Overview Styles
-   ========================================================================== */
+/* SVIT Admin - Canteen & Cafeteria Hub Responsive Stylesheet */
+:root {
+    --can-hero-bg: linear-gradient(135deg, rgba(124, 45, 18, 0.75) 0%, rgba(15, 23, 42, 0.85) 100%);
+    --can-hero-border: rgba(249, 115, 22, 0.35);
+    --can-card-bg: #111827;
+    --can-card-border: #1f2937;
+    --can-card-hover: #7c2d12;
+    --can-accent: #f97316;
+    --can-accent-light: #fb923c;
+    --can-text-primary: #f8fafc;
+    --can-text-muted: #94a3b8;
+}
+
+html[data-admin-theme="light"] {
+    --can-hero-bg: linear-gradient(135deg, #fff7ed 0%, #ffffff 100%);
+    --can-hero-border: #fed7aa;
+    --can-card-bg: #ffffff;
+    --can-card-border: #e2e8f0;
+    --can-card-hover: #fff7ed;
+    --can-accent: #ea580c;
+    --can-accent-light: #f97316;
+    --can-text-primary: #0f172a;
+    --can-text-muted: #475569;
+}
 
 .canteen-hero-card {
-    background: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(17, 24, 39, 0.95) 100%);
-    border: 1px solid rgba(249, 115, 22, 0.25);
+    background: var(--can-hero-bg);
+    border: 1px solid var(--can-hero-border);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 25px -5px rgba(249, 115, 22, 0.15);
+    border-radius: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.canteen-hero-card:hover {
+    box-shadow: 0 14px 30px -5px rgba(249, 115, 22, 0.25);
 }
 
 .canteen-stat-box {
-    background: #111827;
-    border: 1px solid #1F2937;
-    border-radius: 16px;
-    padding: 1.25rem;
-    transition: all 0.2s ease;
+    background: var(--can-card-bg);
+    border: 1px solid var(--can-card-border);
+    border-radius: 1rem;
+    padding: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 105px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.2);
 }
 
 .canteen-stat-box:hover {
-    border-color: #F97316;
+    border-color: var(--can-accent);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 15px rgba(249, 115, 22, 0.2);
+    box-shadow: 0 10px 24px -4px rgba(249, 115, 22, 0.2);
+}
+
+.fssai-certified-badge {
+    font-size: 0.68rem;
+    font-weight: 800;
+    color: #34d399;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.375rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.canteen-shortcut-card {
+    background: var(--can-card-bg);
+    border: 1px solid var(--can-card-border);
+    border-radius: 1rem;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    text-decoration: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    touch-action: manipulation;
+}
+
+.canteen-shortcut-card:hover {
+    border-color: var(--can-accent);
+    background-color: var(--can-card-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px -4px rgba(249, 115, 22, 0.2);
+}
+
+.canteen-timing-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1.1rem;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--can-card-border);
+    border-radius: 0.875rem;
+}
+
+.canteen-counter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--can-accent-light);
+    background: rgba(249, 115, 22, 0.12);
+    border: 1px solid rgba(249, 115, 22, 0.25);
+    padding: 0.25rem 0.55rem;
+    border-radius: 0.5rem;
+}
+
+.canteen-dietary-notice {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    border-radius: 0.75rem;
+    font-size: 0.75rem;
+    color: #34d399;
+}
+
+.canteen-hygiene-card {
+    background: var(--can-card-bg);
+    border: 1px solid var(--can-card-border);
+    border-radius: 1rem;
+    padding: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.canteen-menu-preview-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--can-card-border);
+    font-size: 0.75rem;
+}
+
+.canteen-menu-preview-row:last-child {
+    border-bottom: none;
+}
+
+.canteen-price-chip {
+    font-weight: 800;
+    font-size: 0.72rem;
+    color: #34d399;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.375rem;
+}
+
+.canteen-special-item-card {
+    background: linear-gradient(135deg, rgba(124, 45, 18, 0.3) 0%, rgba(15, 23, 42, 0.7) 100%);
+    border: 1px solid rgba(249, 115, 22, 0.3);
+    border-radius: 0.875rem;
+    padding: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+@media (max-width: 1023.98px) {
+    .canteen-hero-card {
+        padding: 1.25rem !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .canteen-hero-card {
+        padding: 1rem !important;
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 0.75rem;
+    }
+
+    .canteen-hero-card a {
+        width: 100%;
+        justify-content: center;
+        min-height: 44px;
+    }
+
+    .canteen-stat-box {
+        padding: 0.85rem;
+        min-height: 88px;
+    }
+
+    .canteen-timing-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.45rem;
+    }
+
+    .canteen-special-item-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .canteen-hero-card h2 {
+        font-size: 1rem !important;
+    }
+
+    .canteen-stat-box h3 {
+        font-size: 1.25rem !important;
+    }
+
+    .canteen-hygiene-card {
+        padding: 0.85rem;
+    }
+}
+
+@media (max-width: 390px) {
+    .canteen-stat-box {
+        min-height: 80px;
+    }
+}
+
+@media (max-width: 360px) {
+    .canteen-hero-card {
+        padding: 0.75rem !important;
+    }
+}
+
+html[data-admin-theme="light"] .canteen-stat-box {
+    background: #ffffff;
+    border-color: #e2e8f0;
+}
+
+html[data-admin-theme="light"] .canteen-shortcut-card {
+    background: #ffffff;
+    border-color: #e2e8f0;
+}
+
+html[data-admin-theme="light"] .canteen-shortcut-card:hover {
+    background: #fff7ed;
+    border-color: #f97316;
+}
+
+html[data-admin-theme="light"] .canteen-timing-banner {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+}
+
+html[data-admin-theme="light"] .canteen-counter-pill {
+    background: #fff7ed;
+    color: #ea580c;
+    border-color: #fed7aa;
+}
+
+html[data-admin-theme="light"] .canteen-hygiene-card {
+    background: #ffffff;
+    border-color: #e2e8f0;
+}
+
+html[data-admin-theme="light"] .canteen-price-chip {
+    background: #ecfdf5;
+    color: #047857;
+    border-color: #a7f3d0;
+}
+
+html[data-admin-theme="light"] .canteen-menu-preview-row {
+    border-color: #e2e8f0;
+}
+
+html[data-admin-theme="light"] .canteen-special-item-card {
+    background: linear-gradient(135deg, #fff7ed 0%, #ffffff 100%);
+    border-color: #fed7aa;
 }
