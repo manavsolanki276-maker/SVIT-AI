@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Rejected - SVIT AI Assistant</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth/login.css') }}">
+    <style>
+        .status-container {
+            max-width: 480px;
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            padding: 32px 28px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+        .status-icon-box {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.15);
+            border: 2px solid rgba(239, 68, 68, 0.35);
+            color: #ef4444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px auto;
+        }
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #f87171;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .details-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .details-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #334155;
+            font-size: 13px;
+        }
+        .details-row:last-child {
+            border-bottom: none;
+        }
+        .details-label {
+            color: #94a3b8;
+        }
+        .details-val {
+            color: #f8fafc;
+            font-weight: 600;
+        }
+        .rejection-box {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-top: 12px;
+            text-align: left;
+            font-size: 12px;
+            color: #fca5a5;
+        }
+        .action-btns {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .btn-register {
+            flex: 1;
+            background: #4f46e5;
+            color: #ffffff;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .btn-register:hover {
+            background: #4338ca;
+        }
+        .btn-logout {
+            flex: 1;
+            background: #1e293b;
+            color: #f8fafc;
+            border: 1px solid #334155;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .btn-logout:hover {
+            background: #334155;
+        }
+    </style>
+</head>
+<body style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #0b0f19; margin: 0; padding: 16px;">
+    <div class="status-container">
+        <div class="status-icon-box">
+            <i data-lucide="x-circle" style="width: 32px; height: 32px;"></i>
+        </div>
+
+        <div class="status-pill">
+            <i data-lucide="alert-triangle" style="width: 12px; height: 12px;"></i>
+            <span>Registration Rejected</span>
+        </div>
+
+        <h2 style="margin: 0 0 8px 0; color: #f8fafc; font-size: 22px; font-weight: 700;">Request Not Approved</h2>
+        <p style="margin: 0 0 16px 0; color: #94a3b8; font-size: 13px; line-height: 1.5;">
+            Your registration request was rejected by the college administration.
+        </p>
+
+        {% if student.rejection_reason %}
+        <div class="rejection-box">
+            <strong style="display: block; margin-bottom: 4px; color: #ef4444;">Reason for Rejection:</strong>
+            <span>{{ student.rejection_reason }}</span>
+        </div>
+        {% endif %}
+
+        <div class="details-card">
+            <div class="details-row">
+                <span class="details-label">Student Name</span>
+                <span class="details-val">{{ student.full_name or student.name or 'Student' }}</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Enrollment No</span>
+                <span class="details-val">{{ student.enrollment_no or student.enrollment_number or student.id }}</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Department</span>
+                <span class="details-val">{{ student.department or 'Engineering' }}</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Decision Date</span>
+                <span class="details-val">{{ (student.rejected_at|string)[:10] if student.rejected_at else 'Recent' }}</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Current Status</span>
+                <span class="details-val" style="color: #ef4444; text-transform: uppercase;">REJECTED</span>
+            </div>
+        </div>
+
+        <p style="font-size: 12px; color: #94a3b8; margin: 12px 0 0 0;">
+            If you believe this is a mistake, please contact your department coordinator or submit a new registration with valid credentials.
+        </p>
+
+        <div class="action-btns">
+            <a href="{{ url_for('auth.register') }}" class="btn-register">
+                <i data-lucide="user-plus" style="width: 16px; height: 16px;"></i>
+                <span>Re-register</span>
+            </a>
+            <a href="{{ url_for('auth.logout') }}" class="btn-logout">
+                <i data-lucide="log-out" style="width: 16px; height: 16px;"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

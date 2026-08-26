@@ -109,11 +109,11 @@
 
                     <!-- Role Tabs (Student / Faculty & Admin) -->
                     <div class="role-tabs">
-                        <button type="button" class="tab-btn active" id="studentTab" onclick="switchRole('student')">
+                        <button type="button" class="tab-btn {% if selected_tab != 'admin' %}active{% endif %}" id="studentTab" onclick="switchRole('student')">
                             <i data-lucide="user"></i>
                             <span>Student / Faculty</span>
                         </button>
-                        <button type="button" class="tab-btn" id="adminTab" onclick="switchRole('admin')">
+                        <button type="button" class="tab-btn {% if selected_tab == 'admin' %}active{% endif %}" id="adminTab" onclick="switchRole('admin')">
                             <i data-lucide="shield-check"></i>
                             <span>Admin</span>
                         </button>
@@ -121,13 +121,14 @@
 
                     <!-- Login Form -->
                     <form id="loginForm" action="{{ url_for('auth.login') }}" method="POST">
-                        <input type="hidden" name="role" id="roleInput" value="student">
+                        <input type="hidden" name="login_mode" id="loginModeInput" value="{% if selected_tab == 'admin' %}admin{% else %}student_faculty{% endif %}">
+                        <input type="hidden" name="role" id="roleInput" value="{% if selected_tab == 'admin' %}admin{% else %}student{% endif %}">
 
                         <div class="input-group">
-                            <label for="identifier" id="identifierLabel">Email or Enrollment ID</label>
+                            <label for="identifier" id="identifierLabel">{% if selected_tab == 'admin' %}Admin Username / Email{% else %}Email or Enrollment ID{% endif %}</label>
                             <div class="input-field">
                                 <i data-lucide="mail" class="field-icon"></i>
-                                <input type="text" id="identifier" name="identifier" placeholder="Enter your email or enrollment ID" required autocomplete="username">
+                                <input type="text" id="identifier" name="identifier" placeholder="{% if selected_tab == 'admin' %}Enter admin username or email{% else %}Enter your email or enrollment ID{% endif %}" required autocomplete="username">
                             </div>
                         </div>
 
@@ -147,12 +148,12 @@
                                 <input type="checkbox" name="remember" id="rememberMe">
                                 <span>Remember me</span>
                             </label>
-                            <a href="#" class="forgot-link">Forgot Password?</a>
+                            <a href="{{ url_for('auth.forgot_password') }}" class="forgot-link">Forgot Password?</a>
                         </div>
 
                         <button type="submit" class="submit-btn" id="loginSubmitBtn">
-                            <i data-lucide="log-in"></i>
-                            <span>Login</span>
+                            <i data-lucide="log-in" id="loginBtnIcon"></i>
+                            <span id="loginBtnText">Sign In</span>
                         </button>
                     </form>
 
@@ -196,32 +197,45 @@
         function switchRole(role) {
             const studentTab = document.getElementById('studentTab');
             const adminTab = document.getElementById('adminTab');
+            const loginModeInput = document.getElementById('loginModeInput');
             const roleInput = document.getElementById('roleInput');
             const identifierLabel = document.getElementById('identifierLabel');
             const identifierInput = document.getElementById('identifier');
-            const loginForm = document.getElementById('loginForm');
             const formTitle = document.getElementById('formTitle');
-
-            // Unified auth.login route
-            loginForm.action = "{{ url_for('auth.login') }}";
+            const formSub = document.getElementById('formSub');
 
             if (role === 'admin') {
-                studentTab.classList.remove('active');
-                adminTab.classList.add('active');
-                roleInput.value = 'admin';
-                formTitle.textContent = 'Admin Portal Login';
-                identifierLabel.textContent = 'Admin Username / Email';
-                identifierInput.placeholder = 'Enter admin username or email';
+                if (studentTab) studentTab.classList.remove('active');
+                if (adminTab) adminTab.classList.add('active');
+                if (loginModeInput) loginModeInput.value = 'admin';
+                if (roleInput) roleInput.value = 'admin';
+                if (formTitle) formTitle.textContent = 'Admin Portal Login';
+                if (formSub) formSub.textContent = 'Access administrative controls and management';
+                if (identifierLabel) identifierLabel.textContent = 'Admin Username / Email';
+                if (identifierInput) identifierInput.placeholder = 'Enter admin username or email';
             } else {
-                adminTab.classList.remove('active');
-                studentTab.classList.add('active');
-                roleInput.value = 'student';
-                formTitle.textContent = 'Login to Your Account';
-                identifierLabel.textContent = 'Email or Enrollment ID';
-                identifierInput.placeholder = 'Enter your email or enrollment ID';
+                if (adminTab) adminTab.classList.remove('active');
+                if (studentTab) studentTab.classList.add('active');
+                if (loginModeInput) loginModeInput.value = 'student_faculty';
+                if (roleInput) roleInput.value = 'student';
+                if (formTitle) formTitle.textContent = 'Login to Your Account';
+                if (formSub) formSub.textContent = 'Access your SVIT AI Assistant dashboard';
+                if (identifierLabel) identifierLabel.textContent = 'Email or Enrollment ID';
+                if (identifierInput) identifierInput.placeholder = 'Enter your email or enrollment ID';
             }
             lucide.createIcons();
         }
+
+        // Initialize role tab on page load based on URL params
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tabParam = urlParams.get('tab') || urlParams.get('mode') || urlParams.get('role');
+            if (tabParam === 'admin') {
+                switchRole('admin');
+            } else if (tabParam === 'student' || tabParam === 'student_faculty') {
+                switchRole('student');
+            }
+        });
 
         function togglePasswordVisibility() {
             const passwordInput = document.getElementById('password');
@@ -235,6 +249,20 @@
                 eyeIcon.setAttribute('data-lucide', 'eye');
             }
             lucide.createIcons();
+        }
+
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) {
+            loginForm.addEventListener('submit', function() {
+                const btn = document.getElementById('loginSubmitBtn');
+                const btnText = document.getElementById('loginBtnText');
+                if (btn && btnText) {
+                    btn.disabled = true;
+                    btnText.textContent = 'Signing in...';
+                    btn.style.opacity = '0.75';
+                    btn.style.cursor = 'wait';
+                }
+            });
         }
     </script>
 </body>

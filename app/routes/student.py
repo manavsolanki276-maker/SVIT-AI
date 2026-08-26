@@ -14,16 +14,12 @@ def verify_student_status():
     if current_user.is_authenticated and not getattr(current_user, 'is_admin', False):
         status = getattr(current_user, 'status', 'active')
         if status != 'active':
+            if status == 'pending':
+                return redirect(url_for('auth.pending_view'))
+            elif status == 'rejected':
+                return redirect(url_for('auth.rejected_view'))
             from flask_login import logout_user
             logout_user()
-            if status == 'pending':
-                flash('Your registration is pending admin approval.', 'warning')
-            elif status == 'rejected':
-                reason = getattr(current_user, 'rejection_reason', '')
-                msg = 'Your registration request was rejected.'
-                if reason:
-                    msg += f' Reason: {reason}'
-                flash(msg, 'error')
             return redirect(url_for('auth.login'))
 
 

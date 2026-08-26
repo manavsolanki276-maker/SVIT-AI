@@ -173,6 +173,11 @@ class MongoAdmin(UserMixin):
         self.role = normalize_role(doc.get('role', ROLE_SUPER_ADMIN))
         self.department = doc.get('department', '')
         self._is_active = bool(doc.get('is_active', True))
+        raw_status = str(doc.get('status', 'active' if self._is_active else 'inactive')).strip().lower()
+        if raw_status in ('active', 'inactive', 'suspended'):
+            self.status = raw_status
+        else:
+            self.status = 'active' if self._is_active else 'inactive'
         self.created_at = doc.get('created_at')
         self.updated_at = doc.get('updated_at')
         self.last_login = doc.get('last_login')
@@ -182,7 +187,7 @@ class MongoAdmin(UserMixin):
 
     @property
     def is_active(self) -> bool:
-        return self._is_active
+        return self._is_active and self.status == 'active'
 
     @property
     def is_admin(self) -> bool:

@@ -206,15 +206,11 @@ def create_app():
             # Check student approval status
             status = getattr(current_user, 'status', 'active')
             if status != 'active':
-                logout_user()
                 if status == 'pending':
-                    flash('Your registration is pending admin approval.', 'warning')
+                    return redirect(url_for('auth.pending_view'))
                 elif status == 'rejected':
-                    reason = getattr(current_user, 'rejection_reason', '')
-                    msg = 'Your registration request was rejected.'
-                    if reason:
-                        msg += f' Reason: {reason}'
-                    flash(msg, 'error')
+                    return redirect(url_for('auth.rejected_view'))
+                logout_user()
                 return redirect(url_for('auth.login'))
 
             # Check profile completion status
@@ -231,6 +227,10 @@ def create_app():
     def root_login():
         from app.routes.auth import student_login
         return student_login()
+
+    @app.route('/admin/login', methods=['GET', 'POST'])
+    def root_admin_login():
+        return redirect('/login', code=302)
 
     @app.route('/register', methods=['GET', 'POST'])
     def root_register():

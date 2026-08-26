@@ -25,7 +25,7 @@ from flask import (
 from flask_login import login_user, logout_user, current_user
 from werkzeug.security import generate_password_hash
 
-from app.database.models import Admin
+from app.database.models import Admin, Student
 from app.auth.rbac import (
     admin_required,
     require_role,
@@ -127,19 +127,52 @@ def login():
             ).first()
 
         if not admin_user:
+            # Check if this identifier belongs to a student/faculty with valid password
+            student_user = None
+            try:
+                from app.database.mongo_models import MongoStudent
+                student_user = MongoStudent.find_by_identifier(identifier)
+            except Exception:
+                pass
+            if not student_user and Student:
+                if '@' in identifier and hasattr(Student, 'email'):
+                    student_user = Student.query.filter_by(email=identifier).first()
+                if not student_user and hasattr(Student, 'enrollment_no'):
+                    student_user = Student.query.filter_by(enrollment_no=identifier).first()
+            if student_user and hasattr(student_user, 'check_password') and student_user.check_password(password):
+                msg = "Student/Faculty accounts must use the Student / Faculty login."
+                if is_json_req:
+                    return jsonify({"status": "error", "error": "WrongLoginMode", "message": msg}), 403
+                flash(msg, 'error')
+                return redirect(url_for('auth.login', tab='student_faculty'))
+
             msg = "Invalid admin credentials. Username or email not found."
             if is_json_req:
                 return jsonify({"status": "error", "error": "Unauthorized", "message": msg}), 401
             flash(msg, 'error')
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('auth.login', tab='admin'))
 
-        if not getattr(admin_user, 'is_active', True):
-            msg = "Account is disabled. Please contact the Super Administrator."
+        admin_status = getattr(admin_user, 'status', 'active' if getattr(admin_user, 'is_active', True) else 'inactive')
+        if admin_status == 'suspended':
+            msg = "Your admin account has been suspended. Please contact the Super Admin."
             if is_json_req:
                 return jsonify({
                     "status": "error",
                     "error": "Forbidden",
                     "message": msg,
+                    "admin_status": "suspended",
+                    "account_status": "suspended"
+                }), 403
+            flash(msg, 'error')
+            return redirect(url_for('auth.login'))
+        elif admin_status == 'inactive' or not getattr(admin_user, 'is_active', True):
+            msg = "Account is disabled. Your admin account is inactive. Please contact the Super Admin."
+            if is_json_req:
+                return jsonify({
+                    "status": "error",
+                    "error": "Forbidden",
+                    "message": msg,
+                    "admin_status": "inactive",
                     "account_status": "disabled"
                 }), 403
             flash(msg, 'error')

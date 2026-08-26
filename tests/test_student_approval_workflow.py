@@ -334,6 +334,164 @@ class TestStudentApprovalWorkflow(unittest.TestCase):
             active_items = [i for i in res_active.get_json()["items"] if (i.get("enrollment_no") or i.get("id")) == legacy_enrollment]
             self.assertTrue(len(active_items) > 0)
 
+    def test_08_admin_login_redirect_to_login(self):
+        """Accessing /admin/login directly must return HTTP 302 redirecting to /login."""
+        res = self.client.get('/admin/login', follow_redirects=False)
+        self.assertEqual(res.status_code, 302)
+        self.assertIn('/login', res.location)
+
+    def test_09_logout_redirects_to_login(self):
+        """Logging out must clear session and redirect to /login."""
+        # Login admin first
+        self.client.post('/auth/login', data={"identifier": self.admin_username, "password": self.admin_password})
+        res = self.client.get('/auth/logout', follow_redirects=False)
+        self.assertEqual(res.status_code, 302)
+        self.assertIn('/login', res.location)
+
+    def test_10_admin_inactive_and_suspended_accounts(self):
+        """Admin with inactive or suspended status must be blocked from logging in."""
+        inactive_admin_user = "inactive_admin_test"
+        suspended_admin_user = "suspended_admin_test"
+
+        if self.admin_coll is not None:
+            self.admin_coll.update_one(
+                {"username": inactive_admin_user},
+                {"$set": {
+                    "username": inactive_admin_user,
+                    "name": "Inactive Admin Tester",
+                    "role": "academic_admin",
+                    "status": "inactive",
+                    "is_active": False,
+                    "password_hash": generate_password_hash("AdminPass123!")
+                }},
+                upsert=True
+            )
+            self.admin_coll.update_one(
+                {"username": suspended_admin_user},
+                {"$set": {
+                    "username": suspended_admin_user,
+                    "name": "Suspended Admin Tester",
+                    "role": "academic_admin",
+                    "status": "suspended",
+                    "is_active": False,
+                    "password_hash": generate_password_hash("AdminPass123!")
+                }},
+                upsert=True
+            )
+
+        # 1. Test Inactive Admin login
+        res_inact = self.client.post('/auth/login', json={
+            "identifier": inactive_admin_user,
+            "password": "AdminPass123!"
+        })
+        self.assertEqual(res_inact.status_code, 403)
+        data_inact = res_inact.get_json()
+        self.assertIn("inactive", data_inact["message"].lower())
+
+        # 2. Test Suspended Admin login
+        res_susp = self.client.post('/auth/login', json={
+            "identifier": suspended_admin_user,
+            "password": "AdminPass123!"
+        })
+        self.assertEqual(res_susp.status_code, 403)
+        data_susp = res_susp.get_json()
+        self.assertIn("suspended", data_susp["message"].lower())
+
+        # Clean up temporary admin testing records
+        if self.admin_coll is not None:
+            self.admin_coll.delete_many({"username": {"$in": [inactive_admin_user, suspended_admin_user]}})
+
+    def test_11_pending_and_rejected_student_views(self):
+        """Dedicated pending and rejected views render correctly."""
+        res_pending = self.client.get('/auth/pending')
+        self.assertEqual(res_pending.status_code, 200)
+        self.assertIn(b"Pending Admin Approval", res_pending.data)
+
+        res_rejected = self.client.get('/auth/rejected')
+        self.assertEqual(res_rejected.status_code, 200)
+        self.assertIn(b"Registration Rejected", res_rejected.data)
+
+    def test_12_forgot_password_generic_response(self):
+        """Forgot password returns generic message without revealing email existence."""
+        res_get = self.client.get('/auth/forgot-password')
+        self.assertEqual(res_get.status_code, 200)
+        self.assertIn(b"Forgot Password", res_get.data)
+
+        res_post = self.client.post('/auth/forgot-password', json={"email": "anyuser@svitvasad.ac.in"})
+        self.assertEqual(res_post.status_code, 200)
+        data = res_post.get_json()
+        self.assertEqual(data["status"], "success")
+        self.assertIn("If an account exists", data["message"])
+
+    def test_13_student_mode_with_student_credentials(self):
+        """Student/Faculty mode allows valid Student credentials."""
+        # Create/find active student
+        res = self.client.post('/auth/login', json={
+            "identifier": "200410107089",
+            "password": "student@123",
+            "login_mode": "student_faculty"
+        })
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertEqual(data["status"], "success")
+        self.assertEqual(data["redirect_url"], "/")
+
+    def test_14_student_mode_with_admin_credentials_blocked(self):
+        """Student/Faculty mode with valid Admin credentials must be BLOCKED."""
+        res = self.client.post('/auth/login', json={
+            "identifier": self.admin_username,
+            "password": self.admin_password,
+            "login_mode": "student_faculty"
+        })
+        self.assertEqual(res.status_code, 403)
+        data = res.get_json()
+        self.assertEqual(data["status"], "error")
+        self.assertIn("Admin accounts must use the Admin login", data["message"])
+
+    def test_15_admin_mode_with_admin_credentials(self):
+        """Admin mode allows valid Admin credentials."""
+        res = self.client.post('/auth/login', json={
+            "identifier": self.admin_username,
+            "password": self.admin_password,
+            "login_mode": "admin"
+        })
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertEqual(data["status"], "success")
+        self.assertEqual(data["redirect_url"], "/admin/dashboard")
+
+    def test_16_admin_mode_with_student_credentials_blocked(self):
+        """Admin mode with valid Student credentials must be BLOCKED."""
+        res = self.client.post('/auth/login', json={
+            "identifier": "200410107089",
+            "password": "student@123",
+            "login_mode": "admin"
+        })
+        self.assertEqual(res.status_code, 403)
+        data = res.get_json()
+        self.assertEqual(data["status"], "error")
+        self.assertIn("Student/Faculty accounts must use the Student / Faculty login", data["message"])
+
+    def test_17_wrong_password_in_either_mode_blocked(self):
+        """Wrong password in either mode must return 401 Invalid credentials."""
+        # Wrong password in student mode
+        res1 = self.client.post('/auth/login', json={
+            "identifier": "200410107089",
+            "password": "WrongPassword123!",
+            "login_mode": "student_faculty"
+        })
+        self.assertEqual(res1.status_code, 401)
+        self.assertIn("Invalid credentials", res1.get_json()["message"])
+
+        # Wrong password in admin mode
+        res2 = self.client.post('/auth/login', json={
+            "identifier": self.admin_username,
+            "password": "WrongPassword123!",
+            "login_mode": "admin"
+        })
+        self.assertEqual(res2.status_code, 401)
+        self.assertIn("Invalid credentials", res2.get_json()["message"])
+
 
 if __name__ == '__main__':
     unittest.main()

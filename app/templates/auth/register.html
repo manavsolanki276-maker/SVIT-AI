@@ -231,14 +231,27 @@
                             </select>
                         </div>
 
-                        <div class="input-group">
-                            <label for="password">Password *</label>
-                            <div class="input-field">
-                                <i data-lucide="lock" class="field-icon"></i>
-                                <input type="password" id="password" name="password" placeholder="Create a secure password" required autocomplete="new-password">
-                                <button type="button" class="toggle-password" onclick="togglePasswordVisibility()" title="Toggle password visibility">
-                                    <i data-lucide="eye" id="eyeIcon"></i>
-                                </button>
+                        <div class="register-grid">
+                            <div class="input-group">
+                                <label for="password">Password *</label>
+                                <div class="input-field">
+                                    <i data-lucide="lock" class="field-icon"></i>
+                                    <input type="password" id="password" name="password" placeholder="Create password" required autocomplete="new-password" minlength="6">
+                                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility('password', 'eyeIcon')" title="Toggle password visibility">
+                                        <i data-lucide="eye" id="eyeIcon"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="confirm_password">Confirm Password *</label>
+                                <div class="input-field">
+                                    <i data-lucide="shield-check" class="field-icon"></i>
+                                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm password" required autocomplete="new-password" minlength="6">
+                                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility('confirm_password', 'confirmEyeIcon')" title="Toggle password visibility">
+                                        <i data-lucide="eye" id="confirmEyeIcon"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -269,9 +282,10 @@
     <script>
         lucide.createIcons();
 
-        function togglePasswordVisibility() {
-            const passwordInput = document.getElementById('password');
-            const eyeIcon = document.getElementById('eyeIcon');
+        function togglePasswordVisibility(fieldId, iconId) {
+            const passwordInput = document.getElementById(fieldId);
+            const eyeIcon = document.getElementById(iconId);
+            if (!passwordInput || !eyeIcon) return;
 
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
@@ -281,6 +295,19 @@
                 eyeIcon.setAttribute('data-lucide', 'eye');
             }
             lucide.createIcons();
+        }
+
+        const form = document.getElementById('registerForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const pwd = document.getElementById('password').value;
+                const confirmPwd = document.getElementById('confirm_password').value;
+                if (pwd && confirmPwd && pwd !== confirmPwd) {
+                    e.preventDefault();
+                    alert('Passwords do not match. Please verify and re-enter your password.');
+                    document.getElementById('confirm_password').focus();
+                }
+            });
         }
     </script>
 </body>
