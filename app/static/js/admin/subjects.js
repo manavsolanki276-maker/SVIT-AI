@@ -1,7 +1,7 @@
 /**
  * SVIT Admin - Subjects & Curriculum Management Controller (Mobile-First Architecture)
- * Complete Program -> Course -> Semester -> Subjects Hierarchy
- * Live MongoDB Data, Real KPI Calculations, Search, Filters, and Full CRUD
+ * Complete Hierarchy: PROGRAM -> DEPARTMENT -> YEAR -> SEMESTER -> SUBJECTS
+ * Live MongoDB Data, Real KPI Calculations, Dynamic Filters, Debounced Search, and Full CRUD
  */
 
 (function() {
@@ -20,9 +20,17 @@
         'Computer Applications': 'terminal'
     };
 
+    const YEAR_LABELS = {
+        'FY': 'First Year (FY)',
+        'SY': 'Second Year (SY)',
+        'TY': 'Third Year (TY)',
+        'LY': 'Final Year (LY)'
+    };
+
     const state = {
         selectedProgram: 'Diploma', // 'Diploma', 'BE', 'BCA', 'MCA', 'ME'
-        selectedCourse: '',        // '' means show courses grid; 'Computer Engineering' shows semester subjects
+        selectedCourse: '',        // '' shows course cards; 'Computer Engineering' shows curriculum
+        selectedYear: '',          // '' means all years, or 'FY', 'SY', 'TY', 'LY'
         selectedSemester: '1',     // Active semester tab
         search: '',
         typeFilter: '',            // 'Theory', 'Practical', 'Elective'
@@ -67,6 +75,7 @@
                 if (!prog) return;
                 state.selectedProgram = prog;
                 state.selectedCourse = ''; // Reset to course selection view
+                state.selectedYear = '';
                 state.selectedSemester = '1';
                 state.search = '';
                 const searchInput = document.getElementById('subjectSearchInput');
@@ -83,6 +92,7 @@
         if (backBtn) {
             backBtn.addEventListener('click', () => {
                 state.selectedCourse = '';
+                state.selectedYear = '';
                 renderCurriculumViews();
             });
         }
@@ -145,6 +155,7 @@
             applyMobileBtn.addEventListener('click', () => {
                 state.selectedProgram = document.getElementById('mFilterProgram')?.value || 'Diploma';
                 state.selectedCourse = document.getElementById('mFilterDept')?.value || '';
+                state.selectedYear = document.getElementById('mFilterYear')?.value || '';
                 state.selectedSemester = document.getElementById('mFilterSem')?.value || '1';
                 state.typeFilter = document.getElementById('mFilterType')?.value || '';
                 state.creditsFilter = document.getElementById('mFilterCredits')?.value || '';
@@ -161,6 +172,7 @@
             resetMobileBtn.addEventListener('click', () => {
                 state.selectedProgram = 'Diploma';
                 state.selectedCourse = '';
+                state.selectedYear = '';
                 state.selectedSemester = '1';
                 state.typeFilter = '';
                 state.creditsFilter = '';
@@ -179,6 +191,7 @@
             clearChipsBtn.addEventListener('click', () => {
                 state.typeFilter = '';
                 state.creditsFilter = '';
+                state.selectedYear = '';
                 state.search = '';
                 if (searchInput) searchInput.value = '';
                 searchClearBtn?.classList.add('hidden');
@@ -191,7 +204,7 @@
         const addHeaderBtn = document.getElementById('openAddSubjectModalBtn');
         if (addHeaderBtn) {
             addHeaderBtn.addEventListener('click', () => {
-                window.quickAddSubject(state.selectedProgram, state.selectedCourse, state.selectedSemester);
+                window.quickAddSubject(state.selectedProgram, state.selectedCourse, state.selectedSemester, state.selectedYear);
             });
         }
 
@@ -199,7 +212,7 @@
         const addCourseBtn = document.getElementById('addSubjectToActiveCourseBtn');
         if (addCourseBtn) {
             addCourseBtn.addEventListener('click', () => {
-                window.quickAddSubject(state.selectedProgram, state.selectedCourse, state.selectedSemester);
+                window.quickAddSubject(state.selectedProgram, state.selectedCourse, state.selectedSemester, state.selectedYear);
             });
         }
 
@@ -223,6 +236,9 @@
         const mDept = document.getElementById('mFilterDept');
         if (mDept) mDept.value = state.selectedCourse;
 
+        const mYear = document.getElementById('mFilterYear');
+        if (mYear) mYear.value = state.selectedYear;
+
         const mSem = document.getElementById('mFilterSem');
         if (mSem) mSem.value = state.selectedSemester;
 
@@ -241,7 +257,7 @@
     }
 
     // =========================================================================
-    // 2. DATA LOADING & API INTERACTION (MongoDB Atlas)
+    // 2. DATA LOADING & API INTERACTION (Live MongoDB Atlas Dataset)
     // =========================================================================
 
     async function loadCurriculumData() {
@@ -297,7 +313,7 @@
     }
 
     // =========================================================================
-    // 3. STATS & METRICS CALCULATIONS
+    // 3. STATS & METRICS CALCULATIONS (Live MongoDB Dynamic Counts)
     // =========================================================================
 
     function calculateAndRenderCurriculumStats() {
@@ -346,7 +362,7 @@
         ['Diploma', 'BE', 'BCA', 'MCA', 'ME'].forEach(prog => {
             const countEl = document.getElementById(`pillCount${prog}`);
             if (countEl) {
-                const progCourses = Object.values(courseMap).filter(c => c.program.toLowerCase() === prog.toLowerCase());
+                const progCourses = Object.values(courseMap).filter(c => (c.program || '').toLowerCase() === prog.toLowerCase());
                 const progSubjs = all.filter(s => (s.program || '').toLowerCase() === prog.toLowerCase());
                 countEl.innerText = `${progCourses.length} ${progCourses.length === 1 ? 'Course' : 'Courses'} • ${progSubjs.length} Subjects`;
             }
@@ -395,7 +411,7 @@
     }
 
     // =========================================================================
-    // 5. LEVEL 2: COURSES GRID RENDERING
+    // 5. LEVEL 2: COURSES / DEPARTMENTS GRID RENDERING
     // =========================================================================
 
     function renderCoursesGrid() {
@@ -485,24 +501,28 @@
 
     window.selectCourse = function(department) {
         state.selectedCourse = department;
+        state.selectedYear = '';
         state.selectedSemester = '1';
         renderCurriculumViews();
     };
 
     // =========================================================================
-    // 6. LEVEL 3 & 4: COURSE DETAIL & SEMESTER SUBJECTS RENDERING
+    // 6. LEVEL 3 & 4: PROGRAM -> DEPARTMENT -> YEAR -> SEMESTER -> SUBJECTS
     // =========================================================================
 
     function renderCourseDetailAndSubjects() {
         const course = state.selectedCourse;
         const prog = state.selectedProgram;
 
-        // Breadcrumb & Titles
+        // Breadcrumbs & Titles
         const bcProg = document.getElementById('bcProgramName');
         if (bcProg) bcProg.innerText = prog;
 
         const bcCourse = document.getElementById('bcCourseName');
         if (bcCourse) bcCourse.innerText = course;
+
+        const backLabel = document.getElementById('backToCoursesLabel');
+        if (backLabel) backLabel.innerText = `← ${prog} Courses`;
 
         const titleEl = document.getElementById('activeCourseTitle');
         if (titleEl) titleEl.innerText = course;
@@ -513,11 +533,26 @@
             (s.department || '').toLowerCase() === course.toLowerCase()
         );
 
-        // Distinct Semesters in this course
-        const semsSet = new Set(courseSubjects.map(s => String(s.semester)).filter(Boolean));
+        // Distinct Years in this course
+        const yearsSet = new Set(courseSubjects.map(s => s.year).filter(Boolean));
+        const sortedYears = ['FY', 'SY', 'TY', 'LY'].filter(y => yearsSet.has(y));
+
+        // Distinct Semesters in this course (optionally filtered by selectedYear)
+        let relevantSubjectsForSems = courseSubjects;
+        if (state.selectedYear) {
+            relevantSubjectsForSems = courseSubjects.filter(s => (s.year || '').toUpperCase() === state.selectedYear.toUpperCase());
+        }
+
+        const semsSet = new Set(relevantSubjectsForSems.map(s => String(s.semester)).filter(Boolean));
         const sortedSems = Array.from(semsSet).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
 
-        if (!sortedSems.length) sortedSems.push('1');
+        if (!sortedSems.length) {
+            // If year has no sems, reset selectedYear
+            state.selectedYear = '';
+            relevantSubjectsForSems = courseSubjects;
+            courseSubjects.forEach(s => { if (s.semester) semsSet.add(String(s.semester)); });
+        }
+
         if (!sortedSems.includes(state.selectedSemester)) {
             state.selectedSemester = sortedSems[0] || '1';
         }
@@ -531,7 +566,7 @@
 
         const metaEl = document.getElementById('activeCourseMeta');
         if (metaEl) {
-            metaEl.innerText = `${prog} Program • ${sortedSems.length} Semesters • ${courseSubjects.length} Total Subjects`;
+            metaEl.innerText = `${prog} Program • ${courseSubjects.length} Total Subjects • ${courseCredits} Credits`;
         }
 
         const creditsBadge = document.getElementById('activeCourseCreditsBadge');
@@ -539,15 +574,40 @@
             creditsBadge.innerText = `${courseCredits} Total Credits`;
         }
 
-        // Render Semester Navigation Tabs (Level 3)
+        // Render Level 3A: Year Tabs (FY, SY, TY, LY)
+        const yearTabsContainer = document.getElementById('yearTabsContainer');
+        if (yearTabsContainer && sortedYears.length > 1) {
+            let yearHtml = `
+                <button type="button" class="year-tab-pill ${!state.selectedYear ? 'active' : ''}" onclick="window.selectYear('')">
+                    <span>All Years</span>
+                </button>
+            `;
+            sortedYears.forEach(y => {
+                const count = courseSubjects.filter(s => (s.year || '').toUpperCase() === y).length;
+                yearHtml += `
+                    <button type="button" class="year-tab-pill ${state.selectedYear === y ? 'active' : ''}" onclick="window.selectYear('${y}')">
+                        <span>${escapeHtml(YEAR_LABELS[y] || y)}</span>
+                        <span class="text-[10px] opacity-80">(${count})</span>
+                    </button>
+                `;
+            });
+            yearTabsContainer.innerHTML = yearHtml;
+            document.getElementById('yearSelectorWrapper')?.classList.remove('hidden');
+        } else {
+            document.getElementById('yearSelectorWrapper')?.classList.add('hidden');
+        }
+
+        // Render Level 3B: Semester Navigation Tabs (Swipeable & Touch Friendly)
         const tabsContainer = document.getElementById('semesterTabsContainer');
         if (tabsContainer) {
             tabsContainer.innerHTML = sortedSems.map(sem => {
-                const count = courseSubjects.filter(s => String(s.semester) === String(sem)).length;
+                const count = relevantSubjectsForSems.filter(s => String(s.semester) === String(sem)).length;
+                const sampleSub = relevantSubjectsForSems.find(s => String(s.semester) === String(sem));
+                const yearLabel = sampleSub?.year ? ` (${sampleSub.year})` : '';
                 const isActive = (String(state.selectedSemester) === String(sem));
                 return `
                     <button type="button" class="semester-tab-pill ${isActive ? 'active' : ''}" onclick="window.selectSemester('${escapeQuotes(sem)}')">
-                        <span>Semester ${sem}</span>
+                        <span>Semester ${sem}${yearLabel}</span>
                         <span class="sem-badge">${count}</span>
                     </button>
                 `;
@@ -555,7 +615,7 @@
         }
 
         // Filter subjects for Selected Semester
-        let semesterSubjects = courseSubjects.filter(s => String(s.semester) === String(state.selectedSemester));
+        let semesterSubjects = relevantSubjectsForSems.filter(s => String(s.semester) === String(state.selectedSemester));
 
         // Apply type and credits filters if active
         if (state.typeFilter) {
@@ -567,14 +627,29 @@
 
         // Semester Credits Sum
         let semCredits = 0;
+        let currentYear = 'FY';
         semesterSubjects.forEach(s => {
             const c = parseInt(s.credits, 10);
             if (!isNaN(c)) semCredits += c;
+            if (s.year) currentYear = s.year;
         });
+
+        // Update Mobile Context Card
+        const mProg = document.getElementById('mContextProgram');
+        if (mProg) mProg.innerText = prog;
+
+        const mDept = document.getElementById('mContextDept');
+        if (mDept) mDept.innerText = course;
+
+        const mYearSem = document.getElementById('mContextYearSem');
+        if (mYearSem) mYearSem.innerText = `${currentYear} • Semester ${state.selectedSemester}`;
+
+        const mCount = document.getElementById('mContextCount');
+        if (mCount) mCount.innerText = `${semesterSubjects.length} ${semesterSubjects.length === 1 ? 'Subject' : 'Subjects'}`;
 
         const semHeader = document.getElementById('semesterSubjectsHeader');
         if (semHeader) {
-            semHeader.innerText = `Semester ${state.selectedSemester} Subjects (${semesterSubjects.length})`;
+            semHeader.innerText = `${currentYear} • Semester ${state.selectedSemester} Subjects (${semesterSubjects.length})`;
         }
 
         const semCreditSum = document.getElementById('semesterCreditSum');
@@ -594,7 +669,7 @@
                     </div>
                     <h4 class="text-sm font-bold text-[#171D3A] mb-1">No Subjects Found in Semester ${state.selectedSemester}</h4>
                     <p class="text-xs text-[#66708F] mb-4">No subjects match the selected semester or type filters for ${escapeHtml(course)}.</p>
-                    <button type="button" class="btn-primary-custom text-xs font-bold mx-auto py-2.5 px-4" onclick="window.quickAddSubject('${escapeQuotes(prog)}', '${escapeQuotes(course)}', '${escapeQuotes(state.selectedSemester)}')">
+                    <button type="button" class="btn-primary-custom text-xs font-bold mx-auto py-2.5 px-4" onclick="window.quickAddSubject('${escapeQuotes(prog)}', '${escapeQuotes(course)}', '${escapeQuotes(state.selectedSemester)}', '${escapeQuotes(currentYear)}')">
                         <i data-lucide="plus" class="w-4 h-4"></i> Add Subject to Semester ${state.selectedSemester}
                     </button>
                 </div>
@@ -604,6 +679,11 @@
 
         subjectGrid.innerHTML = semesterSubjects.map(sub => renderSingleSubjectCard(sub)).join('');
     }
+
+    window.selectYear = function(year) {
+        state.selectedYear = year;
+        renderCurriculumViews();
+    };
 
     window.selectSemester = function(sem) {
         state.selectedSemester = sem;
@@ -622,11 +702,13 @@
         const q = state.search.toLowerCase();
         let matches = state.allSubjects.filter(s => {
             const name = (s.subject_name || '').toLowerCase();
-            const code = (s.subject_code || '').toLowerCase();
+            const code = (s.subject_code || s.subject_id || '').toLowerCase();
             const dept = (s.department || '').toLowerCase();
             const prog = (s.program || '').toLowerCase();
+            const year = (s.year || '').toLowerCase();
+            const sem = String(s.semester || '');
             const fac = (s.faculty || '').toLowerCase();
-            return name.includes(q) || code.includes(q) || dept.includes(q) || prog.includes(q) || fac.includes(q);
+            return name.includes(q) || code.includes(q) || dept.includes(q) || prog.includes(q) || year.includes(q) || sem.includes(q) || fac.includes(q);
         });
 
         if (state.typeFilter) {
@@ -647,7 +729,7 @@
                         <i data-lucide="search-x" class="w-6 h-6"></i>
                     </div>
                     <h4 class="text-sm font-bold text-[#171D3A] mb-1">No Subjects Match "${escapeHtml(state.search)}"</h4>
-                    <p class="text-xs text-[#66708F] mb-4">Try searching by course name, GTU subject code, or professor name.</p>
+                    <p class="text-xs text-[#66708F] mb-4">Try searching by course name, GTU subject code (e.g. DICO101), or professor name.</p>
                     <button type="button" class="btn-primary-custom text-xs font-bold mx-auto py-2.5 px-4" onclick="document.getElementById('exitSearchBtn')?.click()">
                         Clear Search
                     </button>
@@ -692,7 +774,7 @@
                         ${showHierarchyBreadcrumb ? `
                             <div class="flex items-center gap-1 text-[11px] font-semibold text-[#8B5CF6] truncate">
                                 <i data-lucide="layers" class="w-3 h-3 flex-shrink-0"></i>
-                                <span class="truncate">${escapeHtml(sub.program || '')} › ${escapeHtml(sub.department || '')} › Sem ${escapeHtml(sub.semester || '')}</span>
+                                <span class="truncate">${escapeHtml(sub.program || '')} › ${escapeHtml(sub.department || '')} › ${escapeHtml(sub.year || '')} • Sem ${escapeHtml(sub.semester || '')}</span>
                             </div>
                         ` : ''}
 
@@ -703,20 +785,20 @@
                                 </div>
                                 <span class="text-[#171D3A] font-medium truncate">${escapeHtml(sub.faculty || 'Faculty In-Charge')}</span>
                             </div>
-                            <span class="text-[11px] text-[#8C95AD] whitespace-nowrap">${escapeHtml(sub.year || 'FY')} • Sem ${escapeHtml(sub.semester || '1')}</span>
+                            <span class="text-[11px] text-[#8C95AD] whitespace-nowrap font-medium">${escapeHtml(sub.year || 'FY')} • Sem ${escapeHtml(sub.semester || '1')}</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Card Bottom Touch-Friendly Actions (Min 44px) -->
+                <!-- Card Bottom Touch-Friendly Actions (Min 44px hit targets) -->
                 <div class="pt-3 mt-3 border-t border-[#E1E5F0] flex items-center justify-end gap-1.5">
-                    <button type="button" class="px-3 py-1.5 rounded-xl bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs font-semibold hover:bg-[#E8EBFA]" onclick="window.viewSubjectDetails('${escapeQuotes(sub.id || sub.subject_id)}')">
+                    <button type="button" class="px-3 py-1.5 rounded-xl bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs font-semibold hover:bg-[#E8EBFA] min-h-[36px]" onclick="window.viewSubjectDetails('${escapeQuotes(sub.id || sub.subject_id)}')">
                         Details
                     </button>
-                    <button type="button" class="px-3 py-1.5 rounded-xl bg-white border border-[#E1E5F0] text-[#8B5CF6] text-xs font-bold hover:bg-[#E8EBFA]" onclick="window.editSubject('${escapeQuotes(sub.id || sub.subject_id)}')">
+                    <button type="button" class="px-3 py-1.5 rounded-xl bg-white border border-[#E1E5F0] text-[#8B5CF6] text-xs font-bold hover:bg-[#E8EBFA] min-h-[36px]" onclick="window.editSubject('${escapeQuotes(sub.id || sub.subject_id)}')">
                         Edit
                     </button>
-                    <button type="button" class="p-1.5 rounded-xl bg-white border border-[#E1E5F0] text-[#8C95AD] hover:text-red-600 hover:bg-red-50" onclick="window.deleteSubject('${escapeQuotes(sub.id || sub.subject_id)}')">
+                    <button type="button" class="p-2 rounded-xl bg-white border border-[#E1E5F0] text-[#8C95AD] hover:text-red-600 hover:bg-red-50 min-h-[36px] min-w-[36px] flex items-center justify-center" onclick="window.deleteSubject('${escapeQuotes(sub.id || sub.subject_id)}')">
                         <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                     </button>
                 </div>
@@ -734,6 +816,9 @@
         chips.push({ label: `${state.selectedProgram}`, key: 'program' });
         if (state.selectedCourse) {
             chips.push({ label: `${state.selectedCourse}`, key: 'course', removable: true });
+            if (state.selectedYear) {
+                chips.push({ label: `Year: ${state.selectedYear}`, key: 'year', removable: true });
+            }
             chips.push({ label: `Sem ${state.selectedSemester}`, key: 'semester' });
         }
         if (state.typeFilter) {
@@ -759,6 +844,9 @@
     window.removeSubjectFilterChip = function(key) {
         if (key === 'course') {
             state.selectedCourse = '';
+            state.selectedYear = '';
+        } else if (key === 'year') {
+            state.selectedYear = '';
         } else if (key === 'type') {
             state.typeFilter = '';
             const dt = document.getElementById('desktopTypeFilter');
@@ -778,6 +866,7 @@
         let count = 0;
         if (state.typeFilter) count++;
         if (state.creditsFilter) count++;
+        if (state.selectedYear) count++;
         if (state.search) count++;
 
         const badge = document.getElementById('mobileActiveFilterCount');
@@ -791,7 +880,7 @@
     // 8. CRUD OPERATIONS (ADD, EDIT, DELETE, DETAILS)
     // =========================================================================
 
-    window.quickAddSubject = function(program, department, semester) {
+    window.quickAddSubject = function(program, department, semester, year) {
         document.getElementById('subjectModalTitle').innerText = 'Add Subject';
         document.getElementById('subjectModalSubtitle').innerText = 'Assign subject code, credit distribution, and curriculum mapping';
         document.getElementById('subjectFormSubmitBtn').innerText = 'Save Subject';
@@ -799,10 +888,17 @@
         document.getElementById('subjectRecordId').value = '';
         document.getElementById('subjectForm').reset();
 
+        const activeSem = semester || state.selectedSemester || '1';
+        let calculatedYear = year || state.selectedYear;
+        if (!calculatedYear) {
+            const semNum = parseInt(activeSem, 10) || 1;
+            calculatedYear = semNum > 6 ? 'LY' : (semNum > 4 ? 'TY' : (semNum > 2 ? 'SY' : 'FY'));
+        }
+
         document.getElementById('formProgram').value = program || state.selectedProgram || 'Diploma';
         document.getElementById('formDepartment').value = department || state.selectedCourse || 'Computer Engineering';
-        document.getElementById('formSemester').value = semester || state.selectedSemester || '1';
-        document.getElementById('formYear').value = (semester && parseInt(semester, 10) > 2) ? (parseInt(semester, 10) > 4 ? 'TY' : 'SY') : 'FY';
+        document.getElementById('formSemester').value = activeSem;
+        document.getElementById('formYear').value = calculatedYear;
         document.getElementById('formSubjectType').value = 'Theory';
         document.getElementById('formCredits').value = '4';
 
@@ -948,7 +1044,7 @@
 
         const textEl = document.getElementById('deleteSubjectDetailsText');
         if (textEl) {
-            textEl.innerHTML = `Are you sure you want to remove <strong>${escapeHtml(item.subject_name)}</strong> (<span class="font-mono text-[#8B5CF6]">${escapeHtml(item.subject_code || item.subject_id)}</span>) from ${escapeHtml(item.department)} (Sem ${escapeHtml(item.semester)})?`;
+            textEl.innerHTML = `Are you sure you want to remove <strong>${escapeHtml(item.subject_name)}</strong> (<span class="font-mono text-[#8B5CF6]">${escapeHtml(item.subject_code || item.subject_id)}</span>) from <strong>${escapeHtml(item.program)} ${escapeHtml(item.department)}</strong> (${escapeHtml(item.year || 'FY')} • Sem ${escapeHtml(item.semester)})?`;
         }
 
         if (subjectDeleteModal) subjectDeleteModal.show();

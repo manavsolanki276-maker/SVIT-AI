@@ -233,7 +233,7 @@
                 <div class="flex items-center justify-between flex-wrap gap-2">
                     <button type="button" id="backToCoursesBtn" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F8F9FE] border border-[#E1E5F0] text-xs font-bold text-[#171D3A] hover:bg-[#E8EBFA] hover:text-[#8B5CF6] transition shadow-sm">
                         <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
-                        <span>All Courses</span>
+                        <span id="backToCoursesLabel">← Back to Courses</span>
                     </button>
 
                     <div class="flex items-center gap-1.5 text-xs text-[#66708F] font-semibold" id="courseBreadcrumbPath">
@@ -243,8 +243,20 @@
                     </div>
                 </div>
 
+                <!-- Mobile Context Banner (< 640px) -->
+                <div class="mobile-context-card p-3 rounded-xl bg-[#F8F9FE] border border-[#E1E5F0] sm:hidden flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] uppercase font-bold text-[#8C95AD] block" id="mContextProgram">Diploma</span>
+                        <h4 class="text-xs font-bold text-[#171D3A] mb-0" id="mContextDept">Computer Engineering</h4>
+                        <p class="text-[11px] text-[#8B5CF6] font-semibold mb-0" id="mContextYearSem">FY • Semester 1</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="badge-svit-purple text-xs font-bold" id="mContextCount">5 Subjects</span>
+                    </div>
+                </div>
+
                 <!-- Course Title & Meta Stats -->
-                <div class="pt-2 border-t border-[#E1E5F0] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="pt-2 border-t border-[#E1E5F0] hidden sm:flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
                         <h2 class="text-base sm:text-lg font-bold text-[#171D3A] mb-0.5" id="activeCourseTitle">
                             Computer Engineering
@@ -263,8 +275,18 @@
                 </div>
             </div>
 
-            <!-- Level 3: Semester Tabs Selector (Swipeable & Touch Friendly) -->
-            <div class="space-y-2">
+            <!-- Level 3A: Year Selector Tabs (FY, SY, TY, LY) -->
+            <div class="space-y-1.5" id="yearSelectorWrapper">
+                <span class="text-[11px] font-bold text-[#8C95AD] uppercase tracking-wider block px-1">Academic Year:</span>
+                <div class="overflow-x-auto pb-1 no-scrollbar">
+                    <div class="flex items-center gap-1.5 min-w-max" id="yearTabsContainer">
+                        <!-- Populated via subjects.js -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Level 3B: Semester Tabs Selector (Swipeable & Touch Friendly) -->
+            <div class="space-y-1.5">
                 <span class="text-[11px] font-bold text-[#8C95AD] uppercase tracking-wider block px-1">Select Semester:</span>
                 
                 <div class="overflow-x-auto pb-1 no-scrollbar">
@@ -316,7 +338,7 @@
                     </div>
                     <div>
                         <h3 class="text-sm font-bold text-[#171D3A] mb-0">Curriculum Filters</h3>
-                        <p class="text-[11px] text-[#66708F] mb-0">Filter by program, course, semester and type</p>
+                        <p class="text-[11px] text-[#66708F] mb-0">Filter by program, course, year, semester and type</p>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -353,6 +375,17 @@
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Academic Year</label>
+                        <select id="mFilterYear" class="form-control-custom font-semibold">
+                            <option value="">All Years</option>
+                            <option value="FY">First Year (FY)</option>
+                            <option value="SY">Second Year (SY)</option>
+                            <option value="TY">Third Year (TY)</option>
+                            <option value="LY">Final Year (LY)</option>
+                        </select>
+                    </div>
+
+                    <div>
                         <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Semester</label>
                         <select id="mFilterSem" class="form-control-custom font-semibold">
                             <option value="">All Semesters</option>
@@ -366,7 +399,9 @@
                             <option value="8">Sem 8</option>
                         </select>
                     </div>
+                </div>
 
+                <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Subject Type</label>
                         <select id="mFilterType" class="form-control-custom font-semibold">
@@ -376,17 +411,15 @@
                             <option value="Elective">Elective</option>
                         </select>
                     </div>
-                </div>
 
-                <div>
-                    <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Filter by Credits</label>
-                    <select id="mFilterCredits" class="form-control-custom">
-                        <option value="">All Credits</option>
-                        <option value="2">2 Credits (Practical/Lab)</option>
-                        <option value="3">3 Credits</option>
-                        <option value="4">4 Credits (Core Theory)</option>
-                        <option value="5">5 Credits</option>
-                    </select>
+                    <div>
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Credits</label>
+                        <select id="mFilterCredits" class="form-control-custom">
+                            <option value="">All Credits</option>
+                            <option value="2">2 Credits (Lab)</option>
+                            <option value="4">4 Credits (Theory)</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
