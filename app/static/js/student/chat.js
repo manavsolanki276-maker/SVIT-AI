@@ -1686,12 +1686,8 @@ function openRecentChatMenu(e, convId, title, isPinned = false) {
 
     if (!menu) return;
 
-    // Sidebar menu items: Share, Rename, Divider, Pin, Archive, Delete
+    // Sidebar menu items: Rename, Divider, Pin, Archive, Delete
     menu.innerHTML = `
-        <button type="button" class="context-menu-item" onclick="handleContextMenuAction('share')">
-            <i data-lucide="share-2"></i>
-            <span>Share</span>
-        </button>
         <button type="button" class="context-menu-item" onclick="handleContextMenuAction('rename')">
             <i data-lucide="edit-3"></i>
             <span>Rename</span>
@@ -1741,114 +1737,9 @@ function openRecentChatMenu(e, convId, title, isPinned = false) {
     if (window.lucide) lucide.createIcons();
 }
 
-function toggleHeaderOptionsMenu(e) {
-    if (e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-
-    ensureContextMenuElements();
-
-    const menu = document.getElementById('chatContextMenu');
-    if (menu && menu.classList.contains('active') && activeMenuSource === 'header') {
-        closeRecentChatMenu();
-        return;
-    }
-
-    closeRecentChatMenu();
-
-    const activeConvId = document.getElementById('activeConversationId')?.value || '';
-    const activeChat = cachedRecentChats.find(c => c.id === activeConvId);
-
-    activeMenuConversationId = activeConvId;
-    activeMenuConversationTitle = activeChat ? activeChat.title : 'Current Conversation';
-    activeMenuIsPinned = Boolean(activeChat?.is_pinned);
-    activeMenuSource = 'header';
-
-    if (!menu) return;
-
-    // ChatGPT Conversation Header Menu: View files in chat, Pin chat, Archive, Delete
-    menu.innerHTML = `
-        <button type="button" class="context-menu-item" onclick="handleContextMenuAction('view_files')">
-            <i data-lucide="folder"></i>
-            <span>View files in chat</span>
-        </button>
-        <button type="button" class="context-menu-item" id="contextMenuPinBtn" onclick="handleContextMenuAction('pin')">
-            <i data-lucide="${activeMenuIsPinned ? 'pin-off' : 'pin'}" id="contextMenuPinIcon"></i>
-            <span id="contextMenuPinText">${activeMenuIsPinned ? 'Unpin chat' : 'Pin chat'}</span>
-        </button>
-        <button type="button" class="context-menu-item" onclick="handleContextMenuAction('archive')">
-            <i data-lucide="archive"></i>
-            <span>Archive</span>
-        </button>
-        <button type="button" class="context-menu-item danger" onclick="handleContextMenuAction('delete')">
-            <i data-lucide="trash-2"></i>
-            <span>Delete</span>
-        </button>
-    `;
-
-    const btn = (e && e.currentTarget) ? e.currentTarget : (document.getElementById('desktopHeaderOptionsBtn') || document.getElementById('headerOptionsBtn'));
-    if (!btn) return;
-
-    const btnRect = btn.getBoundingClientRect();
-    const menuWidth = window.innerWidth <= 480 ? 210 : 240;
-    const menuHeight = 180;
-
-    let left = btnRect.right - menuWidth;
-    let top = btnRect.bottom + 8;
-
-    // Viewport bounding clamp
-    if (left + menuWidth > window.innerWidth - 12) {
-        left = window.innerWidth - menuWidth - 12;
-    }
-    if (left < 12) {
-        left = 12;
-    }
-
-    if (top + menuHeight > window.innerHeight - 12) {
-        top = Math.max(12, btnRect.top - menuHeight - 8);
-    }
-    if (top < 12) {
-        top = 12;
-    }
-
-    menu.style.left = `${Math.round(left)}px`;
-    menu.style.top = `${Math.round(top)}px`;
-    menu.style.transformOrigin = 'top right';
-    menu.classList.add('active');
-    btn.classList.add('active');
-
-    if (window.lucide) lucide.createIcons();
-}
-
-function handleHeaderShare() {
-    const activeConvId = document.getElementById('activeConversationId')?.value || '';
-    const shareUrl = activeConvId
-        ? `${window.location.origin}/student/chat?conversation_id=${encodeURIComponent(activeConvId)}`
-        : window.location.href;
-
-    try {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(shareUrl).then(() => {
-                showChatToast("Share link copied to clipboard!");
-            }).catch(() => {
-                prompt("Copy share link:", shareUrl);
-            });
-        } else {
-            prompt("Copy share link:", shareUrl);
-        }
-    } catch (err) {
-        prompt("Copy share link:", shareUrl);
-    }
-}
-
 function closeRecentChatMenu() {
     const menu = document.getElementById('chatContextMenu');
     if (menu) menu.classList.remove('active');
-    const headerBtn = document.getElementById('headerOptionsBtn');
-    if (headerBtn) headerBtn.classList.remove('active');
-    const desktopHeaderBtn = document.getElementById('desktopHeaderOptionsBtn');
-    if (desktopHeaderBtn) desktopHeaderBtn.classList.remove('active');
     activeMenuSource = null;
 }
 
@@ -1950,22 +1841,6 @@ async function handleContextMenuAction(action) {
             showChatToast("Failed to load conversation files.", true);
         } finally {
             isActionProcessing = false;
-        }
-    } else if (action === 'share') {
-        if (!convId) {
-            handleHeaderShare();
-            return;
-        }
-        const shareUrl = `${window.location.origin}/?conversation_id=${encodeURIComponent(convId)}`;
-        try {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                await navigator.clipboard.writeText(shareUrl);
-                showChatToast("Share link copied to clipboard!");
-            } else {
-                prompt("Copy share link:", shareUrl);
-            }
-        } catch (err) {
-            prompt("Copy share link:", shareUrl);
         }
     } else if (action === 'rename') {
         if (!convId) return;
@@ -2120,7 +1995,7 @@ async function submitDeleteChat(convId) {
 // Global click and keydown listeners for closing context menu
 document.addEventListener('click', function(e) {
     const menu = document.getElementById('chatContextMenu');
-    if (menu && menu.classList.contains('active') && !menu.contains(e.target) && !e.target.closest('.recent-item-options-btn') && !e.target.closest('#headerOptionsBtn') && !e.target.closest('#desktopHeaderOptionsBtn')) {
+    if (menu && menu.classList.contains('active') && !menu.contains(e.target) && !e.target.closest('.recent-item-options-btn')) {
         closeRecentChatMenu();
     }
 });
@@ -2133,8 +2008,6 @@ document.addEventListener('keydown', function(e) {
 });
 
 window.openRecentChatMenu = openRecentChatMenu;
-window.toggleHeaderOptionsMenu = toggleHeaderOptionsMenu;
-window.handleHeaderShare = handleHeaderShare;
 window.closeRecentChatMenu = closeRecentChatMenu;
 window.handleContextMenuAction = handleContextMenuAction;
 window.submitRenameChat = submitRenameChat;

@@ -689,31 +689,12 @@ body {
     cursor: pointer;
     transition: background-color 0.18s ease, color 0.18s ease;
     user-select: none;
-}
-
-.chat-header-btn.share-btn {
     color: #111111;
-    background: transparent;
 }
 
-.chat-header-btn.share-btn i {
+.chat-header-btn i {
     width: 16px;
     height: 16px;
-    color: #111111;
-    transition: color 0.18s ease;
-}
-
-.chat-header-btn.options-btn {
-    padding: 6px 8px;
-    min-width: 32px;
-    justify-content: center;
-    background: transparent;
-    color: #111111;
-}
-
-.chat-header-btn.options-btn i {
-    width: 17px;
-    height: 17px;
     color: #111111;
     transition: color 0.18s ease;
 }
@@ -725,23 +706,6 @@ body {
 }
 
 .chat-header-btn:hover i {
-    color: #FFFFFF;
-}
-
-.chat-header-btn.share-btn:hover {
-    background: #2A2A2A;
-    color: #FFFFFF;
-}
-
-.chat-header-btn.share-btn:hover i {
-    color: #FFFFFF;
-}
-
-.chat-header-btn.options-btn:hover {
-    background: #2A2A2A;
-}
-
-.chat-header-btn.options-btn:hover i {
     color: #FFFFFF;
 }
 
