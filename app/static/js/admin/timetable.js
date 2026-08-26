@@ -1,8 +1,7 @@
 /**
  * SVIT Admin - Timetable Management Controller (Mobile-First Architecture)
- * Handles progressive multi-tier academic filtering (Program -> Department -> Semester -> Division),
- * weekly desktop schedule matrix, mobile timeline with live NOW/NEXT tags, conflict detection,
- * KPI calculations, and complete CRUD operations.
+ * Complete Weekly Schedule Mobile Timeline (Mon -> Sat)
+ * Desktop Matrix Grid, Live NOW/NEXT Status, Conflict Detection, Complete CRUD
  */
 
 (function() {
@@ -23,8 +22,11 @@
         department: 'Computer Engineering',
         semester: '1',
         division: 'A',
-        dayFilter: '',       // '' means All Days, or specific Day
-        selectedDay: 'Monday', // Active tab on mobile view
+        dayFilter: '',          // '' means All Days, or specific Day filter
+        selectedDay: 'all',     // 'all' by default on mobile so full week is visible
+        yearFilter: '',
+        facultyFilter: '',
+        roomFilter: '',
         search: '',
         items: [],
         totalCount: 0,
@@ -38,7 +40,7 @@
     let filterDrawerModal = null;
 
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize Modals
+        // Initialize Bootstrap Modals
         const slotEl = document.getElementById('timetableSlotModal');
         const detailsEl = document.getElementById('timetableDetailsModal');
         const deleteEl = document.getElementById('timetableDeleteModal');
@@ -49,19 +51,13 @@
         if (deleteEl && typeof bootstrap !== 'undefined') deleteModal = new bootstrap.Modal(deleteEl);
         if (filterDrawerEl && typeof bootstrap !== 'undefined') filterDrawerModal = new bootstrap.Modal(filterDrawerEl);
 
-        // Smart Day Determination (Default to today if Mon-Sat)
-        const currentDayIndex = new Date().getDay(); // 0 is Sun, 1 is Mon...
-        if (currentDayIndex >= 1 && currentDayIndex <= 6) {
-            state.selectedDay = DAYS[currentDayIndex - 1];
-        }
-
         bindEvents();
         syncFilterSelectors();
         loadTimetable();
     });
 
     function bindEvents() {
-        // Primary Desktop Selectors
+        // Primary Academic Selectors (Desktop / Shared)
         const progSelect = document.getElementById('ttProgramSelect');
         if (progSelect) {
             progSelect.addEventListener('change', (e) => {
@@ -102,10 +98,8 @@
         if (daySelect) {
             daySelect.addEventListener('change', (e) => {
                 state.dayFilter = e.target.value;
-                if (state.dayFilter) {
-                    state.selectedDay = state.dayFilter;
-                }
-                updateMobileDayTabs();
+                state.selectedDay = state.dayFilter || 'all';
+                syncFilterSelectors();
                 renderTimetableViews();
             });
         }
@@ -124,7 +118,7 @@
                 clearTimeout(searchDebounceTimer);
                 searchDebounceTimer = setTimeout(() => {
                     renderTimetableViews();
-                }, 200);
+                }, 180);
             });
         }
 
@@ -137,18 +131,29 @@
             });
         }
 
-        // Mobile Day Tab Buttons
+        // Mobile Day Tab Buttons (Smooth Jump Scroll to Day)
         document.querySelectorAll('#mobileDayTabs .mobile-day-pill').forEach(btn => {
             btn.addEventListener('click', () => {
                 const day = btn.getAttribute('data-day');
                 if (!day) return;
                 state.selectedDay = day;
                 updateMobileDayTabs();
-                renderMobileTimeline();
+
+                if (day === 'all') {
+                    const scheduleEl = document.getElementById('timetableMobileSchedule');
+                    if (scheduleEl) {
+                        scheduleEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                } else {
+                    const targetSection = document.getElementById(`day-section-${day}`);
+                    if (targetSection) {
+                        targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
             });
         });
 
-        // Mobile Filter Drawer Button
+        // Mobile Filter Drawer Trigger Button
         const mobileDrawerBtn = document.getElementById('mobileFilterDrawerBtn');
         if (mobileDrawerBtn) {
             mobileDrawerBtn.addEventListener('click', () => {
@@ -161,12 +166,20 @@
         const applyMobileBtn = document.getElementById('mFilterApplyBtn');
         if (applyMobileBtn) {
             applyMobileBtn.addEventListener('click', () => {
-                state.program = document.getElementById('mFilterProgram').value;
-                state.department = document.getElementById('mFilterDept').value;
-                state.semester = document.getElementById('mFilterSem').value;
-                state.division = document.getElementById('mFilterDiv').value;
-                state.dayFilter = document.getElementById('mFilterDay').value;
-                if (state.dayFilter) state.selectedDay = state.dayFilter;
+                state.program = document.getElementById('mFilterProgram')?.value || 'Diploma';
+                state.department = document.getElementById('mFilterDept')?.value || 'Computer Engineering';
+                state.semester = document.getElementById('mFilterSem')?.value || '1';
+                state.division = document.getElementById('mFilterDiv')?.value || 'A';
+                state.dayFilter = document.getElementById('mFilterDay')?.value || '';
+                state.yearFilter = document.getElementById('mFilterYear')?.value || '';
+                state.facultyFilter = document.getElementById('mFilterFaculty')?.value.trim() || '';
+                state.roomFilter = document.getElementById('mFilterRoom')?.value.trim() || '';
+
+                if (state.dayFilter) {
+                    state.selectedDay = state.dayFilter;
+                } else {
+                    state.selectedDay = 'all';
+                }
 
                 syncFilterSelectors();
                 if (filterDrawerModal) filterDrawerModal.hide();
@@ -183,7 +196,13 @@
                 state.semester = '1';
                 state.division = 'A';
                 state.dayFilter = '';
+                state.selectedDay = 'all';
+                state.yearFilter = '';
+                state.facultyFilter = '';
+                state.roomFilter = '';
                 state.search = '';
+                if (searchInput) searchInput.value = '';
+                if (clearSearchBtn) clearSearchBtn.classList.add('hidden');
                 syncFilterSelectors();
                 if (filterDrawerModal) filterDrawerModal.hide();
                 loadTimetable();
@@ -195,6 +214,10 @@
         if (clearAllBtn) {
             clearAllBtn.addEventListener('click', () => {
                 state.dayFilter = '';
+                state.selectedDay = 'all';
+                state.yearFilter = '';
+                state.facultyFilter = '';
+                state.roomFilter = '';
                 state.search = '';
                 if (searchInput) searchInput.value = '';
                 if (clearSearchBtn) clearSearchBtn.classList.add('hidden');
@@ -211,7 +234,8 @@
         const addBtn = document.getElementById('openAddSlotModalBtn');
         if (addBtn) {
             addBtn.addEventListener('click', () => {
-                window.quickAddSlot(state.selectedDay || 'Monday', '09:00', '10:00');
+                const defaultDay = (state.selectedDay && state.selectedDay !== 'all') ? state.selectedDay : 'Monday';
+                window.quickAddSlot(defaultDay, '09:00', '10:00');
             });
         }
 
@@ -246,12 +270,15 @@
         const daySelect = document.getElementById('ttDaySelect');
         if (daySelect) daySelect.value = state.dayFilter;
 
-        // Mobile drawer selectors
+        // Mobile drawer inputs
         const mProg = document.getElementById('mFilterProgram');
         if (mProg) mProg.value = state.program;
 
         const mDept = document.getElementById('mFilterDept');
         if (mDept) mDept.value = state.department;
+
+        const mYear = document.getElementById('mFilterYear');
+        if (mYear) mYear.value = state.yearFilter;
 
         const mSem = document.getElementById('mFilterSem');
         if (mSem) mSem.value = state.semester;
@@ -262,7 +289,14 @@
         const mDay = document.getElementById('mFilterDay');
         if (mDay) mDay.value = state.dayFilter;
 
+        const mFac = document.getElementById('mFilterFaculty');
+        if (mFac) mFac.value = state.facultyFilter;
+
+        const mRoom = document.getElementById('mFilterRoom');
+        if (mRoom) mRoom.value = state.roomFilter;
+
         updateMobileDayTabs();
+        updateActiveFilterBadge();
     }
 
     function updateMobileDayTabs() {
@@ -272,8 +306,23 @@
         });
     }
 
+    function updateActiveFilterBadge() {
+        let count = 0;
+        if (state.dayFilter) count++;
+        if (state.yearFilter) count++;
+        if (state.facultyFilter) count++;
+        if (state.roomFilter) count++;
+        if (state.search) count++;
+
+        const badge = document.getElementById('mobileActiveFilterCount');
+        if (badge) {
+            badge.innerText = `${count}`;
+            badge.classList.toggle('hidden', count === 0);
+        }
+    }
+
     // =========================================================================
-    // DATA FETCHING & API INTERACTION
+    // DATA FETCHING & API INTERACTION (MongoDB Atlas)
     // =========================================================================
 
     async function loadTimetable() {
@@ -286,7 +335,7 @@
                 <tr>
                     <td colspan="7" class="text-center py-16 text-[#66708F] text-xs">
                         <div class="w-6 h-6 border-2 border-[#8B5CF6] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-                        <p class="font-bold text-[#171D3A] mb-1">Loading Schedule Matrix...</p>
+                        <p class="font-bold text-[#171D3A] mb-1">Loading Schedule Matrix from MongoDB...</p>
                         <p class="text-[11px] text-[#8C95AD] mb-0">${state.program} • ${state.department} (Sem ${state.semester}, Div ${state.division})</p>
                     </td>
                 </tr>
@@ -297,8 +346,8 @@
             mobileSchedule.innerHTML = `
                 <div class="text-center py-12 bg-white border border-[#E1E5F0] rounded-2xl p-6 shadow-sm">
                     <div class="w-6 h-6 border-2 border-[#8B5CF6] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-                    <p class="font-bold text-xs text-[#171D3A] mb-1">Loading Academic Classes...</p>
-                    <p class="text-[11px] text-[#8C95AD] mb-0">${state.department} • Sem ${state.semester}</p>
+                    <p class="font-bold text-xs text-[#171D3A] mb-1">Loading Complete Weekly Timetable...</p>
+                    <p class="text-[11px] text-[#8C95AD] mb-0">${state.department} • Sem ${state.semester} (Div ${state.division})</p>
                 </div>
             `;
         }
@@ -319,7 +368,7 @@
                 state.totalCount = data.total || state.items.length;
                 renderTimetableViews();
             } else {
-                showErrorState(data.message || 'Error loading timetable data.');
+                showErrorState(data.message || 'Error loading timetable data from MongoDB.');
             }
         } catch (err) {
             showErrorState(err.message || 'Network error fetching timetable.');
@@ -334,7 +383,7 @@
                 <i data-lucide="alert-circle" class="w-6 h-6 mx-auto mb-2"></i>
                 <p class="text-xs font-bold mb-1">Failed to Load Schedule</p>
                 <p class="text-[11px] text-red-500 mb-3">${escapeHtml(msg)}</p>
-                <button type="button" class="px-3 py-1.5 rounded-xl bg-white border border-red-200 text-red-700 text-xs font-bold shadow-sm hover:bg-red-100" onclick="location.reload()">
+                <button type="button" class="px-3.5 py-2 rounded-xl bg-white border border-red-200 text-red-700 text-xs font-bold shadow-sm hover:bg-red-100" onclick="location.reload()">
                     Retry
                 </button>
             </div>
@@ -410,7 +459,33 @@
             items = items.filter(it => (it.day || '').toLowerCase() === state.dayFilter.toLowerCase());
         }
 
+        if (state.yearFilter) {
+            items = items.filter(it => (it.year || '').toLowerCase() === state.yearFilter.toLowerCase());
+        }
+
+        if (state.facultyFilter) {
+            const fq = state.facultyFilter.toLowerCase();
+            items = items.filter(it => (it.faculty || '').toLowerCase().includes(fq));
+        }
+
+        if (state.roomFilter) {
+            const rq = state.roomFilter.toLowerCase();
+            items = items.filter(it => (it.room || '').toLowerCase().includes(rq));
+        }
+
         return items;
+    }
+
+    function timeStringToMinutes(str) {
+        if (!str) return -1;
+        const clean = String(str).trim();
+        const parts = clean.split(':').map(n => parseInt(n, 10));
+        if (parts.length < 2 || isNaN(parts[0]) || isNaN(parts[1])) return -1;
+        let h = parts[0];
+        const m = parts[1];
+        // College hour adjustment (e.g. 02:00 PM is 14:00)
+        if (h < 8) h += 12;
+        return h * 60 + m;
     }
 
     function updateKpisAndContext() {
@@ -422,7 +497,9 @@
         const distinctRooms = new Set(allItems.map(i => i.room).filter(Boolean));
 
         // Today's classes
-        const todayDayName = DAYS[new Date().getDay() - 1] || 'Monday';
+        const now = new Date();
+        const currentDayIndex = now.getDay(); // 0 is Sun, 1 is Mon...
+        const todayDayName = (currentDayIndex >= 1 && currentDayIndex <= 6) ? DAYS[currentDayIndex - 1] : 'Monday';
         const todayClasses = allItems.filter(i => (i.day || '').toLowerCase() === todayDayName.toLowerCase());
 
         // Update KPI values
@@ -446,7 +523,7 @@
 
         const subTitleEl = document.getElementById('ttContextSubtitle');
         if (subTitleEl) {
-            subTitleEl.innerText = `${state.program} • Weekly Schedule Matrix`;
+            subTitleEl.innerText = `${state.program} • Complete Weekly Schedule (Mon – Sat)`;
         }
 
         const classCountEl = document.getElementById('ttContextClassCount');
@@ -460,33 +537,17 @@
     }
 
     function updateDayCountBadges() {
-        const counts = {
-            Monday: 0,
-            Tuesday: 0,
-            Wednesday: 0,
-            Thursday: 0,
-            Friday: 0,
-            Saturday: 0
-        };
+        const allItems = state.items;
+        const countAllEl = document.getElementById('countAll');
+        if (countAllEl) countAllEl.innerText = `${allItems.length}`;
 
-        state.items.forEach(it => {
-            if (it.day && counts[it.day] !== undefined) {
-                counts[it.day]++;
+        DAYS.forEach(d => {
+            const shortName = d.slice(0, 3);
+            const el = document.getElementById(`count${shortName}`);
+            if (el) {
+                const count = allItems.filter(i => (i.day || '').toLowerCase() === d.toLowerCase()).length;
+                el.innerText = `${count}`;
             }
-        });
-
-        const map = {
-            Monday: 'countMon',
-            Tuesday: 'countTue',
-            Wednesday: 'countWed',
-            Thursday: 'countThu',
-            Friday: 'countFri',
-            Saturday: 'countSat'
-        };
-
-        Object.keys(map).forEach(day => {
-            const el = document.getElementById(map[day]);
-            if (el) el.innerText = counts[day];
         });
     }
 
@@ -501,8 +562,20 @@
         chips.push({ label: `Sem ${state.semester}`, key: 'semester' });
         chips.push({ label: `Div ${state.division}`, key: 'division' });
 
+        if (state.yearFilter) {
+            chips.push({ label: `Year: ${state.yearFilter}`, key: 'year', removable: true });
+        }
+
         if (state.dayFilter) {
             chips.push({ label: `Day: ${state.dayFilter}`, key: 'day', removable: true });
+        }
+
+        if (state.facultyFilter) {
+            chips.push({ label: `Faculty: ${state.facultyFilter}`, key: 'faculty', removable: true });
+        }
+
+        if (state.roomFilter) {
+            chips.push({ label: `Room: ${state.roomFilter}`, key: 'room', removable: true });
         }
 
         if (state.search) {
@@ -522,8 +595,15 @@
     window.removeFilterChip = function(key) {
         if (key === 'day') {
             state.dayFilter = '';
+            state.selectedDay = 'all';
             const daySelect = document.getElementById('ttDaySelect');
             if (daySelect) daySelect.value = '';
+        } else if (key === 'year') {
+            state.yearFilter = '';
+        } else if (key === 'faculty') {
+            state.facultyFilter = '';
+        } else if (key === 'room') {
+            state.roomFilter = '';
         } else if (key === 'search') {
             state.search = '';
             const searchInput = document.getElementById('ttSearchInput');
@@ -531,6 +611,7 @@
             const clearBtn = document.getElementById('ttSearchClearBtn');
             if (clearBtn) clearBtn.classList.add('hidden');
         }
+        syncFilterSelectors();
         renderTimetableViews();
     };
 
@@ -641,134 +722,168 @@
     }
 
     // =========================================================================
-    // MOBILE TIMELINE RENDERING (< 768px)
+    // MOBILE TIMELINE RENDERING (< 768px): COMPLETE WEEKLY TIMETABLE (MON -> SAT)
     // =========================================================================
 
     function renderMobileTimeline() {
         const mobileSchedule = document.getElementById('timetableMobileSchedule');
         if (!mobileSchedule) return;
 
-        const currentDay = state.selectedDay || 'Monday';
         const filteredItems = getFilteredItems();
         const conflictIds = detectConflicts(state.items);
 
-        const dayItems = filteredItems
-            .filter(item => (item.day || '').toLowerCase() === currentDay.toLowerCase())
-            .sort((a, b) => String(a.start_time || '').localeCompare(String(b.start_time || '')));
-
-        if (!dayItems.length) {
+        if (!state.items.length) {
             mobileSchedule.innerHTML = `
                 <div class="text-center py-10 bg-white border border-[#E1E5F0] rounded-2xl p-6 shadow-sm">
                     <div class="w-12 h-12 rounded-2xl bg-[#E8EBFA] text-[#8B5CF6] flex items-center justify-center mx-auto mb-3 shadow-sm">
                         <i data-lucide="calendar-x" class="w-6 h-6"></i>
                     </div>
-                    <h4 class="text-sm font-bold text-[#171D3A] mb-1">No Classes on ${currentDay}</h4>
-                    <p class="text-xs text-[#66708F] mb-4">No scheduled lectures for ${state.department} on ${currentDay}.</p>
-                    <button type="button" class="btn-primary-custom text-xs font-bold mx-auto py-2 px-4 shadow-sm" onclick="window.quickAddSlot('${currentDay}', '09:00', '10:00')">
-                        <i data-lucide="plus"></i> Add ${currentDay} Lecture
+                    <h4 class="text-sm font-bold text-[#171D3A] mb-1">No Schedule Entries Found</h4>
+                    <p class="text-xs text-[#66708F] mb-4">No timetable records found in MongoDB for ${state.department} (Sem ${state.semester}, Div ${state.division}).</p>
+                    <button type="button" class="btn-primary-custom text-xs font-bold mx-auto py-2.5 px-4 shadow-sm" onclick="window.quickAddSlot('Monday', '09:00', '10:00')">
+                        <i data-lucide="plus" class="w-4 h-4 mr-1"></i> Add First Lecture
                     </button>
                 </div>
             `;
+            if (window.lucide) lucide.createIcons();
             return;
         }
 
-        // Live Time Check for NOW / NEXT status
+        // Live Clock Check for Today's NOW / NEXT status
         const now = new Date();
-        const todayDayIndex = now.getDay();
-        const isToday = (todayDayIndex >= 1 && todayDayIndex <= 6 && DAYS[todayDayIndex - 1] === currentDay);
-        const currentHours = now.getHours();
-        const currentMins = now.getMinutes();
-        const currentMinutesTotal = currentHours * 60 + currentMins;
+        const todayDayIndex = now.getDay(); // 0: Sun, 1: Mon, ..., 6: Sat
+        const todayDayName = (todayDayIndex >= 1 && todayDayIndex <= 6) ? DAYS[todayDayIndex - 1] : null;
+        const currentMinutesTotal = now.getHours() * 60 + now.getMinutes();
 
-        mobileSchedule.innerHTML = `
-            <div class="flex items-center justify-between pb-1 px-1">
-                <span class="text-xs font-bold text-[#171D3A] tracking-wider uppercase">${currentDay} Classes (${dayItems.length})</span>
-                <button type="button" class="text-xs text-[#8B5CF6] font-bold flex items-center gap-1" onclick="window.quickAddSlot('${currentDay}', '09:00', '10:00')">
-                    <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Add Slot
-                </button>
-            </div>
+        // Loop through all 6 days (Monday -> Saturday)
+        const daysToRender = state.dayFilter ? [state.dayFilter] : DAYS;
 
-            <div class="space-y-3">
-                ${dayItems.map((item, idx) => {
-                    const hasConflict = conflictIds.has(item.id);
-                    
-                    // Parse start & end for now/next
-                    let isNow = false;
-                    let isNext = false;
+        let html = '';
 
-                    if (isToday && item.start_time) {
-                        const startParts = item.start_time.split(':').map(n => parseInt(n, 10));
-                        const endParts = (item.end_time || '').split(':').map(n => parseInt(n, 10));
-                        if (startParts.length >= 2 && endParts.length >= 2) {
-                            let startMin = startParts[0] * 60 + startParts[1];
-                            let endMin = endParts[0] * 60 + endParts[1];
-                            // Adjust for PM hours if format is 02:00
-                            if (startParts[0] < 8) startMin += 12 * 60;
-                            if (endParts[0] < 8) endMin += 12 * 60;
+        daysToRender.forEach(day => {
+            const isToday = (todayDayName === day);
+            const dayItems = filteredItems
+                .filter(item => (item.day || '').toLowerCase() === day.toLowerCase())
+                .sort((a, b) => {
+                    const minA = timeStringToMinutes(a.start_time);
+                    const minB = timeStringToMinutes(b.start_time);
+                    return minA - minB;
+                });
 
-                            if (currentMinutesTotal >= startMin && currentMinutesTotal <= endMin) {
-                                isNow = true;
-                            } else if (currentMinutesTotal < startMin && idx === 0) {
-                                isNext = true;
+            // Determine NOW and NEXT for today's classes
+            let nextFound = false;
+
+            const dayContent = dayItems.length ? `
+                <div class="mobile-timeline-track">
+                    ${dayItems.map((item, idx) => {
+                        const hasConflict = conflictIds.has(item.id);
+                        
+                        let isNow = false;
+                        let isNext = false;
+
+                        if (isToday && item.start_time) {
+                            const startMin = timeStringToMinutes(item.start_time);
+                            const endMin = timeStringToMinutes(item.end_time || item.start_time);
+
+                            if (startMin >= 0 && endMin >= 0) {
+                                if (currentMinutesTotal >= startMin && currentMinutesTotal <= endMin) {
+                                    isNow = true;
+                                } else if (currentMinutesTotal < startMin && !nextFound) {
+                                    isNext = true;
+                                    nextFound = true;
+                                }
                             }
                         }
-                    }
 
-                    return `
-                        <div class="mobile-schedule-card ${isNow ? 'is-now' : isNext ? 'is-next' : ''}">
-                            <!-- Top Status & Time Row -->
-                            <div class="flex items-center justify-between gap-2 mb-2">
-                                <div class="flex items-center gap-1.5">
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-[#E8EBFA] text-[#8B5CF6] font-mono text-xs font-bold">
-                                        <i data-lucide="clock" class="w-3 h-3"></i> ${escapeHtml(item.start_time || '')} - ${escapeHtml(item.end_time || '')}
-                                    </span>
-                                    ${isNow ? `<span class="badge-now"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> NOW</span>` : ''}
-                                    ${isNext ? `<span class="badge-next">NEXT</span>` : ''}
-                                </div>
-                                <span class="px-2 py-0.5 rounded-lg bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] font-mono text-xs font-bold">
-                                    <i data-lucide="map-pin" class="w-3 h-3 text-[#8B5CF6] inline"></i> ${escapeHtml(item.room || 'Room')}
-                                </span>
-                            </div>
-
-                            <!-- Subject Title -->
-                            <h4 class="text-sm font-bold text-[#171D3A] mb-2">${escapeHtml(item.subject || 'Scheduled Lecture')}</h4>
-
-                            <!-- Faculty & Academic Meta -->
-                            <div class="flex items-center justify-between text-xs text-[#66708F] gap-2 pt-2 border-t border-[#E1E5F0]">
-                                <div class="flex items-center gap-1.5 truncate">
-                                    <div class="w-5 h-5 rounded-full bg-[#E8EBFA] text-[#8B5CF6] flex items-center justify-center text-[10px] font-bold">
-                                        <i data-lucide="user" class="w-3 h-3"></i>
+                        return `
+                            <div class="mobile-timeline-item ${isNow ? 'is-now' : ''}">
+                                <div class="mobile-timeline-node"></div>
+                                <div class="mobile-schedule-card ${isNow ? 'is-now' : isNext ? 'is-next' : ''}">
+                                    <!-- Top Row: Time, Now/Next Badges, Room -->
+                                    <div class="flex items-center justify-between gap-2 mb-2">
+                                        <div class="flex items-center gap-1.5 flex-wrap">
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-[#E8EBFA] text-[#8B5CF6] font-mono text-xs font-bold">
+                                                <i data-lucide="clock" class="w-3 h-3"></i> ${escapeHtml(item.start_time || '')} - ${escapeHtml(item.end_time || '')}
+                                            </span>
+                                            ${isNow ? `<span class="badge-now"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> NOW</span>` : ''}
+                                            ${isNext ? `<span class="badge-next">NEXT</span>` : ''}
+                                        </div>
+                                        <span class="px-2 py-0.5 rounded-lg bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] font-mono text-xs font-bold flex-shrink-0">
+                                            <i data-lucide="map-pin" class="w-3 h-3 text-[#8B5CF6] inline"></i> ${escapeHtml(item.room || 'Room')}
+                                        </span>
                                     </div>
-                                    <span class="font-semibold text-[#171D3A] truncate">${escapeHtml(item.faculty || 'Faculty In-Charge')}</span>
-                                </div>
-                                <span class="text-[11px] text-[#8C95AD] whitespace-nowrap">${escapeHtml(item.program || state.program)} • Sem ${escapeHtml(item.semester || state.semester)}</span>
-                            </div>
 
-                            <!-- Overlap Warning -->
-                            ${hasConflict ? `
-                                <div class="conflict-alert-banner">
-                                    <i data-lucide="alert-triangle" class="w-3.5 h-3.5 flex-shrink-0"></i>
-                                    <span>Schedule Overlap Conflict Detected</span>
-                                </div>
-                            ` : ''}
+                                    <!-- Subject Name -->
+                                    <h4 class="text-sm font-bold text-[#171D3A] mb-2">${escapeHtml(item.subject || 'Scheduled Lecture')}</h4>
 
-                            <!-- Card Bottom Actions -->
-                            <div class="pt-3 mt-2.5 border-t border-[#E1E5F0] flex items-center justify-end gap-1.5">
-                                <button type="button" class="px-3 py-1.5 rounded-xl bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs font-semibold hover:bg-[#E8EBFA]" onclick="window.viewSlotDetails('${escapeQuotes(item.id)}')">
-                                    Details
-                                </button>
-                                <button type="button" class="px-3 py-1.5 rounded-xl bg-white border border-[#E1E5F0] text-[#8B5CF6] text-xs font-bold hover:bg-[#E8EBFA]" onclick="window.editSlot('${escapeQuotes(item.id)}')">
-                                    Edit
-                                </button>
-                                <button type="button" class="p-1.5 rounded-xl bg-white border border-[#E1E5F0] text-[#8C95AD] hover:text-red-600 hover:bg-red-50" onclick="window.deleteSlot('${escapeQuotes(item.id)}')">
-                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                                </button>
+                                    <!-- Faculty & Academic Meta -->
+                                    <div class="flex items-center justify-between text-xs text-[#66708F] gap-2 pt-2 border-t border-[#E1E5F0]">
+                                        <div class="flex items-center gap-1.5 truncate">
+                                            <div class="w-5 h-5 rounded-full bg-[#E8EBFA] text-[#8B5CF6] flex items-center justify-center text-[10px] font-bold flex-shrink-0">
+                                                <i data-lucide="user" class="w-3 h-3"></i>
+                                            </div>
+                                            <span class="font-semibold text-[#171D3A] truncate">${escapeHtml(item.faculty || 'Faculty In-Charge')}</span>
+                                        </div>
+                                        <span class="text-[11px] text-[#8C95AD] whitespace-nowrap flex-shrink-0">${escapeHtml(item.program || state.program)} • Sem ${escapeHtml(item.semester || state.semester)}</span>
+                                    </div>
+
+                                    <!-- Overlap Conflict Banner -->
+                                    ${hasConflict ? `
+                                        <div class="conflict-alert-banner">
+                                            <i data-lucide="alert-triangle" class="w-3.5 h-3.5 flex-shrink-0"></i>
+                                            <span>Schedule Overlap Conflict Detected</span>
+                                        </div>
+                                    ` : ''}
+
+                                    <!-- Touch-Friendly Actions -->
+                                    <div class="pt-2.5 mt-2.5 border-t border-[#E1E5F0] flex items-center justify-end gap-1.5">
+                                        <button type="button" class="px-3 py-1.5 rounded-xl bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs font-semibold hover:bg-[#E8EBFA]" onclick="window.viewSlotDetails('${escapeQuotes(item.id)}')">
+                                            Details
+                                        </button>
+                                        <button type="button" class="px-3 py-1.5 rounded-xl bg-white border border-[#E1E5F0] text-[#8B5CF6] text-xs font-bold hover:bg-[#E8EBFA]" onclick="window.editSlot('${escapeQuotes(item.id)}')">
+                                            Edit
+                                        </button>
+                                        <button type="button" class="p-1.5 rounded-xl bg-white border border-[#E1E5F0] text-[#8C95AD] hover:text-red-600 hover:bg-red-50" onclick="window.deleteSlot('${escapeQuotes(item.id)}')">
+                                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
+                        `;
+                    }).join('')}
+                </div>
+            ` : `
+                <div class="mobile-day-empty-card">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="calendar" class="w-4 h-4 text-[#8C95AD]"></i>
+                        <span class="text-xs text-[#66708F] font-medium">No classes scheduled on ${day}</span>
+                    </div>
+                    <button type="button" class="text-xs text-[#8B5CF6] font-bold hover:underline" onclick="window.quickAddSlot('${day}', '09:00', '10:00')">
+                        + Add Class
+                    </button>
+                </div>
+            `;
+
+            html += `
+                <section class="mobile-day-section space-y-2.5" id="day-section-${day}">
+                    <div class="mobile-day-header ${isToday ? 'is-today' : ''}">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full ${isToday ? 'bg-emerald-500 animate-pulse' : 'bg-[#8B5CF6]'}"></span>
+                            <h3 class="text-xs font-bold text-[#171D3A] tracking-wider uppercase mb-0">${day}</h3>
+                            ${isToday ? `<span class="px-1.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[9px] font-extrabold uppercase">Today</span>` : ''}
+                            <span class="px-2 py-0.5 rounded-full bg-[#E8EBFA] text-[#8B5CF6] text-[10px] font-bold">${dayItems.length} ${dayItems.length === 1 ? 'Class' : 'Classes'}</span>
                         </div>
-                    `;
-                }).join('')}
-            </div>
-        `;
+                        <button type="button" class="text-xs text-[#8B5CF6] font-bold flex items-center gap-1 hover:underline" onclick="window.quickAddSlot('${day}', '09:00', '10:00')">
+                            <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Add Slot
+                        </button>
+                    </div>
+                    ${dayContent}
+                </section>
+            `;
+        });
+
+        mobileSchedule.innerHTML = html;
+        if (window.lucide) lucide.createIcons();
     }
 
     // =========================================================================
@@ -785,9 +900,10 @@
 
         document.getElementById('slotProgram').value = state.program;
         document.getElementById('slotDepartment').value = state.department;
+        document.getElementById('slotYear').value = state.yearFilter || 'FY';
         document.getElementById('slotSemester').value = state.semester;
         document.getElementById('slotDivision').value = state.division;
-        document.getElementById('slotDay').value = day || state.selectedDay || 'Monday';
+        document.getElementById('slotDay').value = (day && day !== 'all') ? day : 'Monday';
         document.getElementById('slotStartTime').value = startTime || '09:00';
         document.getElementById('slotEndTime').value = endTime || '10:00';
 
@@ -958,7 +1074,7 @@
     }
 
     // =========================================================================
-    // UTILITIES
+    // UTILITIES & TOAST NOTIFICATIONS
     // =========================================================================
 
     function showAdminToast(msg, type = 'info') {

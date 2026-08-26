@@ -201,7 +201,11 @@
     <div class="sm:hidden" id="mobileDaySelectorWrapper">
         <div class="overflow-x-auto pb-1 no-scrollbar">
             <div class="flex items-center gap-1.5 p-1 bg-white border border-[#E1E5F0] rounded-2xl shadow-sm min-w-max" id="mobileDayTabs">
-                <button type="button" class="mobile-day-pill active" data-day="Monday">
+                <button type="button" class="mobile-day-pill active" data-day="all">
+                    <span class="day-name">All Week</span>
+                    <span class="day-count" id="countAll">0</span>
+                </button>
+                <button type="button" class="mobile-day-pill" data-day="Monday">
                     <span class="day-name">Mon</span>
                     <span class="day-count" id="countMon">0</span>
                 </button>
@@ -281,7 +285,7 @@
     <!-- =========================================================================
          7. DEDICATED MOBILE SCHEDULE TIMELINE (< 768px)
          ========================================================================= -->
-    <div id="timetableMobileSchedule" class="admin-mobile-schedule block sm:hidden space-y-3" aria-live="polite">
+    <div id="timetableMobileSchedule" class="admin-mobile-schedule block sm:hidden space-y-4" aria-live="polite">
         <!-- Injected dynamically via timetable.js -->
     </div>
 
@@ -311,7 +315,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <div class="modal-body p-4 space-y-4 overflow-y-auto max-h-[75vh]">
+            <div class="modal-body p-4 space-y-3.5 overflow-y-auto max-h-[75vh]">
                 <div>
                     <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Degree Program</label>
                     <select id="mFilterProgram" class="form-control-custom font-semibold">
@@ -341,6 +345,17 @@
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Academic Year</label>
+                        <select id="mFilterYear" class="form-control-custom font-semibold">
+                            <option value="">All Years</option>
+                            <option value="FY">FY (First Year)</option>
+                            <option value="SY">SY (Second Year)</option>
+                            <option value="TY">TY (Third Year)</option>
+                            <option value="LY">LY (Final Year)</option>
+                        </select>
+                    </div>
+
+                    <div>
                         <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Semester</label>
                         <select id="mFilterSem" class="form-control-custom font-semibold">
                             <option value="1">Sem 1</option>
@@ -353,7 +368,9 @@
                             <option value="8">Sem 8</option>
                         </select>
                     </div>
+                </div>
 
+                <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Division</label>
                         <select id="mFilterDiv" class="form-control-custom font-semibold">
@@ -363,19 +380,29 @@
                             <option value="D">Division D</option>
                         </select>
                     </div>
+
+                    <div>
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Day of Week</label>
+                        <select id="mFilterDay" class="form-control-custom">
+                            <option value="">All Days (Mon - Sat)</option>
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                            <option value="Saturday">Saturday</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div>
-                    <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Day of Week</label>
-                    <select id="mFilterDay" class="form-control-custom">
-                        <option value="">All Days (Mon - Sat)</option>
-                        <option value="Monday">Monday</option>
-                        <option value="Tuesday">Tuesday</option>
-                        <option value="Wednesday">Wednesday</option>
-                        <option value="Thursday">Thursday</option>
-                        <option value="Friday">Friday</option>
-                        <option value="Saturday">Saturday</option>
-                    </select>
+                    <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Filter by Faculty</label>
+                    <input type="text" id="mFilterFaculty" placeholder="e.g. Prof. Faculty 085" class="form-control-custom text-xs">
+                </div>
+
+                <div>
+                    <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Filter by Classroom / Room</label>
+                    <input type="text" id="mFilterRoom" placeholder="e.g. CO-126" class="form-control-custom text-xs font-mono">
                 </div>
             </div>
 

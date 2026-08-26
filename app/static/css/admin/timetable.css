@@ -282,17 +282,80 @@
 }
 
 /* ==========================================================================
-   7. Mobile Schedule Timeline Cards (< 768px)
+   7. Mobile Schedule Timeline Cards & Full Week Vertical Layout (< 768px)
    ========================================================================== */
+
+.mobile-day-section {
+    position: relative;
+    scroll-margin-top: 120px;
+}
+
+.mobile-day-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, #FFFFFF 0%, #F8F9FE 100%);
+    border: 1px solid var(--tt-border);
+    border-radius: 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(23, 29, 58, 0.03);
+}
+
+.mobile-day-header.is-today {
+    background: linear-gradient(135deg, #F0FDF4 0%, #FFFFFF 100%);
+    border-color: #86EFAC;
+}
+
+.mobile-timeline-track {
+    position: relative;
+    border-left: 2px solid #E8EBFA;
+    margin-left: 10px;
+    padding-left: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.mobile-timeline-item {
+    position: relative;
+    width: 100%;
+}
+
+.mobile-timeline-node {
+    position: absolute;
+    left: -21px;
+    top: 16px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--tt-primary);
+    border: 2.5px solid #FFFFFF;
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3);
+    z-index: 2;
+}
+
+.mobile-timeline-item.is-now .mobile-timeline-node {
+    background: #10B981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.4);
+    animation: pulseNode 2s infinite;
+}
+
+@keyframes pulseNode {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.25); opacity: 0.8; }
+}
 
 .mobile-schedule-card {
     position: relative;
     background: #FFFFFF;
     border: 1px solid var(--tt-border);
-    border-radius: 18px;
-    padding: 14px 16px;
+    border-radius: 16px;
+    padding: 13px 14px;
     box-shadow: 0 2px 8px rgba(23, 29, 58, 0.04);
     transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 .mobile-schedule-card:active {
@@ -359,6 +422,18 @@
     font-size: 11px;
     font-weight: 700;
     margin-top: 8px;
+}
+
+/* Empty Day State Card */
+.mobile-day-empty-card {
+    background: #FFFFFF;
+    border: 1.5px dashed var(--tt-border);
+    border-radius: 16px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
 }
 
 /* ==========================================================================
