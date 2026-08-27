@@ -872,8 +872,17 @@ class AdminCRUDService:
         elif canonical == "facilities":
             return get_collection("facilities")
         elif canonical == "campus_info":
-            return get_collection("rooms")
+            return get_collection("campus_info")
         return get_collection(canonical)
+
+    @staticmethod
+    def _invalidate_ai_cache_and_index(module_key: str, item_data: Dict[str, Any] = None, is_delete: bool = False):
+        """Invalidates in-memory AI and RAG dataset caches upon CRUD modification."""
+        try:
+            from app.ai.data_processor import invalidate_ai_caches
+            invalidate_ai_caches(module_key, item_data=item_data, is_delete=is_delete)
+        except Exception as e:
+            logger.debug(f"AI cache invalidation notice: {e}")
 
     @staticmethod
     def list_items(
@@ -899,42 +908,53 @@ class AdminCRUDService:
             # -------------------------------------------------------------
             # MONGODB BACKEND
             # -------------------------------------------------------------
-            query: Dict[str, Any] = {}
+            and_conditions = []
 
             # 1. Search Query
             if search and search.strip():
                 clean_search = search.strip()
                 search_fields = config.get("search_fields", [])
                 if search_fields:
-                    query["$or"] = [
-                        {f: {"$regex": re.escape(clean_search), "$options": "i"}}
-                        for f in search_fields
-                    ]
+                    and_conditions.append({
+                        "$or": [
+                            {f: {"$regex": re.escape(clean_search), "$options": "i"}}
+                            for f in search_fields
+                        ]
+                    })
 
             # 2. Filters
             if filters:
                 for k, v in filters.items():
-                    if v is not None and str(v).strip() != "" and str(v).lower() != "all":
-                        if k == "status" and str(v).lower() == "active":
-                            # Active includes documents where status='active' OR status is missing
-                            status_clause = {"$or": [{"status": "active"}, {"status": {"$exists": False}}]}
-                            if "$and" not in query:
-                                query["$and"] = []
-                            query["$and"].append(status_clause)
-                        elif str(v).lower() in ("true", "false"):
-                            query[k] = (str(v).lower() == "true")
+                    if v is not None and str(v).strip() != "" and str(v).lower() not in ("all", "all categories", "all statuses", "all room types", "all departments", "all zones"):
+                        clean_v = str(v).strip()
+                        if k == "status" and clean_v.lower() == "active":
+                            # Active includes documents where status='active' (case-insensitive) OR status is missing/empty/null
+                            and_conditions.append({
+                                "$or": [
+                                    {"status": {"$regex": "^active$", "$options": "i"}},
+                                    {"status": {"$exists": False}},
+                                    {"status": ""},
+                                    {"status": None}
+                                ]
+                            })
+                        elif clean_v.lower() in ("true", "false"):
+                            and_conditions.append({k: (clean_v.lower() == "true")})
                         elif k in ("semester", "sem"):
                             try:
-                                val_int = int(v)
-                                query[k] = {"$in": [str(v), val_int]}
+                                val_int = int(clean_v)
+                                and_conditions.append({k: {"$in": [clean_v, val_int]}})
                             except (ValueError, TypeError):
-                                query[k] = v
-                        elif k == "zone" and str(v).strip() == "Diploma Block":
-                            query[k] = {"$regex": "^Diploma Block", "$options": "i"}
-                        elif isinstance(v, str) and not v.isdigit() and k not in ("id", "place_id", "faculty_id", "enrollment_no", "_id"):
-                            query[k] = {"$regex": f"^{re.escape(v.strip())}$", "$options": "i"}
+                                and_conditions.append({k: clean_v})
+                        elif k == "zone" and clean_v == "Diploma Block":
+                            and_conditions.append({k: {"$regex": "^Diploma Block", "$options": "i"}})
+                        elif k == "department":
+                            and_conditions.append({k: {"$regex": re.escape(clean_v), "$options": "i"}})
+                        elif isinstance(v, str) and not clean_v.isdigit() and k not in ("id", "place_id", "faculty_id", "enrollment_no", "_id"):
+                            and_conditions.append({k: {"$regex": f"^{re.escape(clean_v)}$", "$options": "i"}})
                         else:
-                            query[k] = v
+                            and_conditions.append({k: v})
+
+            query: Dict[str, Any] = {"$and": and_conditions} if and_conditions else {}
 
             # 3. Sorting
             if not sort_by:
@@ -1005,14 +1025,19 @@ class AdminCRUDService:
             # 2. Filters
             if filters:
                 for k, v in filters.items():
-                    if v is not None and str(v).strip() != "" and str(v).lower() != "all":
-                        if k == "status" and str(v).lower() == "active":
-                            all_items = [i for i in all_items if i.get("status", "active") == "active"]
-                        elif str(v).lower() in ("true", "false"):
-                            bool_val = (str(v).lower() == "true")
+                    if v is not None and str(v).strip() != "" and str(v).lower() not in ("all", "all categories", "all statuses", "all room types", "all departments", "all zones"):
+                        clean_v = str(v).strip().lower()
+                        if k == "status" and clean_v == "active":
+                            all_items = [i for i in all_items if str(i.get("status", "active") or "active").strip().lower() == "active"]
+                        elif clean_v in ("true", "false"):
+                            bool_val = (clean_v == "true")
                             all_items = [i for i in all_items if bool(i.get(k)) == bool_val]
+                        elif k == "zone" and clean_v == "diploma block":
+                            all_items = [i for i in all_items if str(i.get(k, '')).strip().lower().startswith("diploma block")]
+                        elif k == "department":
+                            all_items = [i for i in all_items if clean_v in str(i.get(k, '')).strip().lower()]
                         else:
-                            all_items = [i for i in all_items if str(i.get(k, '')).lower() == str(v).lower()]
+                            all_items = [i for i in all_items if str(i.get(k, '')).strip().lower() == clean_v]
 
             # 3. Sort
             if not sort_by:
@@ -1180,6 +1205,8 @@ class AdminCRUDService:
                 coll.insert_one(clean_data)
                 # Dispatch student notification if applicable for this admin action
                 AdminCRUDService._dispatch_admin_action_notification(module_key, item_id, clean_data, is_update=False)
+                # Invalidate in-memory AI / RAG caches
+                AdminCRUDService._invalidate_ai_cache_and_index(module_key, clean_data, is_delete=False)
                 # Read back clean doc
                 created = AdminCRUDService.get_item(module_key, item_id)
                 return True, "Record created successfully.", created
@@ -1190,6 +1217,7 @@ class AdminCRUDService:
                 _LOCAL_DATA_STORE[module_key] = {}
             _LOCAL_DATA_STORE[module_key][item_id] = clean_data
             AdminCRUDService._dispatch_admin_action_notification(module_key, item_id, clean_data, is_update=False)
+            AdminCRUDService._invalidate_ai_cache_and_index(module_key, clean_data, is_delete=False)
             return True, "Record created successfully.", clean_data
 
     @staticmethod
@@ -1428,6 +1456,7 @@ class AdminCRUDService:
                     {"$set": clean_data}
                 )
                 AdminCRUDService._dispatch_admin_action_notification(module_key, item_id, clean_data, is_update=True)
+                AdminCRUDService._invalidate_ai_cache_and_index(module_key, clean_data, is_delete=False)
                 updated = AdminCRUDService.get_item(module_key, item_id)
                 return True, "Record updated successfully.", updated
             except Exception as e:
@@ -1438,6 +1467,7 @@ class AdminCRUDService:
             else:
                 _LOCAL_DATA_STORE.setdefault(module_key, {})[item_id] = clean_data
             AdminCRUDService._dispatch_admin_action_notification(module_key, item_id, clean_data, is_update=True)
+            AdminCRUDService._invalidate_ai_cache_and_index(module_key, clean_data, is_delete=False)
             return True, "Record updated successfully.", clean_data
 
     @staticmethod
@@ -1481,12 +1511,14 @@ class AdminCRUDService:
                 ]
             })
             if res.deleted_count > 0:
+                AdminCRUDService._invalidate_ai_cache_and_index(module_key, existing, is_delete=True)
                 return True, "Record deleted successfully."
             return False, f"Record with ID '{item_id}' not found."
         else:
             module_data = _LOCAL_DATA_STORE.get(module_key, {})
             if item_id in module_data:
                 del module_data[item_id]
+                AdminCRUDService._invalidate_ai_cache_and_index(module_key, existing, is_delete=True)
                 return True, "Record deleted successfully."
             return False, f"Record with ID '{item_id}' not found."
 

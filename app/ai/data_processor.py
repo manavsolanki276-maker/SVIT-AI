@@ -20,8 +20,106 @@ def get_ist_now() -> datetime:
 # =========================================================================
 # STATIC MAP & LOCATION LOOKUP DIRECTORY
 # =========================================================================
+# =========================================================================
+# STATIC MAP & LOCATION LOOKUP DIRECTORY
+# =========================================================================
 MAP_LOOKUP: Dict[str, str] = {
-    # 1. Diploma Building
+    # 1. Master Campus Entry, Gates, Parking, Garden, Overview
+    "main gate": "SVIT with all dep.jpeg",
+    "gate": "SVIT with all dep.jpeg",
+    "campus entry": "SVIT with all dep.jpeg",
+    "entrance": "SVIT with all dep.jpeg",
+    "entrance gate": "SVIT with all dep.jpeg",
+    "entry gate": "SVIT with all dep.jpeg",
+    "main entrance": "SVIT with all dep.jpeg",
+    "college gate": "SVIT with all dep.jpeg",
+    "front gate": "SVIT with all dep.jpeg",
+    "campus gate": "SVIT with all dep.jpeg",
+    "parking": "SVIT with all dep.jpeg",
+    "parking area": "SVIT with all dep.jpeg",
+    "vehicle parking": "SVIT with all dep.jpeg",
+    "two wheeler parking": "SVIT with all dep.jpeg",
+    "four wheeler parking": "SVIT with all dep.jpeg",
+    "central garden": "SVIT with all dep.jpeg",
+    "amphitheatre": "SVIT with all dep.jpeg",
+    "open amphitheatre": "SVIT with all dep.jpeg",
+    "open air amphitheatre": "SVIT with all dep.jpeg",
+    "open theatre": "SVIT with all dep.jpeg",
+    "campus": "SVIT with all dep.jpeg",
+    "all departments": "SVIT with all dep.jpeg",
+    "svit": "SVIT with all dep.jpeg",
+    "architecture": "SVIT with all dep.jpeg",
+    "architecture block": "SVIT with all dep.jpeg",
+    "architecture department": "SVIT with all dep.jpeg",
+    "hostel": "SVIT with all dep.jpeg",
+    "campus main entrance gate": "SVIT with all dep.jpeg",
+
+    # 2. Degree / PG Department Buildings & Labs
+    "computer engineering block": "Computer dep.jpeg",
+    "computer engineering": "Computer dep.jpeg",
+    "computer department": "Computer dep.jpeg",
+    "computer": "Computer dep.jpeg",
+    "ai & ml department": "Computer dep.jpeg",
+    "ai & ml": "Computer dep.jpeg",
+    "ai/ml": "Computer dep.jpeg",
+    "artificial intelligence": "Computer dep.jpeg",
+    "data science department": "Computer dep.jpeg",
+    "data science": "Computer dep.jpeg",
+    "innovation & ai lab": "Computer dep.jpeg",
+    "innovation lab": "Computer dep.jpeg",
+    "computer lab": "Computer dep.jpeg",
+
+    "information technology block": "IT dep.jpeg",
+    "information technology": "IT dep.jpeg",
+    "it department": "IT dep.jpeg",
+    "it block": "IT dep.jpeg",
+    "it": "IT dep.jpeg",
+
+    "mechanical engineering block": "Mechanical dep.jpeg",
+    "mechanical engineering": "Mechanical dep.jpeg",
+    "mechanical department": "Mechanical dep.jpeg",
+    "mechanical": "Mechanical dep.jpeg",
+    "mechanical workshop": "Mechanical dep.jpeg",
+    "workshop": "Mechanical dep.jpeg",
+
+    "civil engineering block": "Civil dep.jpeg",
+    "civil engineering": "Civil dep.jpeg",
+    "civil department": "Civil dep.jpeg",
+    "civil": "Civil dep.jpeg",
+    "civil lab": "Civil dep.jpeg",
+
+    "electrical engineering block": "Electrical dep.jpeg",
+    "electrical engineering": "Electrical dep.jpeg",
+    "electrical department": "Electrical dep.jpeg",
+    "electrical": "Electrical dep.jpeg",
+    "electrical lab": "Electrical dep.jpeg",
+
+    "electronics & communication block": "E&C dep.jpeg",
+    "electronics & communication": "E&C dep.jpeg",
+    "electronics and communication": "E&C dep.jpeg",
+    "electronics": "E&C dep.jpeg",
+    "ec department": "E&C dep.jpeg",
+    "ec block": "E&C dep.jpeg",
+    "ec lab": "E&C dep.jpeg",
+    "ec": "E&C dep.jpeg",
+    "e&c": "E&C dep.jpeg",
+
+    "aeronautical engineering block": "Aero dep.jpeg",
+    "aeronautical engineering": "Aero dep.jpeg",
+    "aeronautical": "Aero dep.jpeg",
+    "aero department": "Aero dep.jpeg",
+    "aero block": "Aero dep.jpeg",
+    "aero": "Aero dep.jpeg",
+
+    "mca & bca": "MCA&BCA.jpeg",
+    "mca and bca": "MCA&BCA.jpeg",
+    "mca department": "MCA&BCA.jpeg",
+    "bca department": "MCA&BCA.jpeg",
+    "mca": "MCA&BCA.jpeg",
+    "bca": "MCA&BCA.jpeg",
+    "lcmca block": "MCA&BCA.jpeg",
+
+    # 3. Diploma Building & All Diploma Departments (Blocks A–G)
     "diploma computer engineering": "diploma dep.jpeg",
     "diploma computer": "diploma dep.jpeg",
     "diploma ce": "diploma dep.jpeg",
@@ -33,75 +131,91 @@ MAP_LOOKUP: Dict[str, str] = {
     "diploma electrical": "diploma dep.jpeg",
     "diploma civil engineering": "diploma dep.jpeg",
     "diploma civil": "diploma dep.jpeg",
+    "diploma ec": "diploma dep.jpeg",
+    "diploma automobile": "diploma dep.jpeg",
     "diploma department": "diploma dep.jpeg",
     "diploma block": "diploma dep.jpeg",
+    "diploma building": "diploma dep.jpeg",
+    "diploma canteen": "diploma dep.jpeg",
     "diploma": "diploma dep.jpeg",
 
-    # 2. Degree / PG Departments
-    "computer engineering": "Computer dep.jpeg",
-    "computer department": "Computer dep.jpeg",
-    "computer": "Computer dep.jpeg",
-    "information technology": "IT dep.jpeg",
-    "it department": "IT dep.jpeg",
-    "it": "IT dep.jpeg",
-    "mechanical department": "Mechanical dep.jpeg",
-    "mechanical": "Mechanical dep.jpeg",
-    "civil department": "Civil dep.jpeg",
-    "civil": "Civil dep.jpeg",
-    "electrical department": "Electrical dep.jpeg",
-    "electrical": "Electrical dep.jpeg",
-    "electronics & communication": "E&C dep.jpeg",
-    "electronics and communication": "E&C dep.jpeg",
-    "electronics": "E&C dep.jpeg",
-    "ec": "E&C dep.jpeg",
-    "aeronautical engineering": "Aero dep.jpeg",
-    "aeronautical": "Aero dep.jpeg",
-    "aero department": "Aero dep.jpeg",
-    "aero": "Aero dep.jpeg",
-    "mca & bca": "MCA&BCA.jpeg",
-    "mca and bca": "MCA&BCA.jpeg",
-    "mca": "MCA&BCA.jpeg",
-    "bca": "MCA&BCA.jpeg",
-
-    # 3. Admin Block & Facilities
-    "admin": "Admin dep.jpeg",
-    "admin building": "Admin dep.jpeg",
-    "administration": "Admin dep.jpeg",
+    # 4. Administration Block, Central Library, Reading Room, Medical, T&P, Auditoriums
+    "administration block": "Admin dep.jpeg",
+    "administration office & accounts": "Admin dep.jpeg",
+    "administration building": "Admin dep.jpeg",
     "admin block": "Admin dep.jpeg",
-    "library": "Admin dep.jpeg",
+    "admin building": "Admin dep.jpeg",
+    "admin": "Admin dep.jpeg",
+    "administration": "Admin dep.jpeg",
     "central library": "Admin dep.jpeg",
+    "library": "Admin dep.jpeg",
     "librari": "Admin dep.jpeg",
     "reading room": "Admin dep.jpeg",
+    "reading hall": "Admin dep.jpeg",
     "book bank": "Admin dep.jpeg",
-    "indoor sports": "Admin dep.jpeg",
-    "indoor sports room": "Admin dep.jpeg",
-    "sports room": "Admin dep.jpeg",
     "girls room": "Admin dep.jpeg",
     "girls common room": "Admin dep.jpeg",
     "girls rest room": "Admin dep.jpeg",
+    "ladies room": "Admin dep.jpeg",
+    "medical room": "Admin dep.jpeg",
+    "medical & first aid room": "Admin dep.jpeg",
+    "medical": "Admin dep.jpeg",
+    "first aid room": "Admin dep.jpeg",
+    "first aid": "Admin dep.jpeg",
+    "training & placement cell": "Admin dep.jpeg",
+    "training and placement cell": "Admin dep.jpeg",
+    "training & placement": "Admin dep.jpeg",
+    "training and placement": "Admin dep.jpeg",
+    "placement cell": "Admin dep.jpeg",
+    "placement office": "Admin dep.jpeg",
+    "t&p cell": "Admin dep.jpeg",
+    "t&p office": "Admin dep.jpeg",
+    "t&p": "Admin dep.jpeg",
+    "tpo": "Admin dep.jpeg",
+    "college auditorium": "Admin dep.jpeg",
+    "auditorium": "Admin dep.jpeg",
+    "central seminar hall": "Admin dep.jpeg",
+    "seminar hall": "Admin dep.jpeg",
+    "principal office": "Admin dep.jpeg",
+    "accounts office": "Admin dep.jpeg",
+    "examination cell": "Admin dep.jpeg",
 
-    # 4. Outdoor Sports & Pavilion
-    "sports court": "Sports court.png",
+    # 5. Sports Complex, Cricket Ground, Gymnasium & Courts
+    "sports complex & gymnasium": "Sports court.png",
+    "sports complex": "Sports court.png",
+    "gymnasium": "Sports court.png",
+    "gym": "Sports court.png",
+    "cricket ground": "Sports court.png",
     "sports ground": "Sports court.png",
-    "outdoor sports": "Sports court.png",
+    "playground": "Sports court.png",
+    "sports court": "Sports court.png",
     "pavilion": "Sports court.png",
     "pavellinon": "Sports court.png",
-    "paviloin": "Sports court.png",
-    "playground": "Sports court.png",
-    "cricket ground": "Sports court.png",
-    "volleyball court": "Sports court.png",
     "basketball court": "Sports court.png",
+    "volleyball court": "Sports court.png",
+    "outdoor sports": "Sports court.png",
 
-    # 5. Amenities & Campus Locations
-    "canteen": "SVIT Canteen loc.png",
+    # 6. Transport, Bus Stand & Parking
+    "bus parking": "Bus stop.png",
+    "transport office": "Bus stop.png",
+    "bus stop": "Bus stop.png",
+    "bus stand": "Bus stop.png",
+    "transport hub": "Bus stop.png",
+    "transport coordinator": "Bus stop.png",
+
+    # 7. Food & Canteen
+    "central food court & canteen": "SVIT Canteen loc.png",
     "central canteen": "SVIT Canteen loc.png",
+    "canteen": "SVIT Canteen loc.png",
+    "food court": "SVIT Canteen loc.png",
+    "cafeteria": "SVIT Canteen loc.png",
+    "mess": "SVIT Canteen loc.png",
+
+    # 8. Amenities
     "stationary": "Stationarys.png",
     "stationery": "Stationarys.png",
     "xerox shop": "Stationarys.png",
-    "bus stop": "Bus stop.png",
-    "bus stand": "Bus stop.png",
-    "campus": "SVIT with all dep.jpeg",
-    "all departments": "SVIT with all dep.jpeg",
+    "print shop": "Stationarys.png"
 }
 
 # =========================================================================
@@ -109,19 +223,151 @@ MAP_LOOKUP: Dict[str, str] = {
 # =========================================================================
 _DF_CACHE: Dict[str, pd.DataFrame] = {}
 
-def get_cached_dataframe(filename: str) -> Optional[pd.DataFrame]:
+
+def resolve_entity_map_image(entity_dict: dict) -> str:
+    """
+    Deterministically resolves the authoritative map image filename based on entity record metadata.
+    """
+    pid = str(entity_dict.get('place_id') or entity_dict.get('facility_id') or '').strip().upper()
+    name = str(entity_dict.get('place_name') or entity_dict.get('facility_name') or '').strip().lower()
+    cat = str(entity_dict.get('category') or '').strip().lower()
+    zone = str(entity_dict.get('zone') or entity_dict.get('location') or entity_dict.get('building') or '').strip().lower()
+    bldg = str(entity_dict.get('building') or '').strip().lower()
+
+    # 1. By exact Place ID / Facility ID
+    # Main Gate / Campus Entry / Parking / Amphitheatre / Architecture / Hostel
+    if pid in ("P001", "P039", "P040", "P029", "P038", "FAC-010", "FAC-012"):
+        return "SVIT with all dep.jpeg"
+
+    # Bus Parking & Transport Office
+    if pid in ("P025", "P026"):
+        return "Bus stop.png"
+
+    # Sports Complex & Cricket Ground
+    if pid in ("P023", "P024", "FAC-009"):
+        return "Sports court.png"
+
+    # Central Canteen / Food Court
+    if pid in ("P027", "FAC-011"):
+        return "SVIT Canteen loc.png"
+
+    # Diploma Canteen & Diploma Departments A-G
+    if pid in ("P028", "P030", "P031", "P032", "P033", "P034", "P035", "P036"):
+        return "diploma dep.jpeg"
+
+    # Computer Dept & Labs
+    if pid in ("P003", "P009", "P010", "P016", "P017"):
+        return "Computer dep.jpeg"
+
+    # IT Block
+    if pid == "P004":
+        return "IT dep.jpeg"
+
+    # Civil Block & Civil Lab
+    if pid in ("P005", "P018"):
+        return "Civil dep.jpeg"
+
+    # Mechanical Block & Workshop
+    if pid in ("P006", "P019"):
+        return "Mechanical dep.jpeg"
+
+    # Electrical Block & Electrical Lab
+    if pid in ("P007", "P020"):
+        return "Electrical dep.jpeg"
+
+    # EC Block & EC Lab
+    if pid in ("P008", "P021"):
+        return "E&C dep.jpeg"
+
+    # MCA & BCA Departments
+    if pid in ("P011", "P012"):
+        return "MCA&BCA.jpeg"
+
+    # Admin Block & Associated Facilities (Central Library, Reading Room, Medical Room, T&P, Auditoriums)
+    if pid in ("P002", "P013", "P014", "P015", "P022", "P037", "FAC-001", "FAC-002", "FAC-003", "FAC-004", "FAC-005", "FAC-006", "FAC-007", "FAC-008"):
+        return "Admin dep.jpeg"
+
+    # 2. Fallback to name/zone matching
+    if "diploma" in name or "diploma" in zone or "diploma" in bldg:
+        return "diploma dep.jpeg"
+    if "sports" in name or "cricket" in name or "gym" in name or "sports" in cat:
+        return "Sports court.png"
+    if "canteen" in name or "food" in name or "cafeteria" in name:
+        return "SVIT Canteen loc.png"
+    if "bus" in name or "transport" in name:
+        return "Bus stop.png"
+    if "admin" in name or "library" in name or "reading" in name or "medical" in name or "placement" in name or "auditorium" in name or "seminar" in name:
+        return "Admin dep.jpeg"
+    if "computer" in name or "data science" in name or "ai" in name or "computer" in zone:
+        return "Computer dep.jpeg"
+    if "information technology" in name or "it block" in name:
+        return "IT dep.jpeg"
+    if "civil" in name or "civil" in zone:
+        return "Civil dep.jpeg"
+    if "mechanical" in name or "workshop" in name:
+        return "Mechanical dep.jpeg"
+    if "electrical" in name:
+        return "Electrical dep.jpeg"
+    if "electronics" in name or "ec" in name:
+        return "E&C dep.jpeg"
+    if "mca" in name or "bca" in name:
+        return "MCA&BCA.jpeg"
+    if "stationary" in name or "stationery" in name:
+        return "Stationarys.png"
+
+    return "SVIT with all dep.jpeg"
+
+
+def invalidate_ai_caches(module_key: str = None, item_data: dict = None, is_delete: bool = False) -> None:
+    """
+    Invalidates in-memory DataFrame cache, response cache, and vector cache
+    when Admin CRUD actions occur.
+    """
+    global _DF_CACHE
+    if module_key:
+        mod_clean = str(module_key).strip().lower()
+        for k in list(_DF_CACHE.keys()):
+            if mod_clean in k or k.startswith(mod_clean):
+                _DF_CACHE.pop(k, None)
+    else:
+        _DF_CACHE.clear()
+
+    try:
+        from app.ai.retriever import clear_vector_cache
+        clear_vector_cache()
+    except Exception:
+        pass
+
+    try:
+        from app.ai.rag_pipeline import clear_response_cache
+        clear_response_cache()
+    except Exception:
+        pass
+
+
+def get_cached_dataframe(filename: str, force_refresh: bool = False) -> Optional[pd.DataFrame]:
     """
     Returns an in-memory cached copy of a knowledge base dataset DataFrame.
     Checks MongoDB Atlas first, then falls back to local CSV files.
     """
-    if filename in _DF_CACHE:
+    if not force_refresh and filename in _DF_CACHE:
         return _DF_CACHE[filename]
 
     # 1. Try loading from MongoDB Atlas collection first
     try:
         from app.database.mongodb import get_collection
         coll_name = filename.replace('.csv', '').lower().replace(' ', '_')
-        coll = get_collection(coll_name)
+        if coll_name in ('subject', 'subjects'):
+            coll = get_collection('subjects')
+        elif coll_name in ('rooms', 'rooms_facilities'):
+            coll = get_collection('rooms_facilities')
+        elif coll_name == 'facilities':
+            coll = get_collection('facilities')
+        elif coll_name == 'campus_info':
+            coll = get_collection('campus_info')
+        else:
+            coll = get_collection(coll_name)
+
         if coll is not None:
             docs = list(coll.find({}, {'_id': 0}))
             if docs and len(docs) > 0:
@@ -147,7 +393,10 @@ def get_cached_dataframe(filename: str) -> Optional[pd.DataFrame]:
     for path in possible_paths:
         if os.path.exists(path):
             try:
-                df = pd.read_csv(path, dtype=str)
+                try:
+                    df = pd.read_csv(path, dtype=str, sep=None, engine='python')
+                except Exception:
+                    df = pd.read_csv(path, dtype=str)
                 df = df.fillna("")
                 for col in df.columns:
                     df[col] = df[col].astype(str).str.strip()
@@ -164,14 +413,20 @@ def get_cached_dataframe(filename: str) -> Optional[pd.DataFrame]:
 def preload_all_dataframes() -> None:
     """Preloads critical knowledge base DataFrames into memory at startup."""
     critical_files = [
-        "timetable.csv",
+        "campus_info.csv",
+        "facilities.csv",
         "departments.csv",
+        "rooms_facilities.csv",
+        "subject.csv",
+        "subjects.csv",
+        "timetable.csv",
         "notices.csv",
         "events.csv",
         "placements.csv",
         "faculty.csv",
         "transport.csv",
         "canteen.csv",
+        "contact.csv",
         "library_books.csv",
     ]
     loaded_count = 0
@@ -764,27 +1019,31 @@ def process_faculty_context(docs: list, query: str, user_profile: dict = None) -
 
             is_my_hod_query = any(k in cleaned_query for k in ["my hod", "who is my hod", "our hod", "department hod", "who is the hod"])
             has_explicit_dept = any(d in cleaned_query for d in ["computer", "mechanical", "civil", "electrical", "it", "aero", "bca", "mca", "diploma"])
+            is_faculty_related = any(k in cleaned_query for k in ["hod", "head", "faculty", "professor", "teacher", "sir", "madam", "cabin", "department", "branch", "dean", "principal"])
 
-            if (is_my_hod_query or not has_explicit_dept) and prof_dept:
-                dept_col = next((c for c in df.columns if c.lower() in ['department_name', 'department', 'dept']), None)
-                if dept_col:
-                    dept_keyword = prof_dept.split()[0].lower()
-                    temp_df = matched_df[matched_df[dept_col].str.lower().str.contains(dept_keyword, na=False)]
-                    if not temp_df.empty:
-                        matched_df = temp_df
+            if (is_my_hod_query or has_explicit_dept or name_match or is_faculty_related):
+                if (is_my_hod_query or not has_explicit_dept) and prof_dept:
+                    dept_col = next((c for c in df.columns if c.lower() in ['department_name', 'department', 'dept']), None)
+                    if dept_col:
+                        dept_keyword = prof_dept.split()[0].lower()
+                        temp_df = matched_df[matched_df[dept_col].str.lower().str.contains(dept_keyword, na=False)]
+                        if not temp_df.empty:
+                            matched_df = temp_df
 
-                if "diploma" in prof_dept.lower() or "diploma" in cleaned_query:
-                    prog_col = next((c for c in df.columns if 'program' in c.lower()), None)
-                    if prog_col:
-                        p_df = matched_df[matched_df[prog_col].str.lower() == 'diploma']
-                        if not p_df.empty:
-                            matched_df = p_df
-                elif "be" in prof_dept.lower() or "be" in cleaned_query:
-                    prog_col = next((c for c in df.columns if 'program' in c.lower()), None)
-                    if prog_col:
-                        p_df = matched_df[matched_df[prog_col].str.upper() == 'BE']
-                        if not p_df.empty:
-                            matched_df = p_df
+                    if "diploma" in prof_dept.lower() or "diploma" in cleaned_query:
+                        prog_col = next((c for c in df.columns if 'program' in c.lower()), None)
+                        if prog_col:
+                            p_df = matched_df[matched_df[prog_col].str.lower() == 'diploma']
+                            if not p_df.empty:
+                                matched_df = p_df
+                    elif "be" in prof_dept.lower() or "be" in cleaned_query:
+                        prog_col = next((c for c in df.columns if 'program' in c.lower()), None)
+                        if prog_col:
+                            p_df = matched_df[matched_df[prog_col].str.upper() == 'BE']
+                            if not p_df.empty:
+                                matched_df = p_df
+            else:
+                matched_df = pd.DataFrame()
 
             for idx, row in matched_df.iterrows():
                 dept_val = row.get('department_name') or row.get('department') or row.get('Department') or 'N/A'
@@ -1144,3 +1403,495 @@ def resolve_student_profile_query(query: str, user_profile: dict = None) -> Opti
         )
 
     return None
+
+
+def process_campus_navigation_context(query: str) -> Tuple[str, Optional[str], List[str]]:
+    """
+    Directly resolves campus landmarks, buildings, offices, gates, facilities, and amenities
+    from the authoritative campus_info.csv and facilities.csv datasets (backed by MongoDB / CSV).
+    Ensures exact entity grounding, anti-collision rank ordering, and precise map image attachment.
+    """
+    clean_q = re.sub(r'[\?\.\!,;:]', ' ', str(query or '').strip().lower())
+    
+    # 1. Load DataFrames
+    df_campus = get_cached_dataframe("campus_info.csv")
+    df_fac = get_cached_dataframe("facilities.csv")
+    
+    # Check for general "show all locations" / "campus navigation directory"
+    is_list_all = any(k in clean_q for k in [
+        "show campus navigation", "all campus navigation", "campus navigation locations",
+        "list campus locations", "show all locations", "all locations", "all buildings",
+        "campus locations", "navigation locations", "all landmarks"
+    ])
+    
+    if is_list_all and df_campus is not None and not df_campus.empty:
+        context_blocks = ["--- SVIT CAMPUS NAVIGATION DIRECTORY ---"]
+        sources = []
+        for idx, row in df_campus.iterrows():
+            pid = row.get('place_id', f'P{idx+1:03d}')
+            pname = row.get('place_name', '')
+            cat = row.get('category', '')
+            zone = row.get('zone', '')
+            landmark = row.get('landmark', '')
+            desc = row.get('description', '')
+            block = (
+                f"* Place ID: {pid} | Place Name: {pname} | Category: {cat} | "
+                f"Zone: {zone} | Landmark: {landmark} | Description: {desc} | "
+                f"[Source: campus_info.csv (Row {idx + 1})]"
+            )
+            context_blocks.append(block)
+            sources.append(f"campus_info.csv (Row {idx + 1})")
+        
+        map_url = "/static/navigation_maps/SVIT with all dep.jpeg"
+        return "\n".join(context_blocks), map_url, sources[:10]
+    
+    # Check for spatial "near <landmark>"
+    near_match = re.search(r'\b(?:near|around|close to|beside|what is near)\s+(?:the\s+)?([a-z0-9\s&]+)', clean_q)
+    if near_match:
+        target_entity = near_match.group(1).strip()
+        if df_campus is not None and not df_campus.empty:
+            matching_rows = []
+            for idx, row in df_campus.iterrows():
+                row_text = f"{row.get('place_name', '')} {row.get('zone', '')} {row.get('landmark', '')}".lower()
+                target_tokens = [w for w in target_entity.split() if len(w) > 2 and w not in ["the", "and", "campus", "near", "what", "where", "is"]]
+                if target_tokens and any(w in row_text for w in target_tokens):
+                    matching_rows.append((idx, row))
+            if matching_rows:
+                context_blocks = [f"--- CAMPUS LOCATIONS NEAR '{target_entity.title()}' ---"]
+                sources = []
+                for idx, row in matching_rows:
+                    pid = row.get('place_id', f'P{idx+1:03d}')
+                    pname = row.get('place_name', '')
+                    cat = row.get('category', '')
+                    zone = row.get('zone', '')
+                    landmark = row.get('landmark', '')
+                    desc = row.get('description', '')
+                    block = (
+                        f"* Place ID: {pid} | Place Name: {pname} | Category: {cat} | "
+                        f"Zone: {zone} | Landmark: {landmark} | Description: {desc} | "
+                        f"[Source: campus_info.csv (Row {idx + 1})]"
+                    )
+                    context_blocks.append(block)
+                    sources.append(f"campus_info.csv (Row {idx + 1})")
+                
+                # Resolve map image based on target entity
+                top_dict = matching_rows[0][1].to_dict()
+                map_file = resolve_entity_map_image(top_dict)
+                return "\n".join(context_blocks), f"/static/navigation_maps/{map_file}", sources
+
+    # 3. Candidate Scoring & Entity Matching
+    candidates = [] # List of tuples: (score, type, idx, row_dict, source_str)
+
+    # A. Score campus_info.csv records
+    if df_campus is not None and not df_campus.empty:
+        for idx, row in df_campus.iterrows():
+            row_dict = row.to_dict()
+            pid = str(row_dict.get('place_id', '')).strip().upper()
+            pname = str(row_dict.get('place_name', '')).strip()
+            pname_lower = pname.lower()
+
+            score = 0
+
+            # 1. Exact Place ID match
+            if pid and re.search(r'\b' + re.escape(pid.lower()) + r'\b', clean_q):
+                score += 120
+
+            # 2. Exact place name match
+            if pname_lower and re.search(r'\b' + re.escape(pname_lower) + r'\b', clean_q):
+                score += 100
+            elif pname_lower and pname_lower in clean_q:
+                score += 80
+
+            # 3. Domain aliases & intent patterns
+            if pid == "P001": # Main Gate
+                if any(k in clean_q for k in ["main gate", "college gate", "campus gate", "main entrance", "college entrance", "campus entrance", "entrance gate", "entry gate", "front gate", "main entry"]):
+                    score = max(score, 95)
+                elif "gate" in clean_q or "entrance" in clean_q:
+                    score = max(score, 85)
+
+            elif pid == "P039": # Parking Area
+                if any(k in clean_q for k in ["parking area", "park my vehicle", "park vehicle", "vehicle parking", "car parking", "bike parking", "two wheeler parking", "four wheeler parking", "parking space"]):
+                    score = max(score, 95)
+                elif "parking" in clean_q and "bus" not in clean_q:
+                    score = max(score, 85)
+                if "bus" in clean_q:
+                    score -= 50 # Disambiguation against Bus Parking
+
+            elif pid == "P025": # Bus Parking
+                if any(k in clean_q for k in ["bus parking", "college bus parking", "buses parking", "bus stand parking"]):
+                    score = max(score, 100)
+                elif "bus" in clean_q and "parking" in clean_q:
+                    score = max(score, 95)
+
+            elif pid == "P026": # Transport Office
+                if any(k in clean_q for k in ["transport office", "bus pass office", "bus office", "transport section", "transport department", "transport desk", "transport coordinator"]):
+                    score = max(score, 100)
+                elif "transport" in clean_q and "parking" not in clean_q:
+                    score = max(score, 85)
+
+            elif pid == "P027": # Central Canteen
+                if any(k in clean_q for k in ["central canteen", "college canteen", "campus canteen", "main canteen", "canteen", "cafeteria", "food court", "mess"]):
+                    if "diploma" not in clean_q:
+                        score = max(score, 90)
+                if "diploma" in clean_q:
+                    score -= 50 # Disambiguation against Diploma Canteen
+
+            elif pid == "P028": # Diploma Canteen
+                if any(k in clean_q for k in ["diploma canteen", "polytechnic canteen"]):
+                    score = max(score, 100)
+                elif "diploma" in clean_q and "canteen" in clean_q:
+                    score = max(score, 98)
+
+            elif pid == "P013": # Central Library
+                if any(k in clean_q for k in ["central library", "college library", "campus library", "library", "book issue"]):
+                    score = max(score, 90)
+                elif "study" in clean_q or "reading" in clean_q:
+                    score = max(score, 65)
+
+            elif pid == "P022": # Training & Placement Cell
+                if any(k in clean_q for k in ["training & placement", "training and placement", "placement cell", "placement office", "t&p cell", "t&p office", "t&p", "tpo"]):
+                    score = max(score, 95)
+
+            elif pid == "P023": # Sports Complex
+                if any(k in clean_q for k in ["sports complex", "gymnasium", "gym", "fitness center", "indoor sports arena", "sports block", "indoor sports"]):
+                    score = max(score, 95)
+
+            elif pid == "P024": # Cricket Ground
+                if any(k in clean_q for k in ["cricket ground", "cricket pitch", "sports ground", "playground"]):
+                    score = max(score, 95)
+
+            elif pid == "P037": # Medical Room
+                if any(k in clean_q for k in ["medical room", "first aid", "health center", "dispensary", "emergency medical", "medical assistance"]):
+                    score = max(score, 95)
+
+            elif pid == "P040": # Open Amphitheatre
+                if any(k in clean_q for k in ["open amphitheatre", "amphitheatre", "open air amphitheatre", "open theatre"]):
+                    score = max(score, 95)
+
+            elif pid == "P014": # Seminar Hall
+                if any(k in clean_q for k in ["central seminar hall", "seminar hall", "presentation hall"]):
+                    score = max(score, 95)
+
+            elif pid == "P015": # Auditorium
+                if any(k in clean_q for k in ["college auditorium", "main auditorium", "auditorium"]):
+                    score = max(score, 95)
+
+            elif pid == "P002": # Administration Block
+                if any(k in clean_q for k in ["administration block", "admin block", "administration building", "admin building"]):
+                    score = max(score, 90)
+
+            elif pid == "P003": # Computer Engineering Block
+                if any(k in clean_q for k in ["computer engineering block", "computer engineering department", "computer block", "computer department"]):
+                    score = max(score, 95)
+
+            elif pid == "P009": # AI & ML Department
+                if any(k in clean_q for k in ["ai & ml department", "ai & ml", "aiml department", "artificial intelligence department", "ai and ml"]):
+                    score = max(score, 95)
+
+            elif pid == "P010": # Data Science Department
+                if any(k in clean_q for k in ["data science department", "data science block", "data science"]):
+                    score = max(score, 95)
+
+            elif pid == "P004": # Information Technology Block
+                if any(k in clean_q for k in ["information technology block", "information technology department", "it block", "it department"]):
+                    score = max(score, 95)
+
+            elif pid == "P005": # Civil Engineering Block
+                if any(k in clean_q for k in ["civil engineering block", "civil engineering department", "civil block", "civil department"]):
+                    score = max(score, 95)
+
+            elif pid == "P006": # Mechanical Engineering Block
+                if any(k in clean_q for k in ["mechanical engineering block", "mechanical engineering department", "mechanical block", "mechanical department"]):
+                    score = max(score, 95)
+
+            elif pid == "P007": # Electrical Engineering Block
+                if any(k in clean_q for k in ["electrical engineering block", "electrical engineering department", "electrical block", "electrical department"]):
+                    score = max(score, 95)
+
+            elif pid == "P008": # Electronics & Communication Block
+                if any(k in clean_q for k in ["electronics & communication block", "electronics & communication department", "ec block", "ec department", "e&c block"]):
+                    score = max(score, 95)
+
+            elif pid == "P011": # MCA Department
+                if any(k in clean_q for k in ["mca department", "mca block", "master of computer applications"]):
+                    score = max(score, 95)
+
+            elif pid == "P012": # BCA Department
+                if any(k in clean_q for k in ["bca department", "bca block", "bachelor of computer applications"]):
+                    score = max(score, 95)
+
+            elif pid == "P029": # Architecture Block
+                if any(k in clean_q for k in ["architecture block", "architecture department", "b.arch block"]):
+                    score = max(score, 95)
+
+            elif pid == "P016": # Innovation & AI Lab
+                if any(k in clean_q for k in ["innovation & ai lab", "innovation lab", "ai lab", "ai research lab"]):
+                    score = max(score, 95)
+
+            elif pid == "P017": # Computer Lab
+                if any(k in clean_q for k in ["computer lab", "programming lab", "practical lab"]):
+                    score = max(score, 95)
+
+            elif pid == "P018": # Civil Lab
+                if any(k in clean_q for k in ["civil lab", "survey lab", "material testing lab"]):
+                    score = max(score, 95)
+
+            elif pid == "P019": # Mechanical Workshop
+                if any(k in clean_q for k in ["mechanical workshop", "workshop practice", "machine shop", "mechanical lab"]):
+                    score = max(score, 95)
+
+            elif pid == "P020": # Electrical Lab
+                if any(k in clean_q for k in ["electrical lab", "electrical machines lab"]):
+                    score = max(score, 95)
+
+            elif pid == "P021": # EC Lab
+                if any(k in clean_q for k in ["ec lab", "electronics lab", "communication lab"]):
+                    score = max(score, 95)
+
+            elif pid in ("P030", "P031", "P032", "P033", "P034", "P035", "P036"):
+                # Diploma branches
+                d_branch = pname_lower.replace("diploma", "").strip()
+                if "diploma" in clean_q and d_branch and d_branch in clean_q:
+                    score = max(score, 95)
+
+            elif pid == "P038": # Hostel
+                if any(k in clean_q for k in ["hostel", "student hostel", "boys hostel", "girls hostel"]):
+                    score = max(score, 95)
+
+            if score > 0:
+                candidates.append((score, "campus", idx, row_dict, f"campus_info.csv (Row {idx + 1})"))
+
+    # B. Score facilities.csv records
+    if df_fac is not None and not df_fac.empty:
+        for idx, row in df_fac.iterrows():
+            row_dict = row.to_dict()
+            fid = str(row_dict.get('facility_id', '')).strip().upper()
+            fname = str(row_dict.get('facility_name', '')).strip()
+            fname_lower = fname.lower()
+
+            score = 0
+
+            # 1. Exact Facility ID match
+            if fid and re.search(r'\b' + re.escape(fid.lower()) + r'\b', clean_q):
+                score += 120
+
+            # 2. Exact facility name match
+            if fname_lower and re.search(r'\b' + re.escape(fname_lower) + r'\b', clean_q):
+                score += 100
+            elif fname_lower and fname_lower in clean_q:
+                score += 80
+
+            # 3. Domain aliases & intent patterns
+            if fid == "FAC-001": # Girls Room
+                if any(k in clean_q for k in ["girls room", "girls common room", "ladies room", "ladies common room", "girls rest room", "women common room", "girls resting room"]):
+                    score = max(score, 100)
+
+            elif fid == "FAC-002": # Reading Room
+                if any(k in clean_q for k in ["reading room", "study room", "quiet study", "place to study", "where can i study", "where to study", "study space", "reading hall"]):
+                    score = max(score, 100)
+
+            elif fid == "FAC-003": # Central Library
+                if any(k in clean_q for k in ["central library", "college library", "campus library", "library"]):
+                    score = max(score, 90)
+                elif "study" in clean_q or "reading" in clean_q:
+                    score = max(score, 70)
+
+            elif fid == "FAC-004": # College Auditorium
+                if any(k in clean_q for k in ["college auditorium", "main auditorium", "auditorium"]):
+                    score = max(score, 95)
+
+            elif fid == "FAC-005": # Central Seminar Hall
+                if any(k in clean_q for k in ["central seminar hall", "seminar hall", "presentation hall"]):
+                    score = max(score, 95)
+
+            elif fid == "FAC-006": # Medical & First Aid Room
+                if any(k in clean_q for k in [
+                    "medical & first aid room", "medical and first aid room", "medical & first aid", 
+                    "medical and first aid", "medical room", "first aid room", "first aid facility", 
+                    "medical facility", "first aid", "medical", "health center", "dispensary", 
+                    "emergency medical", "medical assistance", "doctor", "get first aid", "need first aid"
+                ]):
+                    score = max(score, 100)
+
+            elif fid == "FAC-007": # Administration Office & Accounts
+                if any(k in clean_q for k in ["administration office", "accounts office", "administration office & accounts", "admin office", "accounts", "student section"]):
+                    score = max(score, 95)
+
+            elif fid == "FAC-008": # Training & Placement Cell
+                if any(k in clean_q for k in ["training & placement", "training and placement", "placement cell", "placement office", "t&p cell", "t&p office", "t&p", "tpo"]):
+                    score = max(score, 95)
+
+            elif fid == "FAC-009": # Sports Complex & Gymnasium
+                if any(k in clean_q for k in ["sports complex & gymnasium", "sports complex", "gymnasium", "gym", "fitness center", "indoor sports arena", "sports block"]):
+                    score = max(score, 95)
+
+            elif fid == "FAC-010": # Open Air Amphitheatre
+                if any(k in clean_q for k in ["open air amphitheatre", "open amphitheatre", "amphitheatre", "open theatre"]):
+                    score = max(score, 95)
+
+            elif fid == "FAC-011": # Central Food Court & Canteen
+                if any(k in clean_q for k in ["central food court & canteen", "food court", "central canteen", "college canteen", "canteen", "cafeteria", "mess"]):
+                    if "diploma" not in clean_q:
+                        score = max(score, 95)
+                if "diploma" in clean_q:
+                    score -= 50
+
+            elif fid == "FAC-012": # Campus Main Entrance Gate
+                if any(k in clean_q for k in ["campus main entrance gate", "main entrance gate", "main gate", "college gate", "campus gate", "main entrance", "entrance gate", "entry gate"]):
+                    score = max(score, 95)
+
+            if score > 0:
+                candidates.append((score, "fac", idx, row_dict, f"facilities.csv (Row {idx + 1})"))
+
+    if not candidates:
+        map_url = get_navigation_map_url(query)
+        return "", map_url, []
+
+    # Sort candidates by score descending
+    candidates.sort(key=lambda x: x[0], reverse=True)
+
+    # Filter to qualified candidates (score >= 40)
+    top_candidates = [c for c in candidates if c[0] >= 40]
+    if not top_candidates:
+        top_candidates = [candidates[0]]
+
+    # Take top 1 or 2 distinct candidates
+    primary_cand = top_candidates[0]
+    selected = [primary_cand]
+    if len(top_candidates) > 1:
+        sec = top_candidates[1]
+        # Include second candidate if it adds complementary context and score is high
+        if sec[0] >= 65:
+            p_id = primary_cand[3].get('place_id') or primary_cand[3].get('facility_id')
+            s_id = sec[3].get('place_id') or sec[3].get('facility_id')
+            if p_id != s_id:
+                selected.append(sec)
+
+    context_blocks = []
+    sources = []
+
+    for cand_score, cand_type, cand_idx, cand_dict, src_str in selected:
+        if cand_type == "campus":
+            pid = cand_dict.get('place_id', '')
+            pname = cand_dict.get('place_name', '')
+            cat = cand_dict.get('category', '')
+            zone = cand_dict.get('zone', '')
+            landmark = cand_dict.get('landmark', '')
+            desc = cand_dict.get('description', '')
+            block = (
+                f"Place ID: {pid}\n"
+                f"Place Name: {pname}\n"
+                f"Category: {cat}\n"
+                f"Campus Zone: {zone}\n"
+                f"Landmark Reference: {landmark}\n"
+                f"Description: {desc}\n"
+                f"[Source: {src_str}]"
+            )
+            context_blocks.append(block)
+            sources.append(src_str)
+        else: # facility
+            fid = cand_dict.get('facility_id', '')
+            fname = cand_dict.get('facility_name', '')
+            fcat = cand_dict.get('category', '')
+            fbldg = cand_dict.get('building', '')
+            ffloor = cand_dict.get('floor', '')
+            floc = cand_dict.get('location', '')
+            fdesc = cand_dict.get('description', '')
+            fcap = cand_dict.get('capacity', '')
+            fstatus = cand_dict.get('status', '')
+            famen = cand_dict.get('facilities', '')
+
+            bldg_line = f"Building / Block: {fbldg}{' (' + ffloor + ')' if ffloor else ''}\n" if fbldg or ffloor else ""
+            cap_line = f"Capacity: {fcap}\n" if fcap else ""
+            status_line = f"Status: {fstatus}\n" if fstatus else ""
+
+            block = (
+                f"Facility ID: {fid}\n"
+                f"Facility Name: {fname}\n"
+                f"Category: {fcat}\n"
+                f"{bldg_line}"
+                f"Location / Landmark: {floc}\n"
+                f"Description: {fdesc}\n"
+                f"{cap_line}"
+                f"{status_line}"
+                f"Amenities & Equipment: {famen}\n"
+                f"[Source: {src_str}]"
+            )
+            context_blocks.append(block)
+            sources.append(src_str)
+
+    # Authoritative map image resolution based on the top matched entity
+    top_dict = primary_cand[3]
+    map_filename = resolve_entity_map_image(top_dict)
+    map_url = f"/static/navigation_maps/{map_filename}"
+
+    return "\n\n---\n\n".join(context_blocks), map_url, sources
+
+
+def process_subject_context(query: str, user_profile: dict = None) -> Tuple[str, List[str]]:
+    """
+    Resolves academic subjects, course codes, and curriculum from subject.csv / subjects.csv.
+    """
+    clean_q = query.strip().lower()
+    user_profile = user_profile or {}
+    prof_dept = user_profile.get("department") or ""
+    prof_sem = str(user_profile.get("semester") or "")
+
+    df = get_cached_dataframe("subjects.csv")
+    if df is None or df.empty:
+        df = get_cached_dataframe("subject.csv")
+    if df is None or df.empty:
+        return "STATUS: NO_SUBJECTS_FOUND", []
+
+    # Extract requested semester from query
+    sem_m = re.search(r'\b(?:sem|semester)\s*([1-8])\b', clean_q)
+    target_sem = sem_m.group(1) if sem_m else (prof_sem if prof_sem else None)
+
+    # Extract department from query
+    dept_keywords = {
+        "computer": "Computer Engineering",
+        "information technology": "Information Technology",
+        "it": "Information Technology",
+        "civil": "Civil Engineering",
+        "mechanical": "Mechanical Engineering",
+        "electrical": "Electrical Engineering",
+        "electronics": "Electronics & Communication",
+        "ec": "Electronics & Communication",
+        "data science": "Data Science",
+        "ai & ml": "Artificial Intelligence & Machine Learning",
+        "artificial intelligence": "Artificial Intelligence & Machine Learning",
+        "mca": "Computer Applications",
+        "bca": "Computer Applications",
+        "automobile": "Automobile Engineering"
+    }
+
+    target_dept = None
+    for k, v in dept_keywords.items():
+        if re.search(r'\b' + re.escape(k) + r'\b', clean_q):
+            target_dept = v
+            break
+    if not target_dept and prof_dept:
+        target_dept = prof_dept
+
+    matched_df = df.copy()
+    if target_dept:
+        matched_df = matched_df[matched_df['department'].str.lower().str.contains(target_dept.lower(), na=False)]
+    if target_sem:
+        matched_df = matched_df[matched_df['semester'].astype(str) == str(target_sem)]
+
+    if matched_df.empty:
+        matched_df = df.head(10)
+
+    context_lines = [f"--- ACADEMIC SUBJECTS ({target_dept or 'All Departments'}, Sem {target_sem or 'All'}) ---"]
+    sources = []
+    for idx, row in matched_df.head(15).iterrows():
+        s_name = row.get('subject_name', '')
+        prog = row.get('program', '')
+        dept = row.get('department', '')
+        sem = row.get('semester', '')
+        yr = row.get('year', '')
+        line = f"* Subject: {s_name} | Program: {prog} | Department: {dept} | Semester: {sem} | Year: {yr} | [Source: subject.csv (Row {idx + 1})]"
+        context_lines.append(line)
+        sources.append(f"subject.csv (Row {idx + 1})")
+
+    return "\n".join(context_lines), sources

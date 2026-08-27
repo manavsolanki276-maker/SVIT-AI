@@ -3,7 +3,7 @@
  * 100% Live Database Architecture:
  * 1. Academic Rooms (1,699 Timetable Rooms via MongoDB 'rooms_facilities')
  * 2. Campus Facilities (12 Campus Facilities via MongoDB 'facilities')
- * 3. Explore Campus Navigation (40 Navigation Landmarks with Real Photos via MongoDB 'rooms')
+ * 3. Explore Campus Navigation (Verified Landmarks with Real Photos via MongoDB 'rooms')
  *
  * Full CRUD, Live Dynamic KPIs, Section-level Error Recovery, Responsive UI (320px - 1920px).
  */
@@ -18,7 +18,7 @@
         searchDebounceTimer: null,
         viewMode: 'card', // 'card' | 'table' (rooms only)
         
-        // 1. Rooms State
+        // 1. Rooms State (Server-side paginated & filtered from MongoDB rooms_facilities)
         rooms: {
             page: 1,
             limit: 24,
@@ -36,30 +36,24 @@
             }
         },
 
-        // 2. Facilities State
+        // 2. Facilities State (Loaded from MongoDB facilities and filtered dynamically)
         facilities: {
-            page: 1,
-            limit: 100,
-            total: 0,
-            pages: 1,
+            allFacilities: [],
             items: [],
+            total: 0,
             loading: false,
             error: null,
             filters: {
                 category: '',
-                status: '',
-                building: '',
-                floor: ''
+                status: ''
             }
         },
 
-        // 3. Navigation State (Explore Campus)
+        // 3. Navigation State (Explore Campus - Loaded from MongoDB rooms/campus_info and filtered dynamically)
         navigation: {
-            page: 1,
-            limit: 100,
-            total: 0,
-            pages: 1,
+            allLocations: [],
             items: [],
+            total: 0,
             loading: false,
             error: null,
             filters: {
@@ -176,13 +170,11 @@
                         state.rooms.page = 1;
                         fetchRooms();
                     } else if (state.activeTab === 'facilities') {
-                        state.facilities.page = 1;
-                        fetchFacilities();
+                        applyFacilityFilters();
                     } else {
-                        state.navigation.page = 1;
-                        fetchNavigation();
+                        applyNavigationFilters();
                     }
-                }, 250);
+                }, 200);
             });
         }
         if (clearSearchBtn) {
@@ -194,11 +186,9 @@
                     state.rooms.page = 1;
                     fetchRooms();
                 } else if (state.activeTab === 'facilities') {
-                    state.facilities.page = 1;
-                    fetchFacilities();
+                    applyFacilityFilters();
                 } else {
-                    state.navigation.page = 1;
-                    fetchNavigation();
+                    applyNavigationFilters();
                 }
             });
         }
@@ -240,17 +230,15 @@
         if (filterFacCat) {
             filterFacCat.addEventListener('change', (e) => {
                 state.facilities.filters.category = e.target.value;
-                state.facilities.page = 1;
                 syncMobileFilterInputs();
-                fetchFacilities();
+                applyFacilityFilters();
             });
         }
         if (filterFacStatus) {
             filterFacStatus.addEventListener('change', (e) => {
                 state.facilities.filters.status = e.target.value;
-                state.facilities.page = 1;
                 syncMobileFilterInputs();
-                fetchFacilities();
+                applyFacilityFilters();
             });
         }
 
@@ -261,17 +249,15 @@
         if (filterNavCat) {
             filterNavCat.addEventListener('change', (e) => {
                 state.navigation.filters.category = e.target.value;
-                state.navigation.page = 1;
                 syncMobileFilterInputs();
-                fetchNavigation();
+                applyNavigationFilters();
             });
         }
         if (filterNavZone) {
             filterNavZone.addEventListener('change', (e) => {
                 state.navigation.filters.zone = e.target.value;
-                state.navigation.page = 1;
                 syncMobileFilterInputs();
-                fetchNavigation();
+                applyNavigationFilters();
             });
         }
 
@@ -313,11 +299,11 @@
         const emptyResetNavBtn = document.getElementById('emptyResetNavBtn');
         const refreshDataBtn = document.getElementById('refreshDataBtn');
 
-        if (resetFiltersBtn) resetFiltersBtn.addEventListener('click', resetAllFilters);
-        if (clearAllFiltersBtn) clearAllFiltersBtn.addEventListener('click', resetAllFilters);
-        if (emptyResetRoomsBtn) emptyResetRoomsBtn.addEventListener('click', resetAllFilters);
-        if (emptyResetFacBtn) emptyResetFacBtn.addEventListener('click', resetAllFilters);
-        if (emptyResetNavBtn) emptyResetNavBtn.addEventListener('click', resetAllFilters);
+        if (resetFiltersBtn) resetFiltersBtn.addEventListener('click', resetCurrentTabFilters);
+        if (clearAllFiltersBtn) clearAllFiltersBtn.addEventListener('click', resetCurrentTabFilters);
+        if (emptyResetRoomsBtn) emptyResetRoomsBtn.addEventListener('click', resetRoomFilters);
+        if (emptyResetFacBtn) emptyResetFacBtn.addEventListener('click', resetFacilityFilters);
+        if (emptyResetNavBtn) emptyResetNavBtn.addEventListener('click', resetNavigationFilters);
         if (refreshDataBtn) refreshDataBtn.addEventListener('click', refreshAllData);
 
         // Retry Connection Buttons (when network or API error occurs)
@@ -326,8 +312,8 @@
         const retryNavBtn = document.getElementById('retryNavigationBtn');
 
         if (retryRoomsBtn) retryRoomsBtn.addEventListener('click', fetchRooms);
-        if (retryFacBtn) retryFacBtn.addEventListener('click', fetchFacilities);
-        if (retryNavBtn) retryNavBtn.addEventListener('click', fetchNavigation);
+        if (retryFacBtn) retryFacBtn.addEventListener('click', () => fetchFacilities(true));
+        if (retryNavBtn) retryNavBtn.addEventListener('click', () => fetchNavigation(true));
 
         // View Mode Switcher (Rooms tab only)
         const viewModeCardBtn = document.getElementById('viewModeCardBtn');
@@ -347,7 +333,7 @@
         if (mobileFilterBackdrop) mobileFilterBackdrop.addEventListener('click', closeMobileDrawer);
         if (mobileResetFiltersBtn) {
             mobileResetFiltersBtn.addEventListener('click', () => {
-                resetAllFilters();
+                resetCurrentTabFilters();
                 closeMobileDrawer();
             });
         }
@@ -438,7 +424,11 @@
             if (viewToggle) viewToggle.classList.add('hidden');
             if (mobFacSec) mobFacSec.classList.remove('hidden');
 
-            if (state.facilities.items.length === 0 && !state.facilities.loading) fetchFacilities();
+            if (state.facilities.allFacilities.length === 0 && !state.facilities.loading) {
+                fetchFacilities();
+            } else {
+                applyFacilityFilters();
+            }
         } else {
             if (tabNavBtn) {
                 tabNavBtn.classList.add('active');
@@ -449,7 +439,11 @@
             if (viewToggle) viewToggle.classList.add('hidden');
             if (mobNavSec) mobNavSec.classList.remove('hidden');
 
-            if (state.navigation.items.length === 0 && !state.navigation.loading) fetchNavigation();
+            if (state.navigation.allLocations.length === 0 && !state.navigation.loading) {
+                fetchNavigation();
+            } else {
+                applyNavigationFilters();
+            }
         }
 
         renderActiveFilterPills();
@@ -484,8 +478,8 @@
      */
     function refreshAllData() {
         fetchRooms();
-        fetchFacilities();
-        fetchNavigation();
+        fetchFacilities(true);
+        fetchNavigation(true);
     }
 
     /**
@@ -551,9 +545,14 @@
     }
 
     /**
-     * 2. Fetch Campus Facilities (Girls Room, Reading Room, Library, etc.)
+     * 2. Fetch Campus Facilities from live backend
      */
-    async function fetchFacilities() {
+    async function fetchFacilities(forceReload = false) {
+        if (!forceReload && state.facilities.allFacilities && state.facilities.allFacilities.length > 0) {
+            applyFacilityFilters();
+            return;
+        }
+
         state.facilities.loading = true;
         state.facilities.error = null;
         renderFacilitiesLoading(true);
@@ -561,34 +560,16 @@
         const errorBox = document.getElementById('facilitiesErrorState');
         if (errorBox) errorBox.classList.add('hidden');
 
-        const params = new URLSearchParams();
-        params.set('page', state.facilities.page.toString());
-        params.set('limit', state.facilities.limit.toString());
-
-        if (state.searchQuery) params.set('search', state.searchQuery);
-
-        const activeFilters = {};
-        for (const [k, v] of Object.entries(state.facilities.filters)) {
-            if (v && v.trim() !== '') activeFilters[k] = v.trim();
-        }
-        if (Object.keys(activeFilters).length > 0) {
-            params.set('filters', JSON.stringify(activeFilters));
-        }
-
         try {
-            const resp = await fetch(`/admin/api/crud/facilities?${params.toString()}`);
+            const resp = await fetch('/admin/api/crud/facilities?limit=500');
             if (!resp.ok) throw new Error(`Server returned HTTP ${resp.status}`);
             const data = await resp.json();
 
             if (data && (data.status === 'success' || Array.isArray(data.items))) {
-                state.facilities.items = data.items || [];
-                state.facilities.total = typeof data.total === 'number' ? data.total : (data.items || []).length;
-
-                if (!state.searchQuery && Object.keys(activeFilters).length === 0) {
-                    state.stats.totalFacilities = state.facilities.total;
-                }
-
-                renderFacilities();
+                state.facilities.allFacilities = data.items || [];
+                state.stats.totalFacilities = state.facilities.allFacilities.length;
+                populateFacilityFilterOptions();
+                applyFacilityFilters();
             } else {
                 throw new Error(data.message || 'Failed to parse facilities response');
             }
@@ -604,15 +585,136 @@
         } finally {
             state.facilities.loading = false;
             renderFacilitiesLoading(false);
-            renderActiveFilterPills();
             updateKpiDisplay();
         }
     }
 
     /**
-     * 3. Fetch Campus Navigation & Locations (40 Landmarks with Real Photos)
+     * Dynamically populate Campus Facilities filter options from actual records
      */
-    async function fetchNavigation() {
+    function populateFacilityFilterOptions() {
+        const catSelect = document.getElementById('filterFacilityCategorySelect');
+        const mobCatSelect = document.getElementById('mobileFilterFacCat');
+        const statusSelect = document.getElementById('filterFacilityStatusSelect');
+        const mobStatusSelect = document.getElementById('mobileFilterFacStatus');
+
+        const facilities = state.facilities.allFacilities || [];
+        if (facilities.length === 0) return;
+
+        // Distinct non-empty categories
+        const categories = Array.from(new Set(
+            facilities.map(f => (f.category || '').trim()).filter(Boolean)
+        )).sort((a, b) => a.localeCompare(b));
+
+        // Distinct non-empty statuses
+        const statuses = Array.from(new Set(
+            facilities.map(f => (f.status || '').trim()).filter(Boolean)
+        )).sort((a, b) => a.localeCompare(b));
+
+        const curCat = state.facilities.filters.category || '';
+        const curStatus = state.facilities.filters.status || '';
+
+        // Category dropdowns
+        let catOptionsHtml = '<option value="">All Categories</option>';
+        categories.forEach(cat => {
+            catOptionsHtml += `<option value="${escapeHtml(cat)}">${escapeHtml(cat)}</option>`;
+        });
+
+        if (catSelect) {
+            catSelect.innerHTML = catOptionsHtml;
+            catSelect.value = curCat;
+        }
+        if (mobCatSelect) {
+            mobCatSelect.innerHTML = catOptionsHtml;
+            mobCatSelect.value = curCat;
+        }
+
+        // Status dropdowns
+        const statusList = statuses.length > 0 ? statuses : ['Active', 'Available', 'Occupied', 'Maintenance', 'Inactive'];
+        let statusOptionsHtml = '<option value="">All Statuses</option>';
+        statusList.forEach(st => {
+            statusOptionsHtml += `<option value="${escapeHtml(st)}">${escapeHtml(st)}</option>`;
+        });
+
+        if (statusSelect) {
+            statusSelect.innerHTML = statusOptionsHtml;
+            statusSelect.value = curStatus;
+        }
+        if (mobStatusSelect) {
+            mobStatusSelect.innerHTML = statusOptionsHtml;
+            mobStatusSelect.value = curStatus;
+        }
+    }
+
+    /**
+     * Apply Campus Facilities filters on the actual facilities dataset
+     */
+    function applyFacilityFilters() {
+        const all = state.facilities.allFacilities || [];
+        const query = (state.searchQuery || '').trim().toLowerCase();
+        const selectedCat = (state.facilities.filters.category || '').trim().toLowerCase();
+        const selectedStatus = (state.facilities.filters.status || '').trim().toLowerCase();
+
+        const filtered = all.filter(fac => {
+            // Search query filter
+            if (query) {
+                const name = (fac.facility_name || '').toLowerCase();
+                const id = (fac.facility_id || fac.id || '').toLowerCase();
+                const cat = (fac.category || '').toLowerCase();
+                const bldg = (fac.building || '').toLowerCase();
+                const loc = (fac.location || '').toLowerCase();
+                const desc = (fac.description || '').toLowerCase();
+                const amenities = (fac.facilities || '').toLowerCase();
+                const matchesSearch = name.includes(query) || id.includes(query) || cat.includes(query) ||
+                    bldg.includes(query) || loc.includes(query) || desc.includes(query) || amenities.includes(query);
+                if (!matchesSearch) return false;
+            }
+
+            // Category filter
+            if (selectedCat) {
+                const facCat = (fac.category || '').trim().toLowerCase();
+                if (facCat !== selectedCat) return false;
+            }
+
+            // Status filter
+            if (selectedStatus) {
+                const facStatus = (fac.status || 'active').trim().toLowerCase();
+                if (selectedStatus === 'active') {
+                    if (facStatus !== 'active' && fac.status) return false;
+                } else {
+                    if (facStatus !== selectedStatus) return false;
+                }
+            }
+
+            return true;
+        });
+
+        state.facilities.items = filtered;
+        state.facilities.total = filtered.length;
+
+        // Update count summary text
+        const totalText = document.getElementById('totalFacilitiesCount');
+        const isFiltered = Boolean(query || selectedCat || selectedStatus);
+
+        if (totalText) {
+            totalText.textContent = isFiltered
+                ? `${filtered.length} of ${all.length}`
+                : `${all.length}`;
+        }
+
+        renderFacilities();
+        renderActiveFilterPills();
+    }
+
+    /**
+     * 3. Fetch Campus Navigation & Locations (Explore Campus) from live backend
+     */
+    async function fetchNavigation(forceReload = false) {
+        if (!forceReload && state.navigation.allLocations && state.navigation.allLocations.length > 0) {
+            applyNavigationFilters();
+            return;
+        }
+
         state.navigation.loading = true;
         state.navigation.error = null;
         renderNavigationLoading(true);
@@ -620,34 +722,16 @@
         const errorBox = document.getElementById('navigationErrorState');
         if (errorBox) errorBox.classList.add('hidden');
 
-        const params = new URLSearchParams();
-        params.set('page', state.navigation.page.toString());
-        params.set('limit', state.navigation.limit.toString());
-
-        if (state.searchQuery) params.set('search', state.searchQuery);
-
-        const activeFilters = {};
-        for (const [k, v] of Object.entries(state.navigation.filters)) {
-            if (v && v.trim() !== '') activeFilters[k] = v.trim();
-        }
-        if (Object.keys(activeFilters).length > 0) {
-            params.set('filters', JSON.stringify(activeFilters));
-        }
-
         try {
-            const resp = await fetch(`/admin/api/crud/campus_info?${params.toString()}`);
+            const resp = await fetch('/admin/api/crud/campus_info?limit=500');
             if (!resp.ok) throw new Error(`Server returned HTTP ${resp.status}`);
             const data = await resp.json();
 
             if (data && (data.status === 'success' || Array.isArray(data.items))) {
-                state.navigation.items = data.items || [];
-                state.navigation.total = typeof data.total === 'number' ? data.total : (data.items || []).length;
-
-                if (!state.searchQuery && Object.keys(activeFilters).length === 0) {
-                    state.stats.totalLocations = state.navigation.total;
-                }
-
-                renderNavigation();
+                state.navigation.allLocations = data.items || [];
+                state.stats.totalLocations = state.navigation.allLocations.length;
+                populateNavigationFilterOptions();
+                applyNavigationFilters();
             } else {
                 throw new Error(data.message || 'Failed to parse campus navigation response');
             }
@@ -663,9 +747,127 @@
         } finally {
             state.navigation.loading = false;
             renderNavigationLoading(false);
-            renderActiveFilterPills();
             updateKpiDisplay();
         }
+    }
+
+    /**
+     * Dynamically populate Explore Campus (Navigation) filter options from actual records
+     */
+    function populateNavigationFilterOptions() {
+        const catSelect = document.getElementById('filterNavCategorySelect');
+        const mobCatSelect = document.getElementById('mobileFilterNavCat');
+        const zoneSelect = document.getElementById('filterNavZoneSelect');
+        const mobZoneSelect = document.getElementById('mobileFilterNavZone');
+
+        const locations = state.navigation.allLocations || [];
+        if (locations.length === 0) return;
+
+        // Distinct non-empty categories
+        const categories = Array.from(new Set(
+            locations.map(loc => (loc.category || '').trim()).filter(Boolean)
+        )).sort((a, b) => a.localeCompare(b));
+
+        // Distinct non-empty zones
+        const rawZones = Array.from(new Set(
+            locations.map(loc => (loc.zone || '').trim()).filter(Boolean)
+        )).sort((a, b) => a.localeCompare(b));
+
+        const curCat = state.navigation.filters.category || '';
+        const curZone = state.navigation.filters.zone || '';
+
+        // Category dropdowns
+        let catOptionsHtml = '<option value="">All Categories</option>';
+        categories.forEach(cat => {
+            catOptionsHtml += `<option value="${escapeHtml(cat)}">${escapeHtml(cat)}</option>`;
+        });
+
+        if (catSelect) {
+            catSelect.innerHTML = catOptionsHtml;
+            catSelect.value = curCat;
+        }
+        if (mobCatSelect) {
+            mobCatSelect.innerHTML = catOptionsHtml;
+            mobCatSelect.value = curCat;
+        }
+
+        // Zone dropdowns (include "Diploma Block" group option if multiple diploma blocks exist)
+        let zoneOptionsHtml = '<option value="">All Zones</option>';
+        const hasDiplomaBlocks = rawZones.some(z => z.toLowerCase().startsWith('diploma block'));
+        if (hasDiplomaBlocks) {
+            zoneOptionsHtml += '<option value="Diploma Block">Diploma Blocks (All Departments)</option>';
+        }
+        rawZones.forEach(zone => {
+            zoneOptionsHtml += `<option value="${escapeHtml(zone)}">${escapeHtml(zone)}</option>`;
+        });
+
+        if (zoneSelect) {
+            zoneSelect.innerHTML = zoneOptionsHtml;
+            zoneSelect.value = curZone;
+        }
+        if (mobZoneSelect) {
+            mobZoneSelect.innerHTML = zoneOptionsHtml;
+            mobZoneSelect.value = curZone;
+        }
+    }
+
+    /**
+     * Apply Explore Campus filters on the actual navigation dataset
+     */
+    function applyNavigationFilters() {
+        const all = state.navigation.allLocations || [];
+        const query = (state.searchQuery || '').trim().toLowerCase();
+        const selectedCat = (state.navigation.filters.category || '').trim().toLowerCase();
+        const selectedZone = (state.navigation.filters.zone || '').trim().toLowerCase();
+
+        const filtered = all.filter(loc => {
+            // Search query filter
+            if (query) {
+                const name = (loc.place_name || '').toLowerCase();
+                const id = (loc.place_id || loc.id || '').toLowerCase();
+                const cat = (loc.category || '').toLowerCase();
+                const zone = (loc.zone || '').toLowerCase();
+                const landmark = (loc.landmark || '').toLowerCase();
+                const desc = (loc.description || '').toLowerCase();
+                const matchesSearch = name.includes(query) || id.includes(query) || cat.includes(query) ||
+                    zone.includes(query) || landmark.includes(query) || desc.includes(query);
+                if (!matchesSearch) return false;
+            }
+
+            // Category filter
+            if (selectedCat) {
+                const locCat = (loc.category || '').trim().toLowerCase();
+                if (locCat !== selectedCat) return false;
+            }
+
+            // Zone filter
+            if (selectedZone) {
+                const locZone = (loc.zone || '').trim().toLowerCase();
+                if (selectedZone === 'diploma block') {
+                    if (!locZone.startsWith('diploma block') && locZone !== 'diploma block') return false;
+                } else {
+                    if (locZone !== selectedZone) return false;
+                }
+            }
+
+            return true;
+        });
+
+        state.navigation.items = filtered;
+        state.navigation.total = filtered.length;
+
+        // Update count summary text
+        const totalText = document.getElementById('totalNavigationCount');
+        const isFiltered = Boolean(query || selectedCat || selectedZone);
+
+        if (totalText) {
+            totalText.textContent = isFiltered
+                ? `${filtered.length} of ${all.length}`
+                : `${all.length}`;
+        }
+
+        renderNavigation();
+        renderActiveFilterPills();
     }
 
     /**
@@ -855,12 +1057,8 @@
     function renderFacilities() {
         const cardGrid = document.getElementById('facilitiesCardGrid');
         const emptyState = document.getElementById('facilitiesEmptyState');
-        const totalText = document.getElementById('totalFacilitiesCount');
 
         const items = state.facilities.items;
-        const total = state.facilities.total;
-
-        if (totalText) totalText.textContent = total.toLocaleString();
 
         if (items.length === 0) {
             if (cardGrid) cardGrid.innerHTML = '';
@@ -883,11 +1081,13 @@
                 const statusClass = getStatusClass(status);
 
                 let iconName = 'building-2';
-                if (category.toLowerCase().includes('student') || name.toLowerCase().includes('girls')) iconName = 'sparkles';
-                else if (category.toLowerCase().includes('study') || category.toLowerCase().includes('library') || name.toLowerCase().includes('reading')) iconName = 'book-open';
-                else if (category.toLowerCase().includes('health') || name.toLowerCase().includes('medical')) iconName = 'heart-pulse';
-                else if (category.toLowerCase().includes('sports')) iconName = 'trophy';
-                else if (category.toLowerCase().includes('entry') || name.toLowerCase().includes('gate')) iconName = 'navigation';
+                const catLower = category.toLowerCase();
+                const nameLower = name.toLowerCase();
+                if (catLower.includes('student') || nameLower.includes('girls')) iconName = 'sparkles';
+                else if (catLower.includes('study') || catLower.includes('library') || nameLower.includes('reading')) iconName = 'book-open';
+                else if (catLower.includes('health') || nameLower.includes('medical')) iconName = 'heart-pulse';
+                else if (catLower.includes('sports')) iconName = 'trophy';
+                else if (catLower.includes('entry') || nameLower.includes('gate')) iconName = 'navigation';
 
                 cardsHtml += `
                 <div class="facility-card" data-facility-id="${id}">
@@ -946,17 +1146,41 @@
     }
 
     /**
+     * Map navigation landmark to its verified photograph
+     */
+    function getNavigationImageUrl(loc) {
+        if (!loc) return '/static/navigation_maps/SVIT with all dep.jpeg';
+        if (loc.image_url && loc.image_url.trim()) return loc.image_url.trim();
+        if (loc.image && loc.image.trim()) {
+            const img = loc.image.trim();
+            return img.startsWith('/') ? img : `/static/navigation_maps/${img}`;
+        }
+        const text = `${loc.place_name || ''} ${loc.landmark || ''} ${loc.zone || ''} ${loc.category || ''}`.toLowerCase();
+        if (text.includes('computer') || text.includes('ai & ml') || text.includes('data science')) return '/static/navigation_maps/Computer dep.jpeg';
+        if (text.includes('information technology') || text.includes('it dep') || text.includes('it block') || text.includes('diploma it')) return '/static/navigation_maps/IT dep.jpeg';
+        if (text.includes('civil')) return '/static/navigation_maps/Civil dep.jpeg';
+        if (text.includes('mechanical') || text.includes('workshop')) return '/static/navigation_maps/Mechanical dep.jpeg';
+        if (text.includes('electrical')) return '/static/navigation_maps/Electrical dep.jpeg';
+        if (text.includes('electronics') || text.includes('ec ') || text.includes('e&c') || text.includes('diploma ec')) return '/static/navigation_maps/E&C dep.jpeg';
+        if (text.includes('aero')) return '/static/navigation_maps/Aero dep.jpeg';
+        if (text.includes('mca') || text.includes('bca')) return '/static/navigation_maps/MCA&BCA.jpeg';
+        if (text.includes('diploma')) return '/static/navigation_maps/diploma dep.jpeg';
+        if (text.includes('sports') || text.includes('cricket') || text.includes('court') || text.includes('ground') || text.includes('gym')) return '/static/navigation_maps/Sports court.png';
+        if (text.includes('canteen') || text.includes('food')) return '/static/navigation_maps/SVIT Canteen loc.png';
+        if (text.includes('bus') || text.includes('transport') || text.includes('gate') || text.includes('entrance') || text.includes('parking')) return '/static/navigation_maps/Bus stop.png';
+        if (text.includes('stationar')) return '/static/navigation_maps/Stationarys.png';
+        if (text.includes('admin') || text.includes('office') || text.includes('library') || text.includes('auditorium') || text.includes('seminar') || text.includes('medical')) return '/static/navigation_maps/Admin dep.jpeg';
+        return '/static/navigation_maps/SVIT with all dep.jpeg';
+    }
+
+    /**
      * Render Campus Navigation & Locations (Explore Campus with Real Photos)
      */
     function renderNavigation() {
         const cardGrid = document.getElementById('navigationCardGrid');
         const emptyState = document.getElementById('navigationEmptyState');
-        const totalText = document.getElementById('totalNavigationCount');
 
         const items = state.navigation.items;
-        const total = state.navigation.total;
-
-        if (totalText) totalText.textContent = total.toLocaleString();
 
         if (items.length === 0) {
             if (cardGrid) cardGrid.innerHTML = '';
@@ -975,7 +1199,7 @@
                 const zone = escapeHtml(loc.zone || 'Campus Area');
                 const landmark = escapeHtml(loc.landmark || '');
                 const desc = escapeHtml(loc.description || `SVIT Campus landmark situated in ${zone}.`);
-                const imgUrl = loc.image_url || '/static/navigation_maps/SVIT with all dep.jpeg';
+                const imgUrl = getNavigationImageUrl(loc);
 
                 cardsHtml += `
                 <div class="navigation-card" data-nav-id="${id}">
@@ -1056,7 +1280,7 @@
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const id = btn.getAttribute('data-facility-id');
-                const fac = state.facilities.items.find(f => (f.facility_id || f.id) === id);
+                const fac = (state.facilities.allFacilities || []).find(f => (f.facility_id || f.id) === id);
                 if (fac) openDetailsModal('facility', fac);
             });
         });
@@ -1065,7 +1289,7 @@
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const id = btn.getAttribute('data-facility-id');
-                const fac = state.facilities.items.find(f => (f.facility_id || f.id) === id);
+                const fac = (state.facilities.allFacilities || []).find(f => (f.facility_id || f.id) === id);
                 if (fac) openFacilityFormModal('edit', fac);
             });
         });
@@ -1085,7 +1309,7 @@
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const id = btn.getAttribute('data-nav-id');
-                const loc = state.navigation.items.find(n => (n.place_id || n.id) === id);
+                const loc = (state.navigation.allLocations || []).find(n => (n.place_id || n.id) === id);
                 if (loc) openDetailsModal('navigation', loc);
             });
         });
@@ -1094,7 +1318,7 @@
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const id = btn.getAttribute('data-nav-id');
-                const loc = state.navigation.items.find(n => (n.place_id || n.id) === id);
+                const loc = (state.navigation.allLocations || []).find(n => (n.place_id || n.id) === id);
                 if (loc) openNavFormModal('edit', loc);
             });
         });
@@ -1426,7 +1650,7 @@
             const zone = escapeHtml(item.zone || 'Campus Area');
             const landmark = escapeHtml(item.landmark || '');
             const desc = escapeHtml(item.description || `SVIT Campus landmark situated in ${zone}.`);
-            const imgUrl = item.image_url || '/static/navigation_maps/SVIT with all dep.jpeg';
+            const imgUrl = getNavigationImageUrl(item);
 
             if (titleEl) titleEl.textContent = `Location: ${name}`;
             if (subLabelEl) subLabelEl.textContent = 'Campus map and navigation landmark';
@@ -1509,9 +1733,9 @@
                 if (module === 'rooms' || module === 'rooms_facilities') {
                     fetchRooms();
                 } else if (module === 'facilities') {
-                    fetchFacilities();
+                    fetchFacilities(true);
                 } else {
-                    fetchNavigation();
+                    fetchNavigation(true);
                 }
             } else {
                 showToast(data.message || 'Error deleting record.', 'error');
@@ -1562,8 +1786,8 @@
 
         try {
             const url = mode === 'edit'
-                ? `/admin/api/crud/rooms/${encodeURIComponent(origId)}`
-                : '/admin/api/crud/rooms';
+                ? `/admin/api/crud/rooms_facilities/${encodeURIComponent(origId)}`
+                : '/admin/api/crud/rooms_facilities';
             const method = mode === 'edit' ? 'PUT' : 'POST';
 
             const resp = await fetch(url, {
@@ -1638,7 +1862,7 @@
             if (data.status === 'success') {
                 showToast(mode === 'edit' ? 'Facility updated successfully.' : 'Facility added successfully.', 'success');
                 if (facilityFormModal) facilityFormModal.hide();
-                fetchFacilities();
+                fetchFacilities(true);
             } else {
                 showToast(data.message || 'Error saving facility.', 'error');
             }
@@ -1697,7 +1921,7 @@
             if (data.status === 'success') {
                 showToast(mode === 'edit' ? 'Location updated successfully.' : 'Location added successfully.', 'success');
                 if (navFormModal) navFormModal.hide();
-                fetchNavigation();
+                fetchNavigation(true);
             } else {
                 showToast(data.message || 'Error saving location.', 'error');
             }
@@ -1807,16 +2031,14 @@
                         fetchRooms();
                     } else if (state.activeTab === 'facilities') {
                         state.facilities.filters[filterKey] = '';
-                        state.facilities.page = 1;
                         syncDesktopFilterInputs();
                         syncMobileFilterInputs();
-                        fetchFacilities();
+                        applyFacilityFilters();
                     } else {
                         state.navigation.filters[filterKey] = '';
-                        state.navigation.page = 1;
                         syncDesktopFilterInputs();
                         syncMobileFilterInputs();
-                        fetchNavigation();
+                        applyNavigationFilters();
                     }
                 });
             });
@@ -1826,27 +2048,57 @@
         if (window.lucide) window.lucide.createIcons();
     }
 
-    function resetAllFilters() {
+    /**
+     * Section-specific filter resets (Never reset other sections)
+     */
+    function resetRoomFilters() {
+        state.rooms.filters = { department: '', status: '', room_type: '', building: '', floor: '' };
+        state.rooms.page = 1;
         state.searchQuery = '';
         const searchInput = document.getElementById('globalSearchInput');
         const clearSearchBtn = document.getElementById('clearSearchBtn');
         if (searchInput) searchInput.value = '';
         if (clearSearchBtn) clearSearchBtn.classList.add('hidden');
 
-        state.rooms.filters = { department: '', status: '', room_type: '', building: '', floor: '' };
-        state.facilities.filters = { category: '', status: '', building: '', floor: '' };
-        state.navigation.filters = { category: '', zone: '' };
+        syncDesktopFilterInputs();
+        syncMobileFilterInputs();
+        fetchRooms();
+    }
 
-        state.rooms.page = 1;
-        state.facilities.page = 1;
-        state.navigation.page = 1;
+    function resetFacilityFilters() {
+        state.facilities.filters = { category: '', status: '' };
+        state.searchQuery = '';
+        const searchInput = document.getElementById('globalSearchInput');
+        const clearSearchBtn = document.getElementById('clearSearchBtn');
+        if (searchInput) searchInput.value = '';
+        if (clearSearchBtn) clearSearchBtn.classList.add('hidden');
 
         syncDesktopFilterInputs();
         syncMobileFilterInputs();
+        applyFacilityFilters();
+    }
 
-        if (state.activeTab === 'rooms') fetchRooms();
-        else if (state.activeTab === 'facilities') fetchFacilities();
-        else fetchNavigation();
+    function resetNavigationFilters() {
+        state.navigation.filters = { category: '', zone: '' };
+        state.searchQuery = '';
+        const searchInput = document.getElementById('globalSearchInput');
+        const clearSearchBtn = document.getElementById('clearSearchBtn');
+        if (searchInput) searchInput.value = '';
+        if (clearSearchBtn) clearSearchBtn.classList.add('hidden');
+
+        syncDesktopFilterInputs();
+        syncMobileFilterInputs();
+        applyNavigationFilters();
+    }
+
+    function resetCurrentTabFilters() {
+        if (state.activeTab === 'rooms') {
+            resetRoomFilters();
+        } else if (state.activeTab === 'facilities') {
+            resetFacilityFilters();
+        } else {
+            resetNavigationFilters();
+        }
     }
 
     /**
@@ -1855,9 +2107,18 @@
     function openMobileDrawer() {
         const backdrop = document.getElementById('mobileFilterBackdrop');
         const drawer = document.getElementById('mobileFilterDrawer');
+        const mobRoomSec = document.getElementById('mobileRoomFiltersSection');
+        const mobFacSec = document.getElementById('mobileFacilityFiltersSection');
+        const mobNavSec = document.getElementById('mobileNavigationFiltersSection');
+
+        if (mobRoomSec) mobRoomSec.classList.toggle('hidden', state.activeTab !== 'rooms');
+        if (mobFacSec) mobFacSec.classList.toggle('hidden', state.activeTab !== 'facilities');
+        if (mobNavSec) mobNavSec.classList.toggle('hidden', state.activeTab !== 'navigation');
+
+        syncMobileFilterInputs();
+
         if (backdrop) backdrop.classList.remove('hidden');
         if (drawer) drawer.classList.remove('hidden');
-        syncMobileFilterInputs();
     }
 
     function closeMobileDrawer() {
@@ -1878,15 +2139,13 @@
         } else if (state.activeTab === 'facilities') {
             state.facilities.filters.category = document.getElementById('mobileFilterFacCat')?.value || '';
             state.facilities.filters.status = document.getElementById('mobileFilterFacStatus')?.value || '';
-            state.facilities.page = 1;
             syncDesktopFilterInputs();
-            fetchFacilities();
+            applyFacilityFilters();
         } else {
             state.navigation.filters.category = document.getElementById('mobileFilterNavCat')?.value || '';
             state.navigation.filters.zone = document.getElementById('mobileFilterNavZone')?.value || '';
-            state.navigation.page = 1;
             syncDesktopFilterInputs();
-            fetchNavigation();
+            applyNavigationFilters();
         }
     }
 

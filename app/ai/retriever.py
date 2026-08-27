@@ -25,6 +25,11 @@ def _put_to_cache(cache_key: str, results: List[Tuple[Document, float]]) -> None
     _VECTOR_CACHE[cache_key] = results
 
 
+def clear_vector_cache() -> None:
+    """Clears the in-memory retrieval vector cache upon dataset mutation."""
+    _VECTOR_CACHE.clear()
+
+
 def retrieve_context(vector_store, query: str, top_k: int = 10, filter: dict = None):
     """
     Retrieves relevant document chunks from the vector store with optional metadata filtering.

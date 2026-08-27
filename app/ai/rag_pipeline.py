@@ -35,9 +35,12 @@ from app.ai.data_processor import (
     process_notice_context,
     process_faculty_context,
     process_events_context,
+    process_campus_navigation_context,
+    process_subject_context,
     resolve_day_and_date,
     generate_followup_suggestions,
     resolve_student_profile_query,
+    get_navigation_map_url,
     MAP_LOOKUP,
 )
 
@@ -56,12 +59,13 @@ FAST_GREETINGS = [
 
 # Patterns for Real-Time "Next Class Now"
 NEXT_CLASS_PATTERNS = [
-    r'\b(?:next|current|upcoming)\s*(?:class|lecture|session|period|lab|room|subject)\b',
-    r'\bwhere\s*(?:do|should|can)\s*i\s*go\b',
+    r'\b(?:next|current|upcoming)\s*(?:class|lecture|session|period|lab|subject)\b',
+    r'\bwhere\s*(?:do|should|can)\s*i\s*go\s*(?:now|next|right now|for next class|for class|for lecture)\b',
+    r'\bwhere\s*(?:do|should|can)\s*i\s*go\s*$',
     r'\bwhere\s*is\s*my\s*(?:next\s*)?(?:class|subject|lecture)\b',
     r'\bwhat\s*class\s*(?:do\s*i\s*have\s*)?(?:right\s*)?now\b',
     r'\bclass\s*(?:right\s*)?now\b',
-    r'\bwhat\s*is\s*next\b',
+    r'\bwhat\s*is\s*next\s*class\b',
     r'\bwhere\s*to\s*go\s*now\b',
     r'\bwhere\s*is\s*my\s*next\s*(?:class|lecture|subject)\b',
     r'\bwhere\s*is\s*my\s*lecture\b'
@@ -72,16 +76,28 @@ _RESPONSE_CACHE: OrderedDict[str, Dict[str, Any]] = OrderedDict()
 _MAX_RESPONSE_CACHE = 100
 
 
+def clear_response_cache() -> None:
+    """Clears in-memory RAG response cache upon dataset mutation."""
+    _RESPONSE_CACHE.clear()
+
+
 def route_query_sources(user_message: str) -> list[tuple[str, float]]:
     """
     Detects query intent via keyword matching from INTENT_CONFIG 
-    and returns a prioritized list of (source_filename, weight) tuples.
+    and returns a prioritized, deduplicated list of (source_filename, weight) tuples.
     """
     msg = user_message.lower()
+    source_map = {}
+    
     for intent, config in INTENT_CONFIG.items():
         if any(keyword in msg for keyword in config["keywords"]):
-            return config["sources"]
-    return []
+            for src, weight in config["sources"]:
+                if src not in source_map or weight > source_map[src]:
+                    source_map[src] = weight
+                    
+    if source_map:
+        return sorted(source_map.items(), key=lambda x: x[1], reverse=True)
+    return [("campus_info.csv", 1.0), ("facilities.csv", 0.95), ("general_faq.csv", 0.5)]
 
 
 class RAGPipeline:
@@ -90,6 +106,10 @@ class RAGPipeline:
         self.force_rebuild = force_rebuild
         self._vector_store = None
         self._llm = None
+
+    def clear_cache(self):
+        """Clears RAG response cache."""
+        clear_response_cache()
 
     @property
     def vector_store(self):
@@ -146,7 +166,7 @@ class RAGPipeline:
     ) -> Tuple[str, Optional[str], List[str], str]:
         """
         Prepares the context string, map image, sources, and detected intent category
-        incorporating logged-in student profile metadata.
+        incorporating logged-in student profile metadata and authoritative campus datasets.
         """
         msg = question.lower().strip()
 
@@ -155,7 +175,8 @@ class RAGPipeline:
         nav_intent_keywords = [
             "where", "location", "reach", "map", "direction", "directions", 
             "way", "route", "locate", "find", "building", "block", "take me",
-            "how to go", "how to reach", "navigate"
+            "how to go", "how to reach", "navigate", "near", "what is near", "gate",
+            "parking", "canteen", "library", "ground", "court", "auditorium"
         ]
 
         if any(re.search(r'\b' + re.escape(k) + r'\b', msg) for k in nav_intent_keywords):
@@ -190,8 +211,14 @@ class RAGPipeline:
         ]
 
         placement_keywords = [
-            'placement', 'drive', 'package', 'lpa', 'salary', 
-            'recruiter', 'highest package', 'upcoming placement'
+            'placement drive', 'package', 'lpa', 'salary', 
+            'recruiter', 'highest package', 'upcoming placement', 'placement stats',
+            'placement statistics', 'average package'
+        ]
+
+        subject_keywords = [
+            'subject', 'subjects', 'syllabus', 'curriculum', 'course code',
+            'subjects for', 'subjects in', 'what subjects', 'which subjects'
         ]
 
         events_keywords = [
@@ -199,24 +226,35 @@ class RAGPipeline:
             'hackathon', 'competition', 'fest', 'techfest', 'cultural fest'
         ]
 
-        transport_keywords = ['bus', 'route', 'transport', 'commute', 'pickup', 'driver']
+        transport_keywords = ['bus', 'route', 'transport', 'commute', 'pickup', 'driver', 'bus pass']
         library_keywords = ['library', 'book', 'issue', 'fine', 'author', 'reading room', 'journal']
         contact_keywords = ['contact', 'phone', 'email', 'office', 'admin', 'number', 'address']
 
+        # -------------------------------------------------------------
+        # 1. CAMPUS NAVIGATION / LANDMARK / FACILITIES CHECK FIRST
+        # -------------------------------------------------------------
+        nav_ctx, nav_img, nav_srcs = process_campus_navigation_context(question)
+        if nav_ctx:
+            if nav_img and not map_image:
+                clean_img = nav_img.replace('/static/', '').lstrip('/')
+                map_image = clean_img
+
+            intent_category = "facilities" if any("facilities.csv" in s for s in nav_srcs) else "campus_info"
+            return nav_ctx, map_image, nav_srcs, intent_category
+
+        # -------------------------------------------------------------
+        # 2. SUBJECTS / CURRICULUM CHECK
+        # -------------------------------------------------------------
+        is_subject = any(k in msg for k in subject_keywords) and not any(k in msg for k in ['time', 'schedule', 'room'])
+        if is_subject:
+            subj_ctx, subj_srcs = process_subject_context(question, user_profile=user_profile)
+            if subj_ctx and "NO_SUBJECTS" not in subj_ctx:
+                return subj_ctx, None, subj_srcs, "subjects"
+
+        # -------------------------------------------------------------
+        # 3. TIMETABLE CHECK
+        # -------------------------------------------------------------
         is_timetable = any(k in msg for k in timetable_keywords)
-        is_notice = any(k in msg for k in notice_keywords)
-        is_faculty = any(k in msg for k in faculty_keywords)
-        is_placement = any(k in msg for k in placement_keywords)
-        is_events = any(k in msg for k in events_keywords)
-        is_transport = any(k in msg for k in transport_keywords)
-        is_library = any(k in msg for k in library_keywords)
-        is_contact = any(k in msg for k in contact_keywords)
-
-        sources = []
-        context = ""
-        intent_category = "general"
-
-        # Option A: Timetable (Personalized)
         if is_timetable:
             intent_category = "timetable"
             context = process_timetable_context([], question, user_profile=user_profile)
@@ -232,9 +270,13 @@ class RAGPipeline:
             sources = re.findall(r'timetable\.csv \(Row \d+\)', context)
             if not sources:
                 sources = ["timetable.csv"]
+            return context, map_image, sources, intent_category
 
-        # Option B: Notices / Circulars / Exam Rules (Personalized + Admin Uploads)
-        elif is_notice:
+        # -------------------------------------------------------------
+        # 4. NOTICES & ANNOUNCEMENTS
+        # -------------------------------------------------------------
+        is_notice = any(k in msg for k in notice_keywords)
+        if is_notice:
             intent_category = "notice"
             context = process_notice_context([], question, user_profile=user_profile)
             retrieved_docs = retrieve_context_tiered(
@@ -249,6 +291,7 @@ class RAGPipeline:
             elif "notices.csv (Row" not in context:
                 context = process_notice_context(retrieved_docs, question, user_profile=user_profile)
 
+            sources = []
             for doc, _ in retrieved_docs:
                 if doc.metadata.get('source_type') == 'admin_document':
                     doc_src = doc.metadata.get('source') or doc.metadata.get('document_name') or 'Official Document'
@@ -259,26 +302,34 @@ class RAGPipeline:
             sources.extend(csv_sources)
             if not sources:
                 sources = ["notices.csv"]
+            return context, map_image, sources, intent_category
 
-        # Option C: Faculty / Department (Personalized)
-        elif is_faculty:
+        # -------------------------------------------------------------
+        # 5. FACULTY & DEPARTMENT
+        # -------------------------------------------------------------
+        is_faculty = any(k in msg for k in faculty_keywords)
+        if is_faculty:
             intent_category = "faculty"
             context = process_faculty_context([], question, user_profile=user_profile)
             if "departments.csv (Row" not in context:
                 retrieved_docs = retrieve_context_tiered(
                     self.vector_store,
                     question,
-                    source_weights=[("departments.csv", 1.0)],
+                    source_weights=[("faculty.csv", 1.0), ("departments.csv", 0.9)],
                     top_k=top_k
                 )
                 context = process_faculty_context(retrieved_docs, question, user_profile=user_profile)
 
-            sources = re.findall(r'departments\.csv \(Row \d+\)', context)
+            sources = re.findall(r'(?:departments|faculty)\.csv \(Row \d+\)', context)
             if not sources:
-                sources = ["departments.csv"]
+                sources = ["faculty.csv", "departments.csv"]
+            return context, map_image, sources, intent_category
 
-        # Option D: Events / Workshops
-        elif is_events:
+        # -------------------------------------------------------------
+        # 6. EVENTS & WORKSHOPS
+        # -------------------------------------------------------------
+        is_events = any(k in msg for k in events_keywords)
+        if is_events:
             intent_category = "events"
             context = process_events_context(question)
             retrieved_docs = retrieve_context_tiered(
@@ -293,6 +344,7 @@ class RAGPipeline:
             elif "events.csv (Row" not in context:
                 context = "\n\n---\n\n".join([doc.page_content for doc, _ in retrieved_docs])
 
+            sources = []
             for doc, _ in retrieved_docs:
                 if doc.metadata.get('source_type') == 'admin_document':
                     doc_src = doc.metadata.get('source') or doc.metadata.get('document_name') or 'Official Document'
@@ -303,52 +355,65 @@ class RAGPipeline:
             sources.extend(csv_sources)
             if not sources:
                 sources = ["events.csv"]
+            return context, map_image, sources, intent_category
 
-        # Option E: Placements & Campus Drives (In-Memory Fast Retrieval)
-        elif is_placement:
+        # -------------------------------------------------------------
+        # 7. PLACEMENTS & DRIVES
+        # -------------------------------------------------------------
+        is_placement = any(k in msg for k in placement_keywords)
+        if is_placement:
             intent_category = "placement"
             context = process_placement_context(question, user_profile=user_profile)
             sources = re.findall(r'placements\.csv \(Row \d+\)', context)
             if not sources:
                 sources = ["placements.csv"]
+            return context, map_image, sources, intent_category
 
-        # Option F: Vector Search (Transport, Library, Canteen, FAQs)
+        # -------------------------------------------------------------
+        # 8. GENERAL VECTOR RETRIEVAL (Transport, Canteen, Library, Contact, FAQs)
+        # -------------------------------------------------------------
+        is_transport = any(k in msg for k in transport_keywords)
+        is_library = any(k in msg for k in library_keywords)
+        is_contact = any(k in msg for k in contact_keywords)
+
+        if is_transport:
+            intent_category = "transport"
+        elif is_library:
+            intent_category = "library"
+        elif is_contact:
+            intent_category = "contact"
         else:
-            if is_transport:
-                intent_category = "transport"
-            elif is_library:
-                intent_category = "library"
-            elif is_contact:
-                intent_category = "contact"
+            intent_category = "general"
 
-            if filter_dict and "source" in filter_dict:
-                source_cascade = [(filter_dict["source"], 1.0)]
+        if filter_dict and "source" in filter_dict:
+            source_cascade = [(filter_dict["source"], 1.0)]
+        else:
+            source_cascade = route_query_sources(question)
+
+        results = retrieve_context_tiered(
+            self.vector_store,
+            question,
+            source_weights=source_cascade,
+            top_k=top_k
+        )
+
+        sources = []
+        seen = set()
+        for doc, score in results:
+            if doc.metadata.get('source_type') == 'admin_document' or 'page_number' in doc.metadata:
+                doc_src = doc.metadata.get('source') or doc.metadata.get('document_name') or 'Official Document'
+                page_num = doc.metadata.get('page_number', 1)
+                src = f"{doc_src} (Page {page_num})"
             else:
-                source_cascade = route_query_sources(question)
+                src = (
+                    f"{doc.metadata.get('source', 'Unknown')} "
+                    f"(Row {doc.metadata.get('row', 'N/A')})"
+                )
+            if src not in seen:
+                seen.add(src)
+                sources.append(src)
 
-            results = retrieve_context_tiered(
-                self.vector_store,
-                question,
-                source_weights=source_cascade,
-                top_k=top_k
-            )
-
-            seen = set()
-            for doc, score in results:
-                if doc.metadata.get('source_type') == 'admin_document' or 'page_number' in doc.metadata:
-                    doc_src = doc.metadata.get('source') or doc.metadata.get('document_name') or 'Official Document'
-                    page_num = doc.metadata.get('page_number', 1)
-                    src = f"{doc_src} (Page {page_num})"
-                else:
-                    src = (
-                        f"{doc.metadata.get('source', 'Unknown')} "
-                        f"(Row {doc.metadata.get('row', 'N/A')})"
-                    )
-                if src not in seen:
-                    seen.add(src)
-                    sources.append(src)
-
-            context = "\n\n---\n\n".join([doc.page_content for doc, _ in results])
+        context = "\n\n---\n\n".join([doc.page_content for doc, _ in results])
 
         return context, map_image, sources, intent_category
 
@@ -377,8 +442,68 @@ class RAGPipeline:
                     "For official academic details, please consult your department coordinator or the student section."
                 )
 
-        # 1. TIMETABLE FORMATTING (Structured Compact Cards)
-        if intent_category == 'timetable':
+        # 1. CAMPUS NAVIGATION / LOCATION / FACILITIES FORMATTING
+        if intent_category in ('campus_info', 'navigation', 'facilities'):
+            entries = []
+            blocks = [b.strip() for b in context.split('---') if b.strip()]
+            for block in blocks:
+                name_m = re.search(r'Place Name:\s*([^\n|]+)|Facility Name:\s*([^\n|]+)', block)
+                pid_m = re.search(r'Place ID:\s*([^\n|]+)|Facility ID:\s*([^\n|]+)', block)
+                zone_m = re.search(r'Campus Zone:\s*([^\n|]+)|Building / Block:\s*([^\n|]+)|Location / Landmark:\s*([^\n|]+)', block)
+                lm_m = re.search(r'Landmark Reference:\s*([^\n|]+)', block)
+                desc_m = re.search(r'Description:\s*([^\n|]+)', block)
+                cat_m = re.search(r'Category:\s*([^\n|]+)', block)
+                amen_m = re.search(r'Amenities & Equipment:\s*([^\n|]+)|Amenities & Features:\s*([^\n|]+)', block)
+                cap_m = re.search(r'Capacity:\s*([^\n|]+)', block)
+                stat_m = re.search(r'Status:\s*([^\n|]+)', block)
+                
+                name = (name_m.group(1) or name_m.group(2)).strip() if name_m else None
+                if not name:
+                    continue
+                pid = (pid_m.group(1) or pid_m.group(2)).strip() if pid_m else ''
+                zone = (zone_m.group(1) or zone_m.group(2) or (zone_m.group(3) if len(zone_m.groups()) >= 3 else '')).strip() if zone_m else ''
+                lm = lm_m.group(1).strip() if lm_m else ''
+                desc = desc_m.group(1).strip() if desc_m else ''
+                cat = cat_m.group(1).strip() if cat_m else ''
+                amen = (amen_m.group(1) or amen_m.group(2)).strip() if amen_m else ''
+                cap = cap_m.group(1).strip() if cap_m else ''
+                stat = stat_m.group(1).strip() if stat_m else ''
+                
+                card_lines = [f"* 📍 **{name}**{' (' + pid + ')' if pid else ''}"]
+                if cat: card_lines.append(f"  * 🏷️ **Category:** {cat}")
+                if zone: card_lines.append(f"  * 🏢 **Building / Location:** {zone}")
+                if lm: card_lines.append(f"  * 📌 **Landmark:** {lm}")
+                if cap and cap != 'N/A': card_lines.append(f"  * 👥 **Capacity:** {cap}")
+                if desc: card_lines.append(f"  * 📝 **Description:** {desc}")
+                if amen and amen != 'N/A': card_lines.append(f"  * 🛠️ **Amenities & Equipment:** {amen}")
+                if stat and stat.lower() != 'active': card_lines.append(f"  * ℹ️ **Status:** {stat}")
+                entries.append("\n".join(card_lines))
+                
+            if entries:
+                return "### 📍 Campus Facility & Location Details\n\n" + "\n\n".join(entries)
+            
+            clean_ctx = re.sub(r'\[Source:.*?\]', '', context).strip()
+            return f"### 📍 Campus Facility & Location Details\n\n{clean_ctx}"
+
+        # 2. SUBJECTS FORMATTING
+        elif intent_category == 'subjects':
+            entries = []
+            lines = context.split('\n')
+            for line in lines:
+                if 'Subject:' in line:
+                    s_m = re.search(r'Subject:\s*([^|]+)', line)
+                    p_m = re.search(r'Program:\s*([^|]+)', line)
+                    d_m = re.search(r'Department:\s*([^|]+)', line)
+                    sem_m = re.search(r'Semester:\s*([^|]+)', line)
+                    if s_m:
+                        entries.append(f"* 📖 **{s_m.group(1).strip()}** *(Sem {sem_m.group(1).strip() if sem_m else ''}, {d_m.group(1).strip() if d_m else ''})*")
+            if entries:
+                return "### 📚 Academic Subjects & Curriculum\n\n" + "\n".join(entries)
+            clean_ctx = re.sub(r'\[Source:.*?\]', '', context).strip()
+            return f"### 📚 Academic Subjects & Curriculum\n\n{clean_ctx}"
+
+        # 3. TIMETABLE FORMATTING (Structured Compact Cards)
+        elif intent_category == 'timetable':
             lines = context.split('\n')
             target_m = re.search(r'PERSONALIZED_STUDENT_SCHEDULE:\s*(.+)', context)
             date_m = re.search(r'HEADER_DATE:\s*(.+)', context)
@@ -431,7 +556,7 @@ class RAGPipeline:
             clean_ctx = re.sub(r'HEADER_DATE:.*?\n|TARGET_DAY:.*?\n|NAVIGATION_MAP_URL:.*?\n|\[Source:.*?\]', '', context)
             return f"### 📅 Class Schedule & Timetable\n\n{clean_ctx.strip()}"
 
-        # 2. EVENTS FORMATTING (Structured Compact Cards)
+        # 4. EVENTS FORMATTING (Structured Compact Cards)
         elif intent_category == 'events':
             entries = []
             lines = context.split('\n')
@@ -461,7 +586,7 @@ class RAGPipeline:
             clean_ctx = re.sub(r'HEADER_EVENT_LIST:\s*|\[Source:.*?\]', '', context)
             return f"### 📢 Upcoming SVIT Events & Workshops\n\n{clean_ctx.strip()}"
 
-        # 3. FACULTY FORMATTING (Structured Compact Cards)
+        # 5. FACULTY FORMATTING (Structured Compact Cards)
         elif intent_category == 'faculty':
             entries = []
             blocks = [b.strip() for b in context.split('---') if b.strip()]
@@ -504,7 +629,7 @@ class RAGPipeline:
             clean_ctx = re.sub(r'NAVIGATION_MAP_URL:.*?\n|departments\.csv \(Row \d+\):\s*', '', context)
             return f"### 👨‍🏫 Faculty & Department Details\n\n{clean_ctx.strip()}"
 
-        # 4. PLACEMENTS FORMATTING (Macro Stats + Compact Company Cards)
+        # 6. PLACEMENTS FORMATTING (Macro Stats + Compact Company Cards)
         elif intent_category == 'placement':
             peak_m = re.search(r'Highest Package:\s*([^\n]+)', context)
             avg_m = re.search(r'Average Package:\s*([^\n]+)', context)
@@ -545,7 +670,7 @@ class RAGPipeline:
             clean_ctx = re.sub(r'\[Source:.*?\]', '', context)
             return f"### 💼 SVIT Placement Drives & Statistics\n\n{clean_ctx.strip()}"
 
-        # 5. NOTICES FORMATTING (Structured Notice Cards)
+        # 7. NOTICES FORMATTING (Structured Notice Cards)
         elif intent_category == 'notices':
             entries = []
             lines = context.split('\n')
@@ -575,7 +700,7 @@ class RAGPipeline:
             clean_ctx = re.sub(r'HEADER_NOTICE_LIST:\s*|\[Source:.*?\]', '', context)
             return f"### 📌 Official Notices & Circulars\n\n{clean_ctx.strip()}"
 
-        # 6. GENERAL / FAQ / DEFAULT FORMATTING
+        # 8. GENERAL / FAQ / DEFAULT FORMATTING
         else:
             blocks = [b.strip() for b in context.split('---') if b.strip()]
             if blocks:
@@ -599,7 +724,7 @@ class RAGPipeline:
         Executes personalized RAG workflow:
         1. Fast Greeting Interception (0ms)
         2. Fast Next Class Real-time Interception (0ms)
-        3. Fast Spatial Navigation Interception (0ms)
+        3. Fast Spatial Room/Floor Navigation (0ms)
         4. Response Cache Lookup
         5. In-Memory Context Processing with student defaults
         6. Category-Trimmed Prompt with Student Metadata + OpenRouter LLM (or robust direct context fallback)
@@ -669,7 +794,9 @@ class RAGPipeline:
         # ---------------------------------------------------------
         # STEP 0.5: FAST NEXT CLASS REAL-TIME INTERCEPTION (0ms)
         # ---------------------------------------------------------
-        if any(re.search(p, clean_q) for p in NEXT_CLASS_PATTERNS):
+        nav_bypass_words = ['transport', 'office', 'canteen', 'food', 'gate', 'library', 'auditorium', 'sports', 'gym', 'hostel', 'parking', 'amphitheatre', 'placement', 'cell', 'reading room', 'girls room']
+        is_nav_keyword = any(k in clean_q for k in nav_bypass_words)
+        if not is_nav_keyword and any(re.search(p, clean_q) for p in NEXT_CLASS_PATTERNS):
             ans_text, nav_map, srcs = process_next_class_context(question, user_profile=user_profile)
             memory_manager.add_message(session_id, "user", question)
             memory_manager.add_message(session_id, "assistant", ans_text)
@@ -682,21 +809,23 @@ class RAGPipeline:
             }
 
         # ---------------------------------------------------------
-        # STEP 1: FAST SPATIAL NAVIGATION LOOKUP (0ms)
+        # STEP 1: FAST SPATIAL ROOM / FLOOR NAVIGATION LOOKUP (0ms)
         # ---------------------------------------------------------
-        nav_result = find_location(question)
-        if nav_result:
-            nav_image_path = f"navigation_maps/{nav_result['image']}"
-            memory_manager.add_message(session_id, "user", question)
-            memory_manager.add_message(session_id, "assistant", nav_result["formatted_text"])
-            suggestions = generate_followup_suggestions(question, "navigation", nav_result["formatted_text"], user_profile=user_profile)
-            return {
-                "answer": nav_result["formatted_text"],
-                "image": nav_image_path,
-                "sources": ["SVIT Navigation Directory"],
-                "navigation": nav_result,
-                "suggestions": suggestions
-            }
+        # For specific lab codes (L1-L5) or room numbers (201-405), resolve instantly via building floor plans
+        if re.search(r'\b(?:lab\s*l[1-5]|room\s*[2-4]0[1-5]|[2-4]0[1-5])\b', clean_q):
+            nav_result = find_location(question)
+            if nav_result:
+                nav_image_path = f"navigation_maps/{nav_result['image']}"
+                memory_manager.add_message(session_id, "user", question)
+                memory_manager.add_message(session_id, "assistant", nav_result["formatted_text"])
+                suggestions = generate_followup_suggestions(question, "navigation", nav_result["formatted_text"], user_profile=user_profile)
+                return {
+                    "answer": nav_result["formatted_text"],
+                    "image": nav_image_path,
+                    "sources": ["rooms_facilities.csv", "campus_info.csv"],
+                    "navigation": nav_result,
+                    "suggestions": suggestions
+                }
 
         # ---------------------------------------------------------
         # STEP 2: CACHED QUERY LOOKUP (Profile-Aware)
@@ -748,38 +877,44 @@ class RAGPipeline:
         memory_manager.add_message(session_id, "user", question)
         memory_manager.add_message(session_id, "assistant", answer)
 
-        suggestions = generate_followup_suggestions(question, intent_category, answer, user_profile=user_profile)
+        suggestions = generate_followup_suggestions(
+            question, 
+            intent_category, 
+            answer,
+            user_profile=user_profile
+        )
 
-        result = {
+        result_payload = {
             "answer": answer,
             "image": map_image,
             "sources": sources,
             "suggestions": suggestions
         }
 
-        # Store in LRU cache
+        # Cache valid responses (up to _MAX_RESPONSE_CACHE)
         if len(_RESPONSE_CACHE) >= _MAX_RESPONSE_CACHE:
             _RESPONSE_CACHE.popitem(last=False)
-        _RESPONSE_CACHE[cache_key] = result
+        _RESPONSE_CACHE[cache_key] = result_payload
 
-        return result
+        return result_payload
 
     def stream_answer_question(
         self, 
         question: str, 
         session_id: str = "default_user", 
         top_k: int = 8,
+        filter_dict: dict = None,
         user_profile: dict = None
     ) -> Generator[Dict[str, Any], None, None]:
         """
-        Streaming generator yielding incremental tokens with student profile personalization.
+        Streams personalized RAG answer chunk-by-chunk for Server-Sent Events (SSE).
         """
         clean_q = question.strip().lower()
         user_name = user_profile.get('full_name') if user_profile else ""
         first_name = user_name.split()[0] if user_name else ""
         name_suffix = f" {first_name}" if first_name else ""
 
-        # 1. Fast Greeting
+        # Step 0: Fast greetings
         for pattern, reply_tmpl in FAST_GREETINGS:
             if re.search(pattern, clean_q):
                 reply = reply_tmpl.format(name_suffix=name_suffix)
@@ -790,7 +925,7 @@ class RAGPipeline:
                 yield {"done": True, "answer": reply, "image": None, "sources": ["SVIT Assistant Greeting"], "suggestions": suggestions}
                 return
 
-        # 1.1 Fast "My Department" Location Resolution
+        # Step 0.1: My Department Location
         user_dept = user_profile.get("department") if user_profile else None
         is_my_dept_location = bool(re.search(r'\b(where|location|locate|find|building|block|reach|direction|directions|how to go|how to reach|way to|kaha|kahan|kidhar)\b', clean_q)) and bool(re.search(r'\b(my department|my dept|my branch|my building)\b', clean_q))
         if is_my_dept_location and user_dept:
@@ -806,28 +941,20 @@ class RAGPipeline:
                 yield {"done": True, "answer": ans_text, "image": nav_image_path, "sources": ["departments.csv", "campus_info.csv", "student_profile.db"], "suggestions": suggestions}
                 return
 
-        # 1.2 Fast Direct Student Profile Query Resolution
+        # Step 0.2: Profile query
         profile_ans = resolve_student_profile_query(question, user_profile=user_profile)
         if profile_ans:
             memory_manager.add_message(session_id, "user", question)
             memory_manager.add_message(session_id, "assistant", profile_ans)
-            suggestions = [
-                "Show today's timetable 📅",
-                "Where is my next class right now? 📍",
-                "Who is my HOD? 👨‍🏫"
-            ]
+            suggestions = ["Show today's timetable 📅", "Where is my next class right now? 📍", "Who is my HOD? 👨‍🏫"]
             yield {"chunk": profile_ans, "done": False}
-            yield {
-                "done": True,
-                "answer": profile_ans,
-                "image": None,
-                "sources": ["student_profile.db"],
-                "suggestions": suggestions
-            }
+            yield {"done": True, "answer": profile_ans, "image": None, "sources": ["student_profile.db"], "suggestions": suggestions}
             return
 
-        # 1.5 Fast Next Class Real-time Interception
-        if any(re.search(p, clean_q) for p in NEXT_CLASS_PATTERNS):
+        # Step 0.5: Next class now
+        nav_bypass_words = ['transport', 'office', 'canteen', 'food', 'gate', 'library', 'auditorium', 'sports', 'gym', 'hostel', 'parking', 'amphitheatre', 'placement', 'cell', 'reading room', 'girls room']
+        is_nav_keyword = any(k in clean_q for k in nav_bypass_words)
+        if not is_nav_keyword and any(re.search(p, clean_q) for p in NEXT_CLASS_PATTERNS):
             ans_text, nav_map, srcs = process_next_class_context(question, user_profile=user_profile)
             memory_manager.add_message(session_id, "user", question)
             memory_manager.add_message(session_id, "assistant", ans_text)
@@ -836,23 +963,25 @@ class RAGPipeline:
             yield {"done": True, "answer": ans_text, "image": nav_map, "sources": srcs, "suggestions": suggestions}
             return
 
-        # 2. Fast Navigation
-        nav_result = find_location(question)
-        if nav_result:
-            nav_image_path = f"navigation_maps/{nav_result['image']}"
-            memory_manager.add_message(session_id, "user", question)
-            memory_manager.add_message(session_id, "assistant", nav_result["formatted_text"])
-            suggestions = generate_followup_suggestions(question, "navigation", nav_result["formatted_text"], user_profile=user_profile)
-            yield {"chunk": nav_result["formatted_text"], "done": False}
-            yield {"done": True, "answer": nav_result["formatted_text"], "image": nav_image_path, "sources": ["SVIT Navigation Directory"], "suggestions": suggestions}
-            return
+        # Step 1: Spatial Room / Floor Navigation
+        if re.search(r'\b(?:lab\s*l[1-5]|room\s*[2-4]0[1-5]|[2-4]0[1-5])\b', clean_q):
+            nav_result = find_location(question)
+            if nav_result:
+                nav_image_path = f"navigation_maps/{nav_result['image']}"
+                memory_manager.add_message(session_id, "user", question)
+                memory_manager.add_message(session_id, "assistant", nav_result["formatted_text"])
+                suggestions = generate_followup_suggestions(question, "navigation", nav_result["formatted_text"], user_profile=user_profile)
+                yield {"chunk": nav_result["formatted_text"], "done": False}
+                yield {"done": True, "answer": nav_result["formatted_text"], "image": nav_image_path, "sources": ["rooms_facilities.csv", "campus_info.csv"], "suggestions": suggestions}
+                return
 
-        # 3. Context & Dynamic Prompt with Profile
+        # Step 3: Prepare Context & Dynamic Prompt
         context, map_image, sources, intent_category = self._prepare_rag_context(
-            question, top_k=top_k, user_profile=user_profile
+            question, top_k=top_k, filter_dict=filter_dict, user_profile=user_profile
         )
+
         history = memory_manager.format_history_for_prompt(session_id)
-        current_date_str = datetime.now(IST).strftime("%A, %d %B YYYY")
+        current_date_str = datetime.now(IST).strftime("%A, %d %B %Y")
 
         prompt = get_dynamic_system_prompt(
             intent_category=intent_category,
@@ -863,26 +992,29 @@ class RAGPipeline:
             user_profile=user_profile
         )
 
-        # 4. Stream LLM tokens live or yield direct formatted knowledge answer
-        accumulated_chunks = []
+        full_answer = ""
         try:
             for chunk in self.llm.stream(prompt):
                 content = chunk.content if hasattr(chunk, 'content') else str(chunk)
                 if content:
-                    accumulated_chunks.append(content)
+                    full_answer += content
                     yield {"chunk": content, "done": False}
-
-            full_answer = "".join(accumulated_chunks)
-            full_answer = re.sub(r'!\[.*?\]\(.*?\)', '', full_answer).strip()
-
         except Exception as e:
-            print(f"[RAG] Streaming LLM fallback ({e}) -> yielding direct formatted knowledge answer.")
+            print(f"[RAG] LLM stream fallback ({e}) -> using direct context formatting.")
             full_answer = self._format_context_as_direct_answer(question, context, intent_category, user_profile=user_profile)
             yield {"chunk": full_answer, "done": False}
 
+        full_answer = re.sub(r'!\[.*?\]\(.*?\)', '', full_answer).strip()
+
         memory_manager.add_message(session_id, "user", question)
         memory_manager.add_message(session_id, "assistant", full_answer)
-        suggestions = generate_followup_suggestions(question, intent_category, full_answer, user_profile=user_profile)
+
+        suggestions = generate_followup_suggestions(
+            question,
+            intent_category,
+            full_answer,
+            user_profile=user_profile
+        )
 
         yield {
             "done": True,
@@ -892,26 +1024,6 @@ class RAGPipeline:
             "suggestions": suggestions
         }
 
-    def query(self, question: str, session_id: str = "default_user", **kwargs) -> dict:
-        return self.answer_question(question, session_id=session_id, **kwargs)
-
-    def get_answer(self, question: str, session_id: str = "default_user", **kwargs) -> dict:
-        return self.answer_question(question, session_id=session_id, **kwargs)
-
-
-# =========================================================
-# SINGLETON INSTANCE & HELPER API FUNCTIONS
-# =========================================================
-_rag_singleton = None
-
 
 def get_rag_pipeline(force_rebuild: bool = False) -> RAGPipeline:
-    global _rag_singleton
-    if _rag_singleton is None or force_rebuild:
-        _rag_singleton = RAGPipeline(force_rebuild=force_rebuild)
-    return _rag_singleton
-
-
-def get_bot_response(question: str, session_id: str = "default_user", user_profile: dict = None) -> dict:
-    pipeline = get_rag_pipeline()
-    return pipeline.answer_question(question, session_id=session_id, user_profile=user_profile)
+    return RAGPipeline(force_rebuild=force_rebuild)

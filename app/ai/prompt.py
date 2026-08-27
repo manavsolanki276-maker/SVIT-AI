@@ -87,6 +87,33 @@ FORMATTING RULES FOR CONTACT & LOCATION:
   📞 **[Department/Office Name]** | 🏢 **[Location]** | 📧 **[Email]** | 📱 **[Contact Number]**
 """,
 
+    "campus_info": """
+FORMATTING RULES FOR CAMPUS NAVIGATION & LOCATIONS:
+- Answer directly where the requested place, gate, office, facility, or landmark is situated.
+- Mention the **Campus Zone**, **Landmark Reference**, and **Description** clearly derived from CONTEXT.
+- If multiple locations or nearby landmarks are asked, list each location with its zone and landmark.
+- Highlight key places in bold (e.g. **Main Gate**, **Transport Office**, **Training & Placement Cell**, **Parking Area**, **Central Canteen**, **Central Library**).
+""",
+
+    "navigation": """
+FORMATTING RULES FOR CAMPUS NAVIGATION & LOCATIONS:
+- Answer directly where the requested place, gate, office, facility, or landmark is situated.
+- Mention the **Campus Zone**, **Landmark Reference**, and **Description** clearly derived from CONTEXT.
+- Highlight key places in bold.
+""",
+
+    "subjects": """
+FORMATTING RULES FOR SUBJECTS & CURRICULUM:
+- List each academic subject clearly with its Program, Department, and Semester derived from CONTEXT.
+- Format as bullet points:
+  * 📖 **[Subject Name]** — [Department Name], Semester [Semester]
+""",
+
+    "facilities": """
+FORMATTING RULES FOR CAMPUS FACILITIES:
+- List each facility clearly with its Location/Building, Category, and available Amenities/Equipment from CONTEXT.
+""",
+
     "general": """
 FORMATTING RULES:
 - Format answers clearly using bold headings, concise bullet points, or lists.

@@ -140,6 +140,13 @@ def build_or_load_vector_store(documents: List[Document] = None, force_rebuild: 
         if (os.environ.get('VERCEL') or os.environ.get('AWS_LAMBDA_FUNCTION_NAME')) and (force_rebuild or not os.path.exists(persist_dir)):
             persist_dir = os.path.join('/tmp', 'chroma_db')
         
+        if force_rebuild and os.path.exists(persist_dir):
+            import shutil
+            try:
+                shutil.rmtree(persist_dir)
+            except Exception as e:
+                print(f"[VectorStore] Warning: Could not completely remove {persist_dir}: {e}")
+
         if not force_rebuild and os.path.exists(CHROMA_PERSIST_DIR) and len(os.listdir(CHROMA_PERSIST_DIR)) > 0:
             return Chroma(
                 persist_directory=CHROMA_PERSIST_DIR,
