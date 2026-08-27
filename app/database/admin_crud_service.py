@@ -107,8 +107,78 @@ MODULE_CONFIGS: Dict[str, Dict[str, Any]] = {
         ]
     },
     "rooms": {
-        "title": "Campus Rooms & Facilities",
-        "description": "Manage campus buildings, lecture halls, computer labs, and landmarks.",
+        "title": "Academic Rooms & Classrooms",
+        "description": "Manage academic classrooms, lecture halls, computer laboratories, and room allocations.",
+        "icon": "door-closed",
+        "required_permission": "academic",
+        "id_field": "room_id",
+        "search_fields": ["room_id", "room_name", "department", "building", "room_type", "status"],
+        "filter_fields": ["department", "status", "room_type", "building", "floor"],
+        "sort_fields": ["room_name", "room_id", "department", "status"],
+        "default_sort": ("room_name", 1),
+        "source_csv": "rooms_facilities.csv",
+        "fields": [
+            {"key": "room_id", "label": "Room ID", "type": "text", "required": True, "table": True},
+            {"key": "room_name", "label": "Room / Lab No.", "type": "text", "required": True, "table": True},
+            {"key": "department", "label": "Department", "type": "text", "required": False, "table": True},
+            {"key": "building", "label": "Building / Block", "type": "text", "required": False, "table": True},
+            {"key": "floor", "label": "Floor", "type": "text", "required": False, "table": True},
+            {"key": "room_type", "label": "Room Type", "type": "select", "options": ["Classroom", "Laboratory", "Seminar Hall", "Tutorial Room", "Workshop", "Other"], "required": False, "table": True},
+            {"key": "capacity", "label": "Capacity", "type": "number", "required": False, "table": True},
+            {"key": "status", "label": "Status", "type": "select", "options": ["Active", "Available", "Occupied", "Maintenance", "Inactive"], "required": True, "table": True},
+            {"key": "facilities", "label": "Equipment / Amenities", "type": "textarea", "required": False, "table": False}
+        ]
+    },
+    "rooms_facilities": {
+        "title": "Academic Rooms & Classrooms",
+        "description": "Manage academic classrooms, lecture halls, computer laboratories, and room allocations.",
+        "icon": "door-closed",
+        "required_permission": "academic",
+        "id_field": "room_id",
+        "search_fields": ["room_id", "room_name", "department", "building", "room_type", "status"],
+        "filter_fields": ["department", "status", "room_type", "building", "floor"],
+        "sort_fields": ["room_name", "room_id", "department", "status"],
+        "default_sort": ("room_name", 1),
+        "source_csv": "rooms_facilities.csv",
+        "fields": [
+            {"key": "room_id", "label": "Room ID", "type": "text", "required": True, "table": True},
+            {"key": "room_name", "label": "Room / Lab No.", "type": "text", "required": True, "table": True},
+            {"key": "department", "label": "Department", "type": "text", "required": False, "table": True},
+            {"key": "building", "label": "Building / Block", "type": "text", "required": False, "table": True},
+            {"key": "floor", "label": "Floor", "type": "text", "required": False, "table": True},
+            {"key": "room_type", "label": "Room Type", "type": "select", "options": ["Classroom", "Laboratory", "Seminar Hall", "Tutorial Room", "Workshop", "Other"], "required": False, "table": True},
+            {"key": "capacity", "label": "Capacity", "type": "number", "required": False, "table": True},
+            {"key": "status", "label": "Status", "type": "select", "options": ["Active", "Available", "Occupied", "Maintenance", "Inactive"], "required": True, "table": True},
+            {"key": "facilities", "label": "Equipment / Amenities", "type": "textarea", "required": False, "table": False}
+        ]
+    },
+    "facilities": {
+        "title": "Campus Facilities & Resources",
+        "description": "Manage student common rooms, reading rooms, libraries, admin offices, and campus resources.",
+        "icon": "building-2",
+        "required_permission": "academic",
+        "id_field": "facility_id",
+        "search_fields": ["facility_id", "facility_name", "category", "building", "location", "description"],
+        "filter_fields": ["category", "status", "building", "floor"],
+        "sort_fields": ["facility_name", "category", "status"],
+        "default_sort": ("facility_name", 1),
+        "source_csv": "facilities.csv",
+        "fields": [
+            {"key": "facility_id", "label": "Facility ID", "type": "text", "required": True, "table": True},
+            {"key": "facility_name", "label": "Facility Name", "type": "text", "required": True, "table": True},
+            {"key": "category", "label": "Category", "type": "select", "options": ["Student Facility", "Academic / Study Facility", "Administrative", "Library / Study", "Health", "Sports", "Campus Landmark / Entry", "Other"], "required": True, "table": True},
+            {"key": "building", "label": "Building / Block", "type": "text", "required": False, "table": True},
+            {"key": "floor", "label": "Floor", "type": "text", "required": False, "table": True},
+            {"key": "location", "label": "Location / Landmark", "type": "text", "required": False, "table": True},
+            {"key": "description", "label": "Description & Accessibility", "type": "textarea", "required": False, "table": False},
+            {"key": "capacity", "label": "Capacity", "type": "number", "required": False, "table": True},
+            {"key": "status", "label": "Status", "type": "select", "options": ["Active", "Available", "Occupied", "Maintenance", "Inactive"], "required": True, "table": True},
+            {"key": "facilities", "label": "Amenities / Features", "type": "textarea", "required": False, "table": False}
+        ]
+    },
+    "campus_info": {
+        "title": "Campus Landmarks & Places",
+        "description": "Manage campus navigation landmarks, gates, zones, and building coordinates.",
         "icon": "map-pin",
         "required_permission": "academic",
         "id_field": "place_id",
@@ -118,8 +188,8 @@ MODULE_CONFIGS: Dict[str, Dict[str, Any]] = {
         "default_sort": ("place_name", 1),
         "source_csv": "campus_info.csv",
         "fields": [
-            {"key": "place_id", "label": "Place / Room ID", "type": "text", "required": True, "table": True},
-            {"key": "place_name", "label": "Place / Room Name", "type": "text", "required": True, "table": True},
+            {"key": "place_id", "label": "Place ID", "type": "text", "required": True, "table": True},
+            {"key": "place_name", "label": "Place Name", "type": "text", "required": True, "table": True},
             {"key": "category", "label": "Category", "type": "select", "options": ["Department", "Classroom", "Laboratory", "Library", "Administrative", "Auditorium", "Sports", "Cafeteria", "Facility"], "required": True, "table": True},
             {"key": "zone", "label": "Campus Zone", "type": "select", "options": ["East Wing", "West Wing", "Main Block", "Ground Floor", "First Floor", "Second Floor", "Sports Complex", "Outer Campus"], "required": False, "table": True},
             {"key": "landmark", "label": "Nearest Landmark", "type": "text", "required": False, "table": True},
@@ -639,7 +709,11 @@ MODULE_ALIASES: Dict[str, str] = {
     "food-items": "canteen",
     "food_items": "canteen",
     "sports-disciplines": "sports",
-    "sports_disciplines": "sports"
+    "sports_disciplines": "sports",
+    "rooms-facilities": "rooms",
+    "rooms_facilities": "rooms",
+    "campus-info": "campus_info",
+    "campus_info": "campus_info"
 }
 
 
@@ -680,7 +754,7 @@ def initialize_datasets_if_needed(project_root: Optional[str] = None):
 
     for module_key, config in MODULE_CONFIGS.items():
         src_csv = config.get("source_csv")
-        coll = get_collection(module_key)
+        coll = AdminCRUDService._resolve_coll(module_key)
         count = coll.count_documents({}) if coll is not None else len(_LOCAL_DATA_STORE.get(module_key, {}))
 
         if count > 0:
@@ -762,10 +836,14 @@ def initialize_datasets_if_needed(project_root: Optional[str] = None):
 
 
 # =========================================================================
-# 3. UNIVERSAL CRUD SERVICE METHODS
+# 3. UNIVERSAL CRUD SERVICE CLASS
 # =========================================================================
 class AdminCRUDService:
-    """Unified service for all admin CRUD operations with search, filters, pagination, and audit."""
+    """
+    Unified CRUD Service powering all 28 Admin Modules.
+    Provides complete pagination, robust text search, multifaceted filtering,
+    dynamic sorting, validation, audit trailing, and RAG document sync.
+    """
 
     @classmethod
     def resolve_module_key(cls, module_key: str) -> str:
@@ -774,6 +852,20 @@ class AdminCRUDService:
             return ""
         clean_key = str(module_key).strip().lower().replace("-", "_")
         return MODULE_ALIASES.get(clean_key, clean_key)
+
+    @classmethod
+    def _resolve_coll(cls, module_key: str):
+        """Resolves the physical MongoDB collection for a given module key."""
+        canonical = cls.resolve_module_key(module_key)
+        if canonical in ("rooms", "rooms_facilities"):
+            return get_collection("rooms_facilities")
+        elif canonical in ("subjects", "subject"):
+            return get_collection("subjects")
+        elif canonical == "facilities":
+            return get_collection("facilities")
+        elif canonical == "campus_info":
+            return get_collection("rooms")
+        return get_collection(canonical)
 
     @staticmethod
     def list_items(
@@ -794,7 +886,7 @@ class AdminCRUDService:
         if not config:
             return {"status": "error", "message": f"Unknown module '{module_key}'", "items": [], "total": 0}
 
-        coll = get_collection(module_key)
+        coll = AdminCRUDService._resolve_coll(module_key)
         if coll is not None:
             # -------------------------------------------------------------
             # MONGODB BACKEND
@@ -960,7 +1052,7 @@ class AdminCRUDService:
             return None
 
         id_field = config["id_field"]
-        coll = get_collection(module_key)
+        coll = AdminCRUDService._resolve_coll(module_key)
         if coll is not None:
             from bson import ObjectId
             query = {
@@ -1072,7 +1164,7 @@ class AdminCRUDService:
                     clean_data["error_message"] = str(rag_err)
 
         # Save to DB or local store
-        coll = get_collection(module_key)
+        coll = AdminCRUDService._resolve_coll(module_key)
         if coll is not None:
             try:
                 coll.insert_one(clean_data)
@@ -1317,7 +1409,7 @@ class AdminCRUDService:
                     clean_data["error_message"] = str(rag_err)
 
         # Update in MongoDB or local store
-        coll = get_collection(module_key)
+        coll = AdminCRUDService._resolve_coll(module_key)
         if coll is not None:
             try:
                 from bson import ObjectId
@@ -1368,7 +1460,7 @@ class AdminCRUDService:
                 pass
 
         id_field = config["id_field"]
-        coll = get_collection(module_key)
+        coll = AdminCRUDService._resolve_coll(module_key)
         if coll is not None:
             from bson import ObjectId
             res = coll.delete_one({

@@ -381,7 +381,10 @@ def timetable():
     return render_module('timetable', 'admin/timetable.html')
 
 @admin_bp.route('/rooms')
+@admin_bp.route('/rooms-facilities')
+@admin_bp.route('/rooms_facilities')
 @admin_bp.route('/campus-info')
+@admin_bp.route('/facilities')
 @admin_required
 def rooms():
     return render_module('rooms', 'admin/rooms.html')
