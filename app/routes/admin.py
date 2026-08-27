@@ -586,11 +586,22 @@ def api_list_items(module_name: str):
 
     # Extract dynamic filters from query params (e.g. filter_department, filter_category, etc.)
     filters: Dict[str, Any] = {}
+    filters_raw = request.args.get('filters')
+    if filters_raw:
+        try:
+            parsed_filters = json.loads(filters_raw)
+            if isinstance(parsed_filters, dict):
+                filters.update(parsed_filters)
+        except Exception:
+            pass
+
     for k, v in request.args.items():
+        if k == 'filters':
+            continue
         if k.startswith('filter_') and v:
             actual_key = k.replace('filter_', '', 1)
             filters[actual_key] = v
-        elif k in ['department', 'category', 'status', 'priority', 'program', 'semester', 'division', 'day', 'year', 'faculty', 'room', 'is_urgent', 'subject_type', 'credits', 'subject_code'] and v:
+        elif k in ['department', 'category', 'status', 'priority', 'program', 'semester', 'division', 'day', 'year', 'faculty', 'room', 'is_urgent', 'subject_type', 'credits', 'subject_code', 'room_type', 'building', 'floor', 'zone', 'location', 'landmark'] and v:
             filters[k] = v
 
     result = AdminCRUDService.list_items(

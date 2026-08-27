@@ -21,7 +21,7 @@
                     <h1 class="rooms-title">Rooms & Facilities</h1>
                     <span id="totalLiveBadge" class="rooms-badge-count">
                         <span class="rooms-badge-dot"></span>
-                        <span id="headerTotalCount">0</span> Total Records
+                        <span id="headerTotalCount">-</span> Total Records
                     </span>
                 </div>
                 <p class="rooms-subtitle">Manage academic classrooms, campus facilities, and explore navigation landmarks</p>
@@ -38,13 +38,17 @@
                 <i data-lucide="building-2" class="w-4 h-4"></i>
                 <span>Add Facility</span>
             </button>
+            <button id="openAddNavBtn" class="btn-rooms-secondary" title="Add Campus Location">
+                <i data-lucide="map-pin" class="w-4 h-4"></i>
+                <span>Add Location</span>
+            </button>
         </div>
     </div>
 
-    <!-- 2. LIVE KPI METRICS -->
+    <!-- 2. LIVE KPI METRICS (100% Dynamically Calculated) -->
     <div class="rooms-kpi-grid">
         <!-- KPI 1: Total Academic Rooms -->
-        <div class="kpi-card" id="kpiTotalRoomsCard">
+        <div class="kpi-card cursor-pointer" id="kpiTotalRoomsCard" title="View Academic Rooms">
             <div class="kpi-icon-wrap kpi-icon-purple">
                 <i data-lucide="door-closed" class="w-5 h-5 text-[#8B5CF6]"></i>
             </div>
@@ -52,13 +56,13 @@
                 <span class="kpi-label">Academic Rooms</span>
                 <div class="kpi-value-row">
                     <h3 class="kpi-value" id="kpiTotalRooms">-</h3>
-                    <span class="kpi-trend kpi-trend-up">100% Timetable</span>
+                    <span class="kpi-trend kpi-trend-up">Timetable Data</span>
                 </div>
             </div>
         </div>
 
         <!-- KPI 2: Campus Facilities -->
-        <div class="kpi-card" id="kpiFacilitiesCard">
+        <div class="kpi-card cursor-pointer" id="kpiFacilitiesCard" title="View Campus Facilities">
             <div class="kpi-icon-wrap kpi-icon-indigo">
                 <i data-lucide="building-2" class="w-5 h-5 text-[#6366F1]"></i>
             </div>
@@ -72,7 +76,7 @@
         </div>
 
         <!-- KPI 3: Explore Campus / Navigation Locations -->
-        <div class="kpi-card" id="kpiLocationsCard">
+        <div class="kpi-card cursor-pointer" id="kpiLocationsCard" title="View Explore Campus">
             <div class="kpi-icon-wrap kpi-icon-blue">
                 <i data-lucide="map-pin" class="w-5 h-5 text-[#3B82F6]"></i>
             </div>
@@ -80,13 +84,13 @@
                 <span class="kpi-label">Campus Locations</span>
                 <div class="kpi-value-row">
                     <h3 class="kpi-value" id="kpiTotalLocations">-</h3>
-                    <span class="kpi-trend kpi-trend-up">With Real Photos</span>
+                    <span class="kpi-trend kpi-trend-up">Verified Photos</span>
                 </div>
             </div>
         </div>
 
         <!-- KPI 4: Academic Departments -->
-        <div class="kpi-card" id="kpiDeptsCard">
+        <div class="kpi-card cursor-pointer" id="kpiDeptsCard" title="Academic Departments">
             <div class="kpi-icon-wrap kpi-icon-green">
                 <i data-lucide="graduation-cap" class="w-5 h-5 text-[#10B981]"></i>
             </div>
@@ -106,23 +110,23 @@
             <button type="button" class="rooms-tab-btn active" id="tabRoomsBtn" data-tab="rooms" role="tab" aria-selected="true">
                 <i data-lucide="door-closed" class="w-4 h-4"></i>
                 <span>Academic Rooms</span>
-                <span class="tab-pill-count" id="tabRoomsCount">0</span>
+                <span class="tab-pill-count" id="tabRoomsCount">-</span>
             </button>
             <button type="button" class="rooms-tab-btn" id="tabFacilitiesBtn" data-tab="facilities" role="tab" aria-selected="false">
                 <i data-lucide="building-2" class="w-4 h-4"></i>
                 <span>Campus Facilities</span>
-                <span class="tab-pill-count" id="tabFacilitiesCount">0</span>
+                <span class="tab-pill-count" id="tabFacilitiesCount">-</span>
             </button>
             <button type="button" class="rooms-tab-btn" id="tabNavigationBtn" data-tab="navigation" role="tab" aria-selected="false">
                 <i data-lucide="map-pin" class="w-4 h-4"></i>
                 <span>Explore Campus</span>
-                <span class="tab-pill-count" id="tabNavigationCount">0</span>
+                <span class="tab-pill-count" id="tabNavigationCount">-</span>
             </button>
         </div>
 
         <div class="rooms-tab-quick-info text-xs text-[#66708F] hidden sm:flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-[#10B981]"></span>
-            <span>Live MongoDB Atlas Sync</span>
+            <span>Live MongoDB Atlas Source</span>
         </div>
     </div>
 
@@ -269,7 +273,7 @@
         <!-- Results Summary Bar -->
         <div class="results-summary-bar">
             <div class="results-count-text">
-                Showing <strong id="showingRoomsRange">0-0</strong> of <strong id="totalRoomsCount">0</strong> academic rooms
+                Showing <strong id="showingRoomsRange">0-0</strong> of <strong id="totalRoomsCount">-</strong> academic rooms
             </div>
             <div class="pagination-limit-select">
                 <label for="roomsLimitSelect" class="text-xs text-[#66708F]">Per page:</label>
@@ -295,6 +299,20 @@
                 <div class="skeleton-line skeleton-footer"></div>
             </div>
             {% endfor %}
+        </div>
+
+        <!-- Error State with Retry -->
+        <div id="roomsErrorState" class="empty-state-card hidden border-red-200">
+            <div class="empty-state-icon bg-red-100 text-red-600">
+                <i data-lucide="alert-circle" class="w-8 h-8"></i>
+            </div>
+            <h4 class="empty-state-title text-red-700">Unable to Load Academic Rooms</h4>
+            <p class="empty-state-desc" id="roomsErrorMessage">Could not connect to the academic room database. Please check your network connection.</p>
+            <div class="empty-state-actions">
+                <button type="button" id="retryRoomsBtn" class="btn-rooms-primary">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i> Retry Connection
+                </button>
+            </div>
         </div>
 
         <!-- Empty State -->
@@ -362,7 +380,7 @@
         <!-- Results Summary Bar -->
         <div class="results-summary-bar">
             <div class="results-count-text">
-                Showing <strong id="totalFacilitiesCount">0</strong> campus facilities & landmark resources
+                Showing <strong id="totalFacilitiesCount">-</strong> campus facilities & landmark resources
             </div>
             <button type="button" id="quickAddFacilityBtn" class="btn-rooms-primary btn-sm">
                 <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Facility
@@ -379,6 +397,20 @@
                 <div class="skeleton-line skeleton-footer"></div>
             </div>
             {% endfor %}
+        </div>
+
+        <!-- Facilities Error State with Retry -->
+        <div id="facilitiesErrorState" class="empty-state-card hidden border-red-200">
+            <div class="empty-state-icon bg-red-100 text-red-600">
+                <i data-lucide="alert-circle" class="w-8 h-8"></i>
+            </div>
+            <h4 class="empty-state-title text-red-700">Unable to Load Campus Facilities</h4>
+            <p class="empty-state-desc" id="facilitiesErrorMessage">Could not connect to the campus facilities database.</p>
+            <div class="empty-state-actions">
+                <button type="button" id="retryFacilitiesBtn" class="btn-rooms-primary">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i> Retry Connection
+                </button>
+            </div>
         </div>
 
         <!-- Facilities Empty State -->
@@ -407,11 +439,12 @@
         <!-- Results Summary Bar -->
         <div class="results-summary-bar">
             <div class="results-count-text">
-                Showing <strong id="totalNavigationCount">0</strong> verified campus buildings & navigation landmarks with photos
+                Showing <strong id="totalNavigationCount">-</strong> verified campus buildings & navigation landmarks with photos
             </div>
-            <div class="text-xs text-[#66708F] flex items-center gap-1.5">
-                <i data-lucide="info" class="w-3.5 h-3.5 text-[#8B5CF6]"></i>
-                <span>Tap any card to view detailed building layout & photo</span>
+            <div class="flex items-center gap-2">
+                <button type="button" id="quickAddNavBtn" class="btn-rooms-primary btn-sm">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Location
+                </button>
             </div>
         </div>
 
@@ -426,6 +459,20 @@
             {% endfor %}
         </div>
 
+        <!-- Navigation Error State with Retry -->
+        <div id="navigationErrorState" class="empty-state-card hidden border-red-200">
+            <div class="empty-state-icon bg-red-100 text-red-600">
+                <i data-lucide="alert-circle" class="w-8 h-8"></i>
+            </div>
+            <h4 class="empty-state-title text-red-700">Unable to Load Campus Navigation</h4>
+            <p class="empty-state-desc" id="navigationErrorMessage">Could not connect to the campus navigation database.</p>
+            <div class="empty-state-actions">
+                <button type="button" id="retryNavigationBtn" class="btn-rooms-primary">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i> Retry Connection
+                </button>
+            </div>
+        </div>
+
         <!-- Navigation Empty State -->
         <div id="navigationEmptyState" class="empty-state-card hidden">
             <div class="empty-state-icon">
@@ -435,6 +482,9 @@
             <p class="empty-state-desc">No campus navigation points match your filter criteria.</p>
             <div class="empty-state-actions">
                 <button type="button" id="emptyResetNavBtn" class="btn-rooms-secondary">Reset Filters</button>
+                <button type="button" id="emptyAddNavBtn" class="btn-rooms-primary">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Add Location
+                </button>
             </div>
         </div>
 
@@ -682,7 +732,115 @@
     </div>
 </div>
 
-<!-- MODAL 3: VIEW DETAILS (Room, Facility, or Navigation) -->
+<!-- MODAL 3: ADD / EDIT CAMPUS NAVIGATION LOCATION -->
+<div class="modal fade" id="navFormModal" tabindex="-1" aria-labelledby="navFormModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content custom-modal-surface">
+            <form id="navForm" novalidate>
+                <div class="modal-header">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-[#3B82F6]/10 border border-[#3B82F6]/20 flex items-center justify-center text-[#3B82F6]">
+                            <i data-lucide="map-pin" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title font-bold text-[#171D3A]" id="navFormModalLabel">Add Campus Location</h5>
+                            <p class="text-xs text-[#66708F] mb-0">Register verified campus buildings, wings, or navigation landmarks</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body custom-form-body">
+                    <input type="hidden" id="navEditMode" value="create">
+                    <input type="hidden" id="navOriginalId" value="">
+
+                    <div class="form-grid-2">
+                        <!-- Place ID -->
+                        <div class="form-group">
+                            <label for="inputNavId" class="form-label">Place ID <span class="text-xs text-[#8C95AD]">(e.g. P041)</span></label>
+                            <input type="text" id="inputNavId" class="form-control-saas" placeholder="Auto-generated if blank">
+                        </div>
+
+                        <!-- Place Name -->
+                        <div class="form-group">
+                            <label for="inputNavName" class="form-label required">Location / Place Name <span class="text-red-500">*</span></label>
+                            <input type="text" id="inputNavName" class="form-control-saas" placeholder="e.g. Computer Engineering Block" required>
+                            <div class="invalid-feedback text-xs text-red-500">Location name is required.</div>
+                        </div>
+
+                        <!-- Category -->
+                        <div class="form-group">
+                            <label for="inputNavCategory" class="form-label required">Category <span class="text-red-500">*</span></label>
+                            <select id="inputNavCategory" class="form-control-saas" required>
+                                <option value="">Select Category</option>
+                                <option value="Academic">Academic Department</option>
+                                <option value="Laboratory">Laboratory & Workshop</option>
+                                <option value="Office">Administrative Office</option>
+                                <option value="Library">Library & Reading Hall</option>
+                                <option value="Facility">Facility & Auditorium</option>
+                                <option value="Sports">Sports & Grounds</option>
+                                <option value="Food">Food & Canteen</option>
+                                <option value="Entrance">Campus Entrance & Parking</option>
+                                <option value="Transport">Transport Hub</option>
+                                <option value="Residence">Hostel & Housing</option>
+                            </select>
+                        </div>
+
+                        <!-- Zone -->
+                        <div class="form-group">
+                            <label for="inputNavZone" class="form-label">Campus Zone / Wing</label>
+                            <input type="text" id="inputNavZone" class="form-control-saas" placeholder="e.g. North Wing, Center Campus">
+                        </div>
+
+                        <!-- Landmark -->
+                        <div class="form-group">
+                            <label for="inputNavLandmark" class="form-label">Nearest Landmark</label>
+                            <input type="text" id="inputNavLandmark" class="form-control-saas" placeholder="e.g. Near Central Garden">
+                        </div>
+
+                        <!-- Image File / URL -->
+                        <div class="form-group">
+                            <label for="inputNavImage" class="form-label">Campus Photograph</label>
+                            <select id="inputNavImage" class="form-control-saas">
+                                <option value="/static/navigation_maps/Computer dep.jpeg">Computer Department (Computer dep.jpeg)</option>
+                                <option value="/static/navigation_maps/Admin dep.jpeg">Administration Building (Admin dep.jpeg)</option>
+                                <option value="/static/navigation_maps/Civil dep.jpeg">Civil Department (Civil dep.jpeg)</option>
+                                <option value="/static/navigation_maps/Mechanical dep.jpeg">Mechanical Department (Mechanical dep.jpeg)</option>
+                                <option value="/static/navigation_maps/Electrical dep.jpeg">Electrical Department (Electrical dep.jpeg)</option>
+                                <option value="/static/navigation_maps/E&C dep.jpeg">E&C Department (E&C dep.jpeg)</option>
+                                <option value="/static/navigation_maps/Aero dep.jpeg">Aero Department (Aero dep.jpeg)</option>
+                                <option value="/static/navigation_maps/IT dep.jpeg">IT Department (IT dep.jpeg)</option>
+                                <option value="/static/navigation_maps/MCA&BCA.jpeg">MCA & BCA Block (MCA&BCA.jpeg)</option>
+                                <option value="/static/navigation_maps/diploma dep.jpeg">Diploma Building (diploma dep.jpeg)</option>
+                                <option value="/static/navigation_maps/Sports court.png">Sports Ground (Sports court.png)</option>
+                                <option value="/static/navigation_maps/SVIT Canteen loc.png">Central Canteen (SVIT Canteen loc.png)</option>
+                                <option value="/static/navigation_maps/Bus stop.png">Bus Stop & Entry (Bus stop.png)</option>
+                                <option value="/static/navigation_maps/Stationarys.png">Stationary Shop (Stationarys.png)</option>
+                                <option value="/static/navigation_maps/SVIT with all dep.jpeg" selected>Campus Overview (SVIT with all dep.jpeg)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group mt-3">
+                        <label for="inputNavDescription" class="form-label">Location Description & Details</label>
+                        <textarea id="inputNavDescription" rows="2" class="form-control-saas" placeholder="Brief description of the building or landmark..."></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer custom-modal-footer">
+                    <button type="button" class="btn-rooms-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" id="saveNavSubmitBtn" class="btn-rooms-primary">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                        <span>Save Location</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL 4: VIEW DETAILS (Room, Facility, or Navigation) -->
 <div class="modal fade" id="itemDetailsModal" tabindex="-1" aria-labelledby="itemDetailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content custom-modal-surface">
@@ -716,7 +874,7 @@
     </div>
 </div>
 
-<!-- MODAL 4: DELETE CONFIRMATION -->
+<!-- MODAL 5: DELETE CONFIRMATION -->
 <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content custom-modal-surface text-center p-4">
@@ -735,7 +893,7 @@
     </div>
 </div>
 
-<!-- BOTTOM SHEET 5: MOBILE FILTER DRAWER -->
+<!-- BOTTOM SHEET 6: MOBILE FILTER DRAWER -->
 <div class="mobile-filter-drawer-backdrop hidden" id="mobileFilterBackdrop"></div>
 <div class="mobile-filter-drawer hidden" id="mobileFilterDrawer">
     <div class="filter-drawer-header">

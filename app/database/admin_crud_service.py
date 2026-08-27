@@ -710,10 +710,18 @@ MODULE_ALIASES: Dict[str, str] = {
     "food_items": "canteen",
     "sports-disciplines": "sports",
     "sports_disciplines": "sports",
-    "rooms-facilities": "rooms",
-    "rooms_facilities": "rooms",
+    "rooms": "rooms_facilities",
+    "rooms-facilities": "rooms_facilities",
+    "rooms_facilities": "rooms_facilities",
+    "facility": "facilities",
+    "facilities": "facilities",
     "campus-info": "campus_info",
-    "campus_info": "campus_info"
+    "campus_info": "campus_info",
+    "campus-landmarks": "campus_info",
+    "campus_landmarks": "campus_info",
+    "navigation": "campus_info",
+    "campus-navigation": "campus_info",
+    "campus_navigation": "campus_info"
 }
 
 
