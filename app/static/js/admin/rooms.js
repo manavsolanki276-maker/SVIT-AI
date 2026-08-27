@@ -1,20 +1,22 @@
 /**
- * SVIT Admin - Rooms & Facilities Controller
- * Dual-pane Academic Rooms & Campus Facilities Management
- * Robust MongoDB Atlas integration, responsive filtering, pagination, and live KPIs.
+ * SVIT Admin - Rooms, Facilities & Campus Navigation Controller
+ * Unified Management for:
+ * 1. Academic Rooms (1,699 Timetable Rooms)
+ * 2. Campus Facilities (Girls Room, Reading Room, Library, etc.)
+ * 3. Campus Navigation & Locations (40 Locations with Real Campus Photos)
  */
 
 (function() {
     'use strict';
 
-    // Global State
+    // Master State
     const state = {
-        activeTab: 'rooms', // 'rooms' | 'facilities'
+        activeTab: 'rooms', // 'rooms' | 'facilities' | 'navigation'
         searchQuery: '',
         searchDebounceTimer: null,
-        viewMode: 'card', // 'card' | 'table'
+        viewMode: 'card', // 'card' | 'table' (rooms only)
         
-        // Rooms State
+        // 1. Rooms State
         rooms: {
             page: 1,
             limit: 24,
@@ -31,7 +33,7 @@
             }
         },
 
-        // Facilities State
+        // 2. Facilities State
         facilities: {
             page: 1,
             limit: 100,
@@ -47,16 +49,30 @@
             }
         },
 
-        // KPI Counts
+        // 3. Navigation State (Explore Campus)
+        navigation: {
+            page: 1,
+            limit: 100,
+            total: 0,
+            pages: 1,
+            items: [],
+            loading: false,
+            filters: {
+                category: '',
+                zone: ''
+            }
+        },
+
+        // Live KPI Metrics
         stats: {
             totalRooms: 0,
             totalFacilities: 0,
-            activeRooms: 0,
-            totalDepts: 0
+            totalLocations: 0,
+            totalDepts: 8
         },
 
-        // Deletion & Action Context
-        pendingDelete: null // { module: 'rooms'|'facilities', id: string, name: string }
+        // Action Context
+        pendingDelete: null // { module: 'rooms'|'facilities'|'campus_info', id: string, name: string }
     };
 
     // Modal Instances
@@ -65,7 +81,7 @@
     let itemDetailsModal = null;
     let deleteConfirmModal = null;
 
-    // Initialize on DOM Ready
+    // Initialization
     document.addEventListener('DOMContentLoaded', () => {
         initModals();
         bindDomEvents();
@@ -96,21 +112,27 @@
     }
 
     /**
-     * Bind all DOM events once
+     * Bind DOM events
      */
     function bindDomEvents() {
-        // Tab Switchers
+        // Tab Buttons
         const tabRoomsBtn = document.getElementById('tabRoomsBtn');
         const tabFacBtn = document.getElementById('tabFacilitiesBtn');
+        const tabNavBtn = document.getElementById('tabNavigationBtn');
         
-        if (tabRoomsBtn) {
-            tabRoomsBtn.addEventListener('click', () => switchTab('rooms'));
-        }
-        if (tabFacBtn) {
-            tabFacBtn.addEventListener('click', () => switchTab('facilities'));
-        }
+        if (tabRoomsBtn) tabRoomsBtn.addEventListener('click', () => switchTab('rooms'));
+        if (tabFacBtn) tabFacBtn.addEventListener('click', () => switchTab('facilities'));
+        if (tabNavBtn) tabNavBtn.addEventListener('click', () => switchTab('navigation'));
 
-        // Header Action Buttons
+        // KPI Card Clicks (Quick Switch)
+        const kpiRooms = document.getElementById('kpiTotalRoomsCard');
+        const kpiFac = document.getElementById('kpiFacilitiesCard');
+        const kpiLoc = document.getElementById('kpiLocationsCard');
+        if (kpiRooms) kpiRooms.addEventListener('click', () => switchTab('rooms'));
+        if (kpiFac) kpiFac.addEventListener('click', () => switchTab('facilities'));
+        if (kpiLoc) kpiLoc.addEventListener('click', () => switchTab('navigation'));
+
+        // Add Buttons
         const openAddRoomBtn = document.getElementById('openAddRoomBtn');
         const emptyAddRoomBtn = document.getElementById('emptyAddRoomBtn');
         if (openAddRoomBtn) openAddRoomBtn.addEventListener('click', () => openRoomFormModal('create'));
@@ -123,24 +145,25 @@
         if (quickAddFacBtn) quickAddFacBtn.addEventListener('click', () => openFacilityFormModal('create'));
         if (emptyAddFacBtn) emptyAddFacBtn.addEventListener('click', () => openFacilityFormModal('create'));
 
-        // Global Search Input
+        // Global Search
         const searchInput = document.getElementById('globalSearchInput');
         const clearSearchBtn = document.getElementById('clearSearchBtn');
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {
                 const val = e.target.value;
-                if (clearSearchBtn) {
-                    clearSearchBtn.classList.toggle('hidden', !val);
-                }
+                if (clearSearchBtn) clearSearchBtn.classList.toggle('hidden', !val);
                 clearTimeout(state.searchDebounceTimer);
                 state.searchDebounceTimer = setTimeout(() => {
                     state.searchQuery = val.trim();
                     if (state.activeTab === 'rooms') {
                         state.rooms.page = 1;
                         fetchRooms();
-                    } else {
+                    } else if (state.activeTab === 'facilities') {
                         state.facilities.page = 1;
                         fetchFacilities();
+                    } else {
+                        state.navigation.page = 1;
+                        fetchNavigation();
                     }
                 }, 250);
             });
@@ -153,9 +176,12 @@
                 if (state.activeTab === 'rooms') {
                     state.rooms.page = 1;
                     fetchRooms();
-                } else {
+                } else if (state.activeTab === 'facilities') {
                     state.facilities.page = 1;
                     fetchFacilities();
+                } else {
+                    state.navigation.page = 1;
+                    fetchNavigation();
                 }
             });
         }
@@ -211,7 +237,28 @@
             });
         }
 
-        // Pagination Limit
+        // Desktop Filters (Navigation)
+        const filterNavCat = document.getElementById('filterNavCategorySelect');
+        const filterNavZone = document.getElementById('filterNavZoneSelect');
+
+        if (filterNavCat) {
+            filterNavCat.addEventListener('change', (e) => {
+                state.navigation.filters.category = e.target.value;
+                state.navigation.page = 1;
+                syncMobileFilterInputs();
+                fetchNavigation();
+            });
+        }
+        if (filterNavZone) {
+            filterNavZone.addEventListener('change', (e) => {
+                state.navigation.filters.zone = e.target.value;
+                state.navigation.page = 1;
+                syncMobileFilterInputs();
+                fetchNavigation();
+            });
+        }
+
+        // Pagination Limit (Rooms)
         const roomsLimit = document.getElementById('roomsLimitSelect');
         if (roomsLimit) {
             roomsLimit.addEventListener('change', (e) => {
@@ -221,7 +268,7 @@
             });
         }
 
-        // Pagination Prev / Next
+        // Pagination Prev / Next (Rooms)
         const prevRoomsBtn = document.getElementById('prevRoomsPageBtn');
         const nextRoomsBtn = document.getElementById('nextRoomsPageBtn');
         if (prevRoomsBtn) {
@@ -241,28 +288,26 @@
             });
         }
 
-        // Reset Filters & Refresh Tools
+        // Reset & Refresh Buttons
         const resetFiltersBtn = document.getElementById('resetFiltersBtn');
         const clearAllFiltersBtn = document.getElementById('clearAllFiltersBtn');
         const emptyResetRoomsBtn = document.getElementById('emptyResetRoomsBtn');
         const emptyResetFacBtn = document.getElementById('emptyResetFacBtn');
+        const emptyResetNavBtn = document.getElementById('emptyResetNavBtn');
         const refreshDataBtn = document.getElementById('refreshDataBtn');
 
         if (resetFiltersBtn) resetFiltersBtn.addEventListener('click', resetAllFilters);
         if (clearAllFiltersBtn) clearAllFiltersBtn.addEventListener('click', resetAllFilters);
         if (emptyResetRoomsBtn) emptyResetRoomsBtn.addEventListener('click', resetAllFilters);
         if (emptyResetFacBtn) emptyResetFacBtn.addEventListener('click', resetAllFilters);
+        if (emptyResetNavBtn) emptyResetNavBtn.addEventListener('click', resetAllFilters);
         if (refreshDataBtn) refreshDataBtn.addEventListener('click', refreshAllData);
 
-        // View Mode Switcher (Rooms)
+        // View Mode Switcher
         const viewModeCardBtn = document.getElementById('viewModeCardBtn');
         const viewModeTableBtn = document.getElementById('viewModeTableBtn');
-        if (viewModeCardBtn) {
-            viewModeCardBtn.addEventListener('click', () => setViewMode('card'));
-        }
-        if (viewModeTableBtn) {
-            viewModeTableBtn.addEventListener('click', () => setViewMode('table'));
-        }
+        if (viewModeCardBtn) viewModeCardBtn.addEventListener('click', () => setViewMode('card'));
+        if (viewModeTableBtn) viewModeTableBtn.addEventListener('click', () => setViewMode('table'));
 
         // Mobile Filter Drawer
         const openMobileFilterBtn = document.getElementById('openMobileFilterBtn');
@@ -289,83 +334,101 @@
 
         // Form Submit Listeners
         const roomForm = document.getElementById('roomForm');
-        if (roomForm) {
-            roomForm.addEventListener('submit', handleRoomFormSubmit);
-        }
+        if (roomForm) roomForm.addEventListener('submit', handleRoomFormSubmit);
 
         const facilityForm = document.getElementById('facilityForm');
-        if (facilityForm) {
-            facilityForm.addEventListener('submit', handleFacilityFormSubmit);
-        }
+        if (facilityForm) facilityForm.addEventListener('submit', handleFacilityFormSubmit);
 
         // Delete Confirm Button
         const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-        if (confirmDeleteBtn) {
-            confirmDeleteBtn.addEventListener('click', handleConfirmDelete);
-        }
+        if (confirmDeleteBtn) confirmDeleteBtn.addEventListener('click', handleConfirmDelete);
     }
 
     /**
-     * Switch Tabs between Academic Rooms and Campus Facilities
+     * Switch Tabs (Rooms, Facilities, Navigation)
      */
     function switchTab(tab) {
         state.activeTab = tab;
 
         const tabRoomsBtn = document.getElementById('tabRoomsBtn');
         const tabFacBtn = document.getElementById('tabFacilitiesBtn');
+        const tabNavBtn = document.getElementById('tabNavigationBtn');
+
         const paneRooms = document.getElementById('paneRooms');
         const paneFacilities = document.getElementById('paneFacilities');
+        const paneNav = document.getElementById('paneNavigation');
+
         const roomsFilters = document.getElementById('roomsDesktopFilters');
         const facFilters = document.getElementById('facilitiesDesktopFilters');
+        const navFilters = document.getElementById('navigationDesktopFilters');
+
         const viewToggle = document.getElementById('viewModeToggleWrap');
-        const mobileRoomSec = document.getElementById('mobileRoomFiltersSection');
-        const mobileFacSec = document.getElementById('mobileFacilityFiltersSection');
+        const mobRoomSec = document.getElementById('mobileRoomFiltersSection');
+        const mobFacSec = document.getElementById('mobileFacilityFiltersSection');
+        const mobNavSec = document.getElementById('mobileNavigationFiltersSection');
+
+        // Reset tab styles
+        [tabRoomsBtn, tabFacBtn, tabNavBtn].forEach(b => {
+            if (b) {
+                b.classList.remove('active');
+                b.setAttribute('aria-selected', 'false');
+            }
+        });
+
+        // Hide all panes & filters
+        if (paneRooms) paneRooms.classList.add('hidden');
+        if (paneFacilities) paneFacilities.classList.add('hidden');
+        if (paneNav) paneNav.classList.add('hidden');
+
+        if (roomsFilters) roomsFilters.classList.add('hidden');
+        if (facFilters) facFilters.classList.add('hidden');
+        if (navFilters) navFilters.classList.add('hidden');
+
+        if (mobRoomSec) mobRoomSec.classList.add('hidden');
+        if (mobFacSec) mobFacSec.classList.add('hidden');
+        if (mobNavSec) mobNavSec.classList.add('hidden');
 
         if (tab === 'rooms') {
             if (tabRoomsBtn) {
                 tabRoomsBtn.classList.add('active');
                 tabRoomsBtn.setAttribute('aria-selected', 'true');
             }
-            if (tabFacBtn) {
-                tabFacBtn.classList.remove('active');
-                tabFacBtn.setAttribute('aria-selected', 'false');
-            }
             if (paneRooms) paneRooms.classList.remove('hidden');
-            if (paneFacilities) paneFacilities.classList.add('hidden');
             if (roomsFilters) roomsFilters.classList.remove('hidden');
-            if (facFilters) facFilters.classList.add('hidden');
             if (viewToggle) viewToggle.classList.remove('hidden');
-            if (mobileRoomSec) mobileRoomSec.classList.remove('hidden');
-            if (mobileFacSec) mobileFacSec.classList.add('hidden');
+            if (mobRoomSec) mobRoomSec.classList.remove('hidden');
 
-            renderActiveFilterPills();
             if (state.rooms.items.length === 0) fetchRooms();
-        } else {
+        } else if (tab === 'facilities') {
             if (tabFacBtn) {
                 tabFacBtn.classList.add('active');
                 tabFacBtn.setAttribute('aria-selected', 'true');
             }
-            if (tabRoomsBtn) {
-                tabRoomsBtn.classList.remove('active');
-                tabRoomsBtn.setAttribute('aria-selected', 'false');
-            }
-            if (paneRooms) paneRooms.classList.add('hidden');
             if (paneFacilities) paneFacilities.classList.remove('hidden');
-            if (roomsFilters) roomsFilters.classList.add('hidden');
             if (facFilters) facFilters.classList.remove('hidden');
             if (viewToggle) viewToggle.classList.add('hidden');
-            if (mobileRoomSec) mobileRoomSec.classList.add('hidden');
-            if (mobileFacSec) mobileFacSec.classList.remove('hidden');
+            if (mobFacSec) mobFacSec.classList.remove('hidden');
 
-            renderActiveFilterPills();
             if (state.facilities.items.length === 0) fetchFacilities();
+        } else {
+            if (tabNavBtn) {
+                tabNavBtn.classList.add('active');
+                tabNavBtn.setAttribute('aria-selected', 'true');
+            }
+            if (paneNav) paneNav.classList.remove('hidden');
+            if (navFilters) navFilters.classList.remove('hidden');
+            if (viewToggle) viewToggle.classList.add('hidden');
+            if (mobNavSec) mobNavSec.classList.remove('hidden');
+
+            if (state.navigation.items.length === 0) fetchNavigation();
         }
 
+        renderActiveFilterPills();
         if (window.lucide) window.lucide.createIcons();
     }
 
     /**
-     * Switch view mode between Card Grid and Table (Rooms tab only)
+     * Switch view mode between Card and Table (Rooms only)
      */
     function setViewMode(mode) {
         state.viewMode = mode;
@@ -388,15 +451,16 @@
     }
 
     /**
-     * Refresh All Data (KPIs, Rooms, Facilities)
+     * Refresh All 3 Datasets
      */
     function refreshAllData() {
         fetchRooms();
         fetchFacilities();
+        fetchNavigation();
     }
 
     /**
-     * Fetch Academic Rooms with filtering, pagination, and live KPIs
+     * 1. Fetch Academic Rooms
      */
     async function fetchRooms() {
         state.rooms.loading = true;
@@ -406,9 +470,7 @@
         params.set('page', state.rooms.page.toString());
         params.set('limit', state.rooms.limit.toString());
 
-        if (state.searchQuery) {
-            params.set('search', state.searchQuery);
-        }
+        if (state.searchQuery) params.set('search', state.searchQuery);
 
         const activeFilters = {};
         for (const [k, v] of Object.entries(state.rooms.filters)) {
@@ -428,19 +490,17 @@
                 state.rooms.pages = data.pages || 1;
                 state.rooms.page = data.page || 1;
 
-                // Update Stats if unfiltered total
                 if (!state.searchQuery && Object.keys(activeFilters).length === 0) {
                     state.stats.totalRooms = data.total;
-                    calculateLiveStats(data.items, data.total);
                 }
 
                 renderRooms();
                 renderRoomsPagination();
             } else {
-                showToast(data.message || 'Failed to load rooms.', 'error');
+                showToast(data.message || 'Failed to load academic rooms.', 'error');
             }
         } catch (err) {
-            console.error('Error fetching academic rooms:', err);
+            console.error('Error fetching rooms:', err);
             showToast('Network error while loading academic rooms.', 'error');
         } finally {
             state.rooms.loading = false;
@@ -451,7 +511,7 @@
     }
 
     /**
-     * Fetch Campus Facilities
+     * 2. Fetch Campus Facilities
      */
     async function fetchFacilities() {
         state.facilities.loading = true;
@@ -461,9 +521,7 @@
         params.set('page', state.facilities.page.toString());
         params.set('limit', state.facilities.limit.toString());
 
-        if (state.searchQuery) {
-            params.set('search', state.searchQuery);
-        }
+        if (state.searchQuery) params.set('search', state.searchQuery);
 
         const activeFilters = {};
         for (const [k, v] of Object.entries(state.facilities.filters)) {
@@ -501,39 +559,80 @@
     }
 
     /**
-     * Calculate live counts for KPIs
+     * 3. Fetch Campus Navigation & Locations (with Images)
      */
-    function calculateLiveStats(sampleItems, totalCount) {
-        state.stats.totalRooms = totalCount;
-        state.stats.activeRooms = totalCount; // Active by default
-        state.stats.totalDepts = 8; // 8 Engineering & Technology Departments
+    async function fetchNavigation() {
+        state.navigation.loading = true;
+        renderNavigationLoading(true);
+
+        const params = new URLSearchParams();
+        params.set('page', state.navigation.page.toString());
+        params.set('limit', state.navigation.limit.toString());
+
+        if (state.searchQuery) params.set('search', state.searchQuery);
+
+        const activeFilters = {};
+        for (const [k, v] of Object.entries(state.navigation.filters)) {
+            if (v && v.trim() !== '') activeFilters[k] = v.trim();
+        }
+        if (Object.keys(activeFilters).length > 0) {
+            params.set('filters', JSON.stringify(activeFilters));
+        }
+
+        try {
+            const resp = await fetch(`/admin/api/crud/campus_info?${params.toString()}`);
+            const data = await resp.json();
+
+            if (data.status === 'success') {
+                state.navigation.items = data.items || [];
+                state.navigation.total = data.total || 0;
+
+                if (!state.searchQuery && Object.keys(activeFilters).length === 0) {
+                    state.stats.totalLocations = data.total;
+                }
+
+                renderNavigation();
+            } else {
+                showToast(data.message || 'Failed to load campus locations.', 'error');
+            }
+        } catch (err) {
+            console.error('Error fetching navigation places:', err);
+            showToast('Network error while loading campus locations.', 'error');
+        } finally {
+            state.navigation.loading = false;
+            renderNavigationLoading(false);
+            renderActiveFilterPills();
+            updateKpiDisplay();
+        }
     }
 
     /**
-     * Update KPI Cards & Header Count
+     * Update KPI display
      */
     function updateKpiDisplay() {
         const headerCount = document.getElementById('headerTotalCount');
         const kpiTotalRooms = document.getElementById('kpiTotalRooms');
         const kpiTotalFac = document.getElementById('kpiTotalFacilities');
-        const kpiActive = document.getElementById('kpiActiveRooms');
+        const kpiTotalLoc = document.getElementById('kpiTotalLocations');
         const kpiDepts = document.getElementById('kpiTotalDepts');
         const tabRoomsCount = document.getElementById('tabRoomsCount');
         const tabFacCount = document.getElementById('tabFacilitiesCount');
+        const tabNavCount = document.getElementById('tabNavigationCount');
 
-        const totalCombined = (state.stats.totalRooms || 0) + (state.stats.totalFacilities || 0);
+        const totalCombined = (state.stats.totalRooms || 0) + (state.stats.totalFacilities || 0) + (state.stats.totalLocations || 0);
 
         if (headerCount) headerCount.textContent = totalCombined.toLocaleString();
         if (kpiTotalRooms) kpiTotalRooms.textContent = (state.stats.totalRooms || 0).toLocaleString();
         if (kpiTotalFac) kpiTotalFac.textContent = (state.stats.totalFacilities || 0).toLocaleString();
-        if (kpiActive) kpiActive.textContent = (state.stats.totalRooms || 0).toLocaleString();
+        if (kpiTotalLoc) kpiTotalLoc.textContent = (state.stats.totalLocations || 0).toLocaleString();
         if (kpiDepts) kpiDepts.textContent = '8';
         if (tabRoomsCount) tabRoomsCount.textContent = (state.stats.totalRooms || 0).toLocaleString();
         if (tabFacCount) tabFacCount.textContent = (state.stats.totalFacilities || 0).toLocaleString();
+        if (tabNavCount) tabNavCount.textContent = (state.stats.totalLocations || 0).toLocaleString();
     }
 
     /**
-     * Render Rooms Cards & Table
+     * Render Academic Rooms Cards & Table
      */
     function renderRooms() {
         const cardGrid = document.getElementById('roomsCardGrid');
@@ -652,9 +751,7 @@
                 <tr>
                     <td class="font-mono text-xs text-[#8C95AD]">${id}</td>
                     <td class="font-bold text-[#171D3A]">${name}</td>
-                    <td>
-                        <span class="text-xs text-[#171D3A] font-medium">${dept}</span>
-                    </td>
+                    <td><span class="text-xs text-[#171D3A] font-medium">${dept}</span></td>
                     <td class="text-xs text-[#66708F]">${bldg}${floor ? ` (${floor})` : ''}</td>
                     <td class="text-xs text-[#66708F]">${type}</td>
                     <td class="text-xs text-[#66708F]">${capacity}</td>
@@ -682,9 +779,7 @@
             tableBody.innerHTML = rowsHtml;
         }
 
-        // Attach action click listeners
         attachRoomCardListeners();
-
         if (window.lucide) window.lucide.createIcons();
     }
 
@@ -715,8 +810,8 @@
                 const id = escapeHtml(fac.facility_id || fac.id || '');
                 const name = escapeHtml(fac.facility_name || id);
                 const category = escapeHtml(fac.category || 'Campus Facility');
-                const desc = escapeHtml(fac.description || 'Campus facility resource for students and faculty.');
-                const location = escapeHtml(fac.location || fac.building || 'Campus Central');
+                const desc = escapeHtml(fac.description || 'Campus resource for students and faculty.');
+                const location = escapeHtml(fac.location || fac.building || 'Campus Central Area');
                 const status = (fac.status || 'Active').trim();
                 const amenities = escapeHtml(fac.facilities || '');
                 const statusClass = getStatusClass(status);
@@ -781,16 +876,82 @@
         }
 
         attachFacilityCardListeners();
-
         if (window.lucide) window.lucide.createIcons();
     }
 
     /**
-     * Attach Event Listeners to Room Card Actions
+     * Render Campus Navigation & Locations (Explore Campus with Real Photos)
+     */
+    function renderNavigation() {
+        const cardGrid = document.getElementById('navigationCardGrid');
+        const emptyState = document.getElementById('navigationEmptyState');
+        const totalText = document.getElementById('totalNavigationCount');
+
+        const items = state.navigation.items;
+        const total = state.navigation.total;
+
+        if (totalText) totalText.textContent = total.toLocaleString();
+
+        if (items.length === 0) {
+            if (cardGrid) cardGrid.innerHTML = '';
+            if (emptyState) emptyState.classList.remove('hidden');
+            return;
+        }
+
+        if (emptyState) emptyState.classList.add('hidden');
+
+        if (cardGrid) {
+            let cardsHtml = '';
+            items.forEach(loc => {
+                const id = escapeHtml(loc.place_id || loc.id || '');
+                const name = escapeHtml(loc.place_name || id);
+                const category = escapeHtml(loc.category || 'Campus Location');
+                const zone = escapeHtml(loc.zone || 'Campus Area');
+                const landmark = escapeHtml(loc.landmark || '');
+                const desc = escapeHtml(loc.description || `SVIT Campus landmark situated in ${zone}.`);
+                const imgUrl = loc.image_url || '/static/navigation_maps/SVIT with all dep.jpeg';
+
+                cardsHtml += `
+                <div class="navigation-card view-navigation-details-card" data-nav-id="${id}">
+                    <div class="nav-card-img-wrap">
+                        <img src="${imgUrl}" alt="${name}" class="nav-card-img" loading="lazy" onerror="this.onerror=null; this.src='/static/navigation_maps/SVIT with all dep.jpeg';">
+                        <span class="nav-card-category-badge">${category}</span>
+                    </div>
+
+                    <div class="nav-card-body">
+                        <div>
+                            <h4 class="nav-card-title">${name}</h4>
+                            <div class="nav-card-zone-row">
+                                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-[#3B82F6] flex-shrink-0"></i>
+                                <span class="font-semibold text-[#171D3A]">${zone}</span>
+                                ${landmark ? `<span class="text-[#8C95AD]">• ${landmark}</span>` : ''}
+                            </div>
+                            <p class="nav-card-desc">${desc}</p>
+                        </div>
+
+                        <div class="nav-card-footer">
+                            <span class="text-xs font-mono text-[#8C95AD]">${id}</span>
+                            <button type="button" class="nav-card-link-btn">
+                                <span>Explore Location</span>
+                                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            cardGrid.innerHTML = cardsHtml;
+        }
+
+        attachNavigationCardListeners();
+        if (window.lucide) window.lucide.createIcons();
+    }
+
+    /**
+     * Attach Click Listeners
      */
     function attachRoomCardListeners() {
         document.querySelectorAll('.view-room-details-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', () => {
                 const id = btn.getAttribute('data-room-id');
                 const room = state.rooms.items.find(r => (r.room_id || r.id) === id);
                 if (room) openDetailsModal('room', room);
@@ -798,7 +959,7 @@
         });
 
         document.querySelectorAll('.edit-room-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', () => {
                 const id = btn.getAttribute('data-room-id');
                 const room = state.rooms.items.find(r => (r.room_id || r.id) === id);
                 if (room) openRoomFormModal('edit', room);
@@ -806,7 +967,7 @@
         });
 
         document.querySelectorAll('.delete-room-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', () => {
                 const id = btn.getAttribute('data-room-id');
                 const name = btn.getAttribute('data-room-name') || id;
                 openDeleteConfirmModal('rooms', id, name);
@@ -814,12 +975,9 @@
         });
     }
 
-    /**
-     * Attach Event Listeners to Facility Card Actions
-     */
     function attachFacilityCardListeners() {
         document.querySelectorAll('.view-facility-details-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', () => {
                 const id = btn.getAttribute('data-facility-id');
                 const fac = state.facilities.items.find(f => (f.facility_id || f.id) === id);
                 if (fac) openDetailsModal('facility', fac);
@@ -827,7 +985,7 @@
         });
 
         document.querySelectorAll('.edit-facility-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', () => {
                 const id = btn.getAttribute('data-facility-id');
                 const fac = state.facilities.items.find(f => (f.facility_id || f.id) === id);
                 if (fac) openFacilityFormModal('edit', fac);
@@ -835,7 +993,7 @@
         });
 
         document.querySelectorAll('.delete-facility-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', () => {
                 const id = btn.getAttribute('data-facility-id');
                 const name = btn.getAttribute('data-facility-name') || id;
                 openDeleteConfirmModal('facilities', id, name);
@@ -843,8 +1001,18 @@
         });
     }
 
+    function attachNavigationCardListeners() {
+        document.querySelectorAll('.view-navigation-details-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const id = card.getAttribute('data-nav-id');
+                const loc = state.navigation.items.find(n => (n.place_id || n.id) === id);
+                if (loc) openDetailsModal('navigation', loc);
+            });
+        });
+    }
+
     /**
-     * Open Room Form Modal (Create or Edit)
+     * Modals: Add / Edit Room
      */
     function openRoomFormModal(mode, roomData = null) {
         const titleEl = document.getElementById('roomFormModalLabel');
@@ -899,7 +1067,7 @@
     }
 
     /**
-     * Open Campus Facility Form Modal (Create or Edit)
+     * Modals: Add / Edit Facility
      */
     function openFacilityFormModal(mode, facData = null) {
         const titleEl = document.getElementById('facilityFormModalLabel');
@@ -957,7 +1125,7 @@
     }
 
     /**
-     * Open Item Details View Modal
+     * Details Modal (Room, Facility, or Navigation)
      */
     function openDetailsModal(type, item) {
         const titleEl = document.getElementById('itemDetailsModalLabel');
@@ -1030,17 +1198,18 @@
             if (contentEl) contentEl.innerHTML = detailsHtml;
 
             if (editBtn) {
+                editBtn.classList.remove('hidden');
                 editBtn.onclick = () => {
                     if (itemDetailsModal) itemDetailsModal.hide();
                     openRoomFormModal('edit', item);
                 };
             }
-        } else {
+        } else if (type === 'facility') {
             const name = escapeHtml(item.facility_name || item.id);
             const id = escapeHtml(item.facility_id || item.id);
             const cat = escapeHtml(item.category || 'Campus Facility');
             const desc = escapeHtml(item.description || '');
-            const loc = escapeHtml(item.location || item.building || 'Campus Central');
+            const loc = escapeHtml(item.location || item.building || 'Campus Central Area');
             const status = (item.status || 'Active').trim();
             const bldg = escapeHtml(item.building || '');
             const floor = escapeHtml(item.floor || '');
@@ -1097,11 +1266,61 @@
             if (contentEl) contentEl.innerHTML = detailsHtml;
 
             if (editBtn) {
+                editBtn.classList.remove('hidden');
                 editBtn.onclick = () => {
                     if (itemDetailsModal) itemDetailsModal.hide();
                     openFacilityFormModal('edit', item);
                 };
             }
+        } else {
+            // Navigation / Campus Location
+            const name = escapeHtml(item.place_name || item.id);
+            const id = escapeHtml(item.place_id || item.id);
+            const cat = escapeHtml(item.category || 'Campus Location');
+            const zone = escapeHtml(item.zone || 'Campus Area');
+            const landmark = escapeHtml(item.landmark || '');
+            const desc = escapeHtml(item.description || `SVIT Campus landmark situated in ${zone}.`);
+            const imgUrl = item.image_url || '/static/navigation_maps/SVIT with all dep.jpeg';
+
+            if (titleEl) titleEl.textContent = `Location: ${name}`;
+            if (subLabelEl) subLabelEl.textContent = 'Campus map and navigation landmark';
+            if (iconEl) iconEl.innerHTML = '<i data-lucide="map-pin" class="w-5 h-5"></i>';
+
+            let detailsHtml = `
+            <div class="details-img-preview mb-3">
+                <img src="${imgUrl}" alt="${name}" onerror="this.onerror=null; this.src='/static/navigation_maps/SVIT with all dep.jpeg';">
+            </div>
+
+            <div class="details-hero-box">
+                <div>
+                    <span class="text-xs font-mono text-[#8C95AD]">${id}</span>
+                    <h3 class="text-xl font-bold text-[#171D3A] m-0">${name}</h3>
+                    <span class="facility-category-badge mt-1">${cat}</span>
+                </div>
+                <div class="text-end">
+                    <span class="text-xs font-bold text-[#3B82F6] block">${zone}</span>
+                </div>
+            </div>
+
+            ${desc ? `
+            <div class="details-full-box">
+                <span class="details-item-label mb-1">Campus Description</span>
+                <p class="text-xs text-[#171D3A] m-0 leading-relaxed">${desc}</p>
+            </div>` : ''}
+
+            <div class="details-grid">
+                <div class="details-item">
+                    <span class="details-item-label">Campus Zone</span>
+                    <span class="details-item-val">${zone}</span>
+                </div>
+                <div class="details-item">
+                    <span class="details-item-label">Landmark Reference</span>
+                    <span class="details-item-val">${landmark || 'Central Campus'}</span>
+                </div>
+            </div>`;
+
+            if (contentEl) contentEl.innerHTML = detailsHtml;
+            if (editBtn) editBtn.classList.add('hidden'); // Read-only navigation landmark
         }
 
         if (itemDetailsModal) itemDetailsModal.show();
@@ -1109,7 +1328,7 @@
     }
 
     /**
-     * Open Delete Confirmation Modal
+     * Delete Confirmation Modal
      */
     function openDeleteConfirmModal(module, id, name) {
         state.pendingDelete = { module, id, name };
@@ -1118,9 +1337,6 @@
         if (deleteConfirmModal) deleteConfirmModal.show();
     }
 
-    /**
-     * Handle Confirm Delete
-     */
     async function handleConfirmDelete() {
         if (!state.pendingDelete) return;
 
@@ -1132,9 +1348,7 @@
         }
 
         try {
-            const resp = await fetch(`/admin/api/crud/${module}/${encodeURIComponent(id)}`, {
-                method: 'DELETE'
-            });
+            const resp = await fetch(`/admin/api/crud/${module}/${encodeURIComponent(id)}`, { method: 'DELETE' });
             const data = await resp.json();
 
             if (data.status === 'success') {
@@ -1142,8 +1356,10 @@
                 if (deleteConfirmModal) deleteConfirmModal.hide();
                 if (module === 'rooms' || module === 'rooms_facilities') {
                     fetchRooms();
-                } else {
+                } else if (module === 'facilities') {
                     fetchFacilities();
+                } else {
+                    fetchNavigation();
                 }
             } else {
                 showToast(data.message || 'Error deleting record.', 'error');
@@ -1161,7 +1377,7 @@
     }
 
     /**
-     * Handle Room Form Submit
+     * Handle Form Submits
      */
     async function handleRoomFormSubmit(e) {
         e.preventDefault();
@@ -1224,9 +1440,6 @@
         }
     }
 
-    /**
-     * Handle Facility Form Submit
-     */
     async function handleFacilityFormSubmit(e) {
         e.preventDefault();
         const form = e.target;
@@ -1290,7 +1503,7 @@
     }
 
     /**
-     * Render Rooms Pagination Controls
+     * Pagination Controls (Rooms)
      */
     function renderRoomsPagination() {
         const infoEl = document.getElementById('currentRoomsPage');
@@ -1340,15 +1553,17 @@
     }
 
     /**
-     * Render Active Filter Pills
+     * Active Filters Feedback Pills
      */
     function renderActiveFilterPills() {
         const container = document.getElementById('activeFiltersContainer');
         const pillsList = document.getElementById('activeFilterPills');
         const badgeDot = document.getElementById('activeFilterBadge');
 
-        const isRooms = state.activeTab === 'rooms';
-        const activeFilters = isRooms ? state.rooms.filters : state.facilities.filters;
+        let activeFilters = {};
+        if (state.activeTab === 'rooms') activeFilters = state.rooms.filters;
+        else if (state.activeTab === 'facilities') activeFilters = state.facilities.filters;
+        else activeFilters = state.navigation.filters;
 
         let activeCount = 0;
         let pillsHtml = '';
@@ -1367,41 +1582,39 @@
             }
         }
 
-        if (container) {
-            container.classList.toggle('hidden', activeCount === 0);
-        }
+        if (container) container.classList.toggle('hidden', activeCount === 0);
         if (pillsList) {
             pillsList.innerHTML = pillsHtml;
             pillsList.querySelectorAll('.filter-pill-remove').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const filterKey = btn.getAttribute('data-filter-key');
-                    if (isRooms) {
+                    if (state.activeTab === 'rooms') {
                         state.rooms.filters[filterKey] = '';
                         state.rooms.page = 1;
                         syncDesktopFilterInputs();
                         syncMobileFilterInputs();
                         fetchRooms();
-                    } else {
+                    } else if (state.activeTab === 'facilities') {
                         state.facilities.filters[filterKey] = '';
                         state.facilities.page = 1;
                         syncDesktopFilterInputs();
                         syncMobileFilterInputs();
                         fetchFacilities();
+                    } else {
+                        state.navigation.filters[filterKey] = '';
+                        state.navigation.page = 1;
+                        syncDesktopFilterInputs();
+                        syncMobileFilterInputs();
+                        fetchNavigation();
                     }
                 });
             });
         }
 
-        if (badgeDot) {
-            badgeDot.classList.toggle('hidden', activeCount === 0);
-        }
-
+        if (badgeDot) badgeDot.classList.toggle('hidden', activeCount === 0);
         if (window.lucide) window.lucide.createIcons();
     }
 
-    /**
-     * Reset All Filters
-     */
     function resetAllFilters() {
         state.searchQuery = '';
         const searchInput = document.getElementById('globalSearchInput');
@@ -1411,18 +1624,18 @@
 
         state.rooms.filters = { department: '', status: '', room_type: '', building: '', floor: '' };
         state.facilities.filters = { category: '', status: '', building: '', floor: '' };
+        state.navigation.filters = { category: '', zone: '' };
 
         state.rooms.page = 1;
         state.facilities.page = 1;
+        state.navigation.page = 1;
 
         syncDesktopFilterInputs();
         syncMobileFilterInputs();
 
-        if (state.activeTab === 'rooms') {
-            fetchRooms();
-        } else {
-            fetchFacilities();
-        }
+        if (state.activeTab === 'rooms') fetchRooms();
+        else if (state.activeTab === 'facilities') fetchFacilities();
+        else fetchNavigation();
     }
 
     /**
@@ -1444,20 +1657,25 @@
     }
 
     function applyMobileFilters() {
-        const isRooms = state.activeTab === 'rooms';
-        if (isRooms) {
+        if (state.activeTab === 'rooms') {
             state.rooms.filters.department = document.getElementById('mobileFilterDept')?.value || '';
             state.rooms.filters.room_type = document.getElementById('mobileFilterType')?.value || '';
             state.rooms.filters.status = document.getElementById('mobileFilterStatus')?.value || '';
             state.rooms.page = 1;
             syncDesktopFilterInputs();
             fetchRooms();
-        } else {
+        } else if (state.activeTab === 'facilities') {
             state.facilities.filters.category = document.getElementById('mobileFilterFacCat')?.value || '';
             state.facilities.filters.status = document.getElementById('mobileFilterFacStatus')?.value || '';
             state.facilities.page = 1;
             syncDesktopFilterInputs();
             fetchFacilities();
+        } else {
+            state.navigation.filters.category = document.getElementById('mobileFilterNavCat')?.value || '';
+            state.navigation.filters.zone = document.getElementById('mobileFilterNavZone')?.value || '';
+            state.navigation.page = 1;
+            syncDesktopFilterInputs();
+            fetchNavigation();
         }
     }
 
@@ -1467,12 +1685,16 @@
         const filterType = document.getElementById('filterTypeSelect');
         const filterFacCat = document.getElementById('filterFacilityCategorySelect');
         const filterFacStatus = document.getElementById('filterFacilityStatusSelect');
+        const filterNavCat = document.getElementById('filterNavCategorySelect');
+        const filterNavZone = document.getElementById('filterNavZoneSelect');
 
         if (filterDept) filterDept.value = state.rooms.filters.department;
         if (filterStatus) filterStatus.value = state.rooms.filters.status;
         if (filterType) filterType.value = state.rooms.filters.room_type;
         if (filterFacCat) filterFacCat.value = state.facilities.filters.category;
         if (filterFacStatus) filterFacStatus.value = state.facilities.filters.status;
+        if (filterNavCat) filterNavCat.value = state.navigation.filters.category;
+        if (filterNavZone) filterNavZone.value = state.navigation.filters.zone;
     }
 
     function syncMobileFilterInputs() {
@@ -1481,12 +1703,16 @@
         const mobStatus = document.getElementById('mobileFilterStatus');
         const mobFacCat = document.getElementById('mobileFilterFacCat');
         const mobFacStatus = document.getElementById('mobileFilterFacStatus');
+        const mobNavCat = document.getElementById('mobileFilterNavCat');
+        const mobNavZone = document.getElementById('mobileFilterNavZone');
 
         if (mobDept) mobDept.value = state.rooms.filters.department;
         if (mobType) mobType.value = state.rooms.filters.room_type;
         if (mobStatus) mobStatus.value = state.rooms.filters.status;
         if (mobFacCat) mobFacCat.value = state.facilities.filters.category;
         if (mobFacStatus) mobFacStatus.value = state.facilities.filters.status;
+        if (mobNavCat) mobNavCat.value = state.navigation.filters.category;
+        if (mobNavZone) mobNavZone.value = state.navigation.filters.zone;
     }
 
     /**
@@ -1510,6 +1736,13 @@
         if (grid) grid.classList.toggle('hidden', isLoading);
     }
 
+    function renderNavigationLoading(isLoading) {
+        const skel = document.getElementById('navigationSkeletonGrid');
+        const grid = document.getElementById('navigationCardGrid');
+        if (skel) skel.classList.toggle('hidden', !isLoading);
+        if (grid) grid.classList.toggle('hidden', isLoading);
+    }
+
     function getStatusClass(status) {
         const s = (status || '').toLowerCase().trim();
         if (s === 'active') return 'status-active';
@@ -1525,6 +1758,7 @@
             room_type: 'Type',
             status: 'Status',
             category: 'Category',
+            zone: 'Zone',
             building: 'Bldg'
         };
         const prefix = keyLabels[key] || key;
@@ -1546,7 +1780,6 @@
             window.showAdminNotification(message, type);
             return;
         }
-        // Fallback Toast
         const toast = document.createElement('div');
         toast.className = `fixed bottom-4 right-4 z-50 px-4 py-2.5 rounded-xl shadow-lg text-xs font-semibold flex items-center gap-2 ${
             type === 'success' ? 'bg-[#10B981] text-white' : type === 'error' ? 'bg-[#EF4444] text-white' : 'bg-[#171D3A] text-white'

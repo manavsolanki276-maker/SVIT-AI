@@ -21,10 +21,10 @@
                     <h1 class="rooms-title">Rooms & Facilities</h1>
                     <span id="totalLiveBadge" class="rooms-badge-count">
                         <span class="rooms-badge-dot"></span>
-                        <span id="headerTotalCount">0</span> Total
+                        <span id="headerTotalCount">0</span> Total Records
                     </span>
                 </div>
-                <p class="rooms-subtitle">Manage academic classrooms, lecture halls, labs, and campus facilities</p>
+                <p class="rooms-subtitle">Manage academic classrooms, campus facilities, and explore navigation landmarks</p>
             </div>
         </div>
 
@@ -43,7 +43,7 @@
 
     <!-- 2. LIVE KPI METRICS -->
     <div class="rooms-kpi-grid">
-        <!-- KPI 1: Total Rooms -->
+        <!-- KPI 1: Total Academic Rooms -->
         <div class="kpi-card" id="kpiTotalRoomsCard">
             <div class="kpi-icon-wrap kpi-icon-purple">
                 <i data-lucide="door-closed" class="w-5 h-5 text-[#8B5CF6]"></i>
@@ -71,30 +71,30 @@
             </div>
         </div>
 
-        <!-- KPI 3: Active Status -->
-        <div class="kpi-card" id="kpiActiveCard">
-            <div class="kpi-icon-wrap kpi-icon-green">
-                <i data-lucide="check-circle-2" class="w-5 h-5 text-[#10B981]"></i>
+        <!-- KPI 3: Explore Campus / Navigation Locations -->
+        <div class="kpi-card" id="kpiLocationsCard">
+            <div class="kpi-icon-wrap kpi-icon-blue">
+                <i data-lucide="map-pin" class="w-5 h-5 text-[#3B82F6]"></i>
             </div>
             <div class="kpi-info">
-                <span class="kpi-label">Active & Available</span>
+                <span class="kpi-label">Campus Locations</span>
                 <div class="kpi-value-row">
-                    <h3 class="kpi-value" id="kpiActiveRooms">-</h3>
-                    <span class="kpi-trend kpi-trend-up">Operational</span>
+                    <h3 class="kpi-value" id="kpiTotalLocations">-</h3>
+                    <span class="kpi-trend kpi-trend-up">With Real Photos</span>
                 </div>
             </div>
         </div>
 
         <!-- KPI 4: Academic Departments -->
         <div class="kpi-card" id="kpiDeptsCard">
-            <div class="kpi-icon-wrap kpi-icon-blue">
-                <i data-lucide="graduation-cap" class="w-5 h-5 text-[#3B82F6]"></i>
+            <div class="kpi-icon-wrap kpi-icon-green">
+                <i data-lucide="graduation-cap" class="w-5 h-5 text-[#10B981]"></i>
             </div>
             <div class="kpi-info">
                 <span class="kpi-label">Departments</span>
                 <div class="kpi-value-row">
-                    <h3 class="kpi-value" id="kpiTotalDepts">-</h3>
-                    <span class="kpi-trend kpi-trend-neutral">Branches</span>
+                    <h3 class="kpi-value" id="kpiTotalDepts">8</h3>
+                    <span class="kpi-trend kpi-trend-neutral">Engineering</span>
                 </div>
             </div>
         </div>
@@ -113,11 +113,16 @@
                 <span>Campus Facilities</span>
                 <span class="tab-pill-count" id="tabFacilitiesCount">0</span>
             </button>
+            <button type="button" class="rooms-tab-btn" id="tabNavigationBtn" data-tab="navigation" role="tab" aria-selected="false">
+                <i data-lucide="map-pin" class="w-4 h-4"></i>
+                <span>Explore Campus</span>
+                <span class="tab-pill-count" id="tabNavigationCount">0</span>
+            </button>
         </div>
 
         <div class="rooms-tab-quick-info text-xs text-[#66708F] hidden sm:flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-[#10B981]"></span>
-            <span>Live MongoDB Sync</span>
+            <span>Live MongoDB Atlas Sync</span>
         </div>
     </div>
 
@@ -126,7 +131,7 @@
         <!-- Search input -->
         <div class="rooms-search-box">
             <i data-lucide="search" class="rooms-search-icon"></i>
-            <input type="text" id="globalSearchInput" placeholder="Search room no., ID, department, facility name..." autocomplete="off">
+            <input type="text" id="globalSearchInput" placeholder="Search rooms, facilities, or campus navigation locations..." autocomplete="off">
             <button type="button" id="clearSearchBtn" class="rooms-clear-search-btn hidden" title="Clear search">
                 <i data-lucide="x" class="w-3.5 h-3.5"></i>
             </button>
@@ -190,6 +195,35 @@
             </select>
         </div>
 
+        <!-- Desktop Filters (Campus Navigation) -->
+        <div class="rooms-desktop-filters hidden" id="navigationDesktopFilters">
+            <select id="filterNavCategorySelect" class="filter-select" aria-label="Navigation Category Filter">
+                <option value="">All Categories</option>
+                <option value="Academic">Academic Department</option>
+                <option value="Laboratory">Laboratory & Workshop</option>
+                <option value="Office">Administrative Office</option>
+                <option value="Library">Library & Reading Hall</option>
+                <option value="Facility">Facility & Auditorium</option>
+                <option value="Sports">Sports & Grounds</option>
+                <option value="Food">Food & Canteen</option>
+                <option value="Entrance">Campus Entrance & Parking</option>
+            </select>
+
+            <select id="filterNavZoneSelect" class="filter-select" aria-label="Campus Zone Filter">
+                <option value="">All Zones</option>
+                <option value="North Wing">North Wing</option>
+                <option value="North-East Wing">North-East Wing</option>
+                <option value="North-West Wing">North-West Wing</option>
+                <option value="West Wing">West Wing</option>
+                <option value="South-West Wing">South-West Wing</option>
+                <option value="East Wing">East Wing</option>
+                <option value="Center Campus">Center Campus</option>
+                <option value="South Campus">South Campus</option>
+                <option value="Last Campus">Last Campus (Diploma)</option>
+                <option value="Campus Entry">Campus Entry</option>
+            </select>
+        </div>
+
         <!-- Action Tools -->
         <div class="rooms-control-tools">
             <!-- Mobile Filter Trigger -->
@@ -229,6 +263,7 @@
     </div>
 
     <!-- 5. MAIN CONTENT PANES -->
+    
     <!-- PANE A: ACADEMIC ROOMS -->
     <div id="paneRooms" class="tab-pane-content">
         <!-- Results Summary Bar -->
@@ -364,6 +399,48 @@
         <!-- Facilities Card Grid -->
         <div id="facilitiesCardGrid" class="facilities-cards-grid">
             <!-- Dynamically injected -->
+        </div>
+    </div>
+
+    <!-- PANE C: EXPLORE CAMPUS / NAVIGATION MAPS -->
+    <div id="paneNavigation" class="tab-pane-content hidden">
+        <!-- Results Summary Bar -->
+        <div class="results-summary-bar">
+            <div class="results-count-text">
+                Showing <strong id="totalNavigationCount">0</strong> verified campus buildings & navigation landmarks with photos
+            </div>
+            <div class="text-xs text-[#66708F] flex items-center gap-1.5">
+                <i data-lucide="info" class="w-3.5 h-3.5 text-[#8B5CF6]"></i>
+                <span>Tap any card to view detailed building layout & photo</span>
+            </div>
+        </div>
+
+        <!-- Navigation Skeleton Loading State -->
+        <div id="navigationSkeletonGrid" class="navigation-cards-grid hidden">
+            {% for i in range(6) %}
+            <div class="nav-skeleton-card">
+                <div class="skeleton-image-box"></div>
+                <div class="skeleton-line skeleton-title mt-2"></div>
+                <div class="skeleton-line skeleton-subtitle"></div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Navigation Empty State -->
+        <div id="navigationEmptyState" class="empty-state-card hidden">
+            <div class="empty-state-icon">
+                <i data-lucide="map-pin" class="w-8 h-8 text-[#8B5CF6]"></i>
+            </div>
+            <h4 class="empty-state-title">No Campus Locations Found</h4>
+            <p class="empty-state-desc">No campus navigation points match your filter criteria.</p>
+            <div class="empty-state-actions">
+                <button type="button" id="emptyResetNavBtn" class="btn-rooms-secondary">Reset Filters</button>
+            </div>
+        </div>
+
+        <!-- Navigation Cards Grid (Rich Images) -->
+        <div id="navigationCardGrid" class="navigation-cards-grid">
+            <!-- Dynamically injected via JavaScript -->
         </div>
     </div>
 
@@ -605,7 +682,7 @@
     </div>
 </div>
 
-<!-- MODAL 3: VIEW ROOM / FACILITY DETAILS -->
+<!-- MODAL 3: VIEW DETAILS (Room, Facility, or Navigation) -->
 <div class="modal fade" id="itemDetailsModal" tabindex="-1" aria-labelledby="itemDetailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content custom-modal-surface">
@@ -616,7 +693,7 @@
                     </div>
                     <div>
                         <h5 class="modal-title font-bold text-[#171D3A]" id="itemDetailsModalLabel">Item Details</h5>
-                        <p class="text-xs text-[#66708F] mb-0" id="detailsSubLabel">Verified academic record</p>
+                        <p class="text-xs text-[#66708F] mb-0" id="detailsSubLabel">Verified campus inventory record</p>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -741,6 +818,41 @@
                     <option value="Occupied">Occupied</option>
                     <option value="Maintenance">Maintenance</option>
                     <option value="Inactive">Inactive</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Filter sections for Navigation tab -->
+        <div id="mobileNavigationFiltersSection" class="hidden">
+            <div class="form-group mb-3">
+                <label class="form-label">Navigation Category</label>
+                <select id="mobileFilterNavCat" class="form-control-saas">
+                    <option value="">All Categories</option>
+                    <option value="Academic">Academic Department</option>
+                    <option value="Laboratory">Laboratory & Workshop</option>
+                    <option value="Office">Administrative Office</option>
+                    <option value="Library">Library & Reading Hall</option>
+                    <option value="Facility">Facility & Auditorium</option>
+                    <option value="Sports">Sports & Grounds</option>
+                    <option value="Food">Food & Canteen</option>
+                    <option value="Entrance">Campus Entrance & Parking</option>
+                </select>
+            </div>
+
+            <div class="form-group mb-3">
+                <label class="form-label">Campus Zone</label>
+                <select id="mobileFilterNavZone" class="form-control-saas">
+                    <option value="">All Zones</option>
+                    <option value="North Wing">North Wing</option>
+                    <option value="North-East Wing">North-East Wing</option>
+                    <option value="North-West Wing">North-West Wing</option>
+                    <option value="West Wing">West Wing</option>
+                    <option value="South-West Wing">South-West Wing</option>
+                    <option value="East Wing">East Wing</option>
+                    <option value="Center Campus">Center Campus</option>
+                    <option value="South Campus">South Campus</option>
+                    <option value="Last Campus">Last Campus (Diploma)</option>
+                    <option value="Campus Entry">Campus Entry</option>
                 </select>
             </div>
         </div>
