@@ -1475,7 +1475,7 @@ def process_campus_navigation_context(query: str) -> Tuple[str, Optional[str], L
                 sources.append(f"facilities.csv (Row {idx + 1})")
         
         map_url = "/static/navigation_maps/SVIT with all dep.jpeg"
-        return "\n".join(context_blocks), map_url, sources[:20]
+        return "\n\n---\n\n".join(context_blocks), map_url, sources[:60]
     
     # Check for spatial "near <landmark>"
     near_match = re.search(r'\b(?:near|around|close to|beside|what is near)\s+(?:the\s+)?([a-z0-9\s&]+)', clean_q)
@@ -1509,7 +1509,7 @@ def process_campus_navigation_context(query: str) -> Tuple[str, Optional[str], L
                 # Resolve map image based on target entity
                 top_dict = matching_rows[0][1].to_dict()
                 map_file = resolve_entity_map_image(top_dict)
-                return "\n".join(context_blocks), f"/static/navigation_maps/{map_file}", sources
+                return "\n\n---\n\n".join(context_blocks), f"/static/navigation_maps/{map_file}", sources
 
     # 3. Candidate Scoring & Entity Matching
     candidates = [] # List of tuples: (score, type, idx, row_dict, source_str)
