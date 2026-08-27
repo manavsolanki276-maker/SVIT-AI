@@ -1,6 +1,10 @@
 /* =========================================================================
    SVIT Light SaaS - Rooms & Facilities Administration Stylesheet
-   Responsive Design: 320px, 360px, 375px, 390px, 414px, 430px, 768px, 1024px, 1440px, 1920px
+   Responsive Design: 320px, 360px, 375px, 390px, 414px, 430px, 768px, 834px, 1024px, 1280px, 1440px, 1920px
+   Fixes:
+   1. Detail Modal: Full image display with object-fit: contain (no cropping/stretching)
+   2. Diploma Navigation: Clean visual badges and full responsiveness
+   3. Academic Rooms: Zero horizontal overflow with proper right margin across all resolutions
    ========================================================================= */
 
 :root {
@@ -42,14 +46,16 @@
 /* Base Page Layout */
 .rooms-page-container {
     width: 100%;
-    max-width: 1600px;
+    max-width: 100%;
     margin: 0 auto;
-    padding: 0 0 6rem 0; /* Safe-area padding for mobile navigation */
+    padding: 0 0.5rem 6rem 0.5rem; /* Safe-area padding with balanced margins */
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
     color: var(--rf-text);
     font-family: inherit;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 /* -------------------------------------------------------------
@@ -66,6 +72,8 @@
     gap: 1rem;
     box-shadow: var(--rf-shadow-sm);
     flex-wrap: wrap;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .rooms-header-content {
@@ -73,6 +81,7 @@
     align-items: center;
     gap: 1rem;
     min-width: 0;
+    flex: 1;
 }
 
 .rooms-header-icon-box {
@@ -89,6 +98,7 @@
 
 .rooms-header-text {
     min-width: 0;
+    flex: 1;
 }
 
 .rooms-header-title-row {
@@ -145,6 +155,7 @@
     align-items: center;
     gap: 0.625rem;
     flex-shrink: 0;
+    flex-wrap: wrap;
 }
 
 /* Button Styles */
@@ -231,8 +242,10 @@
    ------------------------------------------------------------- */
 .rooms-kpi-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 1rem;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .kpi-card {
@@ -245,6 +258,8 @@
     gap: 0.875rem;
     box-shadow: var(--rf-shadow-sm);
     transition: transform 0.15s ease, box-shadow 0.15s ease;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .kpi-card:hover {
@@ -325,6 +340,8 @@
     gap: 1rem;
     padding-bottom: 0.25rem;
     flex-wrap: wrap;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .rooms-tab-bar {
@@ -337,6 +354,7 @@
     box-shadow: var(--rf-shadow-sm);
     gap: 0.25rem;
     flex-wrap: wrap;
+    box-sizing: border-box;
 }
 
 .rooms-tab-btn {
@@ -395,6 +413,8 @@
     gap: 0.875rem;
     box-shadow: var(--rf-shadow-sm);
     flex-wrap: wrap;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .rooms-search-box {
@@ -425,6 +445,7 @@
     outline: none;
     transition: all 0.15s ease;
     min-height: 40px;
+    box-sizing: border-box;
 }
 
 .rooms-search-box input:focus {
@@ -466,6 +487,7 @@
     cursor: pointer;
     transition: border-color 0.15s ease;
     min-height: 40px;
+    box-sizing: border-box;
 }
 
 .filter-select:focus, .limit-select:focus {
@@ -558,6 +580,8 @@
     gap: 0.5rem;
     flex-wrap: wrap;
     padding: 0.25rem 0;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .active-filters-label {
@@ -608,8 +632,15 @@
 }
 
 /* -------------------------------------------------------------
-   5. Results & Content Layouts
+   5. Results & Content Layouts (Zero Overflow Protected)
    ------------------------------------------------------------- */
+.tab-pane-content {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+}
+
 .results-summary-bar {
     display: flex;
     align-items: center;
@@ -618,6 +649,8 @@
     padding: 0.25rem 0;
     font-size: 0.8125rem;
     color: var(--rf-text-secondary);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .pagination-limit-select {
@@ -632,11 +665,13 @@
     font-size: 0.75rem;
 }
 
-/* Rooms Card Grid */
+/* Rooms Card Grid (Responsive with proper right margins) */
 .rooms-cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 1rem;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* Room Card (Premium SaaS UI) */
@@ -651,6 +686,10 @@
     box-shadow: var(--rf-shadow-sm);
     transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
     position: relative;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+    word-break: break-word;
 }
 
 .room-card:hover {
@@ -817,8 +856,10 @@
    ------------------------------------------------------------- */
 .facilities-cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.125rem;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .facility-card {
@@ -833,6 +874,8 @@
     transition: all 0.2s ease;
     position: relative;
     overflow: hidden;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .facility-card::before {
@@ -951,8 +994,10 @@
    ------------------------------------------------------------- */
 .navigation-cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.25rem;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .navigation-card {
@@ -964,11 +1009,12 @@
     flex-direction: column;
     box-shadow: var(--rf-shadow-sm);
     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-    cursor: pointer;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .navigation-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-3px);
     box-shadow: var(--rf-shadow-md);
     border-color: rgba(59, 130, 246, 0.4);
 }
@@ -990,14 +1036,14 @@
 }
 
 .navigation-card:hover .nav-card-img {
-    transform: scale(1.05);
+    transform: scale(1.04);
 }
 
 .nav-card-category-badge {
     position: absolute;
     top: 0.75rem;
     left: 0.75rem;
-    background: rgba(23, 29, 58, 0.8);
+    background: rgba(23, 29, 58, 0.85);
     backdrop-filter: blur(4px);
     color: #FFFFFF;
     font-size: 0.6875rem;
@@ -1052,45 +1098,6 @@
     margin-top: auto;
 }
 
-.nav-card-link-btn {
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--rf-primary);
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-}
-
-.nav-card-link-btn:hover {
-    color: var(--rf-primary-hover);
-    text-decoration: underline;
-}
-
-/* Navigation Skeleton */
-.nav-skeleton-card {
-    background: var(--rf-surface);
-    border: 1px solid var(--rf-border);
-    border-radius: var(--rf-radius-xl);
-    overflow: hidden;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.skeleton-image-box {
-    width: 100%;
-    height: 160px;
-    border-radius: var(--rf-radius-lg);
-    background: linear-gradient(90deg, #F0F2F8 25%, #E4E8F2 50%, #F0F2F8 75%);
-    background-size: 200% 100%;
-    animation: skeletonShimmer 1.5s infinite;
-}
-
 /* -------------------------------------------------------------
    8. Structured Table View (Desktop)
    ------------------------------------------------------------- */
@@ -1100,6 +1107,8 @@
     border-radius: var(--rf-radius-lg);
     overflow-x: auto;
     box-shadow: var(--rf-shadow-sm);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .rooms-data-table {
@@ -1146,6 +1155,8 @@
     gap: 1rem;
     padding: 1rem 0;
     flex-wrap: wrap;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .pagination-info {
@@ -1233,6 +1244,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .empty-state-icon {
@@ -1268,7 +1281,7 @@
 }
 
 /* Skeletons */
-.room-skeleton-card, .facility-skeleton-card {
+.room-skeleton-card, .facility-skeleton-card, .nav-skeleton-card {
     background: var(--rf-surface);
     border: 1px solid var(--rf-border);
     border-radius: var(--rf-radius-lg);
@@ -1276,6 +1289,8 @@
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .skeleton-line {
@@ -1293,13 +1308,22 @@
 .skeleton-badges { display: flex; gap: 0.5rem; }
 .skeleton-pill { height: 1.25rem; width: 4rem; border-radius: 9999px; }
 
+.skeleton-image-box {
+    width: 100%;
+    height: 160px;
+    border-radius: var(--rf-radius-lg);
+    background: linear-gradient(90deg, #F0F2F8 25%, #E4E8F2 50%, #F0F2F8 75%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.5s infinite;
+}
+
 @keyframes skeletonShimmer {
     0% { background-position: 200% 0; }
     100% { background-position: -200% 0; }
 }
 
 /* -------------------------------------------------------------
-   11. Modals & Bottom Sheets
+   11. Modals & Detail Preview Image (Full Image Display Fix)
    ------------------------------------------------------------- */
 .custom-modal-surface {
     background: #FFFFFF;
@@ -1323,7 +1347,7 @@
 
 .form-grid-2 {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
 }
 
@@ -1351,6 +1375,7 @@
     outline: none;
     transition: all 0.15s ease;
     min-height: 44px;
+    box-sizing: border-box;
 }
 
 .form-control-saas:focus {
@@ -1368,11 +1393,36 @@
     gap: 0.625rem;
 }
 
-/* Details Layout */
+/* Detail Modal: Full Image Fix (object-fit: contain, zero cropping) */
 .details-body-layout {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.details-img-preview {
+    width: 100%;
+    max-height: 520px;
+    border-radius: var(--rf-radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--rf-border);
+    background: #0F172A; /* Dark premium frame for full map photos */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    box-sizing: border-box;
+}
+
+.details-img-preview img {
+    width: 100%;
+    max-height: 500px;
+    height: auto;
+    object-fit: contain; /* CRITICAL: Displays full uncropped image */
+    display: block;
+    border-radius: 0.5rem;
 }
 
 .details-hero-box {
@@ -1385,27 +1435,12 @@
     justify-content: space-between;
     gap: 1rem;
     flex-wrap: wrap;
-}
-
-.details-img-preview {
-    width: 100%;
-    max-height: 280px;
-    border-radius: var(--rf-radius-lg);
-    overflow: hidden;
-    border: 1px solid var(--rf-border);
-    background: #E8EBFA;
-}
-
-.details-img-preview img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+    box-sizing: border-box;
 }
 
 .details-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
 }
 
@@ -1413,6 +1448,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    min-width: 0;
 }
 
 .details-item-label {
@@ -1427,6 +1463,7 @@
     font-size: 0.875rem;
     font-weight: 600;
     color: var(--rf-text);
+    word-break: break-word;
 }
 
 .details-full-box {
@@ -1434,6 +1471,7 @@
     border: 1px solid var(--rf-border);
     border-radius: var(--rf-radius-md);
     padding: 0.875rem;
+    box-sizing: border-box;
 }
 
 /* Mobile Filter Drawer / Bottom Sheet */
@@ -1500,13 +1538,13 @@
 }
 
 /* -------------------------------------------------------------
-   12. RESPONSIVE BREAKPOINTS (Mobile First)
+   12. RESPONSIVE BREAKPOINTS (Right Margin & Overflow Fixed)
    ------------------------------------------------------------- */
 
 /* Phones (< 768px: 320px, 360px, 375px, 390px, 414px, 430px) */
 @media (max-width: 767.98px) {
     .rooms-page-container {
-        padding-bottom: 6rem;
+        padding: 0 0.25rem 6rem 0.25rem;
     }
 
     .rooms-header-card {
@@ -1529,7 +1567,7 @@
     }
 
     .rooms-kpi-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 0.625rem;
     }
 
@@ -1591,16 +1629,24 @@
         grid-template-columns: 1fr;
     }
 
-    .facilities-cards-grid {
-        grid-template-columns: 1fr;
+    .details-img-preview {
+        max-height: 280px;
+        padding: 0.25rem;
     }
 
-    .rooms-cards-grid {
-        grid-template-columns: 1fr;
+    .details-img-preview img {
+        max-height: 260px;
     }
 
+    .facilities-cards-grid,
+    .rooms-cards-grid,
     .navigation-cards-grid {
         grid-template-columns: 1fr;
+    }
+
+    .room-card, .facility-card, .navigation-card {
+        width: 100%;
+        max-width: 100%;
     }
 
     .view-mode-toggle {
@@ -1608,36 +1654,36 @@
     }
 }
 
-/* Tablet (768px - 1024px) */
-@media (min-width: 768px) and (max-width: 1024px) {
+/* Tablet / Medium Screens (768px - 1279px) */
+@media (min-width: 768px) and (max-width: 1279.98px) {
     .rooms-kpi-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .rooms-cards-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .facilities-cards-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .navigation-cards-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
-/* Large Screens (>= 1025px) */
-@media (min-width: 1025px) {
+/* Large Screens (>= 1280px: 1280px, 1440px, 1920px) */
+@media (min-width: 1280px) {
     .rooms-cards-grid {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 
     .facilities-cards-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .navigation-cards-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }

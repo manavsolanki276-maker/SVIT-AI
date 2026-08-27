@@ -929,6 +929,8 @@ class AdminCRUDService:
                                 query[k] = {"$in": [str(v), val_int]}
                             except (ValueError, TypeError):
                                 query[k] = v
+                        elif k == "zone" and str(v).strip() == "Diploma Block":
+                            query[k] = {"$regex": "^Diploma Block", "$options": "i"}
                         elif isinstance(v, str) and not v.isdigit() and k not in ("id", "place_id", "faculty_id", "enrollment_no", "_id"):
                             query[k] = {"$regex": f"^{re.escape(v.strip())}$", "$options": "i"}
                         else:

@@ -1273,6 +1273,7 @@
 
     /**
      * Details Modal (Room, Facility, or Navigation)
+     * Full Image Display with Aspect Ratio Preservation
      */
     function openDetailsModal(type, item) {
         const titleEl = document.getElementById('itemDetailsModalLabel');
@@ -1418,7 +1419,7 @@
                 };
             }
         } else {
-            // Navigation / Campus Location
+            // Navigation / Campus Location (Shows FULL uncropped image)
             const name = escapeHtml(item.place_name || item.id);
             const id = escapeHtml(item.place_id || item.id);
             const cat = escapeHtml(item.category || 'Campus Location');
@@ -1433,7 +1434,7 @@
 
             let detailsHtml = `
             <div class="details-img-preview mb-3">
-                <img src="${imgUrl}" alt="${name}" onerror="this.onerror=null; this.src='/static/navigation_maps/SVIT with all dep.jpeg';">
+                <img src="${imgUrl}" alt="${name}" loading="eager" onerror="this.onerror=null; this.src='/static/navigation_maps/SVIT with all dep.jpeg';">
             </div>
 
             <div class="details-hero-box">
