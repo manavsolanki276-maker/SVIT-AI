@@ -428,6 +428,9 @@ def preload_all_dataframes() -> None:
         "canteen.csv",
         "contact.csv",
         "library_books.csv",
+        "campus_info.csv",
+        "facilities.csv",
+        "rooms_facilities.csv",
     ]
     loaded_count = 0
     for fname in critical_files:

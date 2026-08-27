@@ -85,10 +85,28 @@ def route_query_sources(user_message: str) -> list[tuple[str, float]]:
     """
     Detects query intent via keyword matching from INTENT_CONFIG 
     and returns a prioritized, deduplicated list of (source_filename, weight) tuples.
+    Location queries ("where is ...") prioritize facilities/campus_info sources.
+    Room code queries (e.g., "AR-101") route to rooms_facilities.csv.
     """
     msg = user_message.lower()
+
+    # Room code pattern: 2-4 letter prefix + dash + 2-3 digits (e.g., AR-101, CO-203, ME-105)
+    if re.search(r'\b[a-z]{2,4}[-.]?\d{2,3}\b', msg):
+        return [("rooms_facilities.csv", 1.0), ("campus_info.csv", 0.5), ("general_faq.csv", 0.1)]
+
+    is_location_query = any(k in msg for k in ["where is", "where", "locate", "find", "how to reach", "location of"])
+
+    # For location queries, check facilities/campus_info first so they aren't
+    # overshadowed by generic placement/faculty/departments intent matches
+    if is_location_query:
+        location_first_intents = ["facilities", "campus_info"]
+        for intent_key in location_first_intents:
+            if intent_key in INTENT_CONFIG:
+                config = INTENT_CONFIG[intent_key]
+                if any(keyword in msg for keyword in config["keywords"]):
+                    return config["sources"]
+
     source_map = {}
-    
     for intent, config in INTENT_CONFIG.items():
         if any(keyword in msg for keyword in config["keywords"]):
             for src, weight in config["sources"]:
@@ -382,8 +400,18 @@ class RAGPipeline:
             intent_category = "library"
         elif is_contact:
             intent_category = "contact"
-        else:
-            intent_category = "general"
+
+        # Detect campus_info / facilities intent for location-aware source routing
+        campus_facility_keywords = [
+            "medical", "first aid", "reading room", "girls room", "girls common",
+            "placement cell", "training & placement", "training and placement",
+            "transport office", "main gate", "parking area", "parking",
+            "auditorium", "seminar hall", "amphitheatre", "amphitheater",
+            "gymnasium", "sports complex", "library", "central library",
+            "canteen", "campus", "gate", "block", "building", "where is"
+        ]
+        if intent_category == "general" and any(k in msg for k in campus_facility_keywords):
+            intent_category = "campus_info"
 
         if filter_dict and "source" in filter_dict:
             source_cascade = [(filter_dict["source"], 1.0)]
@@ -404,12 +432,6 @@ class RAGPipeline:
                 doc_src = doc.metadata.get('source') or doc.metadata.get('document_name') or 'Official Document'
                 page_num = doc.metadata.get('page_number', 1)
                 src = f"{doc_src} (Page {page_num})"
-            else:
-                src = (
-                    f"{doc.metadata.get('source', 'Unknown')} "
-                    f"(Row {doc.metadata.get('row', 'N/A')})"
-                )
-            if src not in seen:
                 seen.add(src)
                 sources.append(src)
 
