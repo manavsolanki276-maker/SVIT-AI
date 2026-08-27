@@ -1424,29 +1424,58 @@ def process_campus_navigation_context(query: str) -> Tuple[str, Optional[str], L
     is_list_all = any(k in clean_q for k in [
         "show campus navigation", "all campus navigation", "campus navigation locations",
         "list campus locations", "show all locations", "all locations", "all buildings",
-        "campus locations", "navigation locations", "all landmarks"
+        "campus locations", "navigation locations", "all landmarks",
+        # Campus facility overview queries
+        "what facilities", "available facilities", "campus facilities", "explore campus",
+        "campus facility", "facilities available", "show facilities", "list facilities",
+        "explore the campus", "show me the main buildings", "buildings rooms facilities",
+        "rooms facilities and landmarks", "campus overview", "show campus"
     ])
     
-    if is_list_all and df_campus is not None and not df_campus.empty:
+    if is_list_all:
         context_blocks = ["--- SVIT CAMPUS NAVIGATION DIRECTORY ---"]
         sources = []
-        for idx, row in df_campus.iterrows():
-            pid = row.get('place_id', f'P{idx+1:03d}')
-            pname = row.get('place_name', '')
-            cat = row.get('category', '')
-            zone = row.get('zone', '')
-            landmark = row.get('landmark', '')
-            desc = row.get('description', '')
-            block = (
-                f"* Place ID: {pid} | Place Name: {pname} | Category: {cat} | "
-                f"Zone: {zone} | Landmark: {landmark} | Description: {desc} | "
-                f"[Source: campus_info.csv (Row {idx + 1})]"
-            )
-            context_blocks.append(block)
-            sources.append(f"campus_info.csv (Row {idx + 1})")
+        
+        # Include campus_info.csv records (buildings, rooms, landmarks, gates, etc.)
+        if df_campus is not None and not df_campus.empty:
+            for idx, row in df_campus.iterrows():
+                pid = row.get('place_id', f'P{idx+1:03d}')
+                pname = row.get('place_name', '')
+                cat = row.get('category', '')
+                zone = row.get('zone', '')
+                landmark = row.get('landmark', '')
+                desc = row.get('description', '')
+                block = (
+                    f"* Place ID: {pid} | Place Name: {pname} | Category: {cat} | "
+                    f"Zone: {zone} | Landmark: {landmark} | Description: {desc} | "
+                    f"[Source: campus_info.csv (Row {idx + 1})]"
+                )
+                context_blocks.append(block)
+                sources.append(f"campus_info.csv (Row {idx + 1})")
+        
+        # Include facilities.csv records for facility overview queries
+        if df_fac is not None and not df_fac.empty:
+            for idx, row in df_fac.iterrows():
+                fid = row.get('facility_id', f'FAC-{idx+1:03d}')
+                fname = row.get('facility_name', '')
+                fcat = row.get('category', '')
+                fbldg = row.get('building', '')
+                ffloor = row.get('floor', '')
+                floc = row.get('location', '')
+                fdesc = row.get('description', '')
+                fcap = row.get('capacity', '')
+                famen = row.get('facilities', '')
+                block = (
+                    f"* Facility ID: {fid} | Facility Name: {fname} | Category: {fcat} | "
+                    f"Building: {fbldg} | Floor: {ffloor} | Location: {floc} | "
+                    f"Description: {fdesc} | Capacity: {fcap} | Amenities: {famen} | "
+                    f"[Source: facilities.csv (Row {idx + 1})]"
+                )
+                context_blocks.append(block)
+                sources.append(f"facilities.csv (Row {idx + 1})")
         
         map_url = "/static/navigation_maps/SVIT with all dep.jpeg"
-        return "\n".join(context_blocks), map_url, sources[:10]
+        return "\n".join(context_blocks), map_url, sources[:20]
     
     # Check for spatial "near <landmark>"
     near_match = re.search(r'\b(?:near|around|close to|beside|what is near)\s+(?:the\s+)?([a-z0-9\s&]+)', clean_q)
