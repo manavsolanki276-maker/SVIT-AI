@@ -271,16 +271,25 @@ class RAGPipeline:
             return nav_ctx, map_image, nav_srcs, intent_category, nav_loc
 
         # -------------------------------------------------------------
-        # 2. SUBJECTS / CURRICULUM CHECK
+        # 2. BUS & TRANSPORTATION CHECK
         # -------------------------------------------------------------
-        is_subject = any(k in msg for k in subject_keywords) and not any(k in msg for k in ['time', 'schedule', 'room'])
+        is_transport = any(k in msg for k in transport_keywords)
+        if is_transport:
+            trans_ctx, trans_img, trans_srcs, trans_loc = process_transport_context(question, user_profile=user_profile)
+            if trans_ctx:
+                return trans_ctx, trans_img or "navigation_maps/Bus stop.png", trans_srcs, "transport", trans_loc
+
+        # -------------------------------------------------------------
+        # 3. SUBJECTS / CURRICULUM CHECK
+        # -------------------------------------------------------------
+        is_subject = any(k in msg for k in subject_keywords) and not any(k in msg for k in ['time', 'schedule', 'room', 'bus'])
         if is_subject:
             subj_ctx, subj_srcs = process_subject_context(question, user_profile=user_profile)
             if subj_ctx and "NO_SUBJECTS" not in subj_ctx:
                 return subj_ctx, None, subj_srcs, "subjects", None
 
         # -------------------------------------------------------------
-        # 3. TIMETABLE CHECK
+        # 4. TIMETABLE CHECK
         # -------------------------------------------------------------
         is_timetable = any(k in msg for k in timetable_keywords)
         if is_timetable:
@@ -299,15 +308,6 @@ class RAGPipeline:
             if not sources:
                 sources = ["timetable.csv"]
             return context, map_image, sources, intent_category, None
-
-        # -------------------------------------------------------------
-        # 3.5. BUS & TRANSPORTATION CHECK
-        # -------------------------------------------------------------
-        is_transport = any(k in msg for k in transport_keywords)
-        if is_transport:
-            trans_ctx, trans_img, trans_srcs, trans_loc = process_transport_context(question, user_profile=user_profile)
-            if trans_ctx:
-                return trans_ctx, trans_img or "navigation_maps/Bus stop.png", trans_srcs, "transport", trans_loc
 
         # -------------------------------------------------------------
         # 4. NOTICES & ANNOUNCEMENTS
