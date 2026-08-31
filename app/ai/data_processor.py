@@ -443,18 +443,39 @@ def preload_all_dataframes() -> None:
 # DATE & TEMPORAL RESOLUTION HELPERS
 # =========================================================
 
+MONTH_NAMES = {
+    "january": 1, "jan": 1,
+    "february": 2, "feb": 2,
+    "march": 3, "mar": 3,
+    "april": 4, "apr": 4,
+    "may": 5,
+    "june": 6, "jun": 6,
+    "july": 7, "jul": 7,
+    "august": 8, "aug": 8,
+    "september": 9, "sept": 9, "sep": 9,
+    "october": 10, "oct": 10,
+    "november": 11, "nov": 11,
+    "december": 12, "dec": 12
+}
+
 def parse_time_to_minutes(t_str: str) -> Optional[int]:
-    """Converts timetable time strings ('09:00', '11:15', '01:15', '02:00', '03:00') to minutes since midnight."""
+    """Converts timetable and transport time strings ('07:15 AM', '09:00', '11:15', '01:15', '02:00', '03:00') to minutes since midnight."""
     if not t_str or not isinstance(t_str, str):
         return None
-    cleaned = t_str.strip().lower().replace("am", "").replace("pm", "").strip()
+    cleaned = t_str.strip().upper()
+    is_pm = "PM" in cleaned
+    is_am = "AM" in cleaned
+    cleaned = cleaned.replace("AM", "").replace("PM", "").strip()
     match = re.match(r'^(\d{1,2})[:.](\d{2})$', cleaned)
     if not match:
         return None
     hours = int(match.group(1))
     minutes = int(match.group(2))
-    # Timetable PM hour conversion (classes run 9 AM to 5 PM)
-    if hours < 8:
+    if is_pm and hours < 12:
+        hours += 12
+    elif is_am and hours == 12:
+        hours = 0
+    elif not is_pm and not is_am and hours < 8: # Timetable PM hour conversion (classes run 9 AM to 5 PM)
         hours += 12
     return hours * 60 + minutes
 
@@ -472,49 +493,153 @@ def format_minutes_to_time_str(mins: int) -> str:
 
 def resolve_day_and_date(query: str) -> dict:
     """
-    Resolves relative time keywords ('today', 'tomorrow', 'yesterday') or explicit day names
-    into both the target day name ('Wednesday') and a formatted date string using Indian Standard Time (IST).
+    Robust natural language calendar and relative date resolver.
+    Accurately handles:
+      - '15 September 2026', '15th September 2026', 'September 15, 2026'
+      - '15 September', '15 Sept', '15/09/2026', '15-09-2026', '15/9'
+      - 'tomorrow', 'today', 'yesterday', 'day after tomorrow'
+      - 'Monday', 'Tuesday', 'next Monday', etc.
     """
-    msg = re.sub(r"['’]s\b", "", query, flags=re.IGNORECASE)
+    raw_msg = str(query or '').strip()
+    msg = re.sub(r"['’]s\b", "", raw_msg, flags=re.IGNORECASE)
     msg = msg.replace('"', '').replace("'", "").strip().lower()
 
     now = get_ist_now()
-    days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+    default_year = now.year
+
+    # 1. Check explicit standard numeric dates (YYYY-MM-DD, DD/MM/YYYY, DD-MM-YYYY)
+    iso_match = re.search(r'\b(202\d)[-/.](0?[1-9]|1[0-2])[-/.](0?[1-9]|[12]\d|3[01])\b', msg)
+    if iso_match:
+        y, m, d = int(iso_match.group(1)), int(iso_match.group(2)), int(iso_match.group(3))
+        try:
+            target_date = datetime(y, m, d, tzinfo=IST)
+            return {
+                "day_name": target_date.strftime("%A"),
+                "formatted_date": target_date.strftime("%A, %d %B %Y"),
+                "iso_date": target_date.strftime("%Y-%m-%d"),
+                "is_explicit_date": True
+            }
+        except ValueError:
+            pass
+
+    dmy_match = re.search(r'\b(0?[1-9]|[12]\d|3[01])[-/.](0?[1-9]|1[0-2])(?:[-/.](202\d|\d{2}))?\b', msg)
+    if dmy_match:
+        d = int(dmy_match.group(1))
+        m = int(dmy_match.group(2))
+        raw_y = dmy_match.group(3)
+        if raw_y:
+            y = int(raw_y) if len(raw_y) == 4 else 2000 + int(raw_y)
+        else:
+            y = default_year
+        try:
+            target_date = datetime(y, m, d, tzinfo=IST)
+            return {
+                "day_name": target_date.strftime("%A"),
+                "formatted_date": target_date.strftime("%A, %d %B %Y"),
+                "iso_date": target_date.strftime("%Y-%m-%d"),
+                "is_explicit_date": True
+            }
+        except ValueError:
+            pass
+
+    # 2. Check Textual Date formats (e.g. '15 September 2026', '15th Sept', 'September 15')
+    month_regex = r'(?:january|jan|february|feb|march|mar|april|apr|may|june|jun|july|jul|august|aug|september|sept|sep|october|oct|november|nov|december|dec)'
+
+    day_month_match = re.search(r'\b(0?[1-9]|[12]\d|3[01])(?:st|nd|rd|th)?\s+(' + month_regex + r')(?:\s+(202\d))?\b', msg)
+    if day_month_match:
+        d = int(day_month_match.group(1))
+        m_str = day_month_match.group(2).lower()
+        m = MONTH_NAMES.get(m_str, 1)
+        raw_y = day_month_match.group(3)
+        y = int(raw_y) if raw_y else default_year
+        try:
+            target_date = datetime(y, m, d, tzinfo=IST)
+            return {
+                "day_name": target_date.strftime("%A"),
+                "formatted_date": target_date.strftime("%A, %d %B %Y"),
+                "iso_date": target_date.strftime("%Y-%m-%d"),
+                "is_explicit_date": True
+            }
+        except ValueError:
+            pass
+
+    month_day_match = re.search(r'\b(' + month_regex + r')\s+(0?[1-9]|[12]\d|3[01])(?:st|nd|rd|th)?(?:\s+(202\d))?\b', msg)
+    if month_day_match:
+        m_str = month_day_match.group(1).lower()
+        m = MONTH_NAMES.get(m_str, 1)
+        d = int(month_day_match.group(2))
+        raw_y = month_day_match.group(3)
+        y = int(raw_y) if raw_y else default_year
+        try:
+            target_date = datetime(y, m, d, tzinfo=IST)
+            return {
+                "day_name": target_date.strftime("%A"),
+                "formatted_date": target_date.strftime("%A, %d %B %Y"),
+                "iso_date": target_date.strftime("%Y-%m-%d"),
+                "is_explicit_date": True
+            }
+        except ValueError:
+            pass
+
+    # 3. Relative date keywords
+    if "day after tomorrow" in msg:
+        target_date = now + timedelta(days=2)
+        return {
+            "day_name": target_date.strftime("%A"),
+            "formatted_date": target_date.strftime("%A, %d %B %Y"),
+            "iso_date": target_date.strftime("%Y-%m-%d"),
+            "is_explicit_date": False
+        }
 
     if "tomorrow" in msg:
         target_date = now + timedelta(days=1)
         return {
             "day_name": target_date.strftime("%A"),
-            "formatted_date": target_date.strftime("%A, %d %B %Y")
+            "formatted_date": target_date.strftime("%A, %d %B %Y"),
+            "iso_date": target_date.strftime("%Y-%m-%d"),
+            "is_explicit_date": False
         }
 
     if "yesterday" in msg:
         target_date = now - timedelta(days=1)
         return {
             "day_name": target_date.strftime("%A"),
-            "formatted_date": target_date.strftime("%A, %d %B %Y")
+            "formatted_date": target_date.strftime("%A, %d %B %Y"),
+            "iso_date": target_date.strftime("%Y-%m-%d"),
+            "is_explicit_date": False
         }
 
-    if "today" in msg:
+    if "today" in msg or "tonight" in msg:
         return {
             "day_name": now.strftime("%A"),
-            "formatted_date": now.strftime("%A, %d %B %Y")
+            "formatted_date": now.strftime("%A, %d %B %Y"),
+            "iso_date": now.strftime("%Y-%m-%d"),
+            "is_explicit_date": False
         }
 
+    # 4. Explicit Weekday Name
+    days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
     for day in days:
         if re.search(r'\b' + day + r'\b', msg) or re.search(r'\b' + day[:3] + r'\b', msg):
-            days_ahead = days.index(day) - now.weekday()
+            target_weekday = days.index(day)
+            current_weekday = now.weekday()
+            days_ahead = target_weekday - current_weekday
             if days_ahead <= 0:
                 days_ahead += 7
             target_date = now + timedelta(days=days_ahead)
             return {
                 "day_name": day.capitalize(),
-                "formatted_date": target_date.strftime("%A, %d %B %Y")
+                "formatted_date": target_date.strftime("%A, %d %B %Y"),
+                "iso_date": target_date.strftime("%Y-%m-%d"),
+                "is_explicit_date": True
             }
 
+    # Default fallback: Today
     return {
         "day_name": now.strftime("%A"),
-        "formatted_date": now.strftime("%A, %d %B %Y")
+        "formatted_date": now.strftime("%A, %d %B %Y"),
+        "iso_date": now.strftime("%Y-%m-%d"),
+        "is_explicit_date": False
     }
 
 
@@ -533,6 +658,144 @@ def get_map_filename(query: str) -> str:
 
 
 def get_navigation_map_url(query: str) -> str:
+    map_file = get_map_filename(query)
+    if map_file:
+        return f"/static/navigation_maps/{map_file}"
+    return "/static/navigation_maps/SVIT with all dep.jpeg"
+
+
+def process_transport_context(query: str, user_profile: dict = None) -> Tuple[str, Optional[str], List[str], Optional[Dict[str, Any]]]:
+    """
+    Intelligent SVIT Bus & Transport Assistant context processor.
+    Resolves routes, stops, departure times, next/last bus, and location metadata.
+    """
+    df = get_cached_dataframe("transport.csv")
+    if df is None or df.empty:
+        return "No bus transport records are currently available.", None, ["transport.csv"], None
+
+    raw_query = str(query or '').strip()
+    clean_q = re.sub(r'[^\w\s\-\:]', ' ', raw_query).lower()
+
+    now = get_ist_now()
+    current_time_str = now.strftime("%I:%M %p")
+    current_mins = now.hour * 60 + now.minute
+
+    # Parse transport intent keywords
+    is_next_bus = any(k in clean_q for k in ["next bus", "upcoming bus", "bus right now", "next route", "bus leaving now", "next available bus"])
+    is_last_bus = any(k in clean_q for k in ["last bus", "final bus", "latest bus", "end bus"])
+    
+    # Parse explicit time requested (e.g., 'at 8 AM', '7:30', '8am', '07:15')
+    time_match = re.search(r'\b(?:at|around|by|before|after)?\s*(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)\b', clean_q)
+    target_time_min = None
+    if time_match:
+        raw_t = time_match.group(1).strip()
+        if re.search(r'\d', raw_t) and not any(k in raw_t for k in ["svit", "bus", "route"]):
+            if ":" not in raw_t and ("am" in raw_t or "pm" in raw_t or any(raw_t.startswith(h) for h in ["6", "7", "8", "9"])):
+                num = re.findall(r'\d+', raw_t)[0]
+                suffix = "PM" if "pm" in raw_t else "AM"
+                raw_t = f"{num}:00 {suffix}"
+            target_time_min = parse_time_to_minutes(raw_t)
+
+    matched_df = df.copy()
+
+    # Route ID filter (R01 - R40)
+    route_id_match = re.search(r'\b(r\d{1,2})\b', clean_q)
+    if route_id_match:
+        r_id = route_id_match.group(1).upper()
+        if len(r_id) == 2:
+            r_id = f"R0{r_id[1]}"
+        r_match_df = matched_df[matched_df['route_id'].str.upper() == r_id]
+        if not r_match_df.empty:
+            matched_df = r_match_df
+
+    # Extract location tokens (starting point / stops)
+    ignore_words = {"bus", "buses", "svit", "vasad", "campus", "timings", "timing", "time", "show", "tell", "what", "where", "which", "how", "next", "last", "from", "to", "at", "route", "routes", "schedule", "go", "reach", "take", "available", "morning", "evening", "stop", "stops"}
+    query_tokens = [w for w in clean_q.split() if w not in ignore_words and len(w) > 2]
+
+    if not route_id_match and query_tokens:
+        found_rows = []
+        for idx, row in matched_df.iterrows():
+            sp = str(row.get('starting_point', '')).lower()
+            rn = str(row.get('route_name', '')).lower()
+            stops = str(row.get('stops', '')).lower()
+            
+            score = 0
+            for token in query_tokens:
+                if token in sp: score += 6
+                elif token in stops: score += 4
+                elif token in rn: score += 2
+            if score > 0:
+                found_rows.append((score, row))
+
+        if found_rows:
+            found_rows.sort(key=lambda x: x[0], reverse=True)
+            matched_df = pd.DataFrame([r for _, r in found_rows])
+
+    # Next bus resolution
+    is_next_bus_tomorrow = False
+    if is_next_bus:
+        upcoming_rows = []
+        for idx, row in df.iterrows():
+            dep_min = parse_time_to_minutes(str(row.get('departure_time', '')))
+            if dep_min is not None and dep_min >= current_mins:
+                upcoming_rows.append((dep_min - current_mins, row))
+        if upcoming_rows:
+            upcoming_rows.sort(key=lambda x: x[0])
+            matched_df = pd.DataFrame([r for _, r in upcoming_rows[:3]])
+        else:
+            is_next_bus_tomorrow = True
+            matched_df = df.head(4)
+
+    cards = []
+    for idx, row in matched_df.head(6).iterrows():
+        rid = row.get('route_id', f'R{idx+1:02d}')
+        rname = row.get('route_name', f'Route {rid}')
+        bno = row.get('bus_no', 'GJ06-BUS-XXX')
+        sp = row.get('starting_point', 'Vadodara')
+        dest = row.get('destination', 'SVIT Vasad Campus')
+        dep = row.get('departure_time', 'N/A')
+        arr = row.get('arrival_time', 'N/A')
+        stops = row.get('stops', '')
+        driver = row.get('driver_name', 'Campus Driver')
+        contact = row.get('contact_number', 'N/A')
+        cap = row.get('capacity', '50')
+        status = row.get('status', 'Active')
+
+        card = (
+            f"### 🚌 {rname} ({rid})\n"
+            f"* 🏷️ **Bus Number:** `{bno}` &nbsp;|&nbsp; 📋 **Status:** `{status}`\n"
+            f"* 📍 **Route:** **{sp}** ➔ **{dest}**\n"
+            f"* ⏰ **Timings:** Departure **{dep}** | Arrival **{arr}** (at SVIT Campus)\n"
+            f"* 🛑 **Stops Sequence:** {stops}\n"
+            f"* 👨‍✈️ **Driver:** {driver} | 📞 **Contact:** `{contact}` | 💺 **Capacity:** {cap} Seats"
+        )
+        cards.append(card)
+
+    header = f"### 🚌 SVIT Campus Transport Schedule & Bus Routes\n\n"
+    if is_next_bus:
+        if is_next_bus_tomorrow:
+            header += f"ℹ️ *All scheduled morning buses for today have completed their runs (Current Time: {current_time_str}). The earliest bus tomorrow departs at 06:30 AM:*\n\n"
+        else:
+            header += f"*(Live IST Status as of {current_time_str} — Upcoming Bus departures:)*\n\n"
+
+    body = "\n\n---\n\n".join(cards) if cards else "No matching college bus routes were found for the requested location or time. College buses run on all major Vadodara, Anand, and highway arterial routes arriving by 08:00 AM - 08:45 AM at the SVIT Vasad Campus Bus Station."
+    map_url = "/static/navigation_maps/Bus stop.png"
+    sources = ["transport.csv (Row 1-40)"]
+
+    location_data = {
+        "id": "P024",
+        "location_id": "P024",
+        "name": "SVIT Bus Stop & Transport Hub",
+        "latitude": 22.469850,
+        "longitude": 73.077500,
+        "building": "Main Gate Bus Terminal",
+        "landmark": "Near Main Entrance Gate, SVIT Vasad",
+        "zone": "Campus Transport",
+        "description": "SVIT Central Bus Terminal for all 40 college bus routes from Vadodara, Anand, and highway junctions.",
+        "image_url": map_url
+    }
+
+    return header + body, map_url, sources, location_data
     map_file = get_map_filename(query)
     if map_file:
         return f"/static/navigation_maps/{map_file}"

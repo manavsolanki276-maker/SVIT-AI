@@ -4102,3 +4102,126 @@ body {
         font-size: 0.88rem;
     }
 }
+
+/* ==========================================================================
+   STUDENT CHAT ACTION BAR DIRECTIONS PILL BUTTON
+   ========================================================================== */
+.action-btn.directions-action-btn {
+    background: #eff6ff !important;
+    border: 1px solid #bfdbfe !important;
+    color: #2563eb !important;
+    font-weight: 600 !important;
+    gap: 6px !important;
+    padding: 6px 12px !important;
+}
+
+.action-btn.directions-action-btn:hover {
+    background: #dbeafe !important;
+    border-color: #93c5fd !important;
+    color: #1d4ed8 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.18);
+}
+
+.action-btn.directions-action-btn:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+.action-btn.directions-action-btn .directions-action-icon {
+    width: 14px;
+    height: 14px;
+    color: #3b82f6;
+    stroke-width: 2.2;
+}
+
+[data-theme="dark"] .action-btn.directions-action-btn {
+    background: rgba(59, 130, 246, 0.15) !important;
+    border-color: rgba(59, 130, 246, 0.35) !important;
+    color: #93c5fd !important;
+}
+
+[data-theme="dark"] .action-btn.directions-action-btn:hover {
+    background: rgba(59, 130, 246, 0.28) !important;
+    border-color: rgba(59, 130, 246, 0.55) !important;
+    color: #bfdbfe !important;
+}
+
+/* ==========================================================================
+   ENHANCED RESPONSIVE SYSTEM (Mobile 320px-430px, Tablet 768px, Desktop)
+   ========================================================================== */
+.table-responsive {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 12px 0;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+
+.table-responsive::-webkit-scrollbar {
+    height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+@media (max-width: 640px) {
+    .bot-card-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+    }
+
+    .bot-card-actions .action-btn {
+        min-height: 36px;
+        padding: 6px 10px;
+        font-size: 0.82rem;
+    }
+
+    .location-nav-card {
+        padding: 10px 12px;
+        margin: 10px 0;
+    }
+
+    .location-nav-card .location-card-title {
+        font-size: 0.95rem;
+    }
+
+    .location-nav-card .location-card-meta {
+        font-size: 0.78rem;
+    }
+}
+
+@media (max-width: 430px) {
+    .chat-bubble-bot {
+        max-width: 100% !important;
+        padding: 12px 14px;
+    }
+
+    .chat-bubble-user {
+        max-width: 90% !important;
+        padding: 10px 14px;
+    }
+
+    .bot-content table th, 
+    .bot-content table td {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+}

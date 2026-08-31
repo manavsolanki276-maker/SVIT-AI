@@ -26,13 +26,12 @@ CRITICAL CONTENT INSTRUCTIONS:
 CATEGORY_RULES = {
     "timetable": """
 FORMATTING RULES FOR TIMETABLE / SCHEDULE:
-- ALWAYS begin with a clean header greeting on its own line mentioning the target day/date from CONTEXT (e.g. "Here is your schedule for today (Friday, 21 August 2026):" or "Here is your schedule for tomorrow (Saturday, 22 August 2026):"):
-- Output strictly using Markdown table format:
-  | Time | Subject | Room |
-  | :--- | :--- | :--- |
-  | [Start Time] - [End Time] | [Subject Name] | [Room Number / Lab] |
-- Keep columns clean: Time, Subject, and Room. Do NOT include faculty inside the table unless asked.
-- If CONTEXT states "STATUS: NO_CLASSES", respond: "No classes are scheduled for this day for [Department/Semester/Division]. Enjoy your day! 🎉"
+- ALWAYS begin with a clean header on its own line explicitly stating the target day and date from CONTEXT (e.g. "### 📅 Schedule for Tuesday, 15 September 2026"):
+- Output using Markdown table format:
+  | Time | Subject | Faculty | Room |
+  | :--- | :--- | :--- | :--- |
+  | [Start Time] - [End Time] | [Subject Name] | [Faculty Name] | [Room / Lab] |
+- If CONTEXT states "STATUS: NO_CLASSES", respond: "### 📅 Schedule for [Day, Date]\n\n🎉 **No classes are scheduled on this day (Weekend/Holiday) for [Department/Semester/Division].** Enjoy your day! 🚀"
 """,
 
     "faculty": """
@@ -77,8 +76,13 @@ FORMATTING RULES FOR PLACEMENTS & DRIVES:
 
     "transport": """
 FORMATTING RULES FOR BUS ROUTES & TRANSPORT:
-- Format each route on a NEW LINE:
-  🚌 **[Route Name/Number]** | 📍 **[Pickup Points]** | ⏰ **[Departure Time]** | 💳 **[Semester Fee]**
+- Format each route clearly as a card block:
+  ### 🚌 [Route Name] ([Route ID])
+  * 🏷️ **Bus Number:** `[Bus No]` &nbsp;|&nbsp; 📋 **Status:** `[Status]`
+  * 📍 **Route:** **[Starting Point]** ➔ **[Destination]**
+  * ⏰ **Timings:** Departure **[Departure Time]** | Arrival **[Arrival Time]**
+  * 🛑 **Stops:** [Stops Sequence]
+  * 👨‍✈️ **Driver:** [Driver Name] | 📞 **Contact:** `[Contact Number]` | 💺 **Capacity:** [Capacity]
 """,
 
     "contact": """

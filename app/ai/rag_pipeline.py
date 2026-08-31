@@ -37,6 +37,7 @@ from app.ai.data_processor import (
     process_events_context,
     process_campus_navigation_context,
     process_subject_context,
+    process_transport_context,
     resolve_day_and_date,
     generate_followup_suggestions,
     resolve_student_profile_query,
@@ -252,16 +253,19 @@ class RAGPipeline:
         # 1. CAMPUS NAVIGATION / LANDMARK / FACILITIES CHECK FIRST
         # -------------------------------------------------------------
         nav_res = process_campus_navigation_context(question)
-        if len(nav_res) == 4:
-            nav_ctx, nav_img, nav_srcs, nav_loc = nav_res
+        nav_loc = getattr(nav_res, 'location_data', None)
+        if nav_loc is None and isinstance(nav_res, (list, tuple)) and len(nav_res) >= 4:
+            nav_ctx, nav_img, nav_srcs, nav_loc = nav_res[0], nav_res[1], nav_res[2], nav_res[3]
         else:
-            nav_ctx, nav_img, nav_srcs = nav_res
-            nav_loc = None
+            nav_ctx, nav_img, nav_srcs = nav_res[0], nav_res[1], nav_res[2]
 
         if nav_ctx:
             if nav_img and not map_image:
                 clean_img = nav_img.replace('/static/', '').lstrip('/')
                 map_image = clean_img
+
+            if nav_loc is None and map_image:
+                nav_loc = self._resolve_location_from_map_or_query(map_image, question)
 
             intent_category = "facilities" if any("facilities.csv" in s for s in nav_srcs) else "campus_info"
             return nav_ctx, map_image, nav_srcs, intent_category, nav_loc
@@ -295,6 +299,15 @@ class RAGPipeline:
             if not sources:
                 sources = ["timetable.csv"]
             return context, map_image, sources, intent_category, None
+
+        # -------------------------------------------------------------
+        # 3.5. BUS & TRANSPORTATION CHECK
+        # -------------------------------------------------------------
+        is_transport = any(k in msg for k in transport_keywords)
+        if is_transport:
+            trans_ctx, trans_img, trans_srcs, trans_loc = process_transport_context(question, user_profile=user_profile)
+            if trans_ctx:
+                return trans_ctx, trans_img or "navigation_maps/Bus stop.png", trans_srcs, "transport", trans_loc
 
         # -------------------------------------------------------------
         # 4. NOTICES & ANNOUNCEMENTS
@@ -441,9 +454,56 @@ class RAGPipeline:
                 seen.add(src)
                 sources.append(src)
 
-        context = "\n\n---\n\n".join([doc.page_content for doc, _ in results])
+        location_info = self._resolve_location_from_map_or_query(map_image, question) if map_image else None
+        return context, map_image, sources, intent_category, location_info
 
-        return context, map_image, sources, intent_category, None
+    def _resolve_location_from_map_or_query(self, map_image: Optional[str], query: str) -> Optional[Dict[str, Any]]:
+        """
+        Resolves structured location metadata with coordinates for Google Maps directions
+        based on resolved map images or user query tokens.
+        """
+        try:
+            from app.ai.navigation import find_location
+            nav_res = find_location(query)
+            if nav_res:
+                return nav_res
+        except Exception:
+            pass
+
+        if not map_image:
+            return None
+
+        clean_img = os.path.basename(map_image).lower()
+
+        try:
+            from app.ai.navigation_config import NAVIGATION
+            for dept_key, dept_data in NAVIGATION.items():
+                dept_img = dept_data.get('image', '').lower()
+                if dept_img and (dept_img in clean_img or clean_img in dept_img):
+                    return {
+                        "id": dept_data.get('id', 'LOC'),
+                        "location_id": dept_data.get('id', 'LOC'),
+                        "name": dept_data.get('display_name', dept_key.title()),
+                        "latitude": dept_data.get('latitude', 22.470850),
+                        "longitude": dept_data.get('longitude', 73.076780),
+                        "building": dept_data.get('building', dept_key.title()),
+                        "zone": dept_data.get('zone', 'SVIT Campus'),
+                        "image_url": f"/static/navigation_maps/{dept_data.get('image')}"
+                    }
+        except Exception:
+            pass
+
+        clean_name = os.path.basename(map_image).replace('.jpeg', '').replace('.png', '').replace('.jpg', '').replace('dep', 'Department').replace('loc', '').strip().title()
+        return {
+            "id": "SVIT_LOC",
+            "location_id": "SVIT_LOC",
+            "name": clean_name or "SVIT Campus Location",
+            "latitude": 22.470850,
+            "longitude": 73.076780,
+            "building": clean_name or "SVIT Vasad Campus",
+            "zone": "SVIT Vasad",
+            "image_url": f"/static/navigation_maps/{os.path.basename(map_image)}"
+        }
 
     def _format_context_as_direct_answer(
         self, 
@@ -728,7 +788,14 @@ class RAGPipeline:
             clean_ctx = re.sub(r'HEADER_NOTICE_LIST:\s*|\[Source:.*?\]', '', context)
             return f"### 📌 Official Notices & Circulars\n\n{clean_ctx.strip()}"
 
-        # 8. GENERAL / FAQ / DEFAULT FORMATTING
+        # 8. BUS & TRANSPORTATION FORMATTING
+        elif intent_category == 'transport':
+            if "### 🚌" in context:
+                return context.strip()
+            clean_ctx = re.sub(r'\[Source:.*?\]', '', context).strip()
+            return f"### 🚌 SVIT Campus Transport Schedule & Bus Routes\n\n{clean_ctx}"
+
+        # 9. GENERAL / FAQ / DEFAULT FORMATTING
         else:
             blocks = [b.strip() for b in context.split('---') if b.strip()]
             if blocks:

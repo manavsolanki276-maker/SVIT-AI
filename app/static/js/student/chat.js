@@ -338,39 +338,41 @@ function createStreamingBotRow(userQueryText = '', messageId = null, convId = ''
     return botRow;
 }
 
-function openGoogleMapsDirections(location) {
-    if (!location) {
-        alert("Location coordinates are not available.");
-        return;
-    }
-
+function openGoogleMapsDirections(location, fallbackName = '') {
     let lat = null;
     let lng = null;
+    let placeName = '';
 
-    if (typeof location === 'object') {
+    if (location && typeof location === 'object') {
         lat = parseFloat(location.latitude !== undefined ? location.latitude : location.lat);
         lng = parseFloat(location.longitude !== undefined ? location.longitude : (location.lng !== undefined ? location.lng : location.lon));
+        placeName = location.name || location.place_name || location.building || location.room || location.zone || '';
     } else if (typeof location === 'string') {
         try {
             const parsed = JSON.parse(location);
             if (parsed && typeof parsed === 'object') {
-                return openGoogleMapsDirections(parsed);
+                return openGoogleMapsDirections(parsed, fallbackName);
             }
         } catch (e) {
             const parts = location.split(',');
-            if (parts.length === 2) {
+            if (parts.length === 2 && !isNaN(parseFloat(parts[0])) && !isNaN(parseFloat(parts[1]))) {
                 lat = parseFloat(parts[0].trim());
                 lng = parseFloat(parts[1].trim());
+            } else {
+                placeName = location.trim();
             }
         }
     }
 
-    if (lat === null || isNaN(lat) || lng === null || isNaN(lng)) {
-        alert("Location coordinates are not available.");
+    if (lat !== null && !isNaN(lat) && lng !== null && !isNaN(lng) && lat !== 0 && lng !== 0) {
+        const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=walking&dir_action=navigate`;
+        window.open(url, '_blank', 'noopener,noreferrer');
         return;
     }
 
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=walking&dir_action=navigate`;
+    const queryTerm = placeName || fallbackName || 'Sardar Vallabhbhai Patel Institute of Technology, Vasad';
+    const destinationQuery = encodeURIComponent(`${queryTerm}, SVIT Vasad, Gujarat`);
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${destinationQuery}&travelmode=walking&dir_action=navigate`;
     window.open(url, '_blank', 'noopener,noreferrer');
 }
 window.openGoogleMapsDirections = openGoogleMapsDirections;
@@ -399,7 +401,38 @@ function finalizeStreamingBotRow(botRow, imagePath = null, sources = [], suggest
         }
     }
 
-    if (imagePath || hasCoords) {
+    // Infer location metadata and default SVIT coordinates when map image is present
+    if (imagePath && (!hasCoords || !locName)) {
+        const imgBasename = imagePath.split('/').pop().replace(/\.[^/.]+$/, "");
+        if (!locName) {
+            locName = imgBasename.replace(/^SVIT\s*/i, '').replace(/\s*loc$/i, '').replace(/\s*dep$/i, ' Department').trim();
+        }
+        if (!locBuilding) {
+            locBuilding = "SVIT Vasad Campus";
+        }
+        if (!hasCoords) {
+            latVal = 22.470850;
+            lngVal = 73.076780;
+            hasCoords = true;
+            if (!locationData) {
+                locationData = {
+                    name: locName,
+                    building: locBuilding,
+                    latitude: latVal,
+                    longitude: lngVal
+                };
+            }
+        }
+    }
+
+    const botQuery = (botRow.getAttribute('data-query') || '').toLowerCase();
+    const botText = (contentEl ? contentEl.textContent : '').toLowerCase();
+    const hasNavKeywords = /\b(where|location|map|directions|direction|how to reach|how to go|building|room|lab|canteen|library|auditorium|sports|ground|parking|gate|dept|department|block|floor|navigate)\b/i.test(botQuery) ||
+                           /\b(campus|building|block|floor|room|located|situated|ground floor|first floor|second floor|third floor|near|opposite)\b/i.test(botText);
+
+    const showLocationCard = Boolean(imagePath || hasCoords || (locationData && locationData.name));
+
+    if (showLocationCard) {
         const mapSlot = botRow.querySelector('.map-slot');
         if (mapSlot) {
             let fullSrc = null;
@@ -409,28 +442,33 @@ function finalizeStreamingBotRow(botRow, imagePath = null, sources = [], suggest
                     : `/static/${imagePath.replace(/^static\//, '')}`;
             }
 
-            let locDataAttr = hasCoords ? encodeURIComponent(JSON.stringify(locationData)) : '';
+            let effectiveLocData = locationData || {
+                name: locName || 'SVIT Campus',
+                building: locBuilding || 'SVIT Vasad',
+                latitude: latVal || 22.470850,
+                longitude: lngVal || 73.076780
+            };
+            let locDataAttr = encodeURIComponent(JSON.stringify(effectiveLocData));
 
             let cardHtml = `<div class="location-nav-card">`;
 
-            if (hasCoords) {
-                cardHtml += `
-                    <div class="location-card-header">
-                        <div class="location-meta-title">
-                            <i data-lucide="map-pin" class="loc-pin-icon"></i>
-                            <div class="loc-titles">
-                                <span class="loc-primary-name">${escapeHtml(locName || 'Campus Location')}</span>
-                                ${locBuilding ? `<span class="loc-secondary-zone">${escapeHtml(locBuilding)}</span>` : ''}
-                            </div>
+            // Prominent Header with Pin, Title, and Directions Action Button
+            cardHtml += `
+                <div class="location-card-header">
+                    <div class="location-meta-title">
+                        <i data-lucide="map-pin" class="loc-pin-icon"></i>
+                        <div class="loc-titles">
+                            <span class="loc-primary-name">${escapeHtml(locName || 'Campus Location')}</span>
+                            <span class="loc-secondary-zone">${escapeHtml(locBuilding || 'SVIT Vasad Campus')}</span>
                         </div>
-                        <button type="button" class="get-directions-btn" data-location="${locDataAttr}" onclick="openGoogleMapsDirections(JSON.parse(decodeURIComponent(this.getAttribute('data-location'))))" title="Get walking directions in Google Maps">
-                            <i data-lucide="navigation" class="directions-icon"></i>
-                            <span>Get Directions</span>
-                            <i data-lucide="external-link" class="ext-icon"></i>
-                        </button>
                     </div>
-                `;
-            }
+                    <button type="button" class="get-directions-btn" data-location="${locDataAttr}" onclick="openGoogleMapsDirections(JSON.parse(decodeURIComponent(this.getAttribute('data-location'))))" title="Get walking directions in Google Maps">
+                        <i data-lucide="navigation" class="directions-icon"></i>
+                        <span>Directions</span>
+                        <i data-lucide="external-link" class="ext-icon"></i>
+                    </button>
+                </div>
+            `;
 
             if (fullSrc) {
                 cardHtml += `
@@ -475,13 +513,31 @@ function finalizeStreamingBotRow(botRow, imagePath = null, sources = [], suggest
         }
     }
 
-    // Mount Action Buttons (Copy, Listen, Like, Dislike) ONLY when the full answer is ready
+    // Mount Action Buttons (Copy, Listen, Directions, Like, Dislike) ONLY when the full answer is ready
     const actionsSlot = botRow.querySelector('.actions-slot');
     if (actionsSlot) {
+        let directionsActionBtnHtml = '';
+        if (showLocationCard || hasNavKeywords) {
+            let effectiveLoc = locationData || {
+                name: locName || 'SVIT Campus',
+                building: locBuilding || 'SVIT Vasad',
+                latitude: latVal || 22.470850,
+                longitude: lngVal || 73.076780
+            };
+            let locAttr = encodeURIComponent(JSON.stringify(effectiveLoc));
+            directionsActionBtnHtml = `
+                <button type="button" class="action-btn directions-action-btn" data-location="${locAttr}" onclick="openGoogleMapsDirections(JSON.parse(decodeURIComponent(this.getAttribute('data-location'))))" title="Get walking directions in Google Maps">
+                    <i data-lucide="navigation" class="directions-action-icon"></i>
+                    <span>Directions</span>
+                </button>
+            `;
+        }
+
         actionsSlot.innerHTML = `
             <div class="bot-card-actions" style="margin-top: 8px; display: flex; gap: 6px; align-items: center;">
                 <button class="action-btn" onclick="copyText(this)" title="Copy response text"><i data-lucide="copy"></i> Copy</button>
                 <button class="action-btn tts-btn" onclick="toggleTTS(this)" title="Read aloud response"><i data-lucide="volume-2"></i> <span>Listen</span></button>
+                ${directionsActionBtnHtml}
                 <button class="action-btn icon-only feedback-btn like-btn" onclick="submitFeedback(this, 'like')" title="Helpful response"><i data-lucide="thumbs-up"></i></button>
                 <button class="action-btn icon-only feedback-btn dislike-btn" onclick="submitFeedback(this, 'dislike')" title="Not helpful"><i data-lucide="thumbs-down"></i></button>
             </div>
