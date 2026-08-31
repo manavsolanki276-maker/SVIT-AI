@@ -1201,6 +1201,10 @@
                 const desc = escapeHtml(loc.description || `SVIT Campus landmark situated in ${zone}.`);
                 const imgUrl = getNavigationImageUrl(loc);
 
+                const latVal = parseFloat(loc.latitude);
+                const lngVal = parseFloat(loc.longitude);
+                const hasCoords = !isNaN(latVal) && !isNaN(lngVal) && latVal !== 0 && lngVal !== 0;
+
                 cardsHtml += `
                 <div class="navigation-card" data-nav-id="${id}">
                     <div class="nav-card-img-wrap">
@@ -1217,13 +1221,25 @@
                                 ${landmark ? `<span class="text-[#8C95AD]">• ${landmark}</span>` : ''}
                             </div>
                             <p class="nav-card-desc">${desc}</p>
+                            ${hasCoords ? `
+                            <div class="mt-2 flex items-center gap-1.5 text-[11px] font-mono text-[#64748B]">
+                                <i data-lucide="compass" class="w-3 h-3 text-[#6366F1]"></i>
+                                <span>${latVal.toFixed(6)}, ${lngVal.toFixed(6)}</span>
+                            </div>` : ''}
                         </div>
 
                         <div class="nav-card-footer">
-                            <button type="button" class="btn-card-action view-navigation-details-btn" data-nav-id="${id}">
-                                <i data-lucide="eye" class="w-3.5 h-3.5"></i>
-                                <span>Details</span>
-                            </button>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" class="btn-card-action view-navigation-details-btn" data-nav-id="${id}">
+                                    <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                                    <span>Details</span>
+                                </button>
+                                ${hasCoords ? `
+                                <a href="https://www.google.com/maps/dir/?api=1&destination=${latVal},${lngVal}&travelmode=walking&dir_action=navigate" target="_blank" rel="noopener noreferrer" class="btn-card-action text-[#3B82F6] hover:text-[#2563EB]" title="Open walking directions in Google Maps">
+                                    <i data-lucide="navigation" class="w-3.5 h-3.5 text-[#3B82F6]"></i>
+                                    <span>Directions</span>
+                                </a>` : ''}
+                            </div>
                             <div class="card-action-menu">
                                 <button type="button" class="btn-card-icon edit-nav-btn" data-nav-id="${id}" title="Edit Location">
                                     <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
@@ -1459,6 +1475,8 @@
         const zoneInput = document.getElementById('inputNavZone');
         const landmarkInput = document.getElementById('inputNavLandmark');
         const imgInput = document.getElementById('inputNavImage');
+        const latInput = document.getElementById('inputNavLatitude');
+        const lngInput = document.getElementById('inputNavLongitude');
         const descInput = document.getElementById('inputNavDescription');
 
         if (mode === 'edit' && navData) {
@@ -1474,6 +1492,8 @@
             if (zoneInput) zoneInput.value = navData.zone || '';
             if (landmarkInput) landmarkInput.value = navData.landmark || '';
             if (imgInput) imgInput.value = navData.image_url || '/static/navigation_maps/SVIT with all dep.jpeg';
+            if (latInput) latInput.value = navData.latitude !== undefined && navData.latitude !== null ? navData.latitude : '';
+            if (lngInput) lngInput.value = navData.longitude !== undefined && navData.longitude !== null ? navData.longitude : '';
             if (descInput) descInput.value = navData.description || '';
         } else {
             if (titleEl) titleEl.textContent = 'Add Campus Location';
@@ -1488,6 +1508,8 @@
             if (zoneInput) zoneInput.value = 'North Wing';
             if (landmarkInput) landmarkInput.value = '';
             if (imgInput) imgInput.value = '/static/navigation_maps/SVIT with all dep.jpeg';
+            if (latInput) latInput.value = '';
+            if (lngInput) lngInput.value = '';
             if (descInput) descInput.value = '';
         }
 
@@ -1651,6 +1673,9 @@
             const landmark = escapeHtml(item.landmark || '');
             const desc = escapeHtml(item.description || `SVIT Campus landmark situated in ${zone}.`);
             const imgUrl = getNavigationImageUrl(item);
+            const latVal = parseFloat(item.latitude);
+            const lngVal = parseFloat(item.longitude);
+            const hasCoords = !isNaN(latVal) && !isNaN(lngVal) && latVal !== 0 && lngVal !== 0;
 
             if (titleEl) titleEl.textContent = `Location: ${name}`;
             if (subLabelEl) subLabelEl.textContent = 'Campus map and navigation landmark';
@@ -1687,6 +1712,17 @@
                     <span class="details-item-label">Landmark Reference</span>
                     <span class="details-item-val">${landmark || 'Central Campus'}</span>
                 </div>
+                ${hasCoords ? `
+                <div class="details-item">
+                    <span class="details-item-label">Geo Coordinates</span>
+                    <span class="details-item-val font-mono text-xs text-[#6366F1]">${latVal.toFixed(6)}, ${lngVal.toFixed(6)}</span>
+                </div>
+                <div class="details-item">
+                    <span class="details-item-label">Google Maps Walking</span>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=${latVal},${lngVal}&travelmode=walking&dir_action=navigate" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-[#3B82F6] hover:underline flex items-center gap-1">
+                        <i data-lucide="navigation" class="w-3.5 h-3.5"></i> Open in Maps
+                    </a>
+                </div>` : ''}
             </div>`;
 
             if (contentEl) contentEl.innerHTML = detailsHtml;
@@ -1720,7 +1756,7 @@
         const confirmBtn = document.getElementById('confirmDeleteBtn');
         if (confirmBtn) {
             confirmBtn.disabled = true;
-            confirmBtn.textContent = 'Deleting...';
+            confirmBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Deleting...';
         }
 
         try {
@@ -1728,15 +1764,11 @@
             const data = await resp.json();
 
             if (data.status === 'success') {
-                showToast('Record deleted successfully.', 'success');
+                showToast(`Record ${id} deleted successfully.`, 'success');
                 if (deleteConfirmModal) deleteConfirmModal.hide();
-                if (module === 'rooms' || module === 'rooms_facilities') {
-                    fetchRooms();
-                } else if (module === 'facilities') {
-                    fetchFacilities(true);
-                } else {
-                    fetchNavigation(true);
-                }
+                if (module === 'rooms') fetchRooms(true);
+                else if (module === 'facilities') fetchFacilities(true);
+                else if (module === 'campus_info') fetchNavigation(true);
             } else {
                 showToast(data.message || 'Error deleting record.', 'error');
             }
@@ -1746,9 +1778,10 @@
         } finally {
             if (confirmBtn) {
                 confirmBtn.disabled = false;
-                confirmBtn.textContent = 'Delete';
+                confirmBtn.innerHTML = 'Delete';
             }
             state.pendingDelete = null;
+            if (window.lucide) window.lucide.createIcons();
         }
     }
 
@@ -1774,7 +1807,7 @@
             room_type: document.getElementById('inputRoomType').value.trim(),
             building: document.getElementById('inputRoomBuilding').value.trim(),
             floor: document.getElementById('inputRoomFloor').value.trim(),
-            capacity: document.getElementById('inputRoomCapacity').value.trim(),
+            capacity: parseInt(document.getElementById('inputRoomCapacity').value, 10) || 0,
             status: document.getElementById('inputRoomStatus').value.trim(),
             facilities: document.getElementById('inputRoomFacilities').value.trim()
         };
@@ -1786,8 +1819,8 @@
 
         try {
             const url = mode === 'edit'
-                ? `/admin/api/crud/rooms_facilities/${encodeURIComponent(origId)}`
-                : '/admin/api/crud/rooms_facilities';
+                ? `/admin/api/crud/rooms/${encodeURIComponent(origId)}`
+                : '/admin/api/crud/rooms';
             const method = mode === 'edit' ? 'PUT' : 'POST';
 
             const resp = await fetch(url, {
@@ -1800,7 +1833,7 @@
             if (data.status === 'success') {
                 showToast(mode === 'edit' ? 'Room updated successfully.' : 'Room added successfully.', 'success');
                 if (roomFormModal) roomFormModal.hide();
-                fetchRooms();
+                fetchRooms(true);
             } else {
                 showToast(data.message || 'Error saving room.', 'error');
             }
@@ -1832,13 +1865,13 @@
             facility_id: document.getElementById('inputFacilityId').value.trim(),
             facility_name: document.getElementById('inputFacilityName').value.trim(),
             category: document.getElementById('inputFacilityCategory').value.trim(),
-            status: document.getElementById('inputFacilityStatus').value.trim(),
+            location: document.getElementById('inputFacilityLocation').value.trim(),
             building: document.getElementById('inputFacilityBuilding').value.trim(),
             floor: document.getElementById('inputFacilityFloor').value.trim(),
-            location: document.getElementById('inputFacilityLocation').value.trim(),
-            capacity: document.getElementById('inputFacilityCapacity').value.trim(),
+            capacity: parseInt(document.getElementById('inputFacilityCapacity').value, 10) || 0,
+            status: document.getElementById('inputFacilityStatus').value.trim(),
             description: document.getElementById('inputFacilityDescription').value.trim(),
-            facilities: document.getElementById('inputFacilityAmenities').value.trim()
+            amenities: document.getElementById('inputFacilityAmenities').value.trim()
         };
 
         if (submitBtn) {
@@ -1890,6 +1923,11 @@
         const origId = document.getElementById('navOriginalId').value;
         const submitBtn = document.getElementById('saveNavSubmitBtn');
 
+        const latRaw = document.getElementById('inputNavLatitude')?.value?.trim();
+        const lngRaw = document.getElementById('inputNavLongitude')?.value?.trim();
+        const latNum = latRaw ? parseFloat(latRaw) : null;
+        const lngNum = lngRaw ? parseFloat(lngRaw) : null;
+
         const payload = {
             place_id: document.getElementById('inputNavId').value.trim(),
             place_name: document.getElementById('inputNavName').value.trim(),
@@ -1897,6 +1935,8 @@
             zone: document.getElementById('inputNavZone').value.trim(),
             landmark: document.getElementById('inputNavLandmark').value.trim(),
             image_url: document.getElementById('inputNavImage').value.trim(),
+            latitude: (!isNaN(latNum) && latNum !== null) ? latNum : null,
+            longitude: (!isNaN(lngNum) && lngNum !== null) ? lngNum : null,
             description: document.getElementById('inputNavDescription').value.trim()
         };
 

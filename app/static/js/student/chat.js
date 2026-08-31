@@ -133,6 +133,7 @@ async function submitMessage(text) {
             const contentEl = streamCard.querySelector('.bot-content');
             let accumulatedText = '';
             let finalImage = null;
+            let finalLocation = null;
             let finalSources = [];
             let finalSuggestions = [];
 
@@ -168,6 +169,7 @@ async function submitMessage(text) {
                                 if (data.answer) accumulatedText = data.answer;
                                 if (data.message_id) streamCard.setAttribute('data-msg-id', data.message_id);
                                 finalImage = data.image || null;
+                                finalLocation = data.location || null;
                                 finalSources = data.sources || [];
                                 finalSuggestions = data.suggestions || [];
                             }
@@ -181,7 +183,7 @@ async function submitMessage(text) {
             // Finalize rendering only if tokens were received
             if (accumulatedText && accumulatedText.trim().length > 0) {
                 renderMarkdown(contentEl, accumulatedText);
-                finalizeStreamingBotRow(streamCard, finalImage, finalSources, finalSuggestions);
+                finalizeStreamingBotRow(streamCard, finalImage, finalSources, finalSuggestions, null, finalLocation);
                 streamedSuccessfully = true;
                 loadSidebarRecents();
             } else {
@@ -231,10 +233,11 @@ async function submitMessage(text) {
                 }
                 const replyText = data.answer || data.response || "No response received.";
                 const imagePath = data.image || null;
+                const locationData = data.location || null;
                 const sources = data.sources || [];
                 const msgId = data.message_id || null;
                 const suggestions = data.suggestions || [];
-                appendBotMessage(replyText, imagePath, sources, text, data.conversation_id, msgId, null, suggestions);
+                appendBotMessage(replyText, imagePath, sources, text, data.conversation_id, msgId, null, suggestions, locationData);
                 loadSidebarRecents();
             } else {
                 const errorMsg = data?.error || `Error ${response?.status || '500'}: Failed to fetch response.`;
@@ -335,7 +338,44 @@ function createStreamingBotRow(userQueryText = '', messageId = null, convId = ''
     return botRow;
 }
 
-function finalizeStreamingBotRow(botRow, imagePath = null, sources = [], suggestions = [], feedback = null) {
+function openGoogleMapsDirections(location) {
+    if (!location) {
+        alert("Location coordinates are not available.");
+        return;
+    }
+
+    let lat = null;
+    let lng = null;
+
+    if (typeof location === 'object') {
+        lat = parseFloat(location.latitude !== undefined ? location.latitude : location.lat);
+        lng = parseFloat(location.longitude !== undefined ? location.longitude : (location.lng !== undefined ? location.lng : location.lon));
+    } else if (typeof location === 'string') {
+        try {
+            const parsed = JSON.parse(location);
+            if (parsed && typeof parsed === 'object') {
+                return openGoogleMapsDirections(parsed);
+            }
+        } catch (e) {
+            const parts = location.split(',');
+            if (parts.length === 2) {
+                lat = parseFloat(parts[0].trim());
+                lng = parseFloat(parts[1].trim());
+            }
+        }
+    }
+
+    if (lat === null || isNaN(lat) || lng === null || isNaN(lng)) {
+        alert("Location coordinates are not available.");
+        return;
+    }
+
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=walking&dir_action=navigate`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+}
+window.openGoogleMapsDirections = openGoogleMapsDirections;
+
+function finalizeStreamingBotRow(botRow, imagePath = null, sources = [], suggestions = [], feedback = null, locationData = null) {
     if (!botRow) return;
 
     const contentEl = botRow.querySelector('.bot-content');
@@ -343,22 +383,68 @@ function finalizeStreamingBotRow(botRow, imagePath = null, sources = [], suggest
         renderMarkdown(contentEl, "Thank you for asking! For specific details, please consult your department coordinator or student portal.");
     }
 
-    if (imagePath) {
-        let fullSrc = imagePath.startsWith('/static/')
-            ? imagePath
-            : `/static/${imagePath.replace(/^static\//, '')}`;
+    let hasCoords = false;
+    let latVal = null;
+    let lngVal = null;
+    let locName = '';
+    let locBuilding = '';
 
+    if (locationData && typeof locationData === 'object') {
+        latVal = parseFloat(locationData.latitude !== undefined ? locationData.latitude : locationData.lat);
+        lngVal = parseFloat(locationData.longitude !== undefined ? locationData.longitude : (locationData.lng !== undefined ? locationData.lng : locationData.lon));
+        locName = locationData.name || locationData.place_name || locationData.department || '';
+        locBuilding = locationData.building || locationData.zone || locationData.landmark || '';
+        if (!isNaN(latVal) && !isNaN(lngVal) && latVal !== 0 && lngVal !== 0) {
+            hasCoords = true;
+        }
+    }
+
+    if (imagePath || hasCoords) {
         const mapSlot = botRow.querySelector('.map-slot');
         if (mapSlot) {
-            mapSlot.innerHTML = `
-                <div class="map-container" style="margin-top: 12px; margin-bottom: 8px;">
-                    <img src="${fullSrc}"
-                         alt="Campus Map"
-                         class="campus-map"
-                         onerror="this.parentElement.style.display='none';"
-                         style="max-width: 100%; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
-                </div>
-            `;
+            let fullSrc = null;
+            if (imagePath) {
+                fullSrc = imagePath.startsWith('/static/')
+                    ? imagePath
+                    : `/static/${imagePath.replace(/^static\//, '')}`;
+            }
+
+            let locDataAttr = hasCoords ? encodeURIComponent(JSON.stringify(locationData)) : '';
+
+            let cardHtml = `<div class="location-nav-card">`;
+
+            if (hasCoords) {
+                cardHtml += `
+                    <div class="location-card-header">
+                        <div class="location-meta-title">
+                            <i data-lucide="map-pin" class="loc-pin-icon"></i>
+                            <div class="loc-titles">
+                                <span class="loc-primary-name">${escapeHtml(locName || 'Campus Location')}</span>
+                                ${locBuilding ? `<span class="loc-secondary-zone">${escapeHtml(locBuilding)}</span>` : ''}
+                            </div>
+                        </div>
+                        <button type="button" class="get-directions-btn" data-location="${locDataAttr}" onclick="openGoogleMapsDirections(JSON.parse(decodeURIComponent(this.getAttribute('data-location'))))" title="Get walking directions in Google Maps">
+                            <i data-lucide="navigation" class="directions-icon"></i>
+                            <span>Get Directions</span>
+                            <i data-lucide="external-link" class="ext-icon"></i>
+                        </button>
+                    </div>
+                `;
+            }
+
+            if (fullSrc) {
+                cardHtml += `
+                    <div class="map-container">
+                        <img src="${fullSrc}"
+                             alt="${escapeHtml(locName || 'Campus Map')}"
+                             class="campus-map"
+                             onerror="this.parentElement.style.display='none';">
+                    </div>
+                `;
+            }
+
+            cardHtml += `</div>`;
+            mapSlot.innerHTML = cardHtml;
         }
     }
 
@@ -447,12 +533,12 @@ function renderMarkdown(element, text) {
     }
 }
 
-function appendBotMessage(text, imagePath = null, sources = [], userQueryText = '', convId = '', messageId = null, feedback = null, suggestions = []) {
+function appendBotMessage(text, imagePath = null, sources = [], userQueryText = '', convId = '', messageId = null, feedback = null, suggestions = [], locationData = null) {
     const safeText = (text && text.trim().length > 0) ? text : "Thank you for asking! For specific details, please consult your department coordinator.";
     const row = createStreamingBotRow(userQueryText, messageId, convId, feedback);
     const contentEl = row.querySelector('.bot-content');
     renderMarkdown(contentEl, safeText);
-    finalizeStreamingBotRow(row, imagePath, sources, suggestions, feedback);
+    finalizeStreamingBotRow(row, imagePath, sources, suggestions, feedback, locationData);
 }
 
 function showHomeState() {

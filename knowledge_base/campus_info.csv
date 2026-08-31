@@ -1,41 +1,41 @@
-place_id,place_name,category,zone,landmark,description
-P001,Main Gate,Entrance,Campus Entry,Near Security Gate,Main entrance for students and visitors
-P002,Administration Block,Office,Center Campus,"Administrative offices, Principal Office, Accounts",
-P003,Computer Engineering Block,Academic,North Wing,Near Central Garden,BE Computer Engineering Department
-P004,Information Technology Block,Academic,North-East Wing,Adjacent to Computer Block,BE Information Technology
-P005,Civil Engineering Block,Academic,North-West Wing,Opposite Computer Block,Civil Engineering Department
-P006,Mechanical Engineering Block,Academic,West Wing,Near Workshop,Mechanical Engineering Department
-P007,Electrical Engineering Block,Academic,South-West Wing,Near Mechanical Block,Electrical Engineering Department
-P008,Electronics & Communication Block,Academic,East Wing,Near IT Block,EC Department
-P009,AI & ML Department,Academic,Computer Block,2nd Floor,Artificial Intelligence & Machine Learning
-P010,Data Science Department,Academic,Computer Block,3rd Floor,Data Science Department
-P011,MCA Department,Academic,LCMCA Block,Academic Complex,Master of Computer Applications
-P012,BCA Department,Academic,LCMCA Block,Ground Floor,Bachelor of Computer Applications
-P013,Central Library,Library,Central Campus,Near Academic Blocks,Library and Reading Hall
-P014,Seminar Hall,Facility,Central Campus,Near Library,Seminars & Workshops
-P015,Auditorium,Facility,Central Campus,Opposite Library,Major events and functions
-P016,Innovation & AI Lab,Laboratory,Computer Block,2nd Floor,"AI, ML and Research Lab"
-P017,Computer Lab,Laboratory,Computer Block,All Floors,Programming & Practical Labs
-P018,Civil Lab,Laboratory,Civil Block,Ground Floor,Survey & Material Testing
-P019,Mechanical Workshop,Laboratory,Mechanical Block,Rear Side,Workshop Practice
-P020,Electrical Lab,Laboratory,Electrical Block,Ground Floor,Electrical Machines Lab
-P021,EC Lab,Laboratory,EC Block,First Floor,Communication & Electronics Lab
-P022,Training & Placement Cell,Office,Administration Block,First Floor,Placements & Internships
-P023,Sports Complex,Sports,South Campus,Near Playground,Indoor & Outdoor Sports
-P024,Cricket Ground,Sports,South Campus,Sports Complex,Cricket Practice
-P025,Bus Parking,Transport,North Entrance,Near Main Gate,College Bus Parking Area
-P026,Transport Office,Transport,Near Bus Parking,Main Entrance,Bus Pass & Routes
-P027,Central Canteen,Food,Central Campus,Near Library,Main College Canteen
-P028,Diploma Canteen,Food,Last Campus,Behind Architecture & Diploma Blocks,Dedicated Canteen for Diploma Students
-P029,Architecture Block,Academic,South-East Wing,Near Diploma Canteen,Architecture Department
-P030,Diploma Computer Engineering,Academic,Diploma Block A,Near Diploma Canteen,Diploma CE
-P031,Diploma Civil Engineering,Academic,Diploma Block B,Near Diploma Canteen,Diploma Civil
-P032,Diploma Mechanical Engineering,Academic,Diploma Block C,Near Diploma Canteen,Diploma Mechanical
-P033,Diploma Electrical Engineering,Academic,Diploma Block D,Near Diploma Canteen,Diploma Electrical
-P034,Diploma IT,Academic,Diploma Block E,Near Diploma Canteen,Diploma IT
-P035,Diploma EC,Academic,Diploma Block F,Near Diploma Canteen,Diploma EC
-P036,Diploma Automobile,Academic,Diploma Block G,Near Diploma Canteen,Diploma Automobile
-P037,Medical Room,Facility,Central Campus,Near Admin Block,First Aid & Medical Assistance
-P038,Hostel,Residence,East Campus,Near Sports Complex,Student Hostel
-P039,Parking Area,Facility,Main Gate,Front Campus,Two & Four Wheeler Parking
-P040,Open Amphitheatre,Facility,Central Garden,Center Campus,Student Activities
+place_id,place_name,category,zone,landmark,description,latitude,longitude
+P001,Main Gate,Entrance,Campus Entry,Near Security Gate,Main entrance for students and visitors,22.471520,73.076120
+P002,Administration Block,Office,Center Campus,"Administrative offices, Principal Office, Accounts",,22.470850,73.076780
+P003,Computer Engineering Block,Academic,North Wing,Near Central Garden,BE Computer Engineering Department,22.471410,73.077220
+P004,Information Technology Block,Academic,North-East Wing,Adjacent to Computer Block,BE Information Technology,22.471550,73.077480
+P005,Civil Engineering Block,Academic,North-West Wing,Opposite Computer Block,Civil Engineering Department,22.471280,73.076950
+P006,Mechanical Engineering Block,Academic,West Wing,Near Workshop,Mechanical Engineering Department,22.470920,73.076350
+P007,Electrical Engineering Block,Academic,South-West Wing,Near Mechanical Block,Electrical Engineering Department,22.470650,73.076550
+P008,Electronics & Communication Block,Academic,East Wing,Near IT Block,EC Department,22.471350,73.077650
+P009,AI & ML Department,Academic,Computer Block,2nd Floor,Artificial Intelligence & Machine Learning,22.471410,73.077220
+P010,Data Science Department,Academic,Computer Block,3rd Floor,Data Science Department,22.471410,73.077220
+P011,MCA Department,Academic,LCMCA Block,Academic Complex,Master of Computer Applications,22.471680,73.077110
+P012,BCA Department,Academic,LCMCA Block,Ground Floor,Bachelor of Computer Applications,22.471680,73.077110
+P013,Central Library,Library,Central Campus,Near Academic Blocks,Library and Reading Hall,22.470980,73.076890
+P014,Seminar Hall,Facility,Central Campus,Near Library,Seminars & Workshops,22.470950,73.076920
+P015,Auditorium,Facility,Central Campus,Opposite Library,Major events and functions,22.470880,73.077050
+P016,Innovation & AI Lab,Laboratory,Computer Block,2nd Floor,"AI, ML and Research Lab",22.471410,73.077220
+P017,Computer Lab,Laboratory,Computer Block,All Floors,Programming & Practical Labs,22.471410,73.077220
+P018,Civil Lab,Laboratory,Civil Block,Ground Floor,Survey & Material Testing,22.471280,73.076950
+P019,Mechanical Workshop,Laboratory,Mechanical Block,Rear Side,Workshop Practice,22.470820,73.076210
+P020,Electrical Lab,Laboratory,Electrical Block,Ground Floor,Electrical Machines Lab,22.470650,73.076550
+P021,EC Lab,Laboratory,EC Block,First Floor,Communication & Electronics Lab,22.471350,73.077650
+P022,Training & Placement Cell,Office,Administration Block,First Floor,Placements & Internships,22.470850,73.076780
+P023,Sports Complex,Sports,South Campus,Near Playground,Indoor & Outdoor Sports,22.470120,73.077850
+P024,Cricket Ground,Sports,South Campus,Sports Complex,Cricket Practice,22.469850,73.078120
+P025,Bus Parking,Transport,North Entrance,Near Main Gate,College Bus Parking Area,22.471850,73.076320
+P026,Transport Office,Transport,Near Bus Parking,Main Entrance,Bus Pass & Routes,22.471780,73.076280
+P027,Central Canteen,Food,Central Campus,Near Library,Main College Canteen,22.470720,73.077150
+P028,Diploma Canteen,Food,Last Campus,Behind Architecture & Diploma Blocks,Dedicated Canteen for Diploma Students,22.472150,73.078210
+P029,Architecture Block,Academic,South-East Wing,Near Diploma Canteen,Architecture Department,22.471950,73.077920
+P030,Diploma Computer Engineering,Academic,Diploma Block A,Near Diploma Canteen,Diploma CE,22.472250,73.078450
+P031,Diploma Civil Engineering,Academic,Diploma Block B,Near Diploma Canteen,Diploma Civil,22.472310,73.078510
+P032,Diploma Mechanical Engineering,Academic,Diploma Block C,Near Diploma Canteen,Diploma Mechanical,22.472380,73.078580
+P033,Diploma Electrical Engineering,Academic,Diploma Block D,Near Diploma Canteen,Diploma Electrical,22.472420,73.078650
+P034,Diploma IT,Academic,Diploma Block E,Near Diploma Canteen,Diploma IT,22.472480,73.078720
+P035,Diploma EC,Academic,Diploma Block F,Near Diploma Canteen,Diploma EC,22.472520,73.078780
+P036,Diploma Automobile,Academic,Diploma Block G,Near Diploma Canteen,Diploma Automobile,22.472580,73.078850
+P037,Medical Room,Facility,Central Campus,Near Admin Block,First Aid & Medical Assistance,22.470810,73.076820
+P038,Hostel,Residence,East Campus,Near Sports Complex,Student Hostel,22.470450,73.078420
+P039,Parking Area,Facility,Main Gate,Front Campus,Two & Four Wheeler Parking,22.471620,73.076050
+P040,Open Amphitheatre,Facility,Central Garden,Center Campus,Student Activities,22.471150,73.077350

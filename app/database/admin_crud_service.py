@@ -193,6 +193,8 @@ MODULE_CONFIGS: Dict[str, Dict[str, Any]] = {
             {"key": "category", "label": "Category", "type": "select", "options": ["Department", "Classroom", "Laboratory", "Library", "Administrative", "Auditorium", "Sports", "Cafeteria", "Facility"], "required": True, "table": True},
             {"key": "zone", "label": "Campus Zone", "type": "select", "options": ["East Wing", "West Wing", "Main Block", "Ground Floor", "First Floor", "Second Floor", "Sports Complex", "Outer Campus"], "required": False, "table": True},
             {"key": "landmark", "label": "Nearest Landmark", "type": "text", "required": False, "table": True},
+            {"key": "latitude", "label": "Latitude", "type": "text", "required": False, "table": True},
+            {"key": "longitude", "label": "Longitude", "type": "text", "required": False, "table": True},
             {"key": "description", "label": "Description & Accessibility", "type": "textarea", "required": False, "table": False},
             {"key": "image_url", "label": "Location / Room Image", "type": "image_upload", "required": False, "table": False}
         ]

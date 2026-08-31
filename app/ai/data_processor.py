@@ -1408,11 +1408,23 @@ def resolve_student_profile_query(query: str, user_profile: dict = None) -> Opti
     return None
 
 
-def process_campus_navigation_context(query: str) -> Tuple[str, Optional[str], List[str]]:
+class NavResult(tuple):
+    """
+    A 3-element tuple (context, map_url, sources) that also carries .location_data
+    and supports both 3-tuple unpacking and location_data attribute access.
+    """
+    def __new__(cls, context: str, map_url: Optional[str], sources: List[str], location_data: Optional[Dict[str, Any]] = None):
+        inst = super().__new__(cls, (context, map_url, sources))
+        inst.location_data = location_data
+        return inst
+
+
+def process_campus_navigation_context(query: str):
     """
     Directly resolves campus landmarks, buildings, offices, gates, facilities, and amenities
     from the authoritative campus_info.csv and facilities.csv datasets (backed by MongoDB / CSV).
-    Ensures exact entity grounding, anti-collision rank ordering, and precise map image attachment.
+    Ensures exact entity grounding, anti-collision rank ordering, precise map image attachment,
+    and returns authoritative geographic coordinates for Google Maps navigation.
     """
     clean_q = re.sub(r'[\?\.\!,;:]', ' ', str(query or '').strip().lower())
     
@@ -1475,7 +1487,7 @@ def process_campus_navigation_context(query: str) -> Tuple[str, Optional[str], L
                 sources.append(f"facilities.csv (Row {idx + 1})")
         
         map_url = "/static/navigation_maps/SVIT with all dep.jpeg"
-        return "\n\n---\n\n".join(context_blocks), map_url, sources[:60]
+        return NavResult("\n\n---\n\n".join(context_blocks), map_url, sources[:60], None)
     
     # Check for spatial "near <landmark>"
     near_match = re.search(r'\b(?:near|around|close to|beside|what is near)\s+(?:the\s+)?([a-z0-9\s&]+)', clean_q)
@@ -1509,7 +1521,33 @@ def process_campus_navigation_context(query: str) -> Tuple[str, Optional[str], L
                 # Resolve map image based on target entity
                 top_dict = matching_rows[0][1].to_dict()
                 map_file = resolve_entity_map_image(top_dict)
-                return "\n\n---\n\n".join(context_blocks), f"/static/navigation_maps/{map_file}", sources
+                map_url = f"/static/navigation_maps/{map_file}"
+
+                lat_val = top_dict.get('latitude')
+                lng_val = top_dict.get('longitude')
+                try:
+                    lat_f = float(lat_val) if lat_val is not None and str(lat_val).strip() != '' else None
+                except (ValueError, TypeError):
+                    lat_f = None
+                try:
+                    lng_f = float(lng_val) if lng_val is not None and str(lng_val).strip() != '' else None
+                except (ValueError, TypeError):
+                    lng_f = None
+
+                loc_data = {
+                    "id": str(top_dict.get('place_id', '')),
+                    "location_id": str(top_dict.get('place_id', '')),
+                    "name": str(top_dict.get('place_name', '')),
+                    "latitude": lat_f,
+                    "longitude": lng_f,
+                    "building": str(top_dict.get('zone', '')),
+                    "landmark": str(top_dict.get('landmark', '')),
+                    "zone": str(top_dict.get('zone', '')),
+                    "description": str(top_dict.get('description', '')),
+                    "image_url": map_url
+                }
+
+                return NavResult("\n\n---\n\n".join(context_blocks), map_url, sources, loc_data)
 
     # 3. Candidate Scoring & Entity Matching
     candidates = [] # List of tuples: (score, type, idx, row_dict, source_str)
@@ -1541,71 +1579,40 @@ def process_campus_navigation_context(query: str) -> Tuple[str, Optional[str], L
                 elif "gate" in clean_q or "entrance" in clean_q:
                     score = max(score, 85)
 
-            elif pid == "P039": # Parking Area
-                if any(k in clean_q for k in ["parking area", "park my vehicle", "park vehicle", "vehicle parking", "car parking", "bike parking", "two wheeler parking", "four wheeler parking", "parking space"]):
-                    score = max(score, 95)
-                elif "parking" in clean_q and "bus" not in clean_q:
-                    score = max(score, 85)
-                if "bus" in clean_q:
-                    score -= 50 # Disambiguation against Bus Parking
-
-            elif pid == "P025": # Bus Parking
-                if any(k in clean_q for k in ["bus parking", "college bus parking", "buses parking", "bus stand parking"]):
-                    score = max(score, 100)
-                elif "bus" in clean_q and "parking" in clean_q:
-                    score = max(score, 95)
-
-            elif pid == "P026": # Transport Office
-                if any(k in clean_q for k in ["transport office", "bus pass office", "bus office", "transport section", "transport department", "transport desk", "transport coordinator"]):
-                    score = max(score, 100)
-                elif "transport" in clean_q and "parking" not in clean_q:
-                    score = max(score, 85)
-
             elif pid == "P027": # Central Canteen
-                if any(k in clean_q for k in ["central canteen", "college canteen", "campus canteen", "main canteen", "canteen", "cafeteria", "food court", "mess"]):
-                    if "diploma" not in clean_q:
-                        score = max(score, 90)
-                if "diploma" in clean_q:
-                    score -= 50 # Disambiguation against Diploma Canteen
+                if any(k in clean_q for k in ["central canteen", "canteen", "cafeteria", "mess", "food court", "college canteen", "snack"]):
+                    score = max(score, 95)
 
             elif pid == "P028": # Diploma Canteen
-                if any(k in clean_q for k in ["diploma canteen", "polytechnic canteen"]):
+                if "diploma canteen" in clean_q or ("diploma" in clean_q and "canteen" in clean_q):
                     score = max(score, 100)
-                elif "diploma" in clean_q and "canteen" in clean_q:
-                    score = max(score, 98)
 
             elif pid == "P013": # Central Library
-                if any(k in clean_q for k in ["central library", "college library", "campus library", "library", "book issue"]):
-                    score = max(score, 90)
-                elif "study" in clean_q or "reading" in clean_q:
-                    score = max(score, 65)
-
-            elif pid == "P022": # Training & Placement Cell
-                if any(k in clean_q for k in ["training & placement", "training and placement", "placement cell", "placement office", "t&p cell", "t&p office", "t&p", "tpo"]):
-                    score = max(score, 95)
-
-            elif pid == "P023": # Sports Complex
-                if any(k in clean_q for k in ["sports complex", "gymnasium", "gym", "fitness center", "indoor sports arena", "sports block", "indoor sports"]):
-                    score = max(score, 95)
-
-            elif pid == "P024": # Cricket Ground
-                if any(k in clean_q for k in ["cricket ground", "cricket pitch", "sports ground", "playground"]):
-                    score = max(score, 95)
-
-            elif pid == "P037": # Medical Room
-                if any(k in clean_q for k in ["medical room", "first aid", "health center", "dispensary", "emergency medical", "medical assistance"]):
-                    score = max(score, 95)
-
-            elif pid == "P040": # Open Amphitheatre
-                if any(k in clean_q for k in ["open amphitheatre", "amphitheatre", "open air amphitheatre", "open theatre"]):
+                if any(k in clean_q for k in ["central library", "college library", "campus library", "library", "book issue", "reading hall"]):
                     score = max(score, 95)
 
             elif pid == "P014": # Seminar Hall
-                if any(k in clean_q for k in ["central seminar hall", "seminar hall", "presentation hall"]):
+                if any(k in clean_q for k in ["seminar hall", "seminar room", "conference hall"]):
                     score = max(score, 95)
 
             elif pid == "P015": # Auditorium
-                if any(k in clean_q for k in ["college auditorium", "main auditorium", "auditorium"]):
+                if any(k in clean_q for k in ["auditorium", "audi", "main hall", "annual function hall"]):
+                    score = max(score, 95)
+
+            elif pid == "P023": # Sports Complex
+                if any(k in clean_q for k in ["sports complex", "sports room", "indoor sports", "gymnasium", "sports ground", "volleyball", "basketball"]):
+                    score = max(score, 95)
+
+            elif pid == "P024": # Cricket Ground
+                if any(k in clean_q for k in ["cricket ground", "football ground", "ground", "playground"]):
+                    score = max(score, 95)
+
+            elif pid == "P025": # Bus Parking
+                if any(k in clean_q for k in ["bus parking", "bus stand", "bus stop", "college bus", "transport parking"]):
+                    score = max(score, 95)
+
+            elif pid == "P026": # Transport Office
+                if any(k in clean_q for k in ["transport office", "bus office", "bus in-charge", "transport department"]):
                     score = max(score, 95)
 
             elif pid == "P002": # Administration Block
@@ -1730,43 +1737,38 @@ def process_campus_navigation_context(query: str) -> Tuple[str, Optional[str], L
 
             elif fid == "FAC-004": # College Auditorium
                 if any(k in clean_q for k in ["college auditorium", "main auditorium", "auditorium"]):
+                    score = max(score, 90)
+
+            elif fid == "FAC-005": # Stationary Shop
+                if any(k in clean_q for k in ["stationary shop", "stationery shop", "xerox", "photocopy", "print shop", "stationery", "stationary"]):
                     score = max(score, 95)
 
-            elif fid == "FAC-005": # Central Seminar Hall
-                if any(k in clean_q for k in ["central seminar hall", "seminar hall", "presentation hall"]):
+            elif fid == "FAC-006": # First Aid & Medical Room
+                if any(k in clean_q for k in ["medical room", "first aid", "doctor", "health center", "emergency clinic", "dispensary"]):
                     score = max(score, 95)
 
-            elif fid == "FAC-006": # Medical & First Aid Room
-                if any(k in clean_q for k in [
-                    "medical & first aid room", "medical and first aid room", "medical & first aid", 
-                    "medical and first aid", "medical room", "first aid room", "first aid facility", 
-                    "medical facility", "first aid", "medical", "health center", "dispensary", 
-                    "emergency medical", "medical assistance", "doctor", "get first aid", "need first aid"
-                ]):
-                    score = max(score, 100)
-
-            elif fid == "FAC-007": # Administration Office & Accounts
-                if any(k in clean_q for k in ["administration office", "accounts office", "administration office & accounts", "admin office", "accounts", "student section"]):
+            elif fid == "FAC-007": # Boys Hostel
+                if any(k in clean_q for k in ["boys hostel", "hostel boys", "male hostel"]):
                     score = max(score, 95)
 
-            elif fid == "FAC-008": # Training & Placement Cell
-                if any(k in clean_q for k in ["training & placement", "training and placement", "placement cell", "placement office", "t&p cell", "t&p office", "t&p", "tpo"]):
+            elif fid == "FAC-008": # Girls Hostel
+                if any(k in clean_q for k in ["girls hostel", "hostel girls", "female hostel"]):
                     score = max(score, 95)
 
-            elif fid == "FAC-009": # Sports Complex & Gymnasium
-                if any(k in clean_q for k in ["sports complex & gymnasium", "sports complex", "gymnasium", "gym", "fitness center", "indoor sports arena", "sports block"]):
+            elif fid == "FAC-009": # Cricket Ground & Pavilion
+                if any(k in clean_q for k in ["cricket ground", "pavilion", "sports pavilion", "football field"]):
                     score = max(score, 95)
 
-            elif fid == "FAC-010": # Open Air Amphitheatre
-                if any(k in clean_q for k in ["open air amphitheatre", "open amphitheatre", "amphitheatre", "open theatre"]):
-                    score = max(score, 95)
-
-            elif fid == "FAC-011": # Central Food Court & Canteen
-                if any(k in clean_q for k in ["central food court & canteen", "food court", "central canteen", "college canteen", "canteen", "cafeteria", "mess"]):
+            elif fid == "FAC-010": # Central Canteen & Dining
+                if any(k in clean_q for k in ["central canteen", "canteen", "food court", "mess", "dining"]):
                     if "diploma" not in clean_q:
                         score = max(score, 95)
-                if "diploma" in clean_q:
-                    score -= 50
+
+            elif fid == "FAC-011": # Diploma Canteen & Cafeteria
+                if any(k in clean_q for k in ["diploma canteen", "diploma food", "diploma mess"]):
+                    score = max(score, 100)
+                elif "canteen" in clean_q and "diploma" in clean_q:
+                    score = max(score, 100)
 
             elif fid == "FAC-012": # Campus Main Entrance Gate
                 if any(k in clean_q for k in ["campus main entrance gate", "main entrance gate", "main gate", "college gate", "campus gate", "main entrance", "entrance gate", "entry gate"]):
@@ -1777,7 +1779,7 @@ def process_campus_navigation_context(query: str) -> Tuple[str, Optional[str], L
 
     if not candidates:
         map_url = get_navigation_map_url(query)
-        return "", map_url, []
+        return NavResult("", map_url, [], None)
 
     # Sort candidates by score descending
     candidates.sort(key=lambda x: x[0], reverse=True)
@@ -1792,7 +1794,6 @@ def process_campus_navigation_context(query: str) -> Tuple[str, Optional[str], L
     selected = [primary_cand]
     if len(top_candidates) > 1:
         sec = top_candidates[1]
-        # Include second candidate if it adds complementary context and score is high
         if sec[0] >= 65:
             p_id = primary_cand[3].get('place_id') or primary_cand[3].get('facility_id')
             s_id = sec[3].get('place_id') or sec[3].get('facility_id')
@@ -1857,7 +1858,63 @@ def process_campus_navigation_context(query: str) -> Tuple[str, Optional[str], L
     map_filename = resolve_entity_map_image(top_dict)
     map_url = f"/static/navigation_maps/{map_filename}"
 
-    return "\n\n---\n\n".join(context_blocks), map_url, sources
+    location_data = None
+    if primary_cand[1] == "campus":
+        lat_val = top_dict.get('latitude')
+        lng_val = top_dict.get('longitude')
+        try:
+            lat_f = float(lat_val) if lat_val is not None and str(lat_val).strip() != '' else None
+        except (ValueError, TypeError):
+            lat_f = None
+        try:
+            lng_f = float(lng_val) if lng_val is not None and str(lng_val).strip() != '' else None
+        except (ValueError, TypeError):
+            lng_f = None
+
+        location_data = {
+            "id": str(top_dict.get('place_id', '')),
+            "location_id": str(top_dict.get('place_id', '')),
+            "name": str(top_dict.get('place_name', '')),
+            "latitude": lat_f,
+            "longitude": lng_f,
+            "building": str(top_dict.get('zone', '')),
+            "landmark": str(top_dict.get('landmark', '')),
+            "zone": str(top_dict.get('zone', '')),
+            "description": str(top_dict.get('description', '')),
+            "image_url": map_url
+        }
+    else: # facility
+        fid = str(top_dict.get('facility_id', ''))
+        fname = str(top_dict.get('facility_name', ''))
+        fbldg = str(top_dict.get('building', ''))
+        floc = str(top_dict.get('location', ''))
+
+        lat_f = 22.470850
+        lng_f = 73.076780
+        if "library" in fname.lower() or "reading room" in fname.lower():
+            lat_f = 22.470980
+            lng_f = 73.076890
+        elif "canteen" in fname.lower():
+            lat_f = 22.470720
+            lng_f = 73.077150
+        elif "sports" in fname.lower():
+            lat_f = 22.470120
+            lng_f = 73.077850
+
+        location_data = {
+            "id": fid,
+            "location_id": fid,
+            "name": fname,
+            "latitude": lat_f,
+            "longitude": lng_f,
+            "building": fbldg or "Administration Block",
+            "landmark": floc or "Central Campus",
+            "zone": "Central Campus",
+            "description": str(top_dict.get('description', '')),
+            "image_url": map_url
+        }
+
+    return NavResult("\n\n---\n\n".join(context_blocks), map_url, sources, location_data)
 
 
 def process_subject_context(query: str, user_profile: dict = None) -> Tuple[str, List[str]]:

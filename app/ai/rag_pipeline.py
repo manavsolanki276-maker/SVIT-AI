@@ -251,14 +251,20 @@ class RAGPipeline:
         # -------------------------------------------------------------
         # 1. CAMPUS NAVIGATION / LANDMARK / FACILITIES CHECK FIRST
         # -------------------------------------------------------------
-        nav_ctx, nav_img, nav_srcs = process_campus_navigation_context(question)
+        nav_res = process_campus_navigation_context(question)
+        if len(nav_res) == 4:
+            nav_ctx, nav_img, nav_srcs, nav_loc = nav_res
+        else:
+            nav_ctx, nav_img, nav_srcs = nav_res
+            nav_loc = None
+
         if nav_ctx:
             if nav_img and not map_image:
                 clean_img = nav_img.replace('/static/', '').lstrip('/')
                 map_image = clean_img
 
             intent_category = "facilities" if any("facilities.csv" in s for s in nav_srcs) else "campus_info"
-            return nav_ctx, map_image, nav_srcs, intent_category
+            return nav_ctx, map_image, nav_srcs, intent_category, nav_loc
 
         # -------------------------------------------------------------
         # 2. SUBJECTS / CURRICULUM CHECK
@@ -267,7 +273,7 @@ class RAGPipeline:
         if is_subject:
             subj_ctx, subj_srcs = process_subject_context(question, user_profile=user_profile)
             if subj_ctx and "NO_SUBJECTS" not in subj_ctx:
-                return subj_ctx, None, subj_srcs, "subjects"
+                return subj_ctx, None, subj_srcs, "subjects", None
 
         # -------------------------------------------------------------
         # 3. TIMETABLE CHECK
@@ -288,7 +294,7 @@ class RAGPipeline:
             sources = re.findall(r'timetable\.csv \(Row \d+\)', context)
             if not sources:
                 sources = ["timetable.csv"]
-            return context, map_image, sources, intent_category
+            return context, map_image, sources, intent_category, None
 
         # -------------------------------------------------------------
         # 4. NOTICES & ANNOUNCEMENTS
@@ -320,7 +326,7 @@ class RAGPipeline:
             sources.extend(csv_sources)
             if not sources:
                 sources = ["notices.csv"]
-            return context, map_image, sources, intent_category
+            return context, map_image, sources, intent_category, None
 
         # -------------------------------------------------------------
         # 5. FACULTY & DEPARTMENT
@@ -341,7 +347,7 @@ class RAGPipeline:
             sources = re.findall(r'(?:departments|faculty)\.csv \(Row \d+\)', context)
             if not sources:
                 sources = ["faculty.csv", "departments.csv"]
-            return context, map_image, sources, intent_category
+            return context, map_image, sources, intent_category, None
 
         # -------------------------------------------------------------
         # 6. EVENTS & WORKSHOPS
@@ -373,7 +379,7 @@ class RAGPipeline:
             sources.extend(csv_sources)
             if not sources:
                 sources = ["events.csv"]
-            return context, map_image, sources, intent_category
+            return context, map_image, sources, intent_category, None
 
         # -------------------------------------------------------------
         # 7. PLACEMENTS & DRIVES
@@ -385,7 +391,7 @@ class RAGPipeline:
             sources = re.findall(r'placements\.csv \(Row \d+\)', context)
             if not sources:
                 sources = ["placements.csv"]
-            return context, map_image, sources, intent_category
+            return context, map_image, sources, intent_category, None
 
         # -------------------------------------------------------------
         # 8. GENERAL VECTOR RETRIEVAL (Transport, Canteen, Library, Contact, FAQs)
@@ -437,7 +443,7 @@ class RAGPipeline:
 
         context = "\n\n---\n\n".join([doc.page_content for doc, _ in results])
 
-        return context, map_image, sources, intent_category
+        return context, map_image, sources, intent_category, None
 
     def _format_context_as_direct_answer(
         self, 
@@ -773,6 +779,7 @@ class RAGPipeline:
                 }
 
         # ---------------------------------------------------------
+        # ---------------------------------------------------------
         # STEP 0.1: RESOLVE "MY DEPARTMENT" LOCATION
         # ---------------------------------------------------------
         user_dept = user_profile.get("department") if user_profile else None
@@ -789,6 +796,7 @@ class RAGPipeline:
                 return {
                     "answer": ans_text,
                     "image": nav_image_path,
+                    "location": nav_result,
                     "sources": ["departments.csv", "campus_info.csv", "student_profile.db"],
                     "navigation": nav_result,
                     "suggestions": suggestions
@@ -844,6 +852,7 @@ class RAGPipeline:
                 return {
                     "answer": nav_result["formatted_text"],
                     "image": nav_image_path,
+                    "location": nav_result,
                     "sources": ["rooms_facilities.csv", "campus_info.csv"],
                     "navigation": nav_result,
                     "suggestions": suggestions
@@ -868,7 +877,7 @@ class RAGPipeline:
         # ---------------------------------------------------------
         # STEP 3: PREPARE CONTEXT & DYNAMIC PROMPT WITH PROFILE
         # ---------------------------------------------------------
-        context, map_image, sources, intent_category = self._prepare_rag_context(
+        context, map_image, sources, intent_category, location_info = self._prepare_rag_context(
             question, top_k=top_k, filter_dict=filter_dict, user_profile=user_profile
         )
 
@@ -909,6 +918,7 @@ class RAGPipeline:
         result_payload = {
             "answer": answer,
             "image": map_image,
+            "location": location_info,
             "sources": sources,
             "suggestions": suggestions
         }
@@ -960,7 +970,7 @@ class RAGPipeline:
                 memory_manager.add_message(session_id, "assistant", ans_text)
                 suggestions = generate_followup_suggestions(question, "navigation", ans_text, user_profile=user_profile)
                 yield {"chunk": ans_text, "done": False}
-                yield {"done": True, "answer": ans_text, "image": nav_image_path, "sources": ["departments.csv", "campus_info.csv", "student_profile.db"], "suggestions": suggestions}
+                yield {"done": True, "answer": ans_text, "image": nav_image_path, "location": nav_result, "sources": ["departments.csv", "campus_info.csv", "student_profile.db"], "suggestions": suggestions}
                 return
 
         # Step 0.2: Profile query
@@ -994,11 +1004,11 @@ class RAGPipeline:
                 memory_manager.add_message(session_id, "assistant", nav_result["formatted_text"])
                 suggestions = generate_followup_suggestions(question, "navigation", nav_result["formatted_text"], user_profile=user_profile)
                 yield {"chunk": nav_result["formatted_text"], "done": False}
-                yield {"done": True, "answer": nav_result["formatted_text"], "image": nav_image_path, "sources": ["rooms_facilities.csv", "campus_info.csv"], "suggestions": suggestions}
+                yield {"done": True, "answer": nav_result["formatted_text"], "image": nav_image_path, "location": nav_result, "sources": ["rooms_facilities.csv", "campus_info.csv"], "suggestions": suggestions}
                 return
 
         # Step 3: Prepare Context & Dynamic Prompt
-        context, map_image, sources, intent_category = self._prepare_rag_context(
+        context, map_image, sources, intent_category, location_info = self._prepare_rag_context(
             question, top_k=top_k, filter_dict=filter_dict, user_profile=user_profile
         )
 
@@ -1042,6 +1052,7 @@ class RAGPipeline:
             "done": True,
             "answer": full_answer,
             "image": map_image,
+            "location": location_info,
             "sources": sources,
             "suggestions": suggestions
         }

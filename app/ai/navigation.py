@@ -30,7 +30,71 @@ def find_location(query: str) -> Optional[Dict[str, Any]]:
     has_nav_intent = any(re.search(r'\b' + re.escape(k) + r'\b', clean_query) for k in nav_intent_keywords)
 
     # -------------------------------------------------------------
-    # STEP 1: Check Department Context from Query
+    # STEP 0: Check Admin Sub-Facilities (Library, Reading Room, Offices, etc.)
+    # -------------------------------------------------------------
+    admin_info = NAVIGATION.get("admin", {})
+    admin_facilities = admin_info.get("facilities", {})
+    for fac_key, fac_data in admin_facilities.items():
+        for alias in fac_data.get("aliases", []):
+            if re.search(r'\b' + re.escape(alias) + r'\b', clean_query):
+                fac_name = fac_key.title()
+                fac_lat = fac_data.get("latitude", admin_info.get("latitude"))
+                fac_lng = fac_data.get("longitude", admin_info.get("longitude"))
+                fac_floor = fac_data.get("floor", "Administration Building")
+                return {
+                    "id": admin_info.get("id", "P002"),
+                    "location_id": admin_info.get("id", "P002"),
+                    "name": fac_name,
+                    "latitude": fac_lat,
+                    "longitude": fac_lng,
+                    "building": "Administration Building",
+                    "zone": "Center Campus",
+                    "floor": fac_floor,
+                    "room": fac_name,
+                    "image": admin_info.get("image", "Admin dep.jpeg"),
+                    "formatted_text": (
+                        f"📍 **{fac_name}**\n\n"
+                        f"🏢 **Building:** Administration Building\n"
+                        f"📌 **Floor / Location:** {fac_floor} (Center Campus)\n\n"
+                        f"Please follow the highlighted building location on the map below."
+                    )
+                }
+
+    # -------------------------------------------------------------
+    # STEP 1: Check Standalone Amenities (Canteen, Sports Ground, Bus Stop, etc.)
+    # -------------------------------------------------------------
+    standalone_keys = ["canteen", "sports court", "stationary", "bus stop", "admin"]
+    for key in standalone_keys:
+        item_data = NAVIGATION.get(key)
+        if not item_data:
+            continue
+        for alias in item_data.get("aliases", []):
+            if re.search(r'\b' + re.escape(alias) + r'\b', clean_query):
+                item_name = item_data.get("display_name", key.title())
+                item_lat = item_data.get("latitude")
+                item_lng = item_data.get("longitude")
+                item_img = item_data.get("image")
+                item_id = item_data.get("id", "CAMPUS_LOC")
+                return {
+                    "id": item_id,
+                    "location_id": item_id,
+                    "name": item_name,
+                    "latitude": item_lat,
+                    "longitude": item_lng,
+                    "building": item_name,
+                    "zone": "Campus Landmark",
+                    "floor": "Ground Level",
+                    "room": item_name,
+                    "image": item_img,
+                    "formatted_text": (
+                        f"📍 **{item_name}**\n\n"
+                        f"🏢 **Location:** SVIT Vasad Campus\n\n"
+                        f"Please follow the highlighted location on the map below."
+                    )
+                }
+
+    # -------------------------------------------------------------
+    # STEP 2: Check Department Context from Query
     # -------------------------------------------------------------
     matched_dept_key = None
     for dept_key, dept_data in NAVIGATION.items():
@@ -44,13 +108,13 @@ def find_location(query: str) -> Optional[Dict[str, Any]]:
             break
 
     # -------------------------------------------------------------
-    # STEP 2: Extract Room / Lab Identifier using Pattern Matching
+    # STEP 3: Extract Room / Lab Identifier using Pattern Matching
     # -------------------------------------------------------------
     lab_match = re.search(r'\b(?:lab\s*)?l([1-5])\b', clean_query)
     room_match = re.search(r'\b(?:room\s*)?([2-4]0[1-5])\b', clean_query)
 
     # -------------------------------------------------------------
-    # STEP 3: Resolve Location via Department & Identified Room
+    # STEP 4: Resolve Location via Department & Identified Room
     # -------------------------------------------------------------
     if matched_dept_key:
         dept_info = NAVIGATION[matched_dept_key]
@@ -58,12 +122,22 @@ def find_location(query: str) -> Optional[Dict[str, Any]]:
         dept_image = dept_info["image"]
         dept_building = dept_info.get("building", dept_name)
         dept_zone = dept_info.get("zone", "Main Academic Block")
+        dept_id = dept_info.get("id", "CAMPUS_LOC")
+        dept_lat = dept_info.get("latitude")
+        dept_lng = dept_info.get("longitude")
         floors = dept_info.get("floors", {})
 
         # Case A: Underground Lab
         if lab_match:
             lab_code = f"L{lab_match.group(1)}"
             return {
+                "id": dept_id,
+                "location_id": dept_id,
+                "name": f"{dept_name} - Lab {lab_code}",
+                "latitude": dept_lat,
+                "longitude": dept_lng,
+                "building": dept_building,
+                "zone": dept_zone,
                 "department": dept_name,
                 "floor": FLOOR_NAMES["underground"],
                 "room": f"Lab {lab_code}",
@@ -81,6 +155,13 @@ def find_location(query: str) -> Optional[Dict[str, Any]]:
             room_num = int(room_match.group(1))
             floor_key = "first" if 201 <= room_num <= 205 else ("second" if 301 <= room_num <= 305 else "third")
             return {
+                "id": dept_id,
+                "location_id": dept_id,
+                "name": f"{dept_name} - Room {room_num}",
+                "latitude": dept_lat,
+                "longitude": dept_lng,
+                "building": dept_building,
+                "zone": dept_zone,
                 "department": dept_name,
                 "floor": FLOOR_NAMES[floor_key],
                 "room": f"Room {room_num}",
@@ -97,6 +178,13 @@ def find_location(query: str) -> Optional[Dict[str, Any]]:
         for ground_term in floors.get("ground", []):
             if re.search(r'\b' + re.escape(ground_term) + r'\b', clean_query):
                 return {
+                    "id": dept_id,
+                    "location_id": dept_id,
+                    "name": f"{dept_name} - {ground_term.title()}",
+                    "latitude": dept_lat,
+                    "longitude": dept_lng,
+                    "building": dept_building,
+                    "zone": dept_zone,
                     "department": dept_name,
                     "floor": FLOOR_NAMES["ground"],
                     "room": ground_term.title(),
@@ -112,6 +200,13 @@ def find_location(query: str) -> Optional[Dict[str, Any]]:
         # Case D: Department Building Query (matches if nav intent exists or question asks about the department/block)
         if has_nav_intent or any(k in clean_query for k in ["block", "building", "dept", "department", "where is", "location of"]):
             return {
+                "id": dept_id,
+                "location_id": dept_id,
+                "name": dept_name,
+                "latitude": dept_lat,
+                "longitude": dept_lng,
+                "building": dept_building,
+                "zone": dept_zone,
                 "department": dept_name,
                 "floor": "Entire Building",
                 "room": dept_name,
@@ -125,12 +220,17 @@ def find_location(query: str) -> Optional[Dict[str, Any]]:
             }
 
     # -------------------------------------------------------------
-    # STEP 4: Unattached Room Number Fallback (e.g., "Where is 202?")
+    # STEP 5: Unattached Room Number Fallback (e.g., "Where is 202?")
     # -------------------------------------------------------------
     if room_match:
         room_num = int(room_match.group(1))
         floor_key = "first" if 201 <= room_num <= 205 else ("second" if 301 <= room_num <= 305 else "third")
         return {
+            "id": "CAMPUS_ROOM",
+            "location_id": "CAMPUS_ROOM",
+            "name": f"Room {room_num}",
+            "latitude": 22.471410,
+            "longitude": 73.077220,
             "department": "Academic Block",
             "floor": FLOOR_NAMES[floor_key],
             "room": f"Room {room_num}",

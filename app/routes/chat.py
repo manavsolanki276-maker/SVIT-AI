@@ -138,6 +138,7 @@ def generate_campus_response(query_text, session_id="default_user", user_profile
                 sources = response_data.get('sources') or []
                 image = response_data.get('image') or None
                 suggestions = response_data.get('suggestions') or []
+                location = response_data.get('location') or response_data.get('navigation') or None
 
                 # Clean and validate map image existence on disk
                 if image:
@@ -147,7 +148,7 @@ def generate_campus_response(query_text, session_id="default_user", user_profile
                         image = None
 
                 if answer and isinstance(answer, str) and answer.strip():
-                    return answer, image, sources, suggestions
+                    return answer, image, sources, suggestions, location
 
         except Exception as e:
             print(f"[Error] RAG Execution Error: {type(e).__name__} - {str(e)}")
@@ -168,11 +169,23 @@ def generate_campus_response(query_text, session_id="default_user", user_profile
             "*Note: Please check your department notice board for elective lab batch splits.*",
             None,
             ["timetable.csv"],
-            ["Where is my next class right now? 📍", "Show tomorrow's timetable 📅"]
+            ["Where is my next class right now? 📍", "Show tomorrow's timetable 📅"],
+            None
         )
     elif any(k in text_lower for k in ['canteen', 'food', 'mess', 'cafeteria']):
-        img_path = "navigation_maps/canteen.png"
+        img_path = "navigation_maps/SVIT Canteen loc.png"
         full_img_path = os.path.join(current_app.static_folder, img_path)
+        canteen_loc = {
+            "id": "P027",
+            "location_id": "P027",
+            "name": "Central Canteen",
+            "latitude": 22.470720,
+            "longitude": 73.077150,
+            "building": "Central Campus",
+            "landmark": "Near Library",
+            "description": "Main College Canteen",
+            "image_url": "/static/navigation_maps/SVIT Canteen loc.png"
+        }
         return (
             "### 🍔 Campus Canteen Details\n\n"
             "The Main College Canteen is located behind the **Ground Floor Student Activity Center** near the sports ground.\n\n"
@@ -180,7 +193,8 @@ def generate_campus_response(query_text, session_id="default_user", user_profile
             "* **Available Items**: Fresh snacks, full lunch thali meals, cold beverages, and hot tea/coffee.",
             img_path if os.path.exists(full_img_path) else None,
             ["canteen_menu.pdf"],
-            ["Where is the sports ground? 📍", "Show bus schedule 🚌"]
+            ["Where is the sports ground? 📍", "Show bus schedule 🚌"],
+            canteen_loc
         )
     else:
         return (
@@ -189,7 +203,8 @@ def generate_campus_response(query_text, session_id="default_user", user_profile
             "please consult the student academic portal or your department coordinator.",
             None,
             ["svit_handbook.pdf"],
-            ["Show today's timetable 📅", "Where is Diploma Room 202? 📍"]
+            ["Show today's timetable 📅", "Where is Diploma Room 202? 📍"],
+            None
         )
 
 
@@ -258,6 +273,7 @@ def handle_chat_stream():
 
         full_answer = ""
         final_image = None
+        final_location = None
         final_sources = []
         final_suggestions = []
 
@@ -274,6 +290,7 @@ def handle_chat_stream():
                         yield f"data: {json.dumps({'chunk': chunk_str, 'conversation_id': conv_id})}\n\n"
                 else:
                     final_image = packet.get("image")
+                    final_location = packet.get("location") or final_location
                     final_sources = packet.get("sources", [])
                     final_suggestions = packet.get("suggestions", [])
                     if packet.get("answer"):
@@ -281,11 +298,12 @@ def handle_chat_stream():
 
             # Guaranteed safety fallback if stream yielded no tokens
             if not full_answer or not full_answer.strip():
-                fallback_ans, fallback_img, fallback_src, fallback_sug = generate_campus_response(
+                fallback_ans, fallback_img, fallback_src, fallback_sug, fallback_loc = generate_campus_response(
                     user_text, session_id=session_key, user_profile=user_profile
                 )
                 full_answer = fallback_ans
                 final_image = fallback_img or final_image
+                final_location = fallback_loc or final_location
                 final_sources = fallback_src or final_sources
                 final_suggestions = fallback_sug or final_suggestions
                 yield f"data: {json.dumps({'chunk': full_answer, 'conversation_id': conv_id})}\n\n"
@@ -328,15 +346,15 @@ def handle_chat_stream():
             except Exception:
                 pass
 
-            yield f"data: {json.dumps({'done': True, 'conversation_id': conv_id, 'message_id': saved_msg_id, 'answer': full_answer, 'image': final_image, 'sources': final_sources, 'suggestions': final_suggestions})}\n\n"
+            yield f"data: {json.dumps({'done': True, 'conversation_id': conv_id, 'message_id': saved_msg_id, 'answer': full_answer, 'image': final_image, 'location': final_location, 'sources': final_sources, 'suggestions': final_suggestions})}\n\n"
 
         except Exception as err:
             print(f"[Error] Streaming error: {err}")
-            fallback_ans, fallback_img, fallback_src, fallback_sug = generate_campus_response(
+            fallback_ans, fallback_img, fallback_src, fallback_sug, fallback_loc = generate_campus_response(
                 user_text, session_id=session_key, user_profile=user_profile
             )
             yield f"data: {json.dumps({'chunk': fallback_ans, 'conversation_id': conv_id})}\n\n"
-            yield f"data: {json.dumps({'done': True, 'conversation_id': conv_id, 'message_id': 'msg_err', 'answer': fallback_ans, 'image': fallback_img, 'sources': fallback_src, 'suggestions': fallback_sug})}\n\n"
+            yield f"data: {json.dumps({'done': True, 'conversation_id': conv_id, 'message_id': 'msg_err', 'answer': fallback_ans, 'image': fallback_img, 'location': fallback_loc, 'sources': fallback_src, 'suggestions': fallback_sug})}\n\n"
 
     return Response(stream_with_context(event_stream()), mimetype='text/event-stream')
 
@@ -395,7 +413,7 @@ def handle_chat():
 
     # Generate AI Answer with user profile
     session_key = f"student_{student_id}_conv_{conv_id}"
-    ai_response_text, image_path, sources_list, suggestions_list = generate_campus_response(
+    ai_response_text, image_path, sources_list, suggestions_list, location_data = generate_campus_response(
         user_text, 
         session_id=session_key,
         user_profile=user_profile
@@ -436,6 +454,7 @@ def handle_chat():
         "answer": ai_response_text,
         "response": ai_response_text,
         "image": image_path,
+        "location": location_data,
         "sources": sources_list,
         "suggestions": suggestions_list
     })
