@@ -14,7 +14,7 @@ from flask import current_app, url_for
 
 # Allowed extensions and MIME types
 ALLOWED_IMAGE_EXTENSIONS = {'jpg', 'jpeg', 'png', 'webp'}
-ALLOWED_DOCUMENT_EXTENSIONS = {'pdf', 'docx'}
+ALLOWED_DOCUMENT_EXTENSIONS = {'pdf', 'docx', 'xlsx', 'xls', 'csv', 'txt'}
 
 # File size limits (in bytes)
 MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024       # 5 MB
@@ -118,6 +118,8 @@ def validate_and_save_file(
         "original_name": raw_filename,
         "stored_filename": safe_stored_name,
         "url": public_url,
+        "file_url": public_url,
+        "file_path": dest_path,
         "category": category,
         "file_extension": ext,
         "file_type": mime_type or ('image/' + ext if category == 'image' else 'application/pdf'),

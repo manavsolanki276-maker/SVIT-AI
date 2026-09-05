@@ -1,0 +1,554 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}SVIT Info & Campus Overview{% endblock %}
+{% block header_title %}Sardar Vallabhbhai Patel Institute of Technology - Institutional CMS{% endblock %}
+
+{% block content %}
+<div class="space-y-6 text-[#171D3A]" data-module="svit_info">
+
+    <!-- 1. HERO BANNER -->
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-6 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm">
+        <div class="flex items-start gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-[#E8EBFA] border border-[#8B5CF6]/30 flex items-center justify-center text-[#8B5CF6] flex-shrink-0 shadow-sm">
+                <i data-lucide="landmark" class="w-7 h-7"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2.5 flex-wrap">
+                    <h2 class="text-xl font-bold text-[#171D3A] mb-0">Sardar Vallabhbhai Patel Institute of Technology (SVIT)</h2>
+                    <span id="svitInfoBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#E8EBFA] text-[#8B5CF6] border border-[#8B5CF6]/30">
+                        Official SVIT Knowledge Base
+                    </span>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">
+                        GTU Affiliated &bull; AICTE Approved
+                    </span>
+                </div>
+                <p class="text-xs text-[#66708F] mb-0 mt-1 max-w-3xl">
+                    Established in 1997 under the patronship of Patel Kelavani Mandal (PKM) Trust. Located across 26 verdant acres along the banks of the sacred Mahisagar River in Vasad, Anand, Gujarat.
+                </p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap self-start lg:self-auto">
+            <button id="openUploadDocBtn" class="px-3.5 py-2 rounded-xl bg-white border border-[#E1E5F0] hover:border-[#8B5CF6] text-[#171D3A] text-xs font-semibold shadow-sm transition flex items-center gap-1.5">
+                <i data-lucide="upload-cloud" class="w-4 h-4 text-[#8B5CF6]"></i> Upload Info Doc
+            </button>
+            <button id="openCreateModalBtn" class="px-4 py-2 rounded-xl bg-[#8B5CF6] hover:bg-[#7C4FE8] text-white text-xs font-semibold shadow-lg shadow-[#8B5CF6]/30 transition flex items-center gap-2">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i> Add Section
+            </button>
+        </div>
+    </div>
+
+    <!-- 2. INSTITUTIONAL HIGHLIGHTS KPI ROW -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div class="p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold text-[#66708F] uppercase tracking-wider">Establishment</span>
+                <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                    <i data-lucide="calendar" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <h3 class="text-xl font-extrabold text-[#171D3A] mb-0">1997</h3>
+            <span class="text-[11px] text-indigo-600 font-semibold flex items-center gap-1 mt-0.5">
+                <i data-lucide="award" class="w-3 h-3"></i> 27+ Years of Academic Excellence
+            </span>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold text-[#66708F] uppercase tracking-wider">Governing Trust</span>
+                <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <i data-lucide="shield-check" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <h3 class="text-base font-extrabold text-[#171D3A] mb-0">Patel Kelavani Mandal</h3>
+            <span class="text-[11px] text-emerald-600 font-semibold flex items-center gap-1 mt-0.5">
+                <i data-lucide="check-circle-2" class="w-3 h-3"></i> PKM Trust, Vasad
+            </span>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold text-[#66708F] uppercase tracking-wider">Approvals & Affiliation</span>
+                <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                    <i data-lucide="check-check" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <h3 class="text-base font-extrabold text-[#171D3A] mb-0">AICTE &bull; GTU &bull; DTE</h3>
+            <span class="text-[11px] text-amber-600 font-semibold flex items-center gap-1 mt-0.5">
+                <i data-lucide="map-pin" class="w-3 h-3"></i> New Delhi & Gandhinagar
+            </span>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold text-[#66708F] uppercase tracking-wider">Campus & Location</span>
+                <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+                    <i data-lucide="map" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <h3 class="text-base font-extrabold text-[#171D3A] mb-0">26+ Acres &bull; Vasad</h3>
+            <span class="text-[11px] text-purple-600 font-semibold flex items-center gap-1 mt-0.5">
+                <i data-lucide="navigation" class="w-3 h-3"></i> Mahisagar River Banks, Anand
+            </span>
+        </div>
+    </div>
+
+    <!-- 3. SEARCH & CATEGORY FILTER TOOLBAR -->
+    <div class="p-4 rounded-2xl bg-white border border-[#E1E5F0] flex flex-col md:flex-row items-center justify-between gap-3 flex-wrap shadow-sm">
+        <div class="relative w-full md:w-80">
+            <i data-lucide="search" class="w-4 h-4 text-[#8C95AD] absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="searchInput" placeholder="Search SVIT overview, trust, approvals..." class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl pl-9 pr-8 py-2 text-xs text-[#171D3A] placeholder-[#8C95AD] focus:outline-none focus:border-[#8B5CF6] transition">
+            <button id="clearSearchBtn" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs hidden">✕</button>
+        </div>
+
+        <div class="flex items-center gap-2 w-full md:w-auto flex-wrap">
+            <select id="categoryFilter" class="bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-[#8B5CF6]">
+                <option value="">All Categories</option>
+                <option value="About SVIT">About SVIT</option>
+                <option value="Trust / PKM">Trust / PKM</option>
+                <option value="Leadership & Administration">Leadership & Administration</option>
+                <option value="Affiliation & Approvals">Affiliation & Approvals</option>
+                <option value="Campus Infrastructure">Campus Infrastructure</option>
+                <option value="Contact & Location">Contact & Location</option>
+            </select>
+
+            <button id="refreshBtn" class="p-2 rounded-xl bg-[#F8F9FE] border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A]" title="Refresh Records">
+                <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 4. DATA TABLE -->
+    <div class="bg-white border border-[#E1E5F0] rounded-2xl shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-[#171D3A]">
+                <thead class="bg-[#F8F9FE] border-b border-[#E1E5F0] text-[#66708F] uppercase tracking-wider text-[11px] font-semibold">
+                    <tr>
+                        <th class="p-3.5">Info ID</th>
+                        <th class="p-3.5">Section Title</th>
+                        <th class="p-3.5">Category</th>
+                        <th class="p-3.5">Key Contact / Info</th>
+                        <th class="p-3.5">Status</th>
+                        <th class="p-3.5 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody" class="divide-y divide-[#E1E5F0]">
+                    <tr>
+                        <td colspan="6" class="p-8 text-center text-[#8C95AD]">
+                            <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-[#8B5CF6]"></i>
+                            Loading institutional data...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="p-4 border-t border-[#E1E5F0] flex items-center justify-between text-xs text-[#66708F] bg-[#F8F9FE]">
+            <span id="recordCountText">Showing 0 records</span>
+            <div class="flex items-center gap-2">
+                <a href="https://svitvasad.ac.in" target="_blank" rel="noopener noreferrer" class="text-[#8B5CF6] hover:underline flex items-center gap-1 text-xs">
+                    <i data-lucide="external-link" class="w-3 h-3"></i> svitvasad.ac.in
+                </a>
+                <span class="text-[#E1E5F0]">&bull;</span>
+                <a href="https://alumni.svitvasad.ac.in/" target="_blank" rel="noopener noreferrer" class="text-[#8B5CF6] hover:underline flex items-center gap-1 text-xs">
+                    <i data-lucide="users" class="w-3 h-3"></i> alumni.svitvasad.ac.in
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- 5. CREATE / EDIT MODAL -->
+<div class="modal fade" id="svitInfoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-white border border-[#E1E5F0] rounded-2xl shadow-xl">
+            <div class="modal-header border-b border-[#E1E5F0] p-4 bg-[#F8F9FE]">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-[#E8EBFA] text-[#8B5CF6] flex items-center justify-center">
+                        <i data-lucide="landmark" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-[#171D3A] mb-0" id="modalTitle">Add Institutional Info Section</h3>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="svitInfoForm" class="p-5 space-y-3.5 text-xs">
+                <input type="hidden" id="recordId">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Section Title *</label>
+                        <input type="text" id="infoTitle" required placeholder="e.g. Overview & Campus History" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Category *</label>
+                        <select id="infoCategory" required class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                            <option value="About SVIT">About SVIT</option>
+                            <option value="Trust / PKM">Trust / PKM</option>
+                            <option value="Leadership & Administration">Leadership & Administration</option>
+                            <option value="Affiliation & Approvals">Affiliation & Approvals</option>
+                            <option value="Campus Infrastructure">Campus Infrastructure</option>
+                            <option value="Contact & Location">Contact & Location</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                    <div>
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Established Year</label>
+                        <input type="text" id="infoYear" placeholder="e.g. 1997" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Official Email</label>
+                        <input type="email" id="infoEmail" placeholder="svit@svitvasad.ac.in" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Contact Phone</label>
+                        <input type="text" id="infoPhone" placeholder="02692-274766" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Website URL</label>
+                        <input type="url" id="infoWebsite" placeholder="https://svitvasad.ac.in" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Status *</label>
+                        <select id="infoStatus" required class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                            <option value="Active">Active</option>
+                            <option value="Archived">Archived</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Comprehensive Information / Content *</label>
+                    <textarea id="infoDetails" rows="5" required placeholder="Detailed institutional text, historical background, approval notices, infrastructure details..." class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl p-3 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]"></textarea>
+                </div>
+
+                <div class="pt-3 border-t border-[#E1E5F0] flex items-center justify-end gap-2.5">
+                    <button type="button" class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" id="saveInfoBtn" class="px-4 py-2 rounded-xl bg-[#8B5CF6] hover:bg-[#7C4FE8] text-white text-xs font-semibold shadow-md transition flex items-center gap-1.5">
+                        <i data-lucide="check" class="w-4 h-4"></i> Save Record
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 6. UPLOAD SVIT INFO DOCUMENT MODAL (RAG Scoped) -->
+<div class="modal fade" id="uploadDocModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-white border border-[#E1E5F0] rounded-2xl shadow-xl">
+            <div class="modal-header border-b border-[#E1E5F0] p-4 bg-[#F8F9FE]">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-[#E8EBFA] text-[#8B5CF6] flex items-center justify-center">
+                        <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-[#171D3A] mb-0">Upload SVIT Institutional Document</h3>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="uploadDocForm" class="p-5 space-y-4 text-xs">
+                <input type="hidden" name="module" value="svit_info">
+                <div>
+                    <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Document Title</label>
+                    <input type="text" id="docTitle" name="title" placeholder="e.g. SVIT Institutional Profile 2026" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                </div>
+                <div>
+                    <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Select File (.pdf, .docx, .xlsx, .csv, .txt) *</label>
+                    <input type="file" id="docFile" name="file" required accept=".pdf,.docx,.xlsx,.xls,.csv,.txt" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                    <span class="text-[10px] text-[#66708F] mt-1 block">Maximum 10MB. Files are verified with SHA-256 and indexed strictly into <code>svit_info</code> namespace.</span>
+                </div>
+                <div id="uploadFeedback" class="hidden p-3 rounded-xl text-xs"></div>
+                <div class="pt-2 border-t border-[#E1E5F0] flex items-center justify-end gap-2">
+                    <button type="button" class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" id="submitUploadBtn" class="px-4 py-2 rounded-xl bg-[#8B5CF6] hover:bg-[#7C4FE8] text-white text-xs font-semibold shadow-md transition flex items-center gap-1.5">
+                        <i data-lucide="upload" class="w-4 h-4"></i> Upload & Index
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 7. VIEW DETAILS MODAL -->
+<div class="modal fade" id="viewDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-white border border-[#E1E5F0] rounded-2xl shadow-xl">
+            <div class="modal-header border-b border-[#E1E5F0] p-4 bg-[#F8F9FE]">
+                <h3 class="text-sm font-bold text-[#171D3A] mb-0" id="viewDetailTitle">Section Details</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="p-5 space-y-3 text-xs" id="viewDetailBody"></div>
+            <div class="p-4 border-t border-[#E1E5F0] text-right bg-[#F8F9FE]">
+                <button type="button" class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    let allRecords = [];
+    const infoModal = new bootstrap.Modal(document.getElementById("svitInfoModal"));
+    const uploadModal = new bootstrap.Modal(document.getElementById("uploadDocModal"));
+    const viewModal = new bootstrap.Modal(document.getElementById("viewDetailModal"));
+
+    async function loadRecords() {
+        const tbody = document.getElementById("dataTableBody");
+        try {
+            const res = await fetch("/admin/api/crud/svit_info?limit=100");
+            const data = await res.json();
+            if (data.status === "success") {
+                allRecords = data.items || [];
+                renderTable(allRecords);
+            } else {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-red-500">Failed to load data: ${data.message}</td></tr>`;
+            }
+        } catch (e) {
+            tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-red-500">Error loading records.</td></tr>`;
+        }
+    }
+
+    function renderTable(records) {
+        const tbody = document.getElementById("dataTableBody");
+        const countText = document.getElementById("recordCountText");
+        countText.innerText = `Showing ${records.length} records`;
+
+        if (!records || records.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-[#8C95AD]">No records found. Click "Add Section" to create one.</td></tr>`;
+            lucide.createIcons();
+            return;
+        }
+
+        tbody.innerHTML = records.map(r => `
+            <tr class="hover:bg-[#F8F9FE] transition">
+                <td class="p-3.5 font-mono text-[11px] font-semibold text-[#8B5CF6]">${escapeHtml(r.info_id || r.id || '')}</td>
+                <td class="p-3.5 font-medium text-[#171D3A]">
+                    <div class="font-bold">${escapeHtml(r.title || '')}</div>
+                    <div class="text-[11px] text-[#66708F] truncate max-w-xs">${escapeHtml((r.details || '').substring(0, 70))}...</div>
+                </td>
+                <td class="p-3.5">
+                    <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-[#E8EBFA] text-[#8B5CF6]">
+                        ${escapeHtml(r.category || 'General')}
+                    </span>
+                </td>
+                <td class="p-3.5 text-[#66708F]">
+                    <div>${r.contact_email ? `<i data-lucide="mail" class="w-3 h-3 inline mr-1 text-[#8B5CF6]"></i>${escapeHtml(r.contact_email)}` : '-'}</div>
+                    <div>${r.phone ? `<i data-lucide="phone" class="w-3 h-3 inline mr-1 text-emerald-500"></i>${escapeHtml(r.phone)}` : ''}</div>
+                </td>
+                <td class="p-3.5">
+                    <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold ${r.status === 'Active' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-gray-100 text-gray-500'}">
+                        ${escapeHtml(r.status || 'Active')}
+                    </span>
+                </td>
+                <td class="p-3.5 text-right space-x-1">
+                    <button class="view-btn p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-[#171D3A]" data-id="${escapeHtml(r.id || r.info_id)}" title="View Details">
+                        <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button class="edit-btn p-1.5 rounded-lg bg-[#E8EBFA] hover:bg-[#D4DCF7] text-[#8B5CF6]" data-id="${escapeHtml(r.id || r.info_id)}" title="Edit Section">
+                        <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button class="delete-btn p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600" data-id="${escapeHtml(r.id || r.info_id)}" title="Delete Section">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+
+        lucide.createIcons();
+        attachRowEvents();
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function attachRowEvents() {
+        document.querySelectorAll(".view-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = btn.dataset.id;
+                const rec = allRecords.find(r => (r.id == id || r.info_id == id));
+                if (!rec) return;
+                document.getElementById("viewDetailTitle").innerText = rec.title || "Section Details";
+                document.getElementById("viewDetailBody").innerHTML = `
+                    <div class="grid grid-cols-2 gap-3 mb-3 p-3 bg-[#F8F9FE] rounded-xl">
+                        <div><strong class="text-[#66708F]">Category:</strong> <span class="text-[#171D3A] font-semibold">${escapeHtml(rec.category)}</span></div>
+                        <div><strong class="text-[#66708F]">Year:</strong> <span class="text-[#171D3A] font-semibold">${escapeHtml(rec.established_year || '1997')}</span></div>
+                        <div><strong class="text-[#66708F]">Email:</strong> <span class="text-[#171D3A] font-semibold">${escapeHtml(rec.contact_email || '-')}</span></div>
+                        <div><strong class="text-[#66708F]">Phone:</strong> <span class="text-[#171D3A] font-semibold">${escapeHtml(rec.phone || '-')}</span></div>
+                        <div class="col-span-2"><strong class="text-[#66708F]">Website:</strong> <a href="${escapeHtml(rec.website)}" target="_blank" class="text-[#8B5CF6] underline">${escapeHtml(rec.website || '-')}</a></div>
+                    </div>
+                    <div>
+                        <strong class="text-[#66708F] block mb-1">Details:</strong>
+                        <div class="p-3 bg-white border border-[#E1E5F0] rounded-xl whitespace-pre-wrap leading-relaxed">${escapeHtml(rec.details)}</div>
+                    </div>
+                `;
+                viewModal.show();
+            });
+        });
+
+        document.querySelectorAll(".edit-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = btn.dataset.id;
+                const rec = allRecords.find(r => (r.id == id || r.info_id == id));
+                if (!rec) return;
+                document.getElementById("recordId").value = rec.id || rec.info_id;
+                document.getElementById("infoTitle").value = rec.title || '';
+                document.getElementById("infoCategory").value = rec.category || 'About SVIT';
+                document.getElementById("infoYear").value = rec.established_year || '';
+                document.getElementById("infoEmail").value = rec.contact_email || '';
+                document.getElementById("infoPhone").value = rec.phone || '';
+                document.getElementById("infoWebsite").value = rec.website || '';
+                document.getElementById("infoStatus").value = rec.status || 'Active';
+                document.getElementById("infoDetails").value = rec.details || '';
+                document.getElementById("modalTitle").innerText = "Edit SVIT Info Section";
+                infoModal.show();
+            });
+        });
+
+        document.querySelectorAll(".delete-btn").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const id = btn.dataset.id;
+                if (!confirm("Are you sure you want to delete this SVIT Info section?")) return;
+                try {
+                    const res = await fetch(`/admin/api/crud/svit_info/${id}`, { method: "DELETE" });
+                    const d = await res.json();
+                    if (d.status === "success") {
+                        loadRecords();
+                    } else {
+                        alert("Delete failed: " + d.message);
+                    }
+                } catch (e) {
+                    alert("Error deleting record.");
+                }
+            });
+        });
+    }
+
+    // Filter & Search
+    document.getElementById("searchInput").addEventListener("input", (e) => {
+        const val = e.target.value.toLowerCase();
+        document.getElementById("clearSearchBtn").classList.toggle("hidden", !val);
+        filterAndRender();
+    });
+
+    document.getElementById("clearSearchBtn").addEventListener("click", () => {
+        document.getElementById("searchInput").value = "";
+        document.getElementById("clearSearchBtn").classList.add("hidden");
+        filterAndRender();
+    });
+
+    document.getElementById("categoryFilter").addEventListener("change", filterAndRender);
+    document.getElementById("refreshBtn").addEventListener("click", loadRecords);
+
+    function filterAndRender() {
+        const query = document.getElementById("searchInput").value.toLowerCase();
+        const cat = document.getElementById("categoryFilter").value;
+        const filtered = allRecords.filter(r => {
+            const matchesQuery = !query || 
+                (r.title && r.title.toLowerCase().includes(query)) ||
+                (r.details && r.details.toLowerCase().includes(query)) ||
+                (r.category && r.category.toLowerCase().includes(query));
+            const matchesCat = !cat || r.category === cat;
+            return matchesQuery && matchesCat;
+        });
+        renderTable(filtered);
+    }
+
+    // Open Create Modal
+    document.getElementById("openCreateModalBtn").addEventListener("click", () => {
+        document.getElementById("svitInfoForm").reset();
+        document.getElementById("recordId").value = "";
+        document.getElementById("modalTitle").innerText = "Add Institutional Info Section";
+        infoModal.show();
+    });
+
+    // Save Record
+    document.getElementById("svitInfoForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const id = document.getElementById("recordId").value;
+        const payload = {
+            title: document.getElementById("infoTitle").value.trim(),
+            category: document.getElementById("infoCategory").value,
+            established_year: document.getElementById("infoYear").value.trim(),
+            contact_email: document.getElementById("infoEmail").value.trim(),
+            phone: document.getElementById("infoPhone").value.trim(),
+            website: document.getElementById("infoWebsite").value.trim(),
+            status: document.getElementById("infoStatus").value,
+            details: document.getElementById("infoDetails").value.trim(),
+        };
+
+        const url = id ? `/admin/api/crud/svit_info/${id}` : `/admin/api/crud/svit_info`;
+        const method = id ? "PUT" : "POST";
+
+        try {
+            const res = await fetch(url, {
+                method: method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            const d = await res.json();
+            if (d.status === "success") {
+                infoModal.hide();
+                loadRecords();
+            } else {
+                alert("Save failed: " + d.message);
+            }
+        } catch (err) {
+            alert("Error saving record.");
+        }
+    });
+
+    // Open Upload Modal
+    document.getElementById("openUploadDocBtn").addEventListener("click", () => {
+        document.getElementById("uploadDocForm").reset();
+        const fb = document.getElementById("uploadFeedback");
+        fb.className = "hidden p-3 rounded-xl text-xs";
+        uploadModal.show();
+    });
+
+    // Upload Document Form
+    document.getElementById("uploadDocForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const fb = document.getElementById("uploadFeedback");
+        const btn = document.getElementById("submitUploadBtn");
+        fb.className = "p-3 rounded-xl text-xs bg-indigo-50 text-indigo-700 border border-indigo-200 block";
+        fb.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 inline animate-spin mr-1"></i> Running 8-step verification and indexing into svit_info...`;
+        lucide.createIcons();
+        btn.disabled = true;
+
+        const formData = new FormData(e.target);
+        try {
+            const res = await fetch("/admin/api/documents/upload", {
+                method: "POST",
+                body: formData
+            });
+            const data = await res.json();
+            if (res.ok && data.status === "success") {
+                fb.className = "p-3 rounded-xl text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 block";
+                fb.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 inline mr-1"></i> ${data.message} (${data.document.chunk_count} chunks indexed).`;
+                lucide.createIcons();
+                setTimeout(() => {
+                    uploadModal.hide();
+                    btn.disabled = false;
+                }, 1500);
+            } else {
+                fb.className = "p-3 rounded-xl text-xs bg-red-50 text-red-700 border border-red-200 block";
+                fb.innerText = "Upload failed: " + (data.message || data.error);
+                btn.disabled = false;
+            }
+        } catch (err) {
+            fb.className = "p-3 rounded-xl text-xs bg-red-50 text-red-700 border border-red-200 block";
+            fb.innerText = "Error submitting document upload.";
+            btn.disabled = false;
+        }
+    });
+
+    loadRecords();
+});
+</script>
+{% endblock %}

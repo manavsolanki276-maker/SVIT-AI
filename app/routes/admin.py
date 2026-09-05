@@ -5,6 +5,7 @@ Universal CRUD Handlers, File Upload & Download, and Admin Management.
 Enforces backend RBAC security on every endpoint.
 """
 import os
+import uuid
 from urllib.parse import urlparse
 from datetime import datetime
 from typing import Dict, Any
@@ -34,6 +35,7 @@ from app.auth.rbac import (
     has_role,
     normalize_role,
     ROLE_SUPER_ADMIN,
+    ROLE_SVIT_INFO_ADMIN,
     ROLE_ACADEMIC_ADMIN,
     ROLE_ADMISSION_ADMIN,
     ROLE_NOTICE_ADMIN,
@@ -399,12 +401,39 @@ def subjects():
 def placements():
     return render_module('placements', 'admin/placements.html')
 
-@admin_bp.route('/documents')
 @admin_bp.route('/academic-documents')
 @admin_bp.route('/academic_documents')
 @admin_required
 def academic_documents():
     return render_module('academic_documents', 'admin/academic_documents.html')
+
+# SVIT INFO & CAMPUS OVERVIEW ADMIN
+@admin_bp.route('/svit-info')
+@admin_bp.route('/svit_info')
+@admin_bp.route('/about-svit')
+@admin_bp.route('/about_svit')
+@admin_required
+def svit_info():
+    return render_module('svit_info', 'admin/svit_info.html')
+
+# ACADEMICS / SYLLABUS ADMIN
+@admin_bp.route('/syllabus')
+@admin_bp.route('/academics')
+@admin_bp.route('/academic-syllabus')
+@admin_bp.route('/academic_syllabus')
+@admin_required
+def syllabus():
+    return render_module('syllabus', 'admin/syllabus.html')
+
+# UNIVERSAL DOCUMENTS & RAG STATUS ADMIN
+@admin_bp.route('/documents')
+@admin_bp.route('/module-documents')
+@admin_bp.route('/module_documents')
+@admin_bp.route('/rag-status')
+@admin_bp.route('/rag_status')
+@admin_required
+def module_documents():
+    return render_module('module_documents', 'admin/documents.html')
 
 # ADMISSION ADMIN
 @admin_bp.route('/admission')
@@ -436,7 +465,7 @@ def admission_notices():
 def notices():
     return render_module('notices', 'admin/notices.html')
 
-# EVENT ADMIN
+# EVENT ADMIN (EXPLICITLY NO SPORTS)
 @admin_bp.route('/events')
 @admin_required
 def events():
@@ -467,36 +496,6 @@ def bus_stops():
 def bus_timings():
     return render_module('transport', 'admin/bus_timings.html')
 
-# LIBRARY ADMIN
-@admin_bp.route('/library')
-@admin_bp.route('/library-info')
-@admin_bp.route('/library_info')
-@admin_required
-def library():
-    return render_module('library_info', 'admin/library.html')
-
-@admin_bp.route('/library-books')
-@admin_bp.route('/library_books')
-@admin_bp.route('/books')
-@admin_required
-def library_books():
-    return render_module('library_books', 'admin/library_books.html')
-
-@admin_bp.route('/library-members')
-@admin_bp.route('/library_members')
-@admin_bp.route('/members')
-@admin_required
-def library_members():
-    return render_module('library_members', 'admin/library_members.html')
-
-@admin_bp.route('/issue-return')
-@admin_bp.route('/issue_return')
-@admin_bp.route('/library-issue-return')
-@admin_bp.route('/library_issue_return')
-@admin_required
-def issue_return():
-    return render_module('library_issue_return', 'admin/issue_return.html')
-
 # CANTEEN ADMIN
 @admin_bp.route('/canteen')
 @admin_required
@@ -515,22 +514,28 @@ def canteen_menu():
 def food_items():
     return render_module('canteen', 'admin/food_items.html')
 
-# SPORTS ADMIN
+# RETIRED MODULES (LIBRARY & SPORTS) - GRACEFUL FALLBACK REDIRECT (NO 404s)
+@admin_bp.route('/library')
+@admin_bp.route('/library-info')
+@admin_bp.route('/library_info')
+@admin_bp.route('/library-books')
+@admin_bp.route('/library_books')
+@admin_bp.route('/books')
+@admin_bp.route('/library-members')
+@admin_bp.route('/library_members')
+@admin_bp.route('/members')
+@admin_bp.route('/issue-return')
+@admin_bp.route('/issue_return')
+@admin_bp.route('/library-issue-return')
+@admin_bp.route('/library_issue_return')
 @admin_bp.route('/sports')
-@admin_required
-def sports():
-    return render_module('sports', 'admin/sports.html')
-
 @admin_bp.route('/sports-events')
 @admin_bp.route('/sports_events')
-@admin_required
-def sports_events():
-    return render_module('sports_events', 'admin/sports_events.html')
-
 @admin_bp.route('/grounds')
 @admin_required
-def grounds():
-    return render_module('grounds', 'admin/grounds.html')
+def legacy_retired_modules_fallback():
+    flash("The requested module has been retired and consolidated.", "info")
+    return redirect(url_for('admin.dashboard'))
 
 
 # =========================================================================
@@ -1065,6 +1070,158 @@ def api_rag_status(module_name: str, item_id: str):
         "version": item.get("version", 1),
         "indexed_at": item.get("indexed_at"),
         "error_message": item.get("error_message", "")
+    }), 200
+
+
+# =========================================================================
+# 6.2 UNIVERSAL DOCUMENT RAG MANAGEMENT APIS
+# =========================================================================
+@admin_bp.route('/api/documents/upload', methods=['POST'])
+@admin_required
+def api_upload_module_document():
+    """
+    Universal multi-format document upload and scoped RAG indexing.
+    Validates file format (.pdf, .docx, .xlsx, .xls, .csv, .txt),
+    calculates SHA-256 duplicate content hash,
+    and enforces strict 8-step verification before returning:
+    'Document uploaded and RAG indexing completed successfully.'
+    """
+    if 'file' not in request.files:
+        return jsonify({"status": "error", "error": "Bad Request", "message": "No file provided in upload request."}), 400
+
+    file_obj = request.files['file']
+    if not file_obj or not file_obj.filename:
+        return jsonify({"status": "error", "error": "Bad Request", "message": "Invalid file uploaded."}), 400
+
+    module = str(request.form.get('module') or 'svit_info').strip().lower()
+    canonical_module = AdminCRUDService.resolve_module_key(module)
+    if canonical_module in ["transport", "buses"]:
+        rag_namespace = "bus"
+    elif canonical_module in ["admission_info", "admission_documents"]:
+        rag_namespace = "admission"
+    elif canonical_module in ["syllabus", "academics"]:
+        rag_namespace = "syllabus"
+    else:
+        rag_namespace = canonical_module
+
+    # Save file securely to documents upload directory
+    from app.utils.file_upload import validate_and_save_file
+    success, msg, file_info = validate_and_save_file(
+        file_storage=file_obj,
+        category='document',
+        uploaded_by=getattr(current_user, 'username', 'admin')
+    )
+    if not success:
+        return jsonify({"status": "error", "error": "Upload Failed", "message": msg}), 400
+
+    file_path = file_info.get("file_path")
+    file_url = file_info.get("file_url")
+    file_name = file_info.get("original_name") or file_obj.filename
+    file_ext = file_info.get("file_extension", "").lower()
+
+    # Calculate SHA-256 content hash
+    from app.ai.document_processor import calculate_file_hash, process_and_index_document
+    file_hash = calculate_file_hash(file_path)
+
+    # Check for duplicate document in this module namespace
+    existing_docs = AdminCRUDService.list_items("module_documents", limit=1000).get("items", [])
+    for d in existing_docs:
+        if d.get("file_hash") == file_hash and (d.get("module") == canonical_module or d.get("rag_namespace") == rag_namespace):
+            return jsonify({
+                "status": "error",
+                "error": "DuplicateDocument",
+                "message": f"A document with identical content has already been uploaded for the '{canonical_module}' module ({d.get('document_name')})."
+            }), 409
+
+    doc_id = f"DOC_{uuid.uuid4().hex[:8].upper()}"
+    doc_metadata = {
+        "document_id": doc_id,
+        "document_name": file_name,
+        "file_name": file_name,
+        "module": canonical_module,
+        "rag_namespace": rag_namespace,
+        "source": file_name,
+        "source_type": "admin_document",
+        "file_type": file_ext.replace('.', ''),
+        "file_url": file_url,
+        "file_size_formatted": file_info.get("file_size_formatted", "N/A"),
+        "file_hash": file_hash,
+        "uploaded_by": getattr(current_user, 'username', 'admin')
+    }
+
+    # Execute strict 8-step verification and indexing pipeline
+    rag_ok, rag_msg, chunk_count, stats = process_and_index_document(
+        document_id=doc_id,
+        file_path=file_path,
+        doc_metadata=doc_metadata
+    )
+
+    if not rag_ok:
+        try:
+            if os.path.exists(file_path):
+                os.remove(file_path)
+        except Exception:
+            pass
+        return jsonify({
+            "status": "error",
+            "error": "IndexingFailed",
+            "message": f"RAG indexing verification failed: {rag_msg}"
+        }), 400
+
+    # Store record in module_documents collection
+    doc_metadata["status"] = "Indexed"
+    doc_metadata["chunk_count"] = chunk_count
+    doc_metadata["page_count"] = stats.get("page_count", 1)
+    doc_metadata["indexed_at"] = stats.get("indexed_at", datetime.utcnow().isoformat())
+    AdminCRUDService.create_item("module_documents", doc_metadata, admin_user=current_user)
+
+    return jsonify({
+        "status": "success",
+        "message": "Document uploaded and RAG indexing completed successfully.",
+        "document": doc_metadata
+    }), 200
+
+
+@admin_bp.route('/api/documents', methods=['GET'])
+@admin_required
+def api_list_module_documents():
+    """List all registered and indexed documents across admin modules."""
+    module_filter = request.args.get("module")
+    filters = {}
+    if module_filter:
+        filters["module"] = AdminCRUDService.resolve_module_key(module_filter)
+    res = AdminCRUDService.list_items("module_documents", filters=filters, limit=500)
+    return jsonify({
+        "status": "success",
+        "documents": res.get("items", []),
+        "total": res.get("total", 0)
+    }), 200
+
+
+@admin_bp.route('/api/documents/<document_id>/reindex', methods=['POST'])
+@admin_required
+def api_reindex_module_document(document_id: str):
+    """Re-index an existing document into the scoped module namespace."""
+    success, msg, item = AdminCRUDService.reindex_document("module_documents", document_id, admin_user=current_user)
+    if not success:
+        return jsonify({"status": "error", "message": msg}), 400
+    return jsonify({
+        "status": "success",
+        "message": "Document re-indexed successfully into scoped RAG namespace.",
+        "item": item
+    }), 200
+
+
+@admin_bp.route('/api/documents/<document_id>', methods=['DELETE'])
+@admin_required
+def api_delete_module_document(document_id: str):
+    """Deletes document record, physical file, and vector embeddings."""
+    success, msg = AdminCRUDService.delete_item("module_documents", document_id)
+    if not success:
+        return jsonify({"status": "error", "message": msg}), 404
+    return jsonify({
+        "status": "success",
+        "message": "Document and associated vector embeddings deleted successfully."
     }), 200
 
 

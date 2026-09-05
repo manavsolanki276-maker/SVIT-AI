@@ -17,9 +17,10 @@ ROLE_ADMISSION_ADMIN = "admission_admin"
 ROLE_NOTICE_ADMIN = "notice_admin"
 ROLE_EVENT_ADMIN = "event_admin"
 ROLE_BUS_ADMIN = "bus_admin"
-ROLE_LIBRARY_ADMIN = "library_admin"
 ROLE_CANTEEN_ADMIN = "canteen_admin"
-ROLE_SPORTS_ADMIN = "sports_admin"
+ROLE_SVIT_INFO_ADMIN = "svit_info_admin"
+ROLE_LIBRARY_ADMIN = "library_admin"  # Legacy backwards-compat
+ROLE_SPORTS_ADMIN = "sports_admin"    # Legacy backwards-compat
 
 # Normalized role name lookup with common aliases
 ROLE_ALIASES: Dict[str, str] = {
@@ -52,11 +53,15 @@ ROLE_ALIASES: Dict[str, str] = {
     "bus": ROLE_BUS_ADMIN,
     "transport": ROLE_BUS_ADMIN,
 
-    "library_admin": ROLE_LIBRARY_ADMIN,
-    "library": ROLE_LIBRARY_ADMIN,
-
     "canteen_admin": ROLE_CANTEEN_ADMIN,
     "canteen": ROLE_CANTEEN_ADMIN,
+
+    "svit_info_admin": ROLE_SVIT_INFO_ADMIN,
+    "svit_info": ROLE_SVIT_INFO_ADMIN,
+    "svit": ROLE_SVIT_INFO_ADMIN,
+
+    "library_admin": ROLE_LIBRARY_ADMIN,
+    "library": ROLE_LIBRARY_ADMIN,
 
     "sports_admin": ROLE_SPORTS_ADMIN,
     "sport_admin": ROLE_SPORTS_ADMIN,
@@ -65,26 +70,26 @@ ROLE_ALIASES: Dict[str, str] = {
 
 ALL_ADMIN_ROLES = [
     ROLE_SUPER_ADMIN,
+    ROLE_SVIT_INFO_ADMIN,
     ROLE_ACADEMIC_ADMIN,
     ROLE_ADMISSION_ADMIN,
     ROLE_NOTICE_ADMIN,
     ROLE_EVENT_ADMIN,
     ROLE_BUS_ADMIN,
-    ROLE_LIBRARY_ADMIN,
     ROLE_CANTEEN_ADMIN,
-    ROLE_SPORTS_ADMIN,
 ]
 
 ROLE_DISPLAY_NAMES = {
     ROLE_SUPER_ADMIN: "Super Admin",
+    ROLE_SVIT_INFO_ADMIN: "SVIT Info Admin",
     ROLE_ACADEMIC_ADMIN: "Academic Admin",
     ROLE_ADMISSION_ADMIN: "Admission Admin",
     ROLE_NOTICE_ADMIN: "Notice / Announcement Admin",
     ROLE_EVENT_ADMIN: "Event Admin",
     ROLE_BUS_ADMIN: "Bus Admin",
-    ROLE_LIBRARY_ADMIN: "Library Admin",
     ROLE_CANTEEN_ADMIN: "Canteen Admin",
-    ROLE_SPORTS_ADMIN: "Sports Admin",
+    ROLE_LIBRARY_ADMIN: "Library Admin (Retired)",
+    ROLE_SPORTS_ADMIN: "Sports Admin (Retired)",
 }
 
 # =========================================================================
@@ -93,6 +98,13 @@ ROLE_DISPLAY_NAMES = {
 # Module permissions map
 ROLE_PERMISSIONS: Dict[str, Set[str]] = {
     ROLE_SUPER_ADMIN: {"*"},  # Full access to everything
+    ROLE_SVIT_INFO_ADMIN: {
+        "svit_info",
+        "campus_info",
+        "facilities",
+        "documents",
+        "module_documents",
+    },
     ROLE_ACADEMIC_ADMIN: {
         "academic",
         "students",
@@ -100,8 +112,11 @@ ROLE_PERMISSIONS: Dict[str, Set[str]] = {
         "timetable",
         "rooms",
         "subjects",
+        "syllabus",
         "placements",
         "academic_documents",
+        "documents",
+        "module_documents",
         "rag",
     },
     ROLE_ADMISSION_ADMIN: {
@@ -109,6 +124,8 @@ ROLE_PERMISSIONS: Dict[str, Set[str]] = {
         "admission_info",
         "admission_documents",
         "admission_notices",
+        "documents",
+        "module_documents",
     },
     ROLE_NOTICE_ADMIN: {
         "notices",
@@ -120,6 +137,8 @@ ROLE_PERMISSIONS: Dict[str, Set[str]] = {
         "rain_weather",
         "class_cancellations",
         "alerts",
+        "documents",
+        "module_documents",
     },
     ROLE_EVENT_ADMIN: {
         "events",
@@ -130,6 +149,8 @@ ROLE_PERMISSIONS: Dict[str, Set[str]] = {
         "workshops",
         "festivals",
         "college_programs",
+        "documents",
+        "module_documents",
         # EXPLICITLY NOT: sports, sports_events
     },
     ROLE_BUS_ADMIN: {
@@ -139,6 +160,17 @@ ROLE_PERMISSIONS: Dict[str, Set[str]] = {
         "stops",
         "timings",
         "transport",
+        "documents",
+        "module_documents",
+    },
+    ROLE_CANTEEN_ADMIN: {
+        "canteen",
+        "menu",
+        "food_items",
+        "prices",
+        "timings",
+        "documents",
+        "module_documents",
     },
     ROLE_LIBRARY_ADMIN: {
         "library",
@@ -147,18 +179,10 @@ ROLE_PERMISSIONS: Dict[str, Set[str]] = {
         "issue_return",
         "library_info",
     },
-    ROLE_CANTEEN_ADMIN: {
-        "canteen",
-        "menu",
-        "food_items",
-        "prices",
-        "timings",
-    },
     ROLE_SPORTS_ADMIN: {
         "sports",
         "sports_events",
         "grounds",
-        # EXPLICITLY NOT: cultural_events, technical_events, general college events
     },
 }
 

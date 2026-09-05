@@ -38,9 +38,11 @@ class InMemoryFallbackVectorStore:
         """Deletes documents matching ID list or metadata filter."""
         new_docs = []
         new_embs = []
-        for doc, emb in zip(self.documents, self.doc_embeddings):
+        for i, (doc, emb) in enumerate(zip(self.documents, self.doc_embeddings)):
             remove = False
-            if where:
+            if ids and (str(i) in ids or doc.metadata.get("id") in ids or doc.metadata.get("document_id") in ids):
+                remove = True
+            if not remove and where:
                 matched = True
                 for k, v in where.items():
                     if doc.metadata.get(k) != v:
@@ -177,8 +179,9 @@ def add_documents_to_vector_store(vector_store: Any, documents: List[Document]) 
     """Safely adds new documents to the vector store."""
     if not documents:
         return
+    res = None
     if hasattr(vector_store, 'add_documents'):
-        return vector_store.add_documents(documents)
+        res = vector_store.add_documents(documents)
     elif hasattr(vector_store, '_collection'):
         # Raw Chroma collection
         from app.ai.embeddings import get_embedding_model
@@ -187,12 +190,24 @@ def add_documents_to_vector_store(vector_store: Any, documents: List[Document]) 
         metadatas = [d.metadata for d in documents]
         embs = emb_fn.embed_documents(texts)
         ids = [f"{d.metadata.get('document_id', 'doc')}_{i}" for i, d in enumerate(documents)]
-        vector_store._collection.add(
+        res = vector_store._collection.add(
             documents=texts,
             embeddings=embs,
             metadatas=metadatas,
             ids=ids
         )
+
+    try:
+        from app.ai.retriever import clear_vector_cache
+        clear_vector_cache()
+    except Exception:
+        pass
+    try:
+        from app.ai.rag_pipeline import clear_response_cache
+        clear_response_cache()
+    except Exception:
+        pass
+    return res
 
 
 def delete_documents_from_vector_store(vector_store: Any, document_id: str) -> bool:
@@ -216,5 +231,16 @@ def delete_documents_from_vector_store(vector_store: Any, document_id: str) -> b
             success = True
         except Exception:
             pass
+
+    try:
+        from app.ai.retriever import clear_vector_cache
+        clear_vector_cache()
+    except Exception:
+        pass
+    try:
+        from app.ai.rag_pipeline import clear_response_cache
+        clear_response_cache()
+    except Exception:
+        pass
 
     return success

@@ -477,212 +477,141 @@ MODULE_CONFIGS: Dict[str, Dict[str, Any]] = {
     },
 
     # -------------------------------------------------------------
-    # LIBRARY ADMIN MODULES
-    # -------------------------------------------------------------
-    "library_books": {
-        "title": "Library Books & Catalog",
-        "description": "Manage catalogued textbooks, reference volumes, authors, ISBNs, and shelf locations.",
-        "icon": "book-open",
-        "required_permission": "library",
-        "id_field": "book_id",
-        "search_fields": ["book_id", "book_title", "author", "publisher", "isbn", "subject", "department"],
-        "filter_fields": ["department", "program", "semester", "shelf"],
-        "sort_fields": ["book_title", "author", "available_copies", "created_at"],
-        "default_sort": ("book_title", 1),
-        "source_csv": "library_books.csv",
-        "fields": [
-            {"key": "book_id", "label": "Book ID / Accession No", "type": "text", "required": True, "table": True},
-            {"key": "book_title", "label": "Book Title", "type": "text", "required": True, "table": True},
-            {"key": "author", "label": "Author(s)", "type": "text", "required": True, "table": True},
-            {"key": "publisher", "label": "Publisher", "type": "text", "required": False, "table": False},
-            {"key": "edition", "label": "Edition / Year", "type": "text", "required": False, "table": False},
-            {"key": "isbn", "label": "ISBN Code", "type": "text", "required": False, "table": True},
-            {"key": "program", "label": "Program", "type": "select", "options": ["BE", "BTech", "ME", "MCA", "General"], "required": False, "table": False},
-            {"key": "department", "label": "Department", "type": "select", "options": ["Computer Engineering", "Information Technology", "Electronics & Comm.", "Mechanical Eng.", "Civil Eng.", "Electrical Eng.", "Applied Sciences", "General"], "required": True, "table": True},
-            {"key": "semester", "label": "Semester", "type": "number", "min": 1, "max": 8, "required": False, "table": False},
-            {"key": "subject", "label": "Subject Name", "type": "text", "required": False, "table": False},
-            {"key": "available_copies", "label": "Available Copies", "type": "number", "min": 0, "required": True, "table": True},
-            {"key": "shelf", "label": "Shelf / Rack Location", "type": "text", "required": True, "table": True},
-            {"key": "image_url", "label": "Book Cover Image", "type": "image_upload", "required": False, "table": False}
-        ]
-    },
-    "library_members": {
-        "title": "Library Members",
-        "description": "Manage registered student and faculty library memberships and issue limits.",
-        "icon": "id-card",
-        "required_permission": "library",
-        "id_field": "member_id",
-        "search_fields": ["member_id", "name", "email", "card_number", "department"],
-        "filter_fields": ["member_type", "department", "status"],
-        "sort_fields": ["name", "member_id", "created_at"],
-        "default_sort": ("name", 1),
-        "source_csv": None,
-        "fields": [
-            {"key": "member_id", "label": "Member ID", "type": "text", "required": True, "table": True},
-            {"key": "name", "label": "Member Name", "type": "text", "required": True, "table": True},
-            {"key": "member_type", "label": "Member Type", "type": "select", "options": ["Student", "Faculty", "Staff"], "required": True, "table": True},
-            {"key": "email", "label": "Email Address", "type": "email", "required": True, "table": True},
-            {"key": "department", "label": "Department", "type": "select", "options": ["Computer Engineering", "Information Technology", "Electronics & Comm.", "Mechanical Eng.", "Civil Eng.", "Electrical Eng.", "Applied Sciences"], "required": True, "table": True},
-            {"key": "card_number", "label": "Library Card No", "type": "text", "required": True, "table": True},
-            {"key": "max_books_allowed", "label": "Max Books Limit", "type": "number", "min": 1, "max": 10, "required": True, "table": True},
-            {"key": "status", "label": "Status", "type": "select", "options": ["Active", "Suspended", "Expired"], "required": True, "table": True}
-        ]
-    },
-    "library_issue_return": {
-        "title": "Book Issue & Return Records",
-        "description": "Track active book loans, due dates, returns, and overdue penalties.",
-        "icon": "arrow-left-right",
-        "required_permission": "library",
-        "id_field": "transaction_id",
-        "search_fields": ["transaction_id", "book_title", "book_id", "member_name", "member_id"],
-        "filter_fields": ["status"],
-        "sort_fields": ["issue_date", "due_date", "status"],
-        "default_sort": ("issue_date", -1),
-        "source_csv": None,
-        "fields": [
-            {"key": "transaction_id", "label": "Transaction ID", "type": "text", "required": True, "table": True},
-            {"key": "book_id", "label": "Book ID", "type": "text", "required": True, "table": False},
-            {"key": "book_title", "label": "Book Title", "type": "text", "required": True, "table": True},
-            {"key": "member_id", "label": "Member ID", "type": "text", "required": True, "table": False},
-            {"key": "member_name", "label": "Member Name", "type": "text", "required": True, "table": True},
-            {"key": "issue_date", "label": "Issue Date", "type": "date", "required": True, "table": True},
-            {"key": "due_date", "label": "Due Date", "type": "date", "required": True, "table": True},
-            {"key": "return_date", "label": "Return Date", "type": "date", "required": False, "table": True},
-            {"key": "fine_amount", "label": "Fine (INR)", "type": "number", "min": 0, "required": False, "table": True},
-            {"key": "status", "label": "Status", "type": "select", "options": ["Issued", "Returned", "Overdue", "Lost"], "required": True, "table": True}
-        ]
-    },
-    "library_info": {
-        "title": "Library Rules & Information",
-        "description": "Manage central library rules, opening hours, reading hall access, and digital subscriptions.",
-        "icon": "info",
-        "required_permission": "library",
-        "id_field": "section_id",
-        "search_fields": ["section_id", "section_name", "location", "rules_and_guidelines"],
-        "filter_fields": [],
-        "sort_fields": ["section_name"],
-        "default_sort": ("section_name", 1),
-        "source_csv": None,
-        "fields": [
-            {"key": "section_id", "label": "Section ID", "type": "text", "required": True, "table": True},
-            {"key": "section_name", "label": "Library Section / Wing", "type": "text", "required": True, "table": True},
-            {"key": "timings", "label": "Operating Hours", "type": "text", "required": True, "table": True},
-            {"key": "location", "label": "Floor / Room", "type": "text", "required": True, "table": True},
-            {"key": "contact_person", "label": "Librarian In-Charge", "type": "text", "required": False, "table": True},
-            {"key": "facilities", "label": "Available Facilities", "type": "text", "required": False, "table": False},
-            {"key": "rules_and_guidelines", "label": "Rules & Borrowing Guidelines", "type": "textarea", "required": True, "table": False}
-        ]
-    },
-
-    # -------------------------------------------------------------
     # CANTEEN ADMIN MODULE
     # -------------------------------------------------------------
     "canteen": {
-        "title": "Canteen Menu & Pricing",
-        "description": "Manage cafeteria food items, daily menus, pricing, availability, and timings.",
+        "title": "Canteen & Food Menu",
+        "description": "Manage campus canteen items, breakfast and lunch menus, daily prices, and dietary availability.",
         "icon": "utensils",
         "required_permission": "canteen",
         "id_field": "item_id",
-        "search_fields": ["item_id", "shop_name", "item_name", "category", "timing"],
-        "filter_fields": ["category", "is_vegetarian", "availability", "timing", "shop_name"],
-        "sort_fields": ["item_name", "price_inr", "category", "rating"],
+        "search_fields": ["item_id", "item_name", "category", "shop_name"],
+        "filter_fields": ["category", "shop_name", "is_vegetarian", "availability", "timing"],
+        "sort_fields": ["item_name", "price_inr", "category"],
         "default_sort": ("item_name", 1),
         "source_csv": "canteen.csv",
         "fields": [
             {"key": "item_id", "label": "Item ID", "type": "text", "required": True, "table": True},
-            {"key": "item_name", "label": "Food / Beverage Name", "type": "text", "required": True, "table": True},
-            {"key": "category", "label": "Food Category", "type": "select", "options": [
-                "Snacks & Chaat",
-                "South Indian",
-                "Punjabi / Meals",
-                "Gujarati Thali",
-                "Fast Food & Sandwiches",
-                "Hot & Cold Beverages",
-                "Desserts & Ice Cream",
-                "Bakery Items"
-            ], "required": True, "table": True},
-            {"key": "shop_name", "label": "Canteen / Stall Name", "type": "select", "options": ["Main SVIT Canteen", "Nescafe Kiosk", "Amul Parlour", "Juice Center", "Food Court"], "required": True, "table": True},
-            {"key": "price_inr", "label": "Price (₹)", "type": "number", "min": 1, "required": True, "table": True},
-            {"key": "is_vegetarian", "label": "Vegetarian Diet", "type": "select", "options": ["Yes (Pure Veg)", "Egg Item", "No"], "required": True, "table": True},
-            {"key": "availability", "label": "Availability", "type": "select", "options": ["Available", "Out of Stock", "Seasonal", "Special (Fri/Sat Only)"], "required": True, "table": True},
-            {"key": "timing", "label": "Serving Timings", "type": "select", "options": ["All Day (8:00 AM - 5:00 PM)", "Morning Breakfast", "Lunch Hours (11:30 AM - 2:30 PM)", "Evening Snacks (3:00 PM - 5:00 PM)"], "required": True, "table": True},
-            {"key": "location", "label": "Counter Location", "type": "text", "required": False, "table": False},
-            {"key": "rating", "label": "Student Rating (1-5)", "type": "text", "required": False, "table": False},
-            {"key": "image_url", "label": "Food Item Photo", "type": "image_upload", "required": False, "table": False}
+            {"key": "item_name", "label": "Item Name", "type": "text", "required": True, "table": True},
+            {"key": "category", "label": "Category", "type": "select", "options": ["South Indian", "North Indian", "Snacks", "Beverages", "Chinese", "Desserts", "Thali / Lunch", "Fast Food"], "required": True, "table": True},
+            {"key": "shop_name", "label": "Canteen / Stall", "type": "select", "options": ["Main SVIT Canteen", "Diploma Canteen", "Campus Nescafe / Juice Bar", "Food Court Stall 1"], "required": True, "table": True},
+            {"key": "price_inr", "label": "Price (INR)", "type": "number", "required": True, "table": True},
+            {"key": "is_vegetarian", "label": "Dietary Type", "type": "select", "options": ["Yes (Pure Veg)", "Egg", "Non-Veg"], "required": True, "table": True},
+            {"key": "availability", "label": "Availability", "type": "select", "options": ["Available", "Out of Stock", "Discontinued"], "required": True, "table": True},
+            {"key": "timing", "label": "Serving Timings", "type": "text", "required": False, "table": True},
+            {"key": "location", "label": "Counter / Location", "type": "text", "required": False, "table": False},
+            {"key": "description", "label": "Description", "type": "textarea", "required": False, "table": False}
         ]
     },
 
     # -------------------------------------------------------------
-    # SPORTS ADMIN MODULE (EXPLICITLY NO GENERAL EVENTS)
+    # SVIT INFO & OVERVIEW ADMIN MODULE
     # -------------------------------------------------------------
-    "sports": {
-        "title": "Sports & Athletics",
-        "description": "Manage college sports disciplines, coaches, team captains, and equipment.",
-        "icon": "trophy",
-        "required_permission": "sports",
-        "id_field": "sport_id",
-        "search_fields": ["sport_id", "sport_name", "category", "captain_name", "coach_name"],
-        "filter_fields": ["category", "equipment_available"],
-        "sort_fields": ["sport_name", "category"],
-        "default_sort": ("sport_name", 1),
+    "svit_info": {
+        "title": "SVIT Info & Campus Overview",
+        "description": "Manage institutional overview, governance, approvals, and campus profile.",
+        "icon": "school",
+        "required_permission": "svit_info",
+        "id_field": "info_id",
+        "search_fields": ["info_id", "title", "category", "details", "contact_email"],
+        "filter_fields": ["category", "status"],
+        "sort_fields": ["title", "category", "established_year"],
+        "default_sort": ("title", 1),
         "source_csv": None,
         "fields": [
-            {"key": "sport_id", "label": "Sport ID", "type": "text", "required": True, "table": True},
-            {"key": "sport_name", "label": "Sport / Discipline Name", "type": "text", "required": True, "table": True},
-            {"key": "category", "label": "Sport Type", "type": "select", "options": ["Outdoor", "Indoor", "Athletics & Track", "Martial Arts & Fitness"], "required": True, "table": True},
-            {"key": "captain_name", "label": "Team Captain", "type": "text", "required": False, "table": True},
-            {"key": "coach_name", "label": "Sports Instructor / Coach", "type": "text", "required": True, "table": True},
-            {"key": "equipment_available", "label": "Equipment Status", "type": "select", "options": ["Available for Issue", "Limited Stock", "Needs Restocking"], "required": True, "table": True},
-            {"key": "practice_timings", "label": "Regular Practice Hours", "type": "text", "required": False, "table": False},
-            {"key": "ground_assigned", "label": "Assigned Ground / Court", "type": "text", "required": False, "table": True},
-            {"key": "image_url", "label": "Sport Banner / Image", "type": "image_upload", "required": False, "table": False}
+            {"key": "info_id", "label": "Info ID", "type": "text", "required": True, "table": True},
+            {"key": "title", "label": "Section Title", "type": "text", "required": True, "table": True},
+            {"key": "category", "label": "Category", "type": "select", "options": [
+                "About SVIT",
+                "Trust / PKM",
+                "Leadership & Administration",
+                "Affiliation & Approvals",
+                "Campus Infrastructure",
+                "Contact & Location"
+            ], "required": True, "table": True},
+            {"key": "details", "label": "Comprehensive Information / Content", "type": "textarea", "required": True, "table": False},
+            {"key": "established_year", "label": "Established Year", "type": "text", "required": False, "table": True},
+            {"key": "contact_email", "label": "Official Email", "type": "email", "required": False, "table": True},
+            {"key": "phone", "label": "Contact Phone", "type": "text", "required": False, "table": True},
+            {"key": "website", "label": "Official Website / Portal", "type": "text", "required": False, "table": False},
+            {"key": "status", "label": "Status", "type": "select", "options": ["Active", "Archived"], "required": True, "table": True}
         ]
     },
-    "sports_events": {
-        "title": "Sports Tournaments & Matches",
-        "description": "Manage inter-departmental tournaments, GTU sports meets, cricket matches, and athletic events.",
-        "icon": "medal",
-        "required_permission": "sports",
-        "id_field": "event_id",
-        "search_fields": ["event_id", "event_name", "sport_name", "venue", "organizer"],
-        "filter_fields": ["sport_name", "status"],
-        "sort_fields": ["event_date", "event_name", "status"],
-        "default_sort": ("event_date", -1),
+
+    # -------------------------------------------------------------
+    # ACADEMICS / SYLLABUS ADMIN MODULE
+    # -------------------------------------------------------------
+    "syllabus": {
+        "title": "Academics & Syllabus",
+        "description": "Manage academic curricula, course syllabi, semesters, subjects, and study schemes.",
+        "icon": "book-open",
+        "required_permission": "academic",
+        "id_field": "syllabus_id",
+        "search_fields": ["syllabus_id", "subject_code", "subject_name", "department", "program"],
+        "filter_fields": ["department", "program", "semester", "academic_year", "status"],
+        "sort_fields": ["department", "semester", "subject_code", "subject_name"],
+        "default_sort": ("subject_code", 1),
         "source_csv": None,
         "fields": [
-            {"key": "event_id", "label": "Tournament ID", "type": "text", "required": True, "table": True},
-            {"key": "event_name", "label": "Tournament / Match Name", "type": "text", "required": True, "table": True},
-            {"key": "sport_name", "label": "Sport Discipline", "type": "select", "options": ["Cricket", "Football", "Volleyball", "Basketball", "Badminton", "Table Tennis", "Chess", "Kabaddi", "Athletics Meet"], "required": True, "table": True},
-            {"key": "event_date", "label": "Match / Event Date", "type": "date", "required": True, "table": True},
-            {"key": "venue", "label": "Ground / Court Venue", "type": "text", "required": True, "table": True},
-            {"key": "registration_deadline", "label": "Team Registration Deadline", "type": "date", "required": False, "table": False},
-            {"key": "prize_details", "label": "Trophies & Prize Details", "type": "text", "required": False, "table": False},
-            {"key": "organizer", "label": "Sports Committee Coordinator", "type": "text", "required": True, "table": True},
-            {"key": "status", "label": "Tournament Status", "type": "select", "options": ["Upcoming", "Ongoing", "Completed", "Postponed", "Rain Delayed"], "required": True, "table": True},
-            {"key": "image_url", "label": "Sports Event Poster", "type": "image_upload", "required": False, "table": False}
+            {"key": "syllabus_id", "label": "Syllabus ID", "type": "text", "required": True, "table": True},
+            {"key": "program", "label": "Program", "type": "select", "options": ["BE", "BTech", "ME", "MTech", "MCA", "Diploma"], "required": True, "table": True},
+            {"key": "department", "label": "Department", "type": "select", "options": [
+                "Computer Engineering",
+                "Information Technology",
+                "Electronics & Comm.",
+                "Mechanical Eng.",
+                "Civil Eng.",
+                "Electrical Eng.",
+                "Aeronautical Eng.",
+                "Applied Sciences & Humanities"
+            ], "required": True, "table": True},
+            {"key": "semester", "label": "Semester", "type": "number", "min": 1, "max": 8, "required": True, "table": True},
+            {"key": "subject_code", "label": "Subject Code (GTU)", "type": "text", "required": True, "table": True},
+            {"key": "subject_name", "label": "Subject Name", "type": "text", "required": True, "table": True},
+            {"key": "academic_year", "label": "Academic Year", "type": "select", "options": ["2024-2025", "2023-2024", "2022-2023"], "required": False, "table": True},
+            {"key": "credits", "label": "Credits", "type": "number", "min": 1, "max": 10, "required": False, "table": True},
+            {"key": "teaching_scheme", "label": "Teaching Scheme", "type": "text", "required": False, "table": False},
+            {"key": "syllabus_overview", "label": "Course Syllabus & Objectives", "type": "textarea", "required": False, "table": False},
+            {"key": "file_url", "label": "Syllabus PDF / Document URL", "type": "text", "required": False, "table": False},
+            {"key": "status", "label": "Status", "type": "select", "options": ["Active", "Draft", "Archived"], "required": True, "table": True}
         ]
     },
-    "grounds": {
-        "title": "Grounds & Athletic Facilities",
-        "description": "Manage college cricket ground, football pitch, indoor badminton court, and gym facilities.",
-        "icon": "flag",
-        "required_permission": "sports",
-        "id_field": "ground_id",
-        "search_fields": ["ground_id", "ground_name", "sport_type", "location", "in_charge"],
-        "filter_fields": ["sport_type", "availability_status", "floodlights_available"],
-        "sort_fields": ["ground_name", "sport_type", "availability_status"],
-        "default_sort": ("ground_name", 1),
+
+    # -------------------------------------------------------------
+    # UNIVERSAL DOCUMENTS & RAG INDEXING STATUS MODULE
+    # -------------------------------------------------------------
+    "module_documents": {
+        "title": "Documents & RAG Status",
+        "description": "Monitor and manage multi-format documents, chunk counts, namespaces, and indexing status.",
+        "icon": "files",
+        "required_permission": "documents",
+        "id_field": "document_id",
+        "search_fields": ["document_id", "document_name", "module", "rag_namespace", "file_type", "uploaded_by"],
+        "filter_fields": ["module", "rag_namespace", "status", "file_type"],
+        "sort_fields": ["indexed_at", "document_name", "module", "chunk_count"],
+        "default_sort": ("indexed_at", -1),
         "source_csv": None,
         "fields": [
-            {"key": "ground_id", "label": "Ground ID", "type": "text", "required": True, "table": True},
-            {"key": "ground_name", "label": "Ground / Court Facility Name", "type": "text", "required": True, "table": True},
-            {"key": "sport_type", "label": "Designated Sport", "type": "select", "options": ["Cricket Ground", "Football Turf", "Basketball Court", "Badminton Indoor Court", "Volleyball Court", "Athletic Track", "Gymnasium"], "required": True, "table": True},
-            {"key": "location", "label": "Location on Campus", "type": "text", "required": True, "table": True},
-            {"key": "floodlights_available", "label": "Floodlights Installed", "type": "select", "options": ["Yes (Night Matches Allowed)", "No (Daylight Only)"], "required": True, "table": True},
-            {"key": "availability_status", "label": "Availability Status", "type": "select", "options": ["Open for Practice", "Reserved for Tournament", "Under Turf Maintenance", "Closed"], "required": True, "table": True},
-            {"key": "timings", "label": "Operating Hours", "type": "text", "required": True, "table": True},
-            {"key": "in_charge", "label": "Ground In-Charge", "type": "text", "required": False, "table": False},
-            {"key": "image_url", "label": "Ground Photo", "type": "image_upload", "required": False, "table": False}
+            {"key": "document_id", "label": "Document ID", "type": "text", "required": True, "table": True},
+            {"key": "document_name", "label": "File Name", "type": "text", "required": True, "table": True},
+            {"key": "module", "label": "Admin Module", "type": "select", "options": [
+                "svit_info",
+                "admission",
+                "notices",
+                "events",
+                "bus",
+                "canteen",
+                "syllabus",
+                "faculty"
+            ], "required": True, "table": True},
+            {"key": "rag_namespace", "label": "RAG Namespace", "type": "text", "required": True, "table": True},
+            {"key": "file_type", "label": "Type", "type": "text", "required": False, "table": True},
+            {"key": "file_size_formatted", "label": "Size", "type": "text", "required": False, "table": True},
+            {"key": "chunk_count", "label": "Chunks", "type": "number", "required": False, "table": True},
+            {"key": "status", "label": "Index Status", "type": "select", "options": ["Indexed", "Processing", "Failed", "Pending"], "required": True, "table": True},
+            {"key": "indexed_at", "label": "Indexed At", "type": "text", "required": False, "table": True},
+            {"key": "uploaded_by", "label": "Uploaded By", "type": "text", "required": False, "table": True},
+            {"key": "file_hash", "label": "SHA-256 Hash", "type": "text", "required": False, "table": False}
         ]
     }
 }
@@ -698,20 +627,25 @@ MODULE_ALIASES: Dict[str, str] = {
     "bus_stops": "transport",
     "bus-timings": "transport",
     "bus_timings": "transport",
-    "library": "library_info",
-    "library-info": "library_info",
-    "books": "library_books",
-    "library-books": "library_books",
-    "members": "library_members",
-    "library-members": "library_members",
-    "issue-return": "library_issue_return",
-    "issue_return": "library_issue_return",
+    "svit": "svit_info",
+    "svit-info": "svit_info",
+    "svit_info": "svit_info",
+    "svitinfo": "svit_info",
+    "about-svit": "svit_info",
+    "about_svit": "svit_info",
+    "academics": "syllabus",
+    "academic-syllabus": "syllabus",
+    "academic_syllabus": "syllabus",
+    "syllabus": "syllabus",
+    "documents": "module_documents",
+    "module-documents": "module_documents",
+    "module_documents": "module_documents",
+    "rag-documents": "module_documents",
+    "rag_status": "module_documents",
     "canteen-menu": "canteen",
     "canteen_menu": "canteen",
     "food-items": "canteen",
     "food_items": "canteen",
-    "sports-disciplines": "sports",
-    "sports_disciplines": "sports",
     "rooms": "rooms_facilities",
     "rooms-facilities": "rooms_facilities",
     "rooms_facilities": "rooms_facilities",
@@ -825,6 +759,224 @@ def initialize_datasets_if_needed(project_root: Optional[str] = None):
                         })
             except Exception as e:
                 logger.debug(f"Student sync note: {e}")
+
+        # 3. Official SVIT Info & Campus Overview Dataset (Verified Public SVIT Sources)
+        elif module_key == "svit_info":
+            svit_records = [
+                {
+                    "id": "SVIT_0001",
+                    "info_id": "SVIT_0001",
+                    "title": "About SVIT Vasad",
+                    "category": "About SVIT",
+                    "details": "Sardar Vallabhbhai Patel Institute of Technology (SVIT), Vasad was established in 1997 with the vision of providing quality technical and management education in Gujarat. It is managed by Prajapati Kelavani Mandal (PKM), a registered charitable educational trust. The institute is approved by the All India Council for Technical Education (AICTE), New Delhi, and affiliated to Gujarat Technological University (GTU), Ahmedabad. The campus is spread across 26 scenic acres along the banks of River Mahisagar.",
+                    "established_year": "1997",
+                    "contact_email": "principal@svitvasad.ac.in",
+                    "phone": "02692-274766",
+                    "website": "https://www.svitvasad.ac.in",
+                    "status": "Active",
+                    "created_at": datetime.utcnow().isoformat(),
+                    "created_by": "official_svit_source"
+                },
+                {
+                    "id": "SVIT_0002",
+                    "info_id": "SVIT_0002",
+                    "title": "Managing Trust - Prajapati Kelavani Mandal (PKM)",
+                    "category": "Trust / PKM",
+                    "details": "Prajapati Kelavani Mandal (Trust Reg. No. E-274 Kheda) is the premier managing educational trust established to foster higher technological, architectural, and management learning. PKM continuously invests in academic research laboratories, campus infrastructure, and student amenities at SVIT Vasad.",
+                    "established_year": "1997",
+                    "contact_email": "admin@svitvasad.ac.in",
+                    "phone": "02692-274489",
+                    "website": "https://www.svitvasad.ac.in",
+                    "status": "Active",
+                    "created_at": datetime.utcnow().isoformat(),
+                    "created_by": "official_svit_source"
+                },
+                {
+                    "id": "SVIT_0003",
+                    "info_id": "SVIT_0003",
+                    "title": "Institutional Leadership & Principal",
+                    "category": "Leadership & Administration",
+                    "details": "The institute is led by Principal & Professor Dr. D. P. Soni. Each engineering and computer applications department is guided by experienced Heads of Department (HODs) facilitating GTU curricula, laboratory work, industry internships, and academic mentoring.",
+                    "established_year": "1997",
+                    "contact_email": "principal@svitvasad.ac.in",
+                    "phone": "02692-274766",
+                    "website": "https://www.svitvasad.ac.in",
+                    "status": "Active",
+                    "created_at": datetime.utcnow().isoformat(),
+                    "created_by": "official_svit_source"
+                },
+                {
+                    "id": "SVIT_0004",
+                    "info_id": "SVIT_0004",
+                    "title": "Academic Affiliation & AICTE Approvals",
+                    "category": "Affiliation & Approvals",
+                    "details": "SVIT is approved by AICTE (All India Council for Technical Education), New Delhi, recognized by the Education Department of Gujarat, and affiliated with Gujarat Technological University (GTU), Ahmedabad. The institute follows GTU academic regulations, choice-based credit systems (CBCS), and evaluation frameworks.",
+                    "established_year": "1997",
+                    "contact_email": "exam@svitvasad.ac.in",
+                    "phone": "02692-274766",
+                    "website": "https://www.gtu.ac.in",
+                    "status": "Active",
+                    "created_at": datetime.utcnow().isoformat(),
+                    "created_by": "official_svit_source"
+                },
+                {
+                    "id": "SVIT_0005",
+                    "info_id": "SVIT_0005",
+                    "title": "Campus Infrastructure & Laboratories",
+                    "category": "Campus Infrastructure",
+                    "details": "SVIT Vasad campus features advanced computing laboratories with high-speed fiber-optic connectivity, engineering workshops, seminar halls, a central auditorium, air-conditioned seminar halls, and a spacious hygienic campus canteen.",
+                    "established_year": "1997",
+                    "contact_email": "admin@svitvasad.ac.in",
+                    "phone": "02692-274766",
+                    "website": "https://www.svitvasad.ac.in",
+                    "status": "Active",
+                    "created_at": datetime.utcnow().isoformat(),
+                    "created_by": "official_svit_source"
+                },
+                {
+                    "id": "SVIT_0006",
+                    "info_id": "SVIT_0006",
+                    "title": "Campus Location & Official Contact",
+                    "category": "Contact & Location",
+                    "details": "Sardar Vallabhbhai Patel Institute of Technology, Behind Vasad Railway Station, Vasad - 388306, District Anand, Gujarat, India. Located right off the NH-48 corridor near Vadodara and Anand. Official web portal: https://www.svitvasad.ac.in, Alumni portal: https://alumni.svitvasad.ac.in/.",
+                    "established_year": "1997",
+                    "contact_email": "principal@svitvasad.ac.in",
+                    "phone": "02692-274766",
+                    "website": "https://www.svitvasad.ac.in",
+                    "status": "Active",
+                    "created_at": datetime.utcnow().isoformat(),
+                    "created_by": "official_svit_source"
+                }
+            ]
+            records_to_seed.extend(svit_records)
+
+        # 4. Official GTU Syllabus Seed Data for Academics / Syllabus Module
+        elif module_key == "syllabus":
+            syllabus_records = [
+                {
+                    "id": "SYL_0001",
+                    "syllabus_id": "SYL_0001",
+                    "program": "BE",
+                    "department": "Computer Engineering",
+                    "semester": 3,
+                    "subject_code": "3130702",
+                    "subject_name": "Data Structures",
+                    "academic_year": "2024-2025",
+                    "credits": 5,
+                    "teaching_scheme": "4 Theory + 2 Practical",
+                    "syllabus_overview": "Introduction to Linear and Non-linear Data Structures, Arrays, Stacks, Queues, Linked Lists, Trees, Binary Search Trees, AVL Trees, Graphs, Hashing, Sorting and Searching Algorithms as per official GTU syllabus.",
+                    "status": "Active",
+                    "created_at": datetime.utcnow().isoformat(),
+                    "created_by": "gtu_curriculum"
+                },
+                {
+                    "id": "SYL_0002",
+                    "syllabus_id": "SYL_0002",
+                    "program": "BE",
+                    "department": "Computer Engineering",
+                    "semester": 3,
+                    "subject_code": "3130703",
+                    "subject_name": "Database Management Systems",
+                    "academic_year": "2024-2025",
+                    "credits": 5,
+                    "teaching_scheme": "4 Theory + 2 Practical",
+                    "syllabus_overview": "Database Architecture, ER Modeling, Relational Algebra, SQL queries and constraints, Normalization (1NF through BCNF), Transaction Processing, ACID properties, Concurrency Control, and Crash Recovery.",
+                    "status": "Active",
+                    "created_at": datetime.utcnow().isoformat(),
+                    "created_by": "gtu_curriculum"
+                },
+                {
+                    "id": "SYL_0003",
+                    "syllabus_id": "SYL_0003",
+                    "program": "BE",
+                    "department": "Computer Engineering",
+                    "semester": 4,
+                    "subject_code": "3140705",
+                    "subject_name": "Object Oriented Programming - Java",
+                    "academic_year": "2024-2025",
+                    "credits": 5,
+                    "teaching_scheme": "3 Theory + 2 Practical",
+                    "syllabus_overview": "OOP paradigms, Java syntax, Classes, Inheritance, Polymorphism, Interfaces, Packages, Exception Handling, Multithreading, Java Collections Framework, and Stream API.",
+                    "status": "Active",
+                    "created_at": datetime.utcnow().isoformat(),
+                    "created_by": "gtu_curriculum"
+                },
+                {
+                    "id": "SYL_0004",
+                    "syllabus_id": "SYL_0004",
+                    "program": "BE",
+                    "department": "Computer Engineering",
+                    "semester": 5,
+                    "subject_code": "3150703",
+                    "subject_name": "Analysis and Design of Algorithms",
+                    "academic_year": "2024-2025",
+                    "credits": 5,
+                    "teaching_scheme": "4 Theory + 2 Practical",
+                    "syllabus_overview": "Asymptotic notations, Divide & Conquer, Greedy Algorithms, Dynamic Programming, Graph algorithms (Dijkstra, Bellman-Ford, Kruskal, Prim), Backtracking, Branch & Bound, and P/NP completeness.",
+                    "status": "Active",
+                    "created_at": datetime.utcnow().isoformat(),
+                    "created_by": "gtu_curriculum"
+                },
+                {
+                    "id": "SYL_0005",
+                    "syllabus_id": "SYL_0005",
+                    "program": "BE",
+                    "department": "Computer Engineering",
+                    "semester": 6,
+                    "subject_code": "3160704",
+                    "subject_name": "Operating Systems",
+                    "academic_year": "2024-2025",
+                    "credits": 5,
+                    "teaching_scheme": "4 Theory + 2 Practical",
+                    "syllabus_overview": "Operating system structures, Process Management, Inter-process communication, CPU Scheduling, Synchronization semaphores, Deadlocks, Memory Management, Virtual Memory, and File System Implementation.",
+                    "status": "Active",
+                    "created_at": datetime.utcnow().isoformat(),
+                    "created_by": "gtu_curriculum"
+                }
+            ]
+            records_to_seed.extend(syllabus_records)
+
+        # 5. Official ACPC Admission Criteria Seed Data
+        elif module_key == "admission_info":
+            admission_records = [
+                {
+                    "id": "ADM_0001",
+                    "info_id": "ADM_0001",
+                    "title": "Bachelor of Engineering (BE) Undergraduate Admissions",
+                    "program": "Undergraduate (BE/BTech)",
+                    "department": "Computer Engineering",
+                    "category": "ACPC Merit Quota",
+                    "total_seats": 120,
+                    "fees_per_year": "Approved by Fee Regulatory Committee (FRC), Gujarat",
+                    "eligibility": "Passed Std 12 (Science stream PCM) with minimum qualifying percentage and valid GUJCET examination score. Admissions conducted centrally via ACPC Gujarat (jacpcldce.ac.in).",
+                    "admission_process": "1. Online registration on ACPC portal (jacpcldce.ac.in)\n2. Merit rank announcement by ACPC\n3. Choice filling for SVIT Vasad (Institute Code: 041)\n4. Mock round and Round 1 seat allotment\n5. Document verification and token tuition fee payment.",
+                    "key_dates": "ACPC Choice Filling: June-July annually per Government schedule",
+                    "contact_person": "ACPC Admission Cell In-Charge",
+                    "contact_phone": "02692-274766",
+                    "status": "Admissions Open",
+                    "created_at": datetime.utcnow().isoformat(),
+                    "created_by": "official_svit_source"
+                },
+                {
+                    "id": "ADM_0002",
+                    "info_id": "ADM_0002",
+                    "title": "Information Technology (BE IT) Admissions",
+                    "program": "Undergraduate (BE/BTech)",
+                    "department": "Information Technology",
+                    "category": "ACPC Merit Quota",
+                    "total_seats": 120,
+                    "fees_per_year": "Approved by FRC Gujarat",
+                    "eligibility": "Std 12 Science (PCM) with valid GUJCET merit score. Admission via ACPC Gujarat.",
+                    "admission_process": "Centralized online admission counseling via ACPC portal (jacpcldce.ac.in) selecting SVIT Vasad IT branch.",
+                    "key_dates": "Per ACPC Gujarat counseling calendar",
+                    "contact_person": "Admission Cell",
+                    "contact_phone": "02692-274766",
+                    "status": "Admissions Open",
+                    "created_at": datetime.utcnow().isoformat(),
+                    "created_by": "official_svit_source"
+                }
+            ]
+            records_to_seed.extend(admission_records)
 
         # 3. Insert genuine records into MongoDB or local store
         # NOTE: If no CSV exists and no records exist, collection remains EMPTY (0 records)
@@ -1344,8 +1496,8 @@ class AdminCRUDService:
                         link="/admin/notices"
                     )
 
-            # 2. College & Sports Events
-            elif module_key in ("events", "sports_events"):
+            # 2. College Events (Excludes Sports)
+            elif module_key == "events":
                 status = str(clean_data.get("status", "Upcoming")).strip().lower()
                 if status in ("upcoming", "ongoing", "active", ""):
                     ev_name = clean_data.get("event_name") or clean_data.get("title") or "College Event"
@@ -1712,16 +1864,7 @@ class AdminCRUDService:
                 "daily_departures": transport_count
             }
 
-        # 2. Sports Admin stats
-        elif user_role == "sports_admin":
-            stats["counters"] = {
-                "total_sports": get_count("sports"),
-                "tournaments": get_count("sports_events"),
-                "grounds_courts": get_count("grounds"),
-                "active_coaches": 0
-            }
-
-        # 3. Event Admin stats
+        # 2. Event Admin stats
         elif user_role == "event_admin":
             events_count = get_count("events")
             stats["counters"] = {
@@ -1731,16 +1874,7 @@ class AdminCRUDService:
                 "hackathons": 0
             }
 
-        # 4. Library Admin stats
-        elif user_role == "library_admin":
-            stats["counters"] = {
-                "total_books": get_count("library_books"),
-                "registered_members": get_count("library_members"),
-                "active_loans": get_count("library_issue_return"),
-                "e_resources": 0
-            }
-
-        # 5. Canteen Admin stats
+        # 3. Canteen Admin stats
         elif user_role == "canteen_admin":
             canteen_count = get_count("canteen")
             stats["counters"] = {
@@ -1750,17 +1884,17 @@ class AdminCRUDService:
                 "daily_orders": 0
             }
 
-        # 6. Academic Admin stats
+        # 4. Academic Admin stats
         elif user_role == "academic_admin":
             stats["counters"] = {
                 "total_students": get_count("students"),
                 "pending_registrations": pending_count,
                 "faculty_members": get_count("faculty"),
-                "subjects": get_count("subjects"),
-                "academic_documents": get_count("academic_documents")
+                "syllabus_records": get_count("syllabus"),
+                "academic_documents": get_count("module_documents") + get_count("academic_documents")
             }
 
-        # 7. Admission Admin stats
+        # 5. Admission Admin stats
         elif user_role == "admission_admin":
             stats["counters"] = {
                 "programs_offered": get_count("admission_info"),
@@ -1769,25 +1903,36 @@ class AdminCRUDService:
                 "applications": 0
             }
 
-        # 8. Notice Admin stats
+        # 6. Notice Admin stats
         elif user_role == "notice_admin":
             stats["counters"] = {
                 "total_notices": get_count("notices"),
                 "urgent_alerts": len(stats["urgent_notices"]),
-                "departments": 7,
+                "departments": 8,
                 "published_today": len(stats["urgent_notices"])
             }
 
-        # 9. Super Admin stats
+        # 7. SVIT Info Admin stats
+        elif user_role == "svit_info_admin":
+            stats["counters"] = {
+                "svit_info_records": get_count("svit_info"),
+                "campus_landmarks": get_count("campus_info"),
+                "facilities": get_count("facilities"),
+                "total_documents": get_count("module_documents")
+            }
+
+        # 8. Super Admin stats
         else:
             stats["counters"] = {
                 "total_students": get_count("students"),
                 "pending_registrations": pending_count,
                 "faculty_members": get_count("faculty"),
                 "active_notices": get_count("notices"),
-                "library_books": get_count("library_books"),
                 "bus_routes": get_count("transport"),
-                "events_count": get_count("events")
+                "events_count": get_count("events"),
+                "syllabus_records": get_count("syllabus"),
+                "svit_info_records": get_count("svit_info"),
+                "total_documents": get_count("module_documents")
             }
 
         return stats

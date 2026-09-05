@@ -68,17 +68,17 @@ class TestStep4DataConnectivity(unittest.TestCase):
             '/admin/bus_routes',
             '/admin/bus_stops',
             '/admin/bus_timings',
-            '/admin/library',
-            '/admin/library_books',
-            '/admin/library_members',
-            '/admin/issue_return',
             '/admin/canteen',
             '/admin/canteen_menu',
             '/admin/food_items',
-            '/admin/sports',
-            '/admin/sports_events',
-            '/admin/grounds',
+            '/admin/svit-info',
+            '/admin/about-svit',
+            '/admin/syllabus',
+            '/admin/academics',
+            '/admin/documents',
+            '/admin/rag-status',
             '/admin/academic_documents',
+            '/admin/admission_documents',
             '/admin/roles_permissions',
             '/admin/profile'
         ]
@@ -87,6 +87,11 @@ class TestStep4DataConnectivity(unittest.TestCase):
         for route in routes:
             res = self.client.get(route)
             self.assertEqual(res.status_code, 200, f"Route {route} failed with status {res.status_code}")
+
+        # Verify retired routes redirect gracefully without 404
+        for retired in ['/admin/library', '/admin/library_books', '/admin/sports', '/admin/grounds']:
+            res = self.client.get(retired)
+            self.assertIn(res.status_code, [301, 302])
 
     def test_02_all_crud_modules_fetch_real_data(self):
         """Verify that every module registered in MODULE_CONFIGS returns real records."""
@@ -109,13 +114,13 @@ class TestStep4DataConnectivity(unittest.TestCase):
             ("bus_routes", "transport"),
             ("bus_stops", "transport"),
             ("bus_timings", "transport"),
-            ("library", "library_info"),
-            ("books", "library_books"),
-            ("members", "library_members"),
-            ("issue_return", "library_issue_return"),
             ("canteen_menu", "canteen"),
             ("food_items", "canteen"),
-            ("sports_disciplines", "sports")
+            ("svit-info", "svit_info"),
+            ("about-svit", "svit_info"),
+            ("academics", "syllabus"),
+            ("documents", "module_documents"),
+            ("rag_status", "module_documents")
         ]
         for alias, canonical in aliases:
             res = self.client.get(f'/admin/api/crud/{alias}?limit=5')
@@ -182,7 +187,7 @@ class TestStep4DataConnectivity(unittest.TestCase):
         counters = stats_json.get('stats', {}).get('counters', {})
         self.assertIn('total_students', counters)
         self.assertIn('faculty_members', counters)
-        self.assertIn('library_books', counters)
+        self.assertIn('svit_info_records', counters)
 
         me_res = self.client.get('/admin/api/me')
         self.assertEqual(me_res.status_code, 200)
@@ -190,13 +195,12 @@ class TestStep4DataConnectivity(unittest.TestCase):
         self.assertEqual(me_data['admin']['username'], 'test_superadmin')
 
     def test_06_verify_real_counts_and_empty_modules(self):
-        """Verify that modules with CSVs return real counts, and modules without CSVs return 0 / empty."""
+        """Verify that modules with CSVs/seeds return real counts, and modules without return 0 / empty."""
         self._login_admin()
 
-        # 1. Modules with real CSVs must have real counts
+        # 1. Modules with real CSVs/seeds must have real counts
         csv_modules = {
             "faculty": 250,
-            "library_books": 640,
             "subjects": 640,
             "timetable": 9216,
             "rooms": 40,
@@ -204,7 +208,8 @@ class TestStep4DataConnectivity(unittest.TestCase):
             "notices": 150,
             "events": 120,
             "transport": 40,
-            "canteen": 40
+            "canteen": 40,
+            "svit_info": 1
         }
         for mod, expected_min in csv_modules.items():
             res = self.client.get(f'/admin/api/crud/{mod}?limit=1')
@@ -212,17 +217,11 @@ class TestStep4DataConnectivity(unittest.TestCase):
             data = res.get_json()
             self.assertGreaterEqual(data['total'], expected_min, f"Module {mod} missing real CSV records.")
 
-        # 2. Modules without CSVs must be cleanly empty (0 records)
+        # 2. Modules without pre-existing records must be cleanly empty (0 records)
         empty_modules = [
             "academic_documents",
-            "admission_info",
             "admission_documents",
-            "admission_notices",
-            "library_members",
-            "library_issue_return",
-            "sports",
-            "sports_events",
-            "grounds"
+            "admission_notices"
         ]
         for mod in empty_modules:
             res = self.client.get(f'/admin/api/crud/{mod}?limit=1')
@@ -230,27 +229,29 @@ class TestStep4DataConnectivity(unittest.TestCase):
             data = res.get_json()
             self.assertEqual(data['total'], 0, f"Module {mod} must not contain fake seeded records.")
 
-        # 3. Create a real record in an empty module, verify it appears, then delete it
-        sport_payload = {
-            "sport_id": "TEST_SPT_001",
-            "sport_name": "Test Real Badminton",
-            "category": "Indoor",
-            "coach_name": "Test Coach",
-            "equipment_available": "Available for Issue"
+        # 3. Create a real record in an unpopulated module, verify it appears, then delete it
+        notice_payload = {
+            "notice_id": "TEST_ADM_NOT_001",
+            "title": "Test Real Admission Notice",
+            "target_audience": "All Prospective Students",
+            "priority": "Normal",
+            "description": "Notice for all prospective students.",
+            "publish_date": "2026-08-26",
+            "status": "Published"
         }
-        create_res = self.client.post('/admin/api/crud/sports',
-                                      data=json.dumps(sport_payload),
+        create_res = self.client.post('/admin/api/crud/admission_notices',
+                                      data=json.dumps(notice_payload),
                                       content_type='application/json')
         self.assertEqual(create_res.status_code, 201)
         
         # Verify total is now 1
-        res_after = self.client.get('/admin/api/crud/sports?limit=1')
+        res_after = self.client.get('/admin/api/crud/admission_notices?limit=1')
         self.assertEqual(res_after.get_json()['total'], 1)
 
         # Delete it and verify it reverts to 0
-        del_res = self.client.delete('/admin/api/crud/sports/TEST_SPT_001')
+        del_res = self.client.delete('/admin/api/crud/admission_notices/TEST_ADM_NOT_001')
         self.assertEqual(del_res.status_code, 200)
-        res_final = self.client.get('/admin/api/crud/sports?limit=1')
+        res_final = self.client.get('/admin/api/crud/admission_notices?limit=1')
         self.assertEqual(res_final.get_json()['total'], 0)
 
 

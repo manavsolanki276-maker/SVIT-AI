@@ -62,12 +62,12 @@
     <div class="dashboard-stat-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {% if stats and stats.counters %}
             {% for label, val in stats.counters.items() %}
-            <a href="{% if label == 'pending_registrations' %}{{ url_for('admin.students', status='pending') }}{% elif label == 'total_students' %}{{ url_for('admin.students') }}{% elif label == 'faculty_members' %}{{ url_for('admin.faculty') }}{% elif label == 'active_notices' or label == 'total_notices' %}{{ url_for('admin.notices') }}{% elif label == 'library_books' %}{{ url_for('admin.library_books') }}{% elif label == 'bus_routes' %}{{ url_for('admin.buses') }}{% elif label == 'events_count' %}{{ url_for('admin.events') }}{% elif label == 'subjects' %}{{ url_for('admin.subjects') }}{% elif label == 'academic_documents' %}{{ url_for('admin.academic_documents') }}{% elif label == 'menu_items' %}{{ url_for('admin.canteen') }}{% else %}#{% endif %}"
+            <a href="{% if label == 'pending_registrations' %}{{ url_for('admin.students', status='pending') }}{% elif label == 'total_students' %}{{ url_for('admin.students') }}{% elif label == 'faculty_members' %}{{ url_for('admin.faculty') }}{% elif label == 'active_notices' or label == 'total_notices' %}{{ url_for('admin.notices') }}{% elif label == 'svit_info_records' %}{{ url_for('admin.svit_info') }}{% elif label == 'syllabus_records' %}{{ url_for('admin.syllabus') }}{% elif label == 'total_documents' %}{{ url_for('admin.module_documents') }}{% elif label == 'bus_routes' %}{{ url_for('admin.buses') }}{% elif label == 'events_count' %}{{ url_for('admin.events') }}{% elif label == 'subjects' %}{{ url_for('admin.subjects') }}{% elif label == 'academic_documents' %}{{ url_for('admin.module_documents') }}{% elif label == 'menu_items' %}{{ url_for('admin.canteen') }}{% else %}#{% endif %}"
                class="p-4 rounded-2xl bg-white border {% if label == 'pending_registrations' and val > 0 %}border-amber-400 bg-amber-50/40 shadow-sm{% else %}border-[#E1E5F0]{% endif %} stat-card-glow group text-decoration-none block transition transform hover:-translate-y-1 shadow-sm">
                 <div class="flex items-center justify-between mb-2">
                     <span class="text-xs font-semibold {% if label == 'pending_registrations' and val > 0 %}text-amber-700 font-bold{% else %}text-[#66708F]{% endif %} uppercase tracking-wider">{{ label.replace('_', ' ').title() }}</span>
                     <div class="stat-icon-wrapper {% if label == 'pending_registrations' %}bg-amber-100 text-amber-600 group-hover:bg-amber-500 group-hover:text-white{% else %}bg-[#E8EBFA] text-[#8B5CF6] group-hover:bg-[#8B5CF6] group-hover:text-white{% endif %}">
-                        <i data-lucide="{% if label == 'pending_registrations' %}clock{% elif label == 'total_students' %}users{% elif label == 'faculty_members' %}user-check{% elif label == 'active_notices' or label == 'total_notices' %}megaphone{% elif label == 'library_books' %}book-open{% elif label == 'bus_routes' %}bus{% else %}activity{% endif %}" class="w-4 h-4"></i>
+                        <i data-lucide="{% if label == 'pending_registrations' %}clock{% elif label == 'total_students' %}users{% elif label == 'faculty_members' %}user-check{% elif label == 'active_notices' or label == 'total_notices' %}megaphone{% elif label == 'svit_info_records' %}school{% elif label == 'syllabus_records' %}book-marked{% elif label == 'total_documents' %}files{% elif label == 'bus_routes' %}bus{% else %}activity{% endif %}" class="w-4 h-4"></i>
                     </div>
                 </div>
                 <div class="flex items-baseline justify-between mt-1">
@@ -132,9 +132,16 @@
                             <i data-lucide="user-check" class="w-5 h-5 text-emerald-600"></i>
                             <span class="text-xs font-semibold">Faculty</span>
                         </a>
-                        <a href="{{ url_for('admin.academic_documents') }}" class="quick-action-card">
-                            <i data-lucide="file-text" class="w-5 h-5 text-blue-600"></i>
-                            <span class="text-xs font-semibold">Academic PDFs</span>
+                        <a href="{{ url_for('admin.syllabus') }}" class="quick-action-card">
+                            <i data-lucide="book-marked" class="w-5 h-5 text-indigo-600"></i>
+                            <span class="text-xs font-semibold">Syllabus</span>
+                        </a>
+                    {% endif %}
+
+                    {% if has_permission(current_user, 'svit_info') or has_role(current_user, 'super_admin') %}
+                        <a href="{{ url_for('admin.svit_info') }}" class="quick-action-card">
+                            <i data-lucide="school" class="w-5 h-5 text-blue-600"></i>
+                            <span class="text-xs font-semibold">SVIT Info</span>
                         </a>
                     {% endif %}
 
@@ -159,13 +166,6 @@
                         </a>
                     {% endif %}
 
-                    {% if has_permission(current_user, 'library') or has_role(current_user, 'super_admin') %}
-                        <a href="{{ url_for('admin.library_books') }}" class="quick-action-card">
-                            <i data-lucide="book-open" class="w-5 h-5 text-teal-600"></i>
-                            <span class="text-xs font-semibold">Library Books</span>
-                        </a>
-                    {% endif %}
-
                     {% if has_permission(current_user, 'canteen') or has_role(current_user, 'super_admin') %}
                         <a href="{{ url_for('admin.canteen') }}" class="quick-action-card">
                             <i data-lucide="utensils" class="w-5 h-5 text-orange-600"></i>
@@ -173,14 +173,10 @@
                         </a>
                     {% endif %}
 
-                    {% if has_permission(current_user, 'sports') or has_role(current_user, 'super_admin') %}
-                        <a href="{{ url_for('admin.sports') }}" class="quick-action-card">
-                            <i data-lucide="trophy" class="w-5 h-5 text-yellow-600"></i>
-                            <span class="text-xs font-semibold">Sports</span>
-                        </a>
-                        <a href="{{ url_for('admin.sports_events') }}" class="quick-action-card">
-                            <i data-lucide="medal" class="w-5 h-5 text-yellow-600"></i>
-                            <span class="text-xs font-semibold">Tournaments</span>
+                    {% if has_permission(current_user, 'documents') or has_role(current_user, 'super_admin') %}
+                        <a href="{{ url_for('admin.module_documents') }}" class="quick-action-card">
+                            <i data-lucide="file-check-2" class="w-5 h-5 text-[#8B5CF6]"></i>
+                            <span class="text-xs font-semibold">RAG Docs</span>
                         </a>
                     {% endif %}
 

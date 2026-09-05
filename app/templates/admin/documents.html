@@ -1,0 +1,550 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}Universal Documents & RAG Status{% endblock %}
+{% block header_title %}Universal Document Management & Page-Specific RAG Isolation{% endblock %}
+
+{% block content %}
+<div class="space-y-6 text-[#171D3A]" data-module="module_documents">
+
+    <!-- 1. HERO BANNER -->
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-6 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm">
+        <div class="flex items-start gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-[#E8EBFA] border border-[#8B5CF6]/30 flex items-center justify-center text-[#8B5CF6] flex-shrink-0 shadow-sm">
+                <i data-lucide="cpu" class="w-7 h-7"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2.5 flex-wrap">
+                    <h2 class="text-xl font-bold text-[#171D3A] mb-0">Universal Document Management & RAG Status</h2>
+                    <span id="docCountBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#E8EBFA] text-[#8B5CF6] border border-[#8B5CF6]/30">
+                        0 Documents Indexed
+                    </span>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">
+                        Strict Namespace Isolation
+                    </span>
+                </div>
+                <p class="text-xs text-[#66708F] mb-0 mt-1 max-w-3xl">
+                    Multi-format ingestion pipeline (.pdf, .docx, .xlsx, .csv, .txt) with SHA-256 duplicate content detection and strict 8-step verification. Indexed vectors are strictly partitioned into isolated module namespaces.
+                </p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap self-start lg:self-auto">
+            <button id="openUploadDocBtn" class="px-4 py-2 rounded-xl bg-[#8B5CF6] hover:bg-[#7C4FE8] text-white text-xs font-semibold shadow-lg shadow-[#8B5CF6]/30 transition flex items-center gap-2">
+                <i data-lucide="upload-cloud" class="w-4 h-4"></i> Upload & Ingest Document
+            </button>
+        </div>
+    </div>
+
+    <!-- 2. RAG PIPELINE STATS KPI ROW -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div class="p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold text-[#66708F] uppercase tracking-wider">Total Indexed Docs</span>
+                <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                    <i data-lucide="files" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <h3 class="text-xl font-extrabold text-[#171D3A] mb-0" id="statTotalDocs">0</h3>
+            <span class="text-[11px] text-indigo-600 font-semibold flex items-center gap-1 mt-0.5">
+                <i data-lucide="shield-check" class="w-3 h-3"></i> SHA-256 Verified
+            </span>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold text-[#66708F] uppercase tracking-wider">Total Vector Chunks</span>
+                <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <i data-lucide="layers" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <h3 class="text-xl font-extrabold text-[#171D3A] mb-0" id="statTotalChunks">0</h3>
+            <span class="text-[11px] text-emerald-600 font-semibold flex items-center gap-1 mt-0.5">
+                <i data-lucide="database" class="w-3 h-3"></i> Vector Embeddings Ready
+            </span>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold text-[#66708F] uppercase tracking-wider">Universal Formats</span>
+                <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                    <i data-lucide="file-type" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <h3 class="text-base font-extrabold text-[#171D3A] mb-0">PDF, DOCX, XLSX, CSV, TXT</h3>
+            <span class="text-[11px] text-amber-600 font-semibold flex items-center gap-1 mt-0.5">
+                <i data-lucide="check" class="w-3 h-3"></i> 5 File Extractors Active
+            </span>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold text-[#66708F] uppercase tracking-wider">Isolated Namespaces</span>
+                <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+                    <i data-lucide="lock" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <h3 class="text-base font-extrabold text-[#171D3A] mb-0">8 Partitioned Domains</h3>
+            <span class="text-[11px] text-purple-600 font-semibold flex items-center gap-1 mt-0.5">
+                <i data-lucide="shield-alert" class="w-3 h-3"></i> Zero Cross-Contamination
+            </span>
+        </div>
+    </div>
+
+    <!-- 3. SEARCH & MODULE FILTER TOOLBAR -->
+    <div class="p-4 rounded-2xl bg-white border border-[#E1E5F0] flex flex-col md:flex-row items-center justify-between gap-3 flex-wrap shadow-sm">
+        <div class="relative w-full md:w-80">
+            <i data-lucide="search" class="w-4 h-4 text-[#8C95AD] absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="searchInput" placeholder="Search file name, hash, document ID..." class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl pl-9 pr-8 py-2 text-xs text-[#171D3A] placeholder-[#8C95AD] focus:outline-none focus:border-[#8B5CF6] transition">
+            <button id="clearSearchBtn" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs hidden">✕</button>
+        </div>
+
+        <div class="flex items-center gap-2 w-full md:w-auto flex-wrap">
+            <select id="moduleFilter" class="bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-[#8B5CF6]">
+                <option value="">All Namespaces / Modules</option>
+                <option value="svit_info">SVIT Info (svit_info)</option>
+                <option value="admission">Admission (admission)</option>
+                <option value="notices">Notices (notices)</option>
+                <option value="events">Events (events)</option>
+                <option value="bus">Bus / Transport (bus)</option>
+                <option value="canteen">Canteen (canteen)</option>
+                <option value="syllabus">Academics & Syllabus (syllabus)</option>
+                <option value="faculty">Faculty Directory (faculty)</option>
+            </select>
+
+            <select id="statusFilter" class="bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-[#8B5CF6]">
+                <option value="">All Statuses</option>
+                <option value="Indexed">Indexed</option>
+                <option value="Processing">Processing</option>
+                <option value="Failed">Failed</option>
+            </select>
+
+            <button id="refreshBtn" class="p-2 rounded-xl bg-[#F8F9FE] border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A]" title="Refresh Documents">
+                <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 4. DATA TABLE -->
+    <div class="bg-white border border-[#E1E5F0] rounded-2xl shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-[#171D3A]">
+                <thead class="bg-[#F8F9FE] border-b border-[#E1E5F0] text-[#66708F] uppercase tracking-wider text-[11px] font-semibold">
+                    <tr>
+                        <th class="p-3.5">Document / File</th>
+                        <th class="p-3.5">Target Module & Namespace</th>
+                        <th class="p-3.5">Type & Size</th>
+                        <th class="p-3.5">Chunks</th>
+                        <th class="p-3.5">SHA-256 Checksum</th>
+                        <th class="p-3.5">Status</th>
+                        <th class="p-3.5 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody" class="divide-y divide-[#E1E5F0]">
+                    <tr>
+                        <td colspan="7" class="p-8 text-center text-[#8C95AD]">
+                            <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-[#8B5CF6]"></i>
+                            Loading document registry & RAG status...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="p-4 border-t border-[#E1E5F0] flex items-center justify-between text-xs text-[#66708F] bg-[#F8F9FE]">
+            <span id="recordCountText">Showing 0 documents</span>
+            <span class="flex items-center gap-1.5 text-emerald-600 font-semibold">
+                <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
+                Zero cross-module leakage verified across all 8 namespaces
+            </span>
+        </div>
+    </div>
+
+</div>
+
+<!-- 5. UPLOAD DOCUMENT MODAL (UNIVERSAL 8-STEP PIPELINE) -->
+<div class="modal fade" id="uploadModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-white border border-[#E1E5F0] rounded-2xl shadow-xl">
+            <div class="modal-header border-b border-[#E1E5F0] p-4 bg-[#F8F9FE]">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-[#E8EBFA] text-[#8B5CF6] flex items-center justify-center">
+                        <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-[#171D3A] mb-0">Upload & Ingest Scoped Document</h3>
+                        <p class="text-[11px] text-[#66708F] mb-0">Multi-format ingestion with 8-step verification and strict namespace partition.</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="uploadForm" class="p-5 space-y-4 text-xs">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Target Admin Module *</label>
+                        <select name="module" id="uploadModuleSelect" required class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] font-semibold focus:outline-none focus:border-[#8B5CF6]">
+                            <option value="svit_info">SVIT Info & Overview (svit_info)</option>
+                            <option value="admission">Admission & Cutoffs (admission)</option>
+                            <option value="notices">Campus Notices & Circulars (notices)</option>
+                            <option value="events">College Events (events)</option>
+                            <option value="bus">Bus & Transportation (bus)</option>
+                            <option value="canteen">Canteen & Cafeteria (canteen)</option>
+                            <option value="syllabus">Academics & GTU Syllabus (syllabus)</option>
+                            <option value="faculty">Faculty Directory (faculty)</option>
+                        </select>
+                        <span class="text-[10px] text-[#66708F] mt-1 block">Chunks will ONLY be retrievable from this module's query flow.</span>
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Document Title / Display Label</label>
+                        <input type="text" name="title" id="uploadTitleInput" placeholder="e.g. Official Admission Matrix 2026-27" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Select Document File (.pdf, .docx, .xlsx, .csv, .txt) *</label>
+                    <input type="file" name="file" id="uploadFileInput" required accept=".pdf,.docx,.xlsx,.xls,.csv,.txt" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                    <div class="mt-2 flex items-center gap-2 flex-wrap text-[10px] text-[#66708F]">
+                        <span class="px-2 py-0.5 rounded bg-gray-100 font-mono">.pdf</span>
+                        <span class="px-2 py-0.5 rounded bg-gray-100 font-mono">.docx</span>
+                        <span class="px-2 py-0.5 rounded bg-gray-100 font-mono">.xlsx / .xls</span>
+                        <span class="px-2 py-0.5 rounded bg-gray-100 font-mono">.csv</span>
+                        <span class="px-2 py-0.5 rounded bg-gray-100 font-mono">.txt</span>
+                        <span>&bull; Max 10MB &bull; Duplicate SHA-256 rejected automatically (409 Conflict)</span>
+                    </div>
+                </div>
+
+                <!-- Live Pipeline Progress Indicator -->
+                <div id="pipelineProgressBox" class="hidden p-3.5 rounded-xl border text-xs space-y-2">
+                    <div class="flex items-center gap-2 font-bold" id="pipelineStatusHeader">
+                        <i data-lucide="loader-2" class="w-4 h-4 animate-spin text-[#8B5CF6]"></i>
+                        <span>Executing 8-step verification pipeline...</span>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px] font-mono text-[#66708F]" id="pipelineSteps">
+                        <div class="p-1 rounded bg-white border border-[#E1E5F0]">1. Format Check</div>
+                        <div class="p-1 rounded bg-white border border-[#E1E5F0]">2. SHA-256 Hash</div>
+                        <div class="p-1 rounded bg-white border border-[#E1E5F0]">3. Text Extract</div>
+                        <div class="p-1 rounded bg-white border border-[#E1E5F0]">4. Quality Gate</div>
+                        <div class="p-1 rounded bg-white border border-[#E1E5F0]">5. Chunk & Tag</div>
+                        <div class="p-1 rounded bg-white border border-[#E1E5F0]">6. Vector Embed</div>
+                        <div class="p-1 rounded bg-white border border-[#E1E5F0]">7. Dup Check</div>
+                        <div class="p-1 rounded bg-white border border-[#E1E5F0]">8. Cache Clear</div>
+                    </div>
+                    <div id="pipelineMessage" class="text-[11px] text-[#171D3A] pt-1"></div>
+                </div>
+
+                <div class="pt-3 border-t border-[#E1E5F0] flex items-center justify-end gap-2.5">
+                    <button type="button" class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" id="submitBtn" class="px-4 py-2 rounded-xl bg-[#8B5CF6] hover:bg-[#7C4FE8] text-white text-xs font-semibold shadow-md transition flex items-center gap-1.5">
+                        <i data-lucide="arrow-up-circle" class="w-4 h-4"></i> Ingest Document
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 6. DOCUMENT DETAILS MODAL -->
+<div class="modal fade" id="docDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-white border border-[#E1E5F0] rounded-2xl shadow-xl">
+            <div class="modal-header border-b border-[#E1E5F0] p-4 bg-[#F8F9FE]">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-[#E8EBFA] text-[#8B5CF6] flex items-center justify-center">
+                        <i data-lucide="file-search" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-[#171D3A] mb-0" id="docDetailTitle">Document Metadata & RAG Verification</h3>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="p-5 space-y-3.5 text-xs" id="docDetailBody"></div>
+            <div class="p-4 border-t border-[#E1E5F0] text-right bg-[#F8F9FE]">
+                <button type="button" class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    let allDocuments = [];
+    const uploadModal = new bootstrap.Modal(document.getElementById("uploadModal"));
+    const detailModal = new bootstrap.Modal(document.getElementById("docDetailModal"));
+
+    async function loadDocuments() {
+        const tbody = document.getElementById("dataTableBody");
+        try {
+            const res = await fetch("/admin/api/documents");
+            const data = await res.json();
+            if (data.status === "success") {
+                allDocuments = data.documents || [];
+                updateStats(allDocuments);
+                renderTable(allDocuments);
+            } else {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-red-500">Failed to load documents: ${data.message}</td></tr>`;
+            }
+        } catch (e) {
+            tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-red-500">Error loading document registry.</td></tr>`;
+        }
+    }
+
+    function updateStats(docs) {
+        document.getElementById("statTotalDocs").innerText = docs.length;
+        document.getElementById("docCountBadge").innerText = `${docs.length} Documents Indexed`;
+        const totalChunks = docs.reduce((sum, d) => sum + (parseInt(d.chunk_count, 10) || 0), 0);
+        document.getElementById("statTotalChunks").innerText = totalChunks;
+    }
+
+    function renderTable(docs) {
+        const tbody = document.getElementById("dataTableBody");
+        document.getElementById("recordCountText").innerText = `Showing ${docs.length} documents`;
+
+        if (!docs || docs.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-[#8C95AD]">No documents found in registry. Click "Upload & Ingest Document" to add one.</td></tr>`;
+            lucide.createIcons();
+            return;
+        }
+
+        tbody.innerHTML = docs.map(d => {
+            const shortHash = d.file_hash ? d.file_hash.substring(0, 10) + '...' + d.file_hash.substring(d.file_hash.length - 6) : '-';
+            const statusClass = d.status === 'Indexed' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' :
+                                d.status === 'Failed' ? 'bg-red-50 text-red-600 border border-red-200' :
+                                'bg-amber-50 text-amber-600 border border-amber-200';
+            const typeBadge = (d.file_type || 'pdf').toUpperCase();
+
+            return `
+                <tr class="hover:bg-[#F8F9FE] transition">
+                    <td class="p-3.5">
+                        <div class="font-bold text-[#171D3A] flex items-center gap-1.5">
+                            <i data-lucide="${getFileIcon(d.file_type)}" class="w-4 h-4 text-[#8B5CF6]"></i>
+                            ${escapeHtml(d.document_name || d.title || 'Untitled Document')}
+                        </div>
+                        <div class="font-mono text-[10px] text-[#66708F]">${escapeHtml(d.document_id || d.id || '')}</div>
+                    </td>
+                    <td class="p-3.5">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#E8EBFA] text-[#8B5CF6] border border-[#8B5CF6]/30 flex items-center gap-1 w-max">
+                            <i data-lucide="lock" class="w-3 h-3"></i>
+                            ${escapeHtml(d.rag_namespace || d.module || 'general')}
+                        </span>
+                    </td>
+                    <td class="p-3.5 text-[#66708F]">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 font-mono">${escapeHtml(typeBadge)}</span>
+                        <span class="text-[11px] ml-1">${escapeHtml(d.file_size_formatted || '-')}</span>
+                    </td>
+                    <td class="p-3.5 font-semibold text-[#171D3A]">
+                        <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-50 text-purple-700">
+                            ${escapeHtml(d.chunk_count || 0)} chunks
+                        </span>
+                    </td>
+                    <td class="p-3.5 font-mono text-[10px] text-[#66708F]" title="${escapeHtml(d.file_hash || '')}">
+                        ${shortHash}
+                    </td>
+                    <td class="p-3.5">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold ${statusClass}">
+                            ${escapeHtml(d.status || 'Indexed')}
+                        </span>
+                    </td>
+                    <td class="p-3.5 text-right space-x-1">
+                        <button class="view-btn p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-[#171D3A]" data-id="${escapeHtml(d.id || d.document_id)}" title="View Metadata">
+                            <i data-lucide="info" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button class="reindex-btn p-1.5 rounded-lg bg-[#E8EBFA] hover:bg-[#D4DCF7] text-[#8B5CF6]" data-id="${escapeHtml(d.id || d.document_id)}" title="Re-Index into Namespace">
+                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button class="delete-btn p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600" data-id="${escapeHtml(d.id || d.document_id)}" title="Delete Document & Chunks">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        lucide.createIcons();
+        attachRowEvents();
+    }
+
+    function getFileIcon(type) {
+        if (!type) return 'file-text';
+        const t = type.toLowerCase();
+        if (t.includes('pdf')) return 'file-text';
+        if (t.includes('doc')) return 'file-edit';
+        if (t.includes('xls') || t.includes('csv')) return 'table-2';
+        return 'file-code';
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function attachRowEvents() {
+        // View Details
+        document.querySelectorAll(".view-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = btn.dataset.id;
+                const d = allDocuments.find(x => (x.id == id || x.document_id == id));
+                if (!d) return;
+
+                document.getElementById("docDetailTitle").innerText = d.document_name || d.title;
+                document.getElementById("docDetailBody").innerHTML = `
+                    <div class="grid grid-cols-2 gap-3 p-3 bg-[#F8F9FE] rounded-xl">
+                        <div><strong class="text-[#66708F]">Document ID:</strong> <span class="font-mono">${escapeHtml(d.document_id || d.id)}</span></div>
+                        <div><strong class="text-[#66708F]">Isolated Namespace:</strong> <span class="font-bold text-[#8B5CF6]">${escapeHtml(d.rag_namespace || d.module)}</span></div>
+                        <div><strong class="text-[#66708F]">File Format:</strong> <span class="font-bold">${escapeHtml(d.file_type || '-')}</span></div>
+                        <div><strong class="text-[#66708F]">File Size:</strong> <span>${escapeHtml(d.file_size_formatted || '-')}</span></div>
+                        <div><strong class="text-[#66708F]">Indexed Chunks:</strong> <span class="font-bold text-emerald-600">${escapeHtml(d.chunk_count || 0)} chunks</span></div>
+                        <div><strong class="text-[#66708F]">Index Date:</strong> <span>${escapeHtml(d.indexed_at || '-')}</span></div>
+                        <div class="col-span-2">
+                            <strong class="text-[#66708F] block mb-1">SHA-256 Checksum:</strong>
+                            <div class="font-mono text-[11px] bg-white border border-[#E1E5F0] p-2 rounded-lg break-all select-all">${escapeHtml(d.file_hash || '-')}</div>
+                        </div>
+                        <div class="col-span-2">
+                            <strong class="text-[#66708F] block mb-1">Physical File Path:</strong>
+                            <div class="font-mono text-[11px] bg-white border border-[#E1E5F0] p-2 rounded-lg break-all">${escapeHtml(d.file_path || '-')}</div>
+                        </div>
+                    </div>
+                `;
+                detailModal.show();
+            });
+        });
+
+        // Re-Index
+        document.querySelectorAll(".reindex-btn").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const id = btn.dataset.id;
+                if (!confirm(`Re-index document '${id}' into its module namespace?`)) return;
+                btn.disabled = true;
+                btn.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i>`;
+                try {
+                    const res = await fetch(`/admin/api/documents/${id}/reindex`, { method: "POST" });
+                    const data = await res.json();
+                    if (res.ok && data.status === "success") {
+                        alert(data.message);
+                        loadDocuments();
+                    } else {
+                        alert("Re-index failed: " + (data.message || data.error));
+                        btn.disabled = false;
+                        btn.innerHTML = `<i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>`;
+                        lucide.createIcons();
+                    }
+                } catch (e) {
+                    alert("Error executing re-indexing.");
+                    btn.disabled = false;
+                    btn.innerHTML = `<i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>`;
+                    lucide.createIcons();
+                }
+            });
+        });
+
+        // Delete Document
+        document.querySelectorAll(".delete-btn").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const id = btn.dataset.id;
+                if (!confirm(`Are you sure you want to delete document '${id}'? This will purge all associated vector embeddings from the isolated namespace.`)) return;
+                try {
+                    const res = await fetch(`/admin/api/documents/${id}`, { method: "DELETE" });
+                    const data = await res.json();
+                    if (res.ok && data.status === "success") {
+                        loadDocuments();
+                    } else {
+                        alert("Delete failed: " + (data.message || data.error));
+                    }
+                } catch (e) {
+                    alert("Error deleting document.");
+                }
+            });
+        });
+    }
+
+    // Filter & Search
+    document.getElementById("searchInput").addEventListener("input", (e) => {
+        const val = e.target.value.toLowerCase();
+        document.getElementById("clearSearchBtn").classList.toggle("hidden", !val);
+        filterAndRender();
+    });
+
+    document.getElementById("clearSearchBtn").addEventListener("click", () => {
+        document.getElementById("searchInput").value = "";
+        document.getElementById("clearSearchBtn").classList.add("hidden");
+        filterAndRender();
+    });
+
+    document.getElementById("moduleFilter").addEventListener("change", filterAndRender);
+    document.getElementById("statusFilter").addEventListener("change", filterAndRender);
+    document.getElementById("refreshBtn").addEventListener("click", loadDocuments);
+
+    function filterAndRender() {
+        const query = document.getElementById("searchInput").value.toLowerCase();
+        const mod = document.getElementById("moduleFilter").value;
+        const stat = document.getElementById("statusFilter").value;
+
+        const filtered = allDocuments.filter(d => {
+            const matchesQuery = !query ||
+                (d.document_name && d.document_name.toLowerCase().includes(query)) ||
+                (d.document_id && d.document_id.toLowerCase().includes(query)) ||
+                (d.file_hash && d.file_hash.toLowerCase().includes(query));
+            const matchesMod = !mod || (d.rag_namespace === mod || d.module === mod);
+            const matchesStat = !stat || d.status === stat;
+            return matchesQuery && matchesMod && matchesStat;
+        });
+        renderTable(filtered);
+    }
+
+    // Open Upload Modal
+    document.getElementById("openUploadDocBtn").addEventListener("click", () => {
+        document.getElementById("uploadForm").reset();
+        document.getElementById("pipelineProgressBox").classList.add("hidden");
+        document.getElementById("submitBtn").disabled = false;
+        uploadModal.show();
+    });
+
+    // Upload & Ingest Document
+    document.getElementById("uploadForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const progressBox = document.getElementById("pipelineProgressBox");
+        const progressHeader = document.getElementById("pipelineStatusHeader");
+        const progressMsg = document.getElementById("pipelineMessage");
+        const submitBtn = document.getElementById("submitBtn");
+
+        progressBox.className = "p-3.5 rounded-xl border border-indigo-200 bg-indigo-50/70 text-xs space-y-2 block";
+        progressHeader.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin text-[#8B5CF6]"></i><span>Executing 8-step verification pipeline...</span>`;
+        progressMsg.innerText = "Extracting text, computing SHA-256 hash, evaluating quality gate, and partitioning vector embeddings...";
+        lucide.createIcons();
+        submitBtn.disabled = true;
+
+        const formData = new FormData(e.target);
+
+        try {
+            const res = await fetch("/admin/api/documents/upload", {
+                method: "POST",
+                body: formData
+            });
+            const data = await res.json();
+
+            if (res.ok && data.status === "success") {
+                progressBox.className = "p-3.5 rounded-xl border border-emerald-200 bg-emerald-50 text-xs space-y-2 block";
+                progressHeader.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i><span class="text-emerald-800">8-Step Ingestion & Verification Successful</span>`;
+                progressMsg.innerHTML = `Indexed <strong>${data.document.chunk_count} chunks</strong> strictly into namespace <code>${data.document.rag_namespace}</code>.<br><span class="font-mono text-[10px] text-emerald-700">SHA-256: ${data.document.file_hash}</span>`;
+                lucide.createIcons();
+                setTimeout(() => {
+                    uploadModal.hide();
+                    loadDocuments();
+                }, 1800);
+            } else {
+                progressBox.className = "p-3.5 rounded-xl border border-red-200 bg-red-50 text-xs space-y-2 block";
+                progressHeader.innerHTML = `<i data-lucide="alert-circle" class="w-4 h-4 text-red-600"></i><span class="text-red-800">Ingestion Rejected</span>`;
+                progressMsg.innerText = data.message || data.error || "Document failed verification.";
+                lucide.createIcons();
+                submitBtn.disabled = false;
+            }
+        } catch (err) {
+            progressBox.className = "p-3.5 rounded-xl border border-red-200 bg-red-50 text-xs space-y-2 block";
+            progressHeader.innerHTML = `<i data-lucide="alert-circle" class="w-4 h-4 text-red-600"></i><span class="text-red-800">Network / Server Error</span>`;
+            progressMsg.innerText = "Error uploading document.";
+            lucide.createIcons();
+            submitBtn.disabled = false;
+        }
+    });
+
+    loadDocuments();
+});
+</script>
+{% endblock %}

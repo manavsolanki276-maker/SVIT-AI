@@ -1,0 +1,597 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}Academics & Syllabus CMS{% endblock %}
+{% block header_title %}Academic Administration: GTU Syllabus & Curriculum CMS{% endblock %}
+
+{% block content %}
+<div class="space-y-6 text-[#171D3A]" data-module="syllabus">
+
+    <!-- 1. HERO BANNER -->
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-6 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm">
+        <div class="flex items-start gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-[#E8EBFA] border border-[#8B5CF6]/30 flex items-center justify-center text-[#8B5CF6] flex-shrink-0 shadow-sm">
+                <i data-lucide="book-open" class="w-7 h-7"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2.5 flex-wrap">
+                    <h2 class="text-xl font-bold text-[#171D3A] mb-0">GTU Academic Syllabus & Curriculum Hub</h2>
+                    <span id="syllabusCountBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#E8EBFA] text-[#8B5CF6] border border-[#8B5CF6]/30">
+                        0 Subjects
+                    </span>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">
+                        AI RAG Indexed
+                    </span>
+                </div>
+                <p class="text-xs text-[#66708F] mb-0 mt-1 max-w-3xl">
+                    Centralized management of Gujarat Technological University (GTU) curricula across BE, ME, and MCA programs. Manage teaching schemes, course credits, learning objectives, and curriculum PDFs.
+                </p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap self-start lg:self-auto">
+            <button id="openUploadSyllabusDocBtn" class="px-3.5 py-2 rounded-xl bg-white border border-[#E1E5F0] hover:border-[#8B5CF6] text-[#171D3A] text-xs font-semibold shadow-sm transition flex items-center gap-1.5">
+                <i data-lucide="upload-cloud" class="w-4 h-4 text-[#8B5CF6]"></i> Upload Syllabus Doc
+            </button>
+            <button id="openCreateModalBtn" class="px-4 py-2 rounded-xl bg-[#8B5CF6] hover:bg-[#7C4FE8] text-white text-xs font-semibold shadow-lg shadow-[#8B5CF6]/30 transition flex items-center gap-2">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i> Add Subject Syllabus
+            </button>
+        </div>
+    </div>
+
+    <!-- 2. ACADEMIC STATS KPI ROW -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div class="p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold text-[#66708F] uppercase tracking-wider">Indexed Subjects</span>
+                <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                    <i data-lucide="file-check" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <h3 class="text-xl font-extrabold text-[#171D3A] mb-0" id="totalSubjectsCount">0</h3>
+            <span class="text-[11px] text-indigo-600 font-semibold flex items-center gap-1 mt-0.5">
+                <i data-lucide="layers" class="w-3 h-3"></i> GTU Scheme
+            </span>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold text-[#66708F] uppercase tracking-wider">Programs Offered</span>
+                <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <h3 class="text-base font-extrabold text-[#171D3A] mb-0">BE &bull; ME &bull; MCA</h3>
+            <span class="text-[11px] text-emerald-600 font-semibold flex items-center gap-1 mt-0.5">
+                <i data-lucide="check-circle" class="w-3 h-3"></i> AICTE & GTU Approved
+            </span>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold text-[#66708F] uppercase tracking-wider">Engineering Depts</span>
+                <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                    <i data-lucide="cpu" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <h3 class="text-base font-extrabold text-[#171D3A] mb-0">8 Departments</h3>
+            <span class="text-[11px] text-amber-600 font-semibold flex items-center gap-1 mt-0.5">
+                <i data-lucide="git-branch" class="w-3 h-3"></i> CE, IT, EC, ME, CL, EE, Aero, ASH
+            </span>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white border border-[#E1E5F0] shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold text-[#66708F] uppercase tracking-wider">RAG Retrieval Status</span>
+                <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <h3 class="text-base font-extrabold text-[#171D3A] mb-0">Active & Scoped</h3>
+            <span class="text-[11px] text-purple-600 font-semibold flex items-center gap-1 mt-0.5">
+                <i data-lucide="shield" class="w-3 h-3"></i> <code>syllabus</code> namespace
+            </span>
+        </div>
+    </div>
+
+    <!-- 3. SEARCH & FILTERS TOOLBAR -->
+    <div class="p-4 rounded-2xl bg-white border border-[#E1E5F0] flex flex-col md:flex-row items-center justify-between gap-3 flex-wrap shadow-sm">
+        <div class="relative w-full md:w-80">
+            <i data-lucide="search" class="w-4 h-4 text-[#8C95AD] absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="searchInput" placeholder="Search subject code (e.g. 3130702), subject name..." class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl pl-9 pr-8 py-2 text-xs text-[#171D3A] placeholder-[#8C95AD] focus:outline-none focus:border-[#8B5CF6] transition">
+            <button id="clearSearchBtn" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs hidden">✕</button>
+        </div>
+
+        <div class="flex items-center gap-2 w-full md:w-auto flex-wrap">
+            <select id="programFilter" class="bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-[#8B5CF6]">
+                <option value="">All Programs</option>
+                <option value="BE">BE / BTech</option>
+                <option value="ME">ME / MTech</option>
+                <option value="MCA">MCA</option>
+                <option value="Diploma">Diploma</option>
+            </select>
+
+            <select id="deptFilter" class="bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-[#8B5CF6]">
+                <option value="">All Departments</option>
+                <option value="Computer Engineering">Computer Engineering</option>
+                <option value="Information Technology">Information Technology</option>
+                <option value="Electronics & Comm.">Electronics & Comm.</option>
+                <option value="Mechanical Eng.">Mechanical Eng.</option>
+                <option value="Civil Eng.">Civil Eng.</option>
+                <option value="Electrical Eng.">Electrical Eng.</option>
+                <option value="Aeronautical Eng.">Aeronautical Eng.</option>
+                <option value="Applied Sciences & Humanities">Applied Sciences & Humanities</option>
+            </select>
+
+            <select id="semFilter" class="bg-[#F8F9FE] border border-[#E1E5F0] text-[#171D3A] text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-[#8B5CF6]">
+                <option value="">All Semesters</option>
+                <option value="1">Sem 1</option>
+                <option value="2">Sem 2</option>
+                <option value="3">Sem 3</option>
+                <option value="4">Sem 4</option>
+                <option value="5">Sem 5</option>
+                <option value="6">Sem 6</option>
+                <option value="7">Sem 7</option>
+                <option value="8">Sem 8</option>
+            </select>
+
+            <button id="refreshBtn" class="p-2 rounded-xl bg-[#F8F9FE] border border-[#E1E5F0] text-[#66708F] hover:text-[#171D3A]" title="Refresh Records">
+                <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 4. DATA TABLE -->
+    <div class="bg-white border border-[#E1E5F0] rounded-2xl shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-[#171D3A]">
+                <thead class="bg-[#F8F9FE] border-b border-[#E1E5F0] text-[#66708F] uppercase tracking-wider text-[11px] font-semibold">
+                    <tr>
+                        <th class="p-3.5">Code</th>
+                        <th class="p-3.5">Subject Name</th>
+                        <th class="p-3.5">Department</th>
+                        <th class="p-3.5">Sem & Program</th>
+                        <th class="p-3.5">Credits</th>
+                        <th class="p-3.5">Status</th>
+                        <th class="p-3.5 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody" class="divide-y divide-[#E1E5F0]">
+                    <tr>
+                        <td colspan="7" class="p-8 text-center text-[#8C95AD]">
+                            <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-[#8B5CF6]"></i>
+                            Loading syllabus records...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="p-4 border-t border-[#E1E5F0] flex items-center justify-between text-xs text-[#66708F] bg-[#F8F9FE]">
+            <span id="recordCountText">Showing 0 subjects</span>
+            <span>All syllabus outlines are synchronized with GTU syllabus repository</span>
+        </div>
+    </div>
+
+</div>
+
+<!-- 5. CREATE / EDIT MODAL -->
+<div class="modal fade" id="syllabusModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-white border border-[#E1E5F0] rounded-2xl shadow-xl">
+            <div class="modal-header border-b border-[#E1E5F0] p-4 bg-[#F8F9FE]">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-[#E8EBFA] text-[#8B5CF6] flex items-center justify-center">
+                        <i data-lucide="book-plus" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-[#171D3A] mb-0" id="modalTitle">Add Subject Syllabus</h3>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="syllabusForm" class="p-5 space-y-3.5 text-xs">
+                <input type="hidden" id="recordId">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Subject Code (GTU) *</label>
+                        <input type="text" id="subjCode" required placeholder="e.g. 3130702" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] font-mono focus:outline-none focus:border-[#8B5CF6]">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Subject Name *</label>
+                        <input type="text" id="subjName" required placeholder="e.g. Data Structures and Algorithms" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                    <div>
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Program *</label>
+                        <select id="subjProgram" required class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                            <option value="BE">BE / BTech</option>
+                            <option value="ME">ME / MTech</option>
+                            <option value="MCA">MCA</option>
+                            <option value="Diploma">Diploma</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Department *</label>
+                        <select id="subjDept" required class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                            <option value="Computer Engineering">Computer Engineering</option>
+                            <option value="Information Technology">Information Technology</option>
+                            <option value="Electronics & Comm.">Electronics & Comm.</option>
+                            <option value="Mechanical Eng.">Mechanical Eng.</option>
+                            <option value="Civil Eng.">Civil Eng.</option>
+                            <option value="Electrical Eng.">Electrical Eng.</option>
+                            <option value="Aeronautical Eng.">Aeronautical Eng.</option>
+                            <option value="Applied Sciences & Humanities">Applied Sciences & Humanities</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Semester *</label>
+                        <input type="number" id="subjSem" required min="1" max="8" value="1" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                    <div>
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Credits</label>
+                        <input type="number" id="subjCredits" min="1" max="10" value="4" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Teaching Scheme</label>
+                        <input type="text" id="subjScheme" placeholder="e.g. 4L-0T-2P" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Status *</label>
+                        <select id="subjStatus" required class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                            <option value="Active">Active</option>
+                            <option value="Draft">Draft</option>
+                            <option value="Archived">Archived</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Course Syllabus Overview & Objectives</label>
+                    <textarea id="subjOverview" rows="4" placeholder="Course modules, unit breakdown, prerequisites, textbook references, and learning outcomes..." class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl p-3 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]"></textarea>
+                </div>
+
+                <div>
+                    <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Document / PDF Link</label>
+                    <input type="text" id="subjFileUrl" placeholder="URL or uploaded document reference" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                </div>
+
+                <div class="pt-3 border-t border-[#E1E5F0] flex items-center justify-end gap-2.5">
+                    <button type="button" class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" id="saveSyllabusBtn" class="px-4 py-2 rounded-xl bg-[#8B5CF6] hover:bg-[#7C4FE8] text-white text-xs font-semibold shadow-md transition flex items-center gap-1.5">
+                        <i data-lucide="check" class="w-4 h-4"></i> Save Syllabus
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 6. UPLOAD SYLLABUS DOCUMENT MODAL (RAG Scoped to syllabus) -->
+<div class="modal fade" id="uploadSyllabusDocModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-white border border-[#E1E5F0] rounded-2xl shadow-xl">
+            <div class="modal-header border-b border-[#E1E5F0] p-4 bg-[#F8F9FE]">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-[#E8EBFA] text-[#8B5CF6] flex items-center justify-center">
+                        <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-[#171D3A] mb-0">Upload Academic Syllabus Document</h3>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="uploadSyllabusDocForm" class="p-5 space-y-4 text-xs">
+                <input type="hidden" name="module" value="syllabus">
+                <div>
+                    <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Document Title</label>
+                    <input type="text" name="title" placeholder="e.g. GTU BE CSE Sem 3 Data Structures Syllabus" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                </div>
+                <div>
+                    <label class="text-[11px] font-semibold text-[#66708F] block mb-1">Select File (.pdf, .docx, .xlsx, .csv, .txt) *</label>
+                    <input type="file" name="file" required accept=".pdf,.docx,.xlsx,.xls,.csv,.txt" class="w-full bg-[#F8F9FE] border border-[#E1E5F0] rounded-xl px-3 py-2 text-[#171D3A] focus:outline-none focus:border-[#8B5CF6]">
+                    <span class="text-[10px] text-[#66708F] mt-1 block">Maximum 10MB. Files are verified with SHA-256 and indexed strictly into <code>syllabus</code> namespace.</span>
+                </div>
+                <div id="syllabusUploadFeedback" class="hidden p-3 rounded-xl text-xs"></div>
+                <div class="pt-2 border-t border-[#E1E5F0] flex items-center justify-end gap-2">
+                    <button type="button" class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" id="submitSyllabusUploadBtn" class="px-4 py-2 rounded-xl bg-[#8B5CF6] hover:bg-[#7C4FE8] text-white text-xs font-semibold shadow-md transition flex items-center gap-1.5">
+                        <i data-lucide="upload" class="w-4 h-4"></i> Upload & Index
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 7. VIEW DETAILS MODAL -->
+<div class="modal fade" id="viewDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-white border border-[#E1E5F0] rounded-2xl shadow-xl">
+            <div class="modal-header border-b border-[#E1E5F0] p-4 bg-[#F8F9FE]">
+                <h3 class="text-sm font-bold text-[#171D3A] mb-0" id="viewDetailTitle">Subject Details</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="p-5 space-y-3 text-xs" id="viewDetailBody"></div>
+            <div class="p-4 border-t border-[#E1E5F0] text-right bg-[#F8F9FE]">
+                <button type="button" class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    let allRecords = [];
+    const sylModal = new bootstrap.Modal(document.getElementById("syllabusModal"));
+    const uploadModal = new bootstrap.Modal(document.getElementById("uploadSyllabusDocModal"));
+    const viewModal = new bootstrap.Modal(document.getElementById("viewDetailModal"));
+
+    async function loadRecords() {
+        const tbody = document.getElementById("dataTableBody");
+        try {
+            const res = await fetch("/admin/api/crud/syllabus?limit=100");
+            const data = await res.json();
+            if (data.status === "success") {
+                allRecords = data.items || [];
+                document.getElementById("totalSubjectsCount").innerText = allRecords.length;
+                document.getElementById("syllabusCountBadge").innerText = `${allRecords.length} Subjects`;
+                renderTable(allRecords);
+            } else {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-red-500">Failed to load syllabus: ${data.message}</td></tr>`;
+            }
+        } catch (e) {
+            tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-red-500">Error loading syllabus records.</td></tr>`;
+        }
+    }
+
+    function renderTable(records) {
+        const tbody = document.getElementById("dataTableBody");
+        const countText = document.getElementById("recordCountText");
+        countText.innerText = `Showing ${records.length} subjects`;
+
+        if (!records || records.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-[#8C95AD]">No syllabus records found. Click "Add Subject Syllabus" to create one.</td></tr>`;
+            lucide.createIcons();
+            return;
+        }
+
+        tbody.innerHTML = records.map(r => `
+            <tr class="hover:bg-[#F8F9FE] transition">
+                <td class="p-3.5 font-mono text-[11px] font-semibold text-[#8B5CF6]">${escapeHtml(r.subject_code || '')}</td>
+                <td class="p-3.5 font-medium text-[#171D3A]">
+                    <div class="font-bold">${escapeHtml(r.subject_name || '')}</div>
+                    <div class="text-[11px] text-[#66708F]">${escapeHtml(r.academic_year || '2024-2025')}</div>
+                </td>
+                <td class="p-3.5 text-[#66708F]">${escapeHtml(r.department || 'Computer Engineering')}</td>
+                <td class="p-3.5">
+                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#E8EBFA] text-[#8B5CF6]">
+                        Sem ${escapeHtml(r.semester || '')} &bull; ${escapeHtml(r.program || 'BE')}
+                    </span>
+                </td>
+                <td class="p-3.5 font-semibold text-[#171D3A]">${escapeHtml(r.credits || '4')} Cr</td>
+                <td class="p-3.5">
+                    <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold ${r.status === 'Active' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-gray-100 text-gray-500'}">
+                        ${escapeHtml(r.status || 'Active')}
+                    </span>
+                </td>
+                <td class="p-3.5 text-right space-x-1">
+                    <button class="view-btn p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-[#171D3A]" data-id="${escapeHtml(r.id || r.syllabus_id)}" title="View Details">
+                        <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button class="edit-btn p-1.5 rounded-lg bg-[#E8EBFA] hover:bg-[#D4DCF7] text-[#8B5CF6]" data-id="${escapeHtml(r.id || r.syllabus_id)}" title="Edit Syllabus">
+                        <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button class="delete-btn p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600" data-id="${escapeHtml(r.id || r.syllabus_id)}" title="Delete Syllabus">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+
+        lucide.createIcons();
+        attachRowEvents();
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function attachRowEvents() {
+        document.querySelectorAll(".view-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = btn.dataset.id;
+                const rec = allRecords.find(r => (r.id == id || r.syllabus_id == id));
+                if (!rec) return;
+                document.getElementById("viewDetailTitle").innerText = `${rec.subject_code} - ${rec.subject_name}`;
+                document.getElementById("viewDetailBody").innerHTML = `
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3 p-3 bg-[#F8F9FE] rounded-xl">
+                        <div><strong class="text-[#66708F]">Program:</strong> <span class="text-[#171D3A] font-semibold">${escapeHtml(rec.program)}</span></div>
+                        <div><strong class="text-[#66708F]">Semester:</strong> <span class="text-[#171D3A] font-semibold">Sem ${escapeHtml(rec.semester)}</span></div>
+                        <div><strong class="text-[#66708F]">Credits:</strong> <span class="text-[#171D3A] font-semibold">${escapeHtml(rec.credits || '4')} Cr</span></div>
+                        <div><strong class="text-[#66708F]">Teaching Scheme:</strong> <span class="text-[#171D3A] font-semibold">${escapeHtml(rec.teaching_scheme || '4L-0T-2P')}</span></div>
+                    </div>
+                    <div><strong class="text-[#66708F]">Department:</strong> <span class="text-[#171D3A] font-semibold">${escapeHtml(rec.department)}</span></div>
+                    <div class="mt-2">
+                        <strong class="text-[#66708F] block mb-1">Course Overview & Modules:</strong>
+                        <div class="p-3 bg-white border border-[#E1E5F0] rounded-xl whitespace-pre-wrap leading-relaxed">${escapeHtml(rec.syllabus_overview || 'No description provided.')}</div>
+                    </div>
+                    ${rec.file_url ? `<div class="mt-2"><strong class="text-[#66708F]">Syllabus Document:</strong> <a href="${escapeHtml(rec.file_url)}" target="_blank" class="text-[#8B5CF6] underline ml-1 font-mono">${escapeHtml(rec.file_url)}</a></div>` : ''}
+                `;
+                viewModal.show();
+            });
+        });
+
+        document.querySelectorAll(".edit-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = btn.dataset.id;
+                const rec = allRecords.find(r => (r.id == id || r.syllabus_id == id));
+                if (!rec) return;
+                document.getElementById("recordId").value = rec.id || rec.syllabus_id;
+                document.getElementById("subjCode").value = rec.subject_code || '';
+                document.getElementById("subjName").value = rec.subject_name || '';
+                document.getElementById("subjProgram").value = rec.program || 'BE';
+                document.getElementById("subjDept").value = rec.department || 'Computer Engineering';
+                document.getElementById("subjSem").value = rec.semester || 1;
+                document.getElementById("subjCredits").value = rec.credits || 4;
+                document.getElementById("subjScheme").value = rec.teaching_scheme || '';
+                document.getElementById("subjStatus").value = rec.status || 'Active';
+                document.getElementById("subjOverview").value = rec.syllabus_overview || '';
+                document.getElementById("subjFileUrl").value = rec.file_url || '';
+                document.getElementById("modalTitle").innerText = "Edit Subject Syllabus";
+                sylModal.show();
+            });
+        });
+
+        document.querySelectorAll(".delete-btn").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const id = btn.dataset.id;
+                if (!confirm("Are you sure you want to delete this syllabus record?")) return;
+                try {
+                    const res = await fetch(`/admin/api/crud/syllabus/${id}`, { method: "DELETE" });
+                    const d = await res.json();
+                    if (d.status === "success") {
+                        loadRecords();
+                    } else {
+                        alert("Delete failed: " + d.message);
+                    }
+                } catch (e) {
+                    alert("Error deleting record.");
+                }
+            });
+        });
+    }
+
+    // Filter & Search
+    document.getElementById("searchInput").addEventListener("input", (e) => {
+        const val = e.target.value.toLowerCase();
+        document.getElementById("clearSearchBtn").classList.toggle("hidden", !val);
+        filterAndRender();
+    });
+
+    document.getElementById("clearSearchBtn").addEventListener("click", () => {
+        document.getElementById("searchInput").value = "";
+        document.getElementById("clearSearchBtn").classList.add("hidden");
+        filterAndRender();
+    });
+
+    document.getElementById("programFilter").addEventListener("change", filterAndRender);
+    document.getElementById("deptFilter").addEventListener("change", filterAndRender);
+    document.getElementById("semFilter").addEventListener("change", filterAndRender);
+    document.getElementById("refreshBtn").addEventListener("click", loadRecords);
+
+    function filterAndRender() {
+        const query = document.getElementById("searchInput").value.toLowerCase();
+        const prog = document.getElementById("programFilter").value;
+        const dept = document.getElementById("deptFilter").value;
+        const sem = document.getElementById("semFilter").value;
+
+        const filtered = allRecords.filter(r => {
+            const matchesQuery = !query || 
+                (r.subject_code && r.subject_code.toLowerCase().includes(query)) ||
+                (r.subject_name && r.subject_name.toLowerCase().includes(query));
+            const matchesProg = !prog || r.program === prog;
+            const matchesDept = !dept || r.department === dept;
+            const matchesSem = !sem || String(r.semester) === String(sem);
+            return matchesQuery && matchesProg && matchesDept && matchesSem;
+        });
+        renderTable(filtered);
+    }
+
+    // Open Create Modal
+    document.getElementById("openCreateModalBtn").addEventListener("click", () => {
+        document.getElementById("syllabusForm").reset();
+        document.getElementById("recordId").value = "";
+        document.getElementById("modalTitle").innerText = "Add Subject Syllabus";
+        sylModal.show();
+    });
+
+    // Save Syllabus Form
+    document.getElementById("syllabusForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const id = document.getElementById("recordId").value;
+        const payload = {
+            subject_code: document.getElementById("subjCode").value.trim(),
+            subject_name: document.getElementById("subjName").value.trim(),
+            program: document.getElementById("subjProgram").value,
+            department: document.getElementById("subjDept").value,
+            semester: parseInt(document.getElementById("subjSem").value, 10),
+            credits: parseInt(document.getElementById("subjCredits").value, 10),
+            teaching_scheme: document.getElementById("subjScheme").value.trim(),
+            status: document.getElementById("subjStatus").value,
+            syllabus_overview: document.getElementById("subjOverview").value.trim(),
+            file_url: document.getElementById("subjFileUrl").value.trim()
+        };
+
+        const url = id ? `/admin/api/crud/syllabus/${id}` : `/admin/api/crud/syllabus`;
+        const method = id ? "PUT" : "POST";
+
+        try {
+            const res = await fetch(url, {
+                method: method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            const d = await res.json();
+            if (d.status === "success") {
+                sylModal.hide();
+                loadRecords();
+            } else {
+                alert("Save failed: " + d.message);
+            }
+        } catch (err) {
+            alert("Error saving syllabus record.");
+        }
+    });
+
+    // Open Upload Modal
+    document.getElementById("openUploadSyllabusDocBtn").addEventListener("click", () => {
+        document.getElementById("uploadSyllabusDocForm").reset();
+        const fb = document.getElementById("syllabusUploadFeedback");
+        fb.className = "hidden p-3 rounded-xl text-xs";
+        uploadModal.show();
+    });
+
+    // Upload Syllabus Document Form
+    document.getElementById("uploadSyllabusDocForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const fb = document.getElementById("syllabusUploadFeedback");
+        const btn = document.getElementById("submitSyllabusUploadBtn");
+        fb.className = "p-3 rounded-xl text-xs bg-indigo-50 text-indigo-700 border border-indigo-200 block";
+        fb.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 inline animate-spin mr-1"></i> Running 8-step verification and indexing into syllabus...`;
+        lucide.createIcons();
+        btn.disabled = true;
+
+        const formData = new FormData(e.target);
+        try {
+            const res = await fetch("/admin/api/documents/upload", {
+                method: "POST",
+                body: formData
+            });
+            const data = await res.json();
+            if (res.ok && data.status === "success") {
+                fb.className = "p-3 rounded-xl text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 block";
+                fb.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 inline mr-1"></i> ${data.message} (${data.document.chunk_count} chunks indexed).`;
+                lucide.createIcons();
+                setTimeout(() => {
+                    uploadModal.hide();
+                    btn.disabled = false;
+                }, 1500);
+            } else {
+                fb.className = "p-3 rounded-xl text-xs bg-red-50 text-red-700 border border-red-200 block";
+                fb.innerText = "Upload failed: " + (data.message || data.error);
+                btn.disabled = false;
+            }
+        } catch (err) {
+            fb.className = "p-3 rounded-xl text-xs bg-red-50 text-red-700 border border-red-200 block";
+            fb.innerText = "Error submitting syllabus upload.";
+            btn.disabled = false;
+        }
+    });
+
+    loadRecords();
+});
+</script>
+{% endblock %}

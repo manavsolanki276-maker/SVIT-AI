@@ -12,6 +12,7 @@ from werkzeug.security import generate_password_hash
 
 from app.auth.rbac import (
     ROLE_SUPER_ADMIN,
+    ROLE_SVIT_INFO_ADMIN,
     ROLE_ACADEMIC_ADMIN,
     ROLE_ADMISSION_ADMIN,
     ROLE_NOTICE_ADMIN,
@@ -84,6 +85,16 @@ DEFAULT_ADMIN_ACCOUNTS: List[Dict[str, Any]] = [
         "role": ROLE_BUS_ADMIN,
         "name": "Transport Coordinator",
         "department": "Transportation Section",
+        "is_active": True,
+    },
+    {
+        "admin_id": "ADM-0011",
+        "username": "svit_admin",
+        "email": "svit@svit.ac.in",
+        "password": "Svit@123",
+        "role": ROLE_SVIT_INFO_ADMIN,
+        "name": "SVIT Info Coordinator",
+        "department": "Campus Information Cell",
         "is_active": True,
     },
     {

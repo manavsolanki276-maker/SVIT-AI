@@ -89,13 +89,12 @@ class TestStep2AdminCrudAndUpload(unittest.TestCase):
         """Verify that stats returned for each role contain role-specific counters."""
         role_creds = [
             ("bus_admin", "Bus@123", "total_routes"),
-            ("sports_admin", "Sports@123", "total_sports"),
             ("event_admin", "Event@123", "total_events"),
-            ("library_admin", "Library@123", "total_books"),
             ("canteen_admin", "Canteen@123", "menu_items"),
             ("academic_admin", "Academic@123", "total_students"),
             ("admission_admin", "Admission@123", "programs_offered"),
             ("notice_admin", "Notice@123", "total_notices"),
+            ("svit_admin", "Svit@123", "svit_info_records"),
         ]
 
         for username, password, expected_counter in role_creds:
@@ -111,7 +110,7 @@ class TestStep2AdminCrudAndUpload(unittest.TestCase):
     # 2. RBAC BOUNDARY TESTS ACROSS MODULES
     # =========================================================================
     def test_03_bus_admin_cannot_access_unauthorized_modules(self):
-        """Verify Bus Admin has access to transport but is forbidden from Library, Canteen, Academic, Sports, Events."""
+        """Verify Bus Admin has access to transport but is forbidden from Canteen, Academic, Events, SVIT Info."""
         self.login_as("bus_admin", "Bus@123")
 
         # Allowed:
@@ -119,44 +118,42 @@ class TestStep2AdminCrudAndUpload(unittest.TestCase):
         self.assertEqual(res_transport.status_code, 200)
 
         # Forbidden HTML routes (403):
-        for route in ['/admin/library', '/admin/canteen', '/admin/students', '/admin/faculty', '/admin/sports', '/admin/events', '/admin/admins']:
+        for route in ['/admin/canteen', '/admin/students', '/admin/faculty', '/admin/events', '/admin/admins']:
             res = self.client.get(route)
             self.assertEqual(res.status_code, 403, f"Bus Admin should get 403 on {route}, got {res.status_code}")
 
         # Forbidden API endpoints (403):
-        for module in ['library_books', 'canteen', 'students', 'faculty', 'sports', 'events']:
+        for module in ['canteen', 'students', 'faculty', 'events']:
             res = self.client.get(f'/admin/api/crud/{module}')
             self.assertEqual(res.status_code, 403, f"Bus Admin should get 403 on API {module}, got {res.status_code}")
 
         self.logout()
 
-    def test_04_sports_admin_cannot_access_college_events(self):
-        """Verify Sports Admin is permitted for sports/grounds/tournaments but strictly forbidden from College Events."""
-        self.login_as("sports_admin", "Sports@123")
+    def test_04_svit_admin_cannot_access_unauthorized_modules(self):
+        """Verify SVIT Info Admin is permitted for svit_info but strictly forbidden from Bus and Canteen."""
+        self.login_as("svit_admin", "Svit@123")
 
-        # Allowed Sports APIs:
-        self.assertEqual(self.client.get('/admin/api/crud/sports').status_code, 200)
-        self.assertEqual(self.client.get('/admin/api/crud/sports_events').status_code, 200)
-        self.assertEqual(self.client.get('/admin/api/crud/grounds').status_code, 200)
+        # Allowed SVIT Info API:
+        self.assertEqual(self.client.get('/admin/api/crud/svit_info').status_code, 200)
 
-        # Forbidden from College Events:
-        res_events = self.client.get('/admin/api/crud/events')
-        self.assertEqual(res_events.status_code, 403, "Sports Admin must NOT access events API")
-        self.assertEqual(self.client.get('/admin/events').status_code, 403)
+        # Forbidden from Transport and Canteen:
+        res_trans = self.client.get('/admin/api/crud/transport')
+        self.assertEqual(res_trans.status_code, 403, "SVIT Admin must NOT access transport API")
+        res_cant = self.client.get('/admin/api/crud/canteen')
+        self.assertEqual(res_cant.status_code, 403, "SVIT Admin must NOT access canteen API")
 
         self.logout()
 
-    def test_05_event_admin_cannot_access_sports(self):
-        """Verify Event Admin is permitted for College Events but strictly forbidden from Sports."""
+    def test_05_event_admin_cannot_access_unauthorized_modules(self):
+        """Verify Event Admin is permitted for College Events but strictly forbidden from Transport."""
         self.login_as("event_admin", "Event@123")
 
         # Allowed Events API:
         self.assertEqual(self.client.get('/admin/api/crud/events').status_code, 200)
 
-        # Forbidden from Sports modules:
-        for mod in ['sports', 'sports_events', 'grounds']:
-            res = self.client.get(f'/admin/api/crud/{mod}')
-            self.assertEqual(res.status_code, 403, f"Event Admin must NOT access {mod} API")
+        # Forbidden from Transport:
+        res = self.client.get('/admin/api/crud/transport')
+        self.assertEqual(res.status_code, 403, "Event Admin must NOT access transport API")
 
         self.logout()
 
@@ -167,8 +164,7 @@ class TestStep2AdminCrudAndUpload(unittest.TestCase):
         modules = [
             'students', 'faculty', 'timetable', 'rooms', 'subjects', 'placements',
             'academic_documents', 'admission_info', 'admission_documents', 'admission_notices',
-            'notices', 'events', 'transport', 'library_books', 'library_members',
-            'library_issue_return', 'library_info', 'canteen', 'sports', 'sports_events', 'grounds'
+            'notices', 'events', 'transport', 'canteen', 'svit_info', 'syllabus', 'module_documents'
         ]
 
         for mod in modules:

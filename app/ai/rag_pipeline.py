@@ -18,7 +18,7 @@ IST = ZoneInfo("Asia/Kolkata")
 load_dotenv()
 
 
-from app.ai.config import INTENT_CONFIG
+from app.ai.config import INTENT_CONFIG, INTENT_TO_MODULE_MAP
 from app.ai.loader import load_csv_knowledge_base
 from app.ai.chunker import chunk_documents
 from app.ai.vector_store import build_or_load_vector_store
@@ -438,11 +438,18 @@ class RAGPipeline:
         else:
             source_cascade = route_query_sources(question)
 
+        target_module = None
+        if filter_dict:
+            target_module = filter_dict.get("rag_namespace") or filter_dict.get("module")
+        if not target_module and intent_category:
+            target_module = INTENT_TO_MODULE_MAP.get(intent_category)
+
         results = retrieve_context_tiered(
             self.vector_store,
             question,
             source_weights=source_cascade,
-            top_k=top_k
+            top_k=top_k,
+            target_module=target_module
         )
 
         sources = []

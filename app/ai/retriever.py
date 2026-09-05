@@ -51,20 +51,72 @@ def retrieve_context(vector_store, query: str, top_k: int = 10, filter: dict = N
     return results
 
 
+def retrieve_by_module(vector_store, query: str, module: str, k: int = 5) -> List[Tuple[Document, float]]:
+    """
+    Strict page-specific RAG retrieval: Retrieves only document chunks matching the specified module/namespace.
+    Guarantees zero cross-module contamination for scoped queries and automated verification tests.
+    """
+    if not vector_store or not module:
+        return []
+
+    # Map aliases if needed
+    module_norm = str(module).strip().lower()
+    if module_norm in ["admissions", "admission_info"]:
+        module_norm = "admission"
+    elif module_norm in ["buses", "transport", "transportation"]:
+        module_norm = "bus"
+    elif module_norm in ["academic", "syllabus_info"]:
+        module_norm = "syllabus"
+    elif module_norm in ["teachers", "teacher"]:
+        module_norm = "faculty"
+
+    # Search with filter
+    results = []
+    try:
+        results = vector_store.similarity_search_with_score(
+            query,
+            k=k,
+            filter={"rag_namespace": module_norm}
+        )
+    except Exception:
+        pass
+
+    if not results:
+        try:
+            results = vector_store.similarity_search_with_score(
+                query,
+                k=k,
+                filter={"module": module_norm}
+            )
+        except Exception:
+            pass
+
+    # Strict isolation guarantee: ensure no chunk from a foreign namespace leaks through
+    isolated_results = []
+    for doc, score in results:
+        doc_ns = doc.metadata.get("rag_namespace") or doc.metadata.get("module")
+        if doc_ns and doc_ns.lower() == module_norm:
+            isolated_results.append((doc, score))
+
+    isolated_results.sort(key=lambda x: x[1])
+    return isolated_results[:k]
+
+
 def retrieve_context_tiered(
     vector_store, 
     query: str, 
     source_weights: List[Tuple[str, float]], 
-    top_k: int = 8
+    top_k: int = 8,
+    target_module: Optional[str] = None
 ) -> List[Tuple[Document, float]]:
     """
     High-speed Single-Pass ChromaDB & In-Memory Retriever:
     1. Checks LRU memory cache
     2. Performs multi-source query for weighted sources
-    3. Retrieves relevant admin-uploaded knowledge documents
+    3. Retrieves relevant admin-uploaded knowledge documents isolated by module/namespace
     4. De-duplicates and ranks top_k matches
     """
-    cache_key = f"{query.strip().lower()}_{str(source_weights)}_{top_k}"
+    cache_key = f"{query.strip().lower()}_{str(source_weights)}_{top_k}_{str(target_module)}"
     cached = _get_from_cache(cache_key)
     if cached is not None:
         return cached
@@ -100,13 +152,27 @@ def retrieve_context_tiered(
                 except Exception:
                     pass
 
-    # 2. Check for matching Admin Documents in the vector store
+    # 2. Check for matching Admin Documents in the vector store (scoped by module if given)
     try:
+        admin_filter = {"source_type": "admin_document"}
+        if target_module:
+            norm_mod = target_module.strip().lower()
+            admin_filter["rag_namespace"] = norm_mod
+        
         admin_doc_results = vector_store.similarity_search_with_score(
             query, 
             k=top_k, 
-            filter={"source_type": "admin_document"}
+            filter=admin_filter
         )
+        
+        # If target_module was specified but no results with rag_namespace, try with module key
+        if not admin_doc_results and target_module:
+            admin_doc_results = vector_store.similarity_search_with_score(
+                query,
+                k=top_k,
+                filter={"source_type": "admin_document", "module": norm_mod}
+            )
+
         if admin_doc_results:
             for doc, score in admin_doc_results:
                 # Active admin documents get priority boost over static historical CSVs

@@ -69,15 +69,15 @@
                 <i data-lucide="chevron-right" class="w-3 h-3 text-[#8C95AD]"></i>
             </a>
 
-            <a href="{{ url_for('admin.subjects') }}" 
-               class="flex items-center justify-between px-3 py-2 rounded-lg transition text-decoration-none {% if request.path == '/admin/subjects' %}bg-[#E8EBFA] text-[#8B5CF6] font-bold border border-[#8B5CF6]/20{% else %}text-[#66708F] hover:text-[#171D3A] hover:bg-[#F8F9FE]{% endif %}">
-                <div class="flex items-center gap-2.5"><i data-lucide="book" class="w-4 h-4 {% if request.path == '/admin/subjects' %}text-[#8B5CF6]{% else %}text-[#8C95AD]{% endif %}"></i><span>Subjects</span></div>
+            <a href="{{ url_for('admin.syllabus') }}" 
+               class="flex items-center justify-between px-3 py-2 rounded-lg transition text-decoration-none {% if request.path in ['/admin/syllabus', '/admin/academics', '/admin/academic-syllabus', '/admin/academic_syllabus'] %}bg-[#E8EBFA] text-[#8B5CF6] font-bold border border-[#8B5CF6]/20{% else %}text-[#66708F] hover:text-[#171D3A] hover:bg-[#F8F9FE]{% endif %}">
+                <div class="flex items-center gap-2.5"><i data-lucide="book-marked" class="w-4 h-4 {% if request.path in ['/admin/syllabus', '/admin/academics', '/admin/academic-syllabus'] %}text-[#8B5CF6]{% else %}text-[#8C95AD]{% endif %}"></i><span>Academics & Syllabus</span></div>
                 <i data-lucide="chevron-right" class="w-3 h-3 text-[#8C95AD]"></i>
             </a>
 
-            <a href="{{ url_for('admin.rooms') }}" 
-               class="flex items-center justify-between px-3 py-2 rounded-lg transition text-decoration-none {% if request.path in ['/admin/rooms', '/admin/rooms-facilities', '/admin/rooms_facilities', '/admin/campus-info', '/admin/facilities'] %}bg-[#E8EBFA] text-[#8B5CF6] font-bold border border-[#8B5CF6]/20{% else %}text-[#66708F] hover:text-[#171D3A] hover:bg-[#F8F9FE]{% endif %}">
-                <div class="flex items-center gap-2.5"><i data-lucide="door-closed" class="w-4 h-4 {% if request.path in ['/admin/rooms', '/admin/rooms-facilities', '/admin/rooms_facilities', '/admin/campus-info', '/admin/facilities'] %}text-[#8B5CF6]{% else %}text-[#8C95AD]{% endif %}"></i><span>Rooms & Facilities</span></div>
+            <a href="{{ url_for('admin.subjects') }}" 
+               class="flex items-center justify-between px-3 py-2 rounded-lg transition text-decoration-none {% if request.path == '/admin/subjects' %}bg-[#E8EBFA] text-[#8B5CF6] font-bold border border-[#8B5CF6]/20{% else %}text-[#66708F] hover:text-[#171D3A] hover:bg-[#F8F9FE]{% endif %}">
+                <div class="flex items-center gap-2.5"><i data-lucide="book" class="w-4 h-4 {% if request.path == '/admin/subjects' %}text-[#8B5CF6]{% else %}text-[#8C95AD]{% endif %}"></i><span>Subjects</span></div>
                 <i data-lucide="chevron-right" class="w-3 h-3 text-[#8C95AD]"></i>
             </a>
 
@@ -88,32 +88,55 @@
             </a>
 
             <a href="{{ url_for('admin.academic_documents') }}" 
-               class="flex items-center justify-between px-3 py-2 rounded-lg transition text-decoration-none {% if request.path == '/admin/documents' or request.path == '/admin/academic-documents' or request.path == '/admin/academic_documents' %}bg-[#E8EBFA] text-[#8B5CF6] font-bold border border-[#8B5CF6]/20{% else %}text-[#66708F] hover:text-[#171D3A] hover:bg-[#F8F9FE]{% endif %}">
-                <div class="flex items-center gap-2.5"><i data-lucide="file-text" class="w-4 h-4 text-[#8B5CF6]"></i><span class="text-[#8B5CF6] font-semibold">Academic Documents</span></div>
-                <span class="px-1.5 py-0.5 rounded text-[9px] bg-[#E8EBFA] text-[#8B5CF6] font-bold">RAG</span>
+               class="flex items-center justify-between px-3 py-2 rounded-lg transition text-decoration-none {% if request.path == '/admin/academic-documents' or request.path == '/admin/academic_documents' %}bg-[#E8EBFA] text-[#8B5CF6] font-bold border border-[#8B5CF6]/20{% else %}text-[#66708F] hover:text-[#171D3A] hover:bg-[#F8F9FE]{% endif %}">
+                <div class="flex items-center gap-2.5"><i data-lucide="file-text" class="w-4 h-4 text-[#8B5CF6]"></i><span>Academic Documents</span></div>
+                <span class="px-1.5 py-0.5 rounded text-[9px] bg-[#E8EBFA] text-[#8B5CF6] font-bold">PDF</span>
             </a>
         </div>
         {% endif %}
 
         <!-- ------------------------------------------------------------- -->
-        <!-- 2. ADMISSION MODULE (Admission Admin & Super Admin) -->
+        <!-- 2. SVIT INFO & CAMPUS OVERVIEW MODULE -->
         <!-- ------------------------------------------------------------- -->
-        {% if has_permission(current_user, 'admission') or has_role(current_user, 'super_admin') %}
+        {% if has_permission(current_user, 'svit_info') or has_role(current_user, 'super_admin') %}
         <div class="space-y-1">
             <p class="px-3 text-[10px] font-bold text-[#8C95AD] uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-                <i data-lucide="info" class="w-3 h-3 text-[#16A34A]"></i> Admission Admin
+                <i data-lucide="school" class="w-3 h-3 text-[#3B82F6]"></i> SVIT Info Admin
             </p>
 
-            <a href="{{ url_for('admin.admission') }}" 
-               class="flex items-center justify-between px-3 py-2 rounded-lg transition text-decoration-none {% if request.path.startswith('/admin/admission') %}bg-[#E8EBFA] text-[#8B5CF6] font-bold border border-[#8B5CF6]/20{% else %}text-[#66708F] hover:text-[#171D3A] hover:bg-[#F8F9FE]{% endif %}">
-                <div class="flex items-center gap-2.5"><i data-lucide="graduation-cap" class="w-4 h-4 text-[#16A34A]"></i><span>Admission</span></div>
+            <a href="{{ url_for('admin.svit_info') }}" 
+               class="flex items-center justify-between px-3 py-2 rounded-lg transition text-decoration-none {% if request.path in ['/admin/svit-info', '/admin/svit_info', '/admin/about-svit'] %}bg-[#E8EBFA] text-[#8B5CF6] font-bold border border-[#8B5CF6]/20{% else %}text-[#66708F] hover:text-[#171D3A] hover:bg-[#F8F9FE]{% endif %}">
+                <div class="flex items-center gap-2.5"><i data-lucide="building" class="w-4 h-4 text-[#3B82F6]"></i><span>SVIT Overview</span></div>
+                <i data-lucide="chevron-right" class="w-3 h-3 text-[#8C95AD]"></i>
+            </a>
+
+            <a href="{{ url_for('admin.rooms') }}" 
+               class="flex items-center justify-between px-3 py-2 rounded-lg transition text-decoration-none {% if request.path in ['/admin/rooms', '/admin/rooms-facilities', '/admin/rooms_facilities', '/admin/campus-info', '/admin/facilities'] %}bg-[#E8EBFA] text-[#8B5CF6] font-bold border border-[#8B5CF6]/20{% else %}text-[#66708F] hover:text-[#171D3A] hover:bg-[#F8F9FE]{% endif %}">
+                <div class="flex items-center gap-2.5"><i data-lucide="map-pin" class="w-4 h-4 text-[#3B82F6]"></i><span>Rooms & Facilities</span></div>
                 <i data-lucide="chevron-right" class="w-3 h-3 text-[#8C95AD]"></i>
             </a>
         </div>
         {% endif %}
 
         <!-- ------------------------------------------------------------- -->
-        <!-- 3. NOTICE & ANNOUNCEMENT MODULE (Notice Admin & Super Admin) -->
+        <!-- 3. ADMISSION MODULE (Admission Admin & Super Admin) -->
+        <!-- ------------------------------------------------------------- -->
+        {% if has_permission(current_user, 'admission') or has_role(current_user, 'super_admin') %}
+        <div class="space-y-1">
+            <p class="px-3 text-[10px] font-bold text-[#8C95AD] uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                <i data-lucide="graduation-cap" class="w-3 h-3 text-[#16A34A]"></i> Admission Admin
+            </p>
+
+            <a href="{{ url_for('admin.admission') }}" 
+               class="flex items-center justify-between px-3 py-2 rounded-lg transition text-decoration-none {% if request.path.startswith('/admin/admission') %}bg-[#E8EBFA] text-[#8B5CF6] font-bold border border-[#8B5CF6]/20{% else %}text-[#66708F] hover:text-[#171D3A] hover:bg-[#F8F9FE]{% endif %}">
+                <div class="flex items-center gap-2.5"><i data-lucide="graduation-cap" class="w-4 h-4 text-[#16A34A]"></i><span>Admission & Quota</span></div>
+                <i data-lucide="chevron-right" class="w-3 h-3 text-[#8C95AD]"></i>
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- ------------------------------------------------------------- -->
+        <!-- 4. NOTICE & ANNOUNCEMENT MODULE (Notice Admin & Super Admin) -->
         <!-- ------------------------------------------------------------- -->
         {% if has_permission(current_user, 'notices') or has_role(current_user, 'super_admin') %}
         <div class="space-y-1">
@@ -130,7 +153,7 @@
         {% endif %}
 
         <!-- ------------------------------------------------------------- -->
-        <!-- 4. COLLEGE EVENTS MODULE (Event Admin & Super Admin) -->
+        <!-- 5. COLLEGE EVENTS MODULE (Event Admin & Super Admin) -->
         <!-- ------------------------------------------------------------- -->
         {% if has_permission(current_user, 'events') or has_role(current_user, 'super_admin') %}
         <div class="space-y-1">
@@ -147,7 +170,7 @@
         {% endif %}
 
         <!-- ------------------------------------------------------------- -->
-        <!-- 5. BUS ADMIN (Bus Admin & Super Admin) -->
+        <!-- 6. BUS ADMIN (Bus Admin & Super Admin) -->
         <!-- ------------------------------------------------------------- -->
         {% if has_permission(current_user, 'bus') or has_role(current_user, 'super_admin') %}
         <div class="space-y-1">
@@ -182,41 +205,6 @@
         {% endif %}
 
         <!-- ------------------------------------------------------------- -->
-        <!-- 6. LIBRARY ADMIN (Library Admin & Super Admin) -->
-        <!-- ------------------------------------------------------------- -->
-        {% if has_permission(current_user, 'library') or has_role(current_user, 'super_admin') %}
-        <div class="space-y-1">
-            <p class="px-3 text-[10px] font-bold text-[#8C95AD] uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-                <i data-lucide="book-open" class="w-3 h-3 text-[#91A7EE]"></i> Library Admin
-            </p>
-
-            <a href="{{ url_for('admin.library') }}" 
-               class="flex items-center justify-between px-3 py-2 rounded-lg transition text-decoration-none {% if request.path == '/admin/library' or request.path == '/admin/library-info' or request.path == '/admin/library_info' %}bg-[#E8EBFA] text-[#8B5CF6] font-bold border border-[#8B5CF6]/20{% else %}text-[#66708F] hover:text-[#171D3A] hover:bg-[#F8F9FE]{% endif %}">
-                <div class="flex items-center gap-2.5"><i data-lucide="info" class="w-4 h-4 text-[#8C95AD]"></i><span>Library</span></div>
-                <i data-lucide="chevron-right" class="w-3 h-3 text-[#8C95AD]"></i>
-            </a>
-
-            <a href="{{ url_for('admin.library_books') }}" 
-               class="flex items-center justify-between px-3 py-2 rounded-lg transition text-decoration-none {% if request.path == '/admin/library-books' or request.path == '/admin/library_books' or request.path == '/admin/books' %}bg-[#E8EBFA] text-[#8B5CF6] font-bold border border-[#8B5CF6]/20{% else %}text-[#66708F] hover:text-[#171D3A] hover:bg-[#F8F9FE]{% endif %}">
-                <div class="flex items-center gap-2.5"><i data-lucide="book" class="w-4 h-4 text-[#8C95AD]"></i><span>Library Books</span></div>
-                <i data-lucide="chevron-right" class="w-3 h-3 text-[#8C95AD]"></i>
-            </a>
-
-            <a href="{{ url_for('admin.library_members') }}" 
-               class="flex items-center justify-between px-3 py-2 rounded-lg transition text-decoration-none {% if request.path == '/admin/library-members' or request.path == '/admin/library_members' or request.path == '/admin/members' %}bg-[#E8EBFA] text-[#8B5CF6] font-bold border border-[#8B5CF6]/20{% else %}text-[#66708F] hover:text-[#171D3A] hover:bg-[#F8F9FE]{% endif %}">
-                <div class="flex items-center gap-2.5"><i data-lucide="id-card" class="w-4 h-4 text-[#8C95AD]"></i><span>Library Members</span></div>
-                <i data-lucide="chevron-right" class="w-3 h-3 text-[#8C95AD]"></i>
-            </a>
-
-            <a href="{{ url_for('admin.issue_return') }}" 
-               class="flex items-center justify-between px-3 py-2 rounded-lg transition text-decoration-none {% if request.path == '/admin/issue-return' or request.path == '/admin/issue_return' or request.path == '/admin/library-issue-return' or request.path == '/admin/library_issue_return' %}bg-[#E8EBFA] text-[#8B5CF6] font-bold border border-[#8B5CF6]/20{% else %}text-[#66708F] hover:text-[#171D3A] hover:bg-[#F8F9FE]{% endif %}">
-                <div class="flex items-center gap-2.5"><i data-lucide="arrow-left-right" class="w-4 h-4 text-[#8C95AD]"></i><span>Issue / Return</span></div>
-                <i data-lucide="chevron-right" class="w-3 h-3 text-[#8C95AD]"></i>
-            </a>
-        </div>
-        {% endif %}
-
-        <!-- ------------------------------------------------------------- -->
         <!-- 7. CANTEEN ADMIN (Canteen Admin & Super Admin) -->
         <!-- ------------------------------------------------------------- -->
         {% if has_permission(current_user, 'canteen') or has_role(current_user, 'super_admin') %}
@@ -227,13 +215,13 @@
 
             <a href="{{ url_for('admin.canteen') }}" 
                class="flex items-center justify-between px-3 py-2 rounded-lg transition text-decoration-none {% if request.path == '/admin/canteen' %}bg-[#E8EBFA] text-[#8B5CF6] font-bold border border-[#8B5CF6]/20{% else %}text-[#66708F] hover:text-[#171D3A] hover:bg-[#F8F9FE]{% endif %}">
-                <div class="flex items-center gap-2.5"><i data-lucide="store" class="w-4 h-4 text-[#8C95AD]"></i><span>Canteen</span></div>
+                <div class="flex items-center gap-2.5"><i data-lucide="store" class="w-4 h-4 text-[#8C95AD]"></i><span>Canteen Menu</span></div>
                 <i data-lucide="chevron-right" class="w-3 h-3 text-[#8C95AD]"></i>
             </a>
 
             <a href="{{ url_for('admin.canteen_menu') }}" 
                class="flex items-center justify-between px-3 py-2 rounded-lg transition text-decoration-none {% if request.path == '/admin/canteen-menu' or request.path == '/admin/canteen_menu' %}bg-[#E8EBFA] text-[#8B5CF6] font-bold border border-[#8B5CF6]/20{% else %}text-[#66708F] hover:text-[#171D3A] hover:bg-[#F8F9FE]{% endif %}">
-                <div class="flex items-center gap-2.5"><i data-lucide="menu-square" class="w-4 h-4 text-[#8C95AD]"></i><span>Canteen Menu</span></div>
+                <div class="flex items-center gap-2.5"><i data-lucide="menu-square" class="w-4 h-4 text-[#8C95AD]"></i><span>Price List</span></div>
                 <i data-lucide="chevron-right" class="w-3 h-3 text-[#8C95AD]"></i>
             </a>
 
@@ -246,30 +234,18 @@
         {% endif %}
 
         <!-- ------------------------------------------------------------- -->
-        <!-- 8. SPORTS ADMIN (Sports Admin & Super Admin) -->
+        <!-- 8. UNIVERSAL DOCUMENTS & RAG STATUS -->
         <!-- ------------------------------------------------------------- -->
-        {% if has_permission(current_user, 'sports') or has_role(current_user, 'super_admin') %}
+        {% if has_permission(current_user, 'documents') or has_role(current_user, 'super_admin') %}
         <div class="space-y-1">
             <p class="px-3 text-[10px] font-bold text-[#8C95AD] uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-                <i data-lucide="trophy" class="w-3 h-3 text-[#8B5CF6]"></i> Sports Admin
+                <i data-lucide="cpu" class="w-3 h-3 text-[#8B5CF6]"></i> Document RAG
             </p>
 
-            <a href="{{ url_for('admin.sports') }}" 
-               class="flex items-center justify-between px-3 py-2 rounded-lg transition text-decoration-none {% if request.path == '/admin/sports' %}bg-[#E8EBFA] text-[#8B5CF6] font-bold border border-[#8B5CF6]/20{% else %}text-[#66708F] hover:text-[#171D3A] hover:bg-[#F8F9FE]{% endif %}">
-                <div class="flex items-center gap-2.5"><i data-lucide="trophy" class="w-4 h-4 text-[#8C95AD]"></i><span>Sports</span></div>
-                <i data-lucide="chevron-right" class="w-3 h-3 text-[#8C95AD]"></i>
-            </a>
-
-            <a href="{{ url_for('admin.sports_events') }}" 
-               class="flex items-center justify-between px-3 py-2 rounded-lg transition text-decoration-none {% if request.path == '/admin/sports-events' or request.path == '/admin/sports_events' %}bg-[#E8EBFA] text-[#8B5CF6] font-bold border border-[#8B5CF6]/20{% else %}text-[#66708F] hover:text-[#171D3A] hover:bg-[#F8F9FE]{% endif %}">
-                <div class="flex items-center gap-2.5"><i data-lucide="medal" class="w-4 h-4 text-[#8C95AD]"></i><span>Sports Events</span></div>
-                <i data-lucide="chevron-right" class="w-3 h-3 text-[#8C95AD]"></i>
-            </a>
-
-            <a href="{{ url_for('admin.grounds') }}" 
-               class="flex items-center justify-between px-3 py-2 rounded-lg transition text-decoration-none {% if request.path == '/admin/grounds' %}bg-[#E8EBFA] text-[#8B5CF6] font-bold border border-[#8B5CF6]/20{% else %}text-[#66708F] hover:text-[#171D3A] hover:bg-[#F8F9FE]{% endif %}">
-                <div class="flex items-center gap-2.5"><i data-lucide="flag" class="w-4 h-4 text-[#8C95AD]"></i><span>Grounds</span></div>
-                <i data-lucide="chevron-right" class="w-3 h-3 text-[#8C95AD]"></i>
+            <a href="{{ url_for('admin.module_documents') }}" 
+               class="flex items-center justify-between px-3 py-2 rounded-lg transition text-decoration-none {% if request.path in ['/admin/documents', '/admin/module-documents', '/admin/rag-status'] %}bg-[#E8EBFA] text-[#8B5CF6] font-bold border border-[#8B5CF6]/20{% else %}text-[#66708F] hover:text-[#171D3A] hover:bg-[#F8F9FE]{% endif %}">
+                <div class="flex items-center gap-2.5"><i data-lucide="file-check-2" class="w-4 h-4 text-[#8B5CF6]"></i><span>Documents & RAG</span></div>
+                <span class="px-1.5 py-0.5 rounded text-[9px] bg-[#E8EBFA] text-[#8B5CF6] font-bold">INDEX</span>
             </a>
         </div>
         {% endif %}
