@@ -745,10 +745,20 @@ def api_approve_student(student_id):
                 s_db.approved_at = now
             db.session.commit()
     except Exception:
-        pass
+        s_db = None
 
-    target_enroll = student_doc.get("enrollment_no") or str(student_id) if student_doc else str(student_id)
-    student_name = student_doc.get("full_name") or student_doc.get("name") if student_doc else "Student"
+    target_enroll = student_doc.get("enrollment_no") or str(student_id) if student_doc else (getattr(s_db, 'enrollment_no', None) or str(student_id))
+    student_name = student_doc.get("full_name") or student_doc.get("name") if student_doc else (getattr(s_db, 'full_name', None) or "Student")
+
+    try:
+        from app.database.admin_crud_service import _LOCAL_DATA_STORE
+        if "students" in _LOCAL_DATA_STORE:
+            for k in (str(student_id), target_enroll):
+                if k in _LOCAL_DATA_STORE["students"]:
+                    _LOCAL_DATA_STORE["students"][k]["status"] = "active"
+                    _LOCAL_DATA_STORE["students"][k]["approved_by"] = admin_identifier
+    except Exception:
+        pass
 
     # Send Student Notification
     # Send Student Notification
@@ -860,10 +870,21 @@ def api_reject_student(student_id):
                 s_db.rejection_reason = reason
             db.session.commit()
     except Exception:
-        pass
+        s_db = None
 
-    target_enroll = student_doc.get("enrollment_no") or str(student_id) if student_doc else str(student_id)
-    student_name = student_doc.get("full_name") or student_doc.get("name") if student_doc else "Student"
+    target_enroll = student_doc.get("enrollment_no") or str(student_id) if student_doc else (getattr(s_db, 'enrollment_no', None) or str(student_id))
+    student_name = student_doc.get("full_name") or student_doc.get("name") if student_doc else (getattr(s_db, 'full_name', None) or "Student")
+
+    try:
+        from app.database.admin_crud_service import _LOCAL_DATA_STORE
+        if "students" in _LOCAL_DATA_STORE:
+            for k in (str(student_id), target_enroll):
+                if k in _LOCAL_DATA_STORE["students"]:
+                    _LOCAL_DATA_STORE["students"][k]["status"] = "rejected"
+                    _LOCAL_DATA_STORE["students"][k]["rejected_by"] = admin_identifier
+                    _LOCAL_DATA_STORE["students"][k]["rejection_reason"] = reason
+    except Exception:
+        pass
 
     notif_msg = "Your SVIT registration request was rejected."
     if reason:

@@ -31,6 +31,9 @@ class TestStudentApprovalWorkflow(unittest.TestCase):
         self.app_context = self.app.app_context()
         self.app_context.push()
 
+        from app.database.admin_seed import migrate_sqlite_admin_columns
+        migrate_sqlite_admin_columns()
+
         # Create temporary testing credentials
         self.admin_username = "academic_test_admin"
         self.admin_password = "AdminSecurePass123!"
@@ -81,6 +84,42 @@ class TestStudentApprovalWorkflow(unittest.TestCase):
                 upsert=True
             )
 
+        try:
+            admin_obj = Admin.query.filter_by(username=self.admin_username).first()
+            if not admin_obj:
+                admin_obj = Admin(
+                    username=self.admin_username,
+                    name="Academic Admin Tester",
+                    email="academic_admin_test@svitvasad.ac.in",
+                    role="academic_admin",
+                    password_hash=generate_password_hash(self.admin_password),
+                    is_active=True,
+                    status="active"
+                )
+                db.session.add(admin_obj)
+            else:
+                admin_obj.password_hash = generate_password_hash(self.admin_password)
+                admin_obj.is_active = True
+                admin_obj.status = "active"
+
+            test_student = Student.query.filter_by(enrollment_no="200410107089").first()
+            if not test_student:
+                test_student = Student(
+                    enrollment_no="200410107089",
+                    email="student200410107089@svitvasad.ac.in",
+                    full_name="Active Test Student",
+                    password_hash=generate_password_hash("student@123"),
+                    status="active"
+                )
+                db.session.add(test_student)
+            else:
+                test_student.password_hash = generate_password_hash("student@123")
+                test_student.status = "active"
+
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+
     def tearDown(self):
         # Cleanup
         test_enrollments = [self.student_enrollment, "990410107002", "990410107003"]
@@ -93,11 +132,13 @@ class TestStudentApprovalWorkflow(unittest.TestCase):
             self.admin_coll.delete_one({"username": self.admin_username})
 
         try:
-            from app.database.models import Student
+            from app.database.models import Student, Admin
             from app.extensions import db
             if Student:
-                Student.query.filter(Student.enrollment_no.in_(test_enrollments)).delete(synchronize_session=False)
-                db.session.commit()
+                Student.query.filter(Student.enrollment_no.in_(test_enrollments + ["200410107089"])).delete(synchronize_session=False)
+            if Admin:
+                Admin.query.filter_by(username=self.admin_username).delete()
+            db.session.commit()
         except Exception:
             try:
                 from app.extensions import db
@@ -379,6 +420,27 @@ class TestStudentApprovalWorkflow(unittest.TestCase):
                 upsert=True
             )
 
+        try:
+            for u_name, u_status in [(inactive_admin_user, "inactive"), (suspended_admin_user, "suspended")]:
+                adm = Admin.query.filter_by(username=u_name).first()
+                if not adm:
+                    adm = Admin(
+                        username=u_name,
+                        name=u_name,
+                        email=f"{u_name}@svitvasad.ac.in",
+                        role="academic_admin",
+                        password_hash=generate_password_hash("AdminPass123!"),
+                        is_active=False,
+                        status=u_status
+                    )
+                    db.session.add(adm)
+                else:
+                    adm.is_active = False
+                    adm.status = u_status
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+
         # 1. Test Inactive Admin login
         res_inact = self.client.post('/auth/login', json={
             "identifier": inactive_admin_user,
@@ -400,6 +462,11 @@ class TestStudentApprovalWorkflow(unittest.TestCase):
         # Clean up temporary admin testing records
         if self.admin_coll is not None:
             self.admin_coll.delete_many({"username": {"$in": [inactive_admin_user, suspended_admin_user]}})
+        try:
+            Admin.query.filter(Admin.username.in_([inactive_admin_user, suspended_admin_user])).delete()
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
 
     def test_11_pending_and_rejected_student_views(self):
         """Dedicated pending and rejected views render correctly."""

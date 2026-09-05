@@ -413,6 +413,7 @@ class RAGPipeline:
         is_library = any(k in msg for k in library_keywords)
         is_contact = any(k in msg for k in contact_keywords)
 
+        intent_category = "general"
         if is_transport:
             intent_category = "transport"
         elif is_library:
@@ -451,9 +452,13 @@ class RAGPipeline:
                 doc_src = doc.metadata.get('source') or doc.metadata.get('document_name') or 'Official Document'
                 page_num = doc.metadata.get('page_number', 1)
                 src = f"{doc_src} (Page {page_num})"
+            else:
+                src = f"{doc.metadata.get('source', 'Unknown')} (Row {doc.metadata.get('row', 'N/A')})"
+            if src not in seen:
                 seen.add(src)
                 sources.append(src)
 
+        context = "\n\n---\n\n".join([doc.page_content for doc, _ in results]) if results else ""
         location_info = self._resolve_location_from_map_or_query(map_image, question) if map_image else None
         return context, map_image, sources, intent_category, location_info
 
@@ -1125,5 +1130,16 @@ class RAGPipeline:
         }
 
 
+_rag_pipeline_instance = None
+
+
 def get_rag_pipeline(force_rebuild: bool = False) -> RAGPipeline:
-    return RAGPipeline(force_rebuild=force_rebuild)
+    global _rag_pipeline_instance
+    if _rag_pipeline_instance is None or force_rebuild:
+        _rag_pipeline_instance = RAGPipeline(force_rebuild=force_rebuild)
+    return _rag_pipeline_instance
+
+
+def get_bot_response(question: str, session_id: str = "default_user", user_profile: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    pipeline = get_rag_pipeline()
+    return pipeline.answer_question(question, session_id=session_id, user_profile=user_profile)

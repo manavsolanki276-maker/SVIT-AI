@@ -377,6 +377,36 @@ function openGoogleMapsDirections(location, fallbackName = '') {
 }
 window.openGoogleMapsDirections = openGoogleMapsDirections;
 
+function openOsmDirections(location, fallbackName = '') {
+    let lat = null;
+    let lng = null;
+    if (location && typeof location === 'object') {
+        lat = parseFloat(location.latitude !== undefined ? location.latitude : location.lat);
+        lng = parseFloat(location.longitude !== undefined ? location.longitude : (location.lng !== undefined ? location.lng : location.lon));
+    } else if (typeof location === 'string') {
+        try {
+            const parsed = JSON.parse(location);
+            if (parsed && typeof parsed === 'object') {
+                return openOsmDirections(parsed, fallbackName);
+            }
+        } catch (e) {
+            const parts = location.split(',');
+            if (parts.length === 2 && !isNaN(parseFloat(parts[0])) && !isNaN(parseFloat(parts[1]))) {
+                lat = parseFloat(parts[0].trim());
+                lng = parseFloat(parts[1].trim());
+            }
+        }
+    }
+
+    if (lat !== null && !isNaN(lat) && lng !== null && !isNaN(lng) && lat !== 0 && lng !== 0) {
+        const osmUrl = `https://www.openstreetmap.org/directions?engine=fossgis_osrm_foot&route=%2C%3B${lat}%2C${lng}#map=18/${lat}/${lng}`;
+        window.open(osmUrl, '_blank', 'noopener,noreferrer');
+        return;
+    }
+    openGoogleMapsDirections(location, fallbackName);
+}
+window.openOsmDirections = openOsmDirections;
+
 function finalizeStreamingBotRow(botRow, imagePath = null, sources = [], suggestions = [], feedback = null, locationData = null) {
     if (!botRow) return;
 

@@ -815,7 +815,8 @@ def initialize_datasets_if_needed(project_root: Optional[str] = None):
                             "division": s.division or "A",
                             "batch": s.batch or "A1",
                             "phone": s.phone or "",
-                            "gender": s.gender or "Other",
+                            "status": getattr(s, 'status', 'active') or "active",
+                            "gender": getattr(s, 'gender', 'Other') or "Other",
                             "dob": s.dob or "",
                             "address": s.address or "",
                             "is_profile_complete": bool(s.is_profile_complete),
@@ -1010,6 +1011,40 @@ class AdminCRUDService:
             # -------------------------------------------------------------
             # IN-MEMORY / LOCAL STORE FALLBACK
             # -------------------------------------------------------------
+            if module_key == "students":
+                try:
+                    from app.database.models.student import Student
+                    if Student:
+                        stu_store = _LOCAL_DATA_STORE.setdefault("students", {})
+                        for s in Student.query.all():
+                            sid = str(s.enrollment_no or s.id)
+                            st_val = getattr(s, 'status', 'active') or 'active'
+                            if sid in stu_store:
+                                stu_store[sid]["status"] = st_val
+                            else:
+                                stu_store[sid] = {
+                                    "id": sid,
+                                    "enrollment_no": s.enrollment_no or f"STU_{s.id:04d}",
+                                    "full_name": s.full_name or "Student",
+                                    "name": s.full_name or "Student",
+                                    "email": s.email or "",
+                                    "program": s.program or "BE",
+                                    "department": s.department or "Computer Engineering",
+                                    "semester": s.semester or 1,
+                                    "division": s.division or "A",
+                                    "batch": s.batch or "A1",
+                                    "phone": s.phone or "",
+                                    "status": st_val,
+                                    "gender": getattr(s, 'gender', 'Other') or "Other",
+                                    "dob": getattr(s, 'dob', '') or "",
+                                    "address": getattr(s, 'address', '') or "",
+                                    "is_profile_complete": bool(s.is_profile_complete),
+                                    "created_at": getattr(s, 'created_at', datetime.utcnow()).isoformat() if isinstance(getattr(s, 'created_at', None), datetime) else datetime.utcnow().isoformat(),
+                                    "created_by": "student_registration"
+                                }
+                except Exception as e:
+                    logger.debug(f"Student sync note: {e}")
+
             module_data = _LOCAL_DATA_STORE.get(module_key, {})
             all_items = list(module_data.values())
 
@@ -1119,6 +1154,42 @@ class AdminCRUDService:
             for item in module_data.values():
                 if str(item.get("id")) == str(item_id) or str(item.get(id_field)) == str(item_id):
                     return item
+
+            if module_key == "students":
+                try:
+                    from app.database.models.student import Student
+                    if Student:
+                        s = Student.query.filter(
+                            (Student.enrollment_no == str(item_id)) |
+                            (Student.id == int(item_id) if str(item_id).isdigit() else -1)
+                        ).first()
+                        if s:
+                            sid = str(s.enrollment_no or s.id)
+                            res_item = {
+                                "id": sid,
+                                "enrollment_no": s.enrollment_no or f"STU_{s.id:04d}",
+                                "full_name": s.full_name or "Student",
+                                "name": s.full_name or "Student",
+                                "email": s.email or "",
+                                "program": s.program or "BE",
+                                "department": s.department or "Computer Engineering",
+                                "semester": s.semester or 1,
+                                "division": s.division or "A",
+                                "batch": s.batch or "A1",
+                                "phone": s.phone or "",
+                                "status": getattr(s, 'status', 'active') or "active",
+                                "gender": getattr(s, 'gender', 'Other') or "Other",
+                                "dob": getattr(s, 'dob', '') or "",
+                                "address": getattr(s, 'address', '') or "",
+                                "is_profile_complete": bool(s.is_profile_complete),
+                                "created_at": getattr(s, 'created_at', datetime.utcnow()).isoformat() if isinstance(getattr(s, 'created_at', None), datetime) else datetime.utcnow().isoformat(),
+                                "created_by": "student_registration"
+                            }
+                            _LOCAL_DATA_STORE.setdefault("students", {})[sid] = res_item
+                            return res_item
+                except Exception as e:
+                    logger.debug(f"Student get fallback note: {e}")
+
             return None
 
     @staticmethod

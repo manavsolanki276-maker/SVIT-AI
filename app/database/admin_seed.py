@@ -148,6 +148,7 @@ def migrate_sqlite_admin_columns(db_path: str = None):
             ("role", "VARCHAR(50) DEFAULT 'super_admin'"),
             ("department", "VARCHAR(100)"),
             ("is_active", "BOOLEAN DEFAULT 1"),
+            ("status", "VARCHAR(20) DEFAULT 'active'"),
             ("created_at", "DATETIME"),
             ("updated_at", "DATETIME"),
             ("last_login", "DATETIME"),

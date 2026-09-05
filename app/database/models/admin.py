@@ -32,6 +32,7 @@ class Admin(UserMixin, db.Model):
     role = db.Column(db.String(50), default=ROLE_SUPER_ADMIN, nullable=False)
     department = db.Column(db.String(100), nullable=True)
     is_active = db.Column(db.Boolean, default=True, nullable=False)
+    status = db.Column(db.String(20), default='active', nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     last_login = db.Column(db.DateTime, nullable=True)
