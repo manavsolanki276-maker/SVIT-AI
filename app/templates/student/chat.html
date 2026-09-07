@@ -330,10 +330,10 @@
             }
         }
     </style>
-</head>
-<body class="{% if guest_mode %}is-guest-mode{% endif %}">
     {% set is_auth = (current_user is defined and current_user and current_user.is_authenticated) %}
     {% set guest_mode = (is_guest is defined and is_guest) or not is_auth %}
+</head>
+<body class="{% if guest_mode %}is-guest-mode{% endif %}">
     <script>window.IS_GUEST_MODE = {{ 'true' if guest_mode else 'false' }};</script>
 
     <!-- GLOBAL ANIMATED LOADER -->

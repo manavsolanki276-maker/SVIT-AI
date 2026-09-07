@@ -1102,9 +1102,23 @@ class AdminCRUDService:
                                 and_conditions.append({k: clean_v})
                         elif k == "zone" and clean_v == "Diploma Block":
                             and_conditions.append({k: {"$regex": "^Diploma Block", "$options": "i"}})
+                        elif k == "priority" and clean_v.lower() in ("emergency", "urgent"):
+                            and_conditions.append({
+                                "$or": [
+                                    {"priority": {"$regex": "^(emergency|urgent)$", "$options": "i"}},
+                                    {"is_urgent": True},
+                                    {"is_urgent": "true"}
+                                ]
+                            })
+                        elif k == "priority" and clean_v.lower() in ("normal", "medium"):
+                            and_conditions.append({
+                                "priority": {"$regex": "^(normal|medium)$", "$options": "i"}
+                            })
+                        elif k == "category" and module_key in ("events", "notices"):
+                            and_conditions.append({k: {"$regex": re.escape(clean_v), "$options": "i"}})
                         elif k == "department":
                             and_conditions.append({k: {"$regex": re.escape(clean_v), "$options": "i"}})
-                        elif isinstance(v, str) and not clean_v.isdigit() and k not in ("id", "place_id", "faculty_id", "enrollment_no", "_id"):
+                        elif isinstance(v, str) and not clean_v.isdigit() and k not in ("id", "place_id", "faculty_id", "enrollment_no", "notice_id", "event_id", "_id"):
                             and_conditions.append({k: {"$regex": f"^{re.escape(clean_v)}$", "$options": "i"}})
                         else:
                             and_conditions.append({k: v})
@@ -1223,6 +1237,12 @@ class AdminCRUDService:
                             all_items = [i for i in all_items if bool(i.get(k)) == bool_val]
                         elif k == "zone" and clean_v == "diploma block":
                             all_items = [i for i in all_items if str(i.get(k, '')).strip().lower().startswith("diploma block")]
+                        elif k == "priority" and clean_v in ("emergency", "urgent"):
+                            all_items = [i for i in all_items if str(i.get("priority", '')).strip().lower() in ("emergency", "urgent") or bool(i.get("is_urgent"))]
+                        elif k == "priority" and clean_v in ("normal", "medium"):
+                            all_items = [i for i in all_items if str(i.get("priority", '')).strip().lower() in ("normal", "medium")]
+                        elif k == "category" and module_key in ("events", "notices"):
+                            all_items = [i for i in all_items if clean_v in str(i.get(k, '')).strip().lower()]
                         elif k == "department":
                             all_items = [i for i in all_items if clean_v in str(i.get(k, '')).strip().lower()]
                         else:
@@ -1358,6 +1378,45 @@ class AdminCRUDService:
         clean_data = dict(data)
         clean_data.pop("_id", None)
         id_field = config["id_field"]
+
+        # Module-specific smart defaults before strict validation
+        if module_key == "notices":
+            if not clean_data.get("status"):
+                clean_data["status"] = "Published"
+            if not clean_data.get("publish_date"):
+                clean_data["publish_date"] = datetime.utcnow().strftime('%Y-%m-%d')
+            if not clean_data.get("priority"):
+                clean_data["priority"] = "Normal"
+            if not clean_data.get("target_audience"):
+                clean_data["target_audience"] = "All Students & Faculty"
+            if not clean_data.get("category"):
+                clean_data["category"] = "General Updates"
+            if not clean_data.get("department"):
+                clean_data["department"] = "All Departments"
+            if "is_urgent" in clean_data:
+                clean_data["is_urgent"] = bool(clean_data["is_urgent"] and str(clean_data["is_urgent"]).lower() not in ("false", "0", "no"))
+            elif clean_data.get("priority") in ("Emergency", "Urgent"):
+                clean_data["is_urgent"] = True
+            else:
+                clean_data["is_urgent"] = False
+
+        elif module_key == "events":
+            if not clean_data.get("status"):
+                clean_data["status"] = "Upcoming"
+            if not clean_data.get("department"):
+                clean_data["department"] = "All Departments"
+            if not clean_data.get("organizer"):
+                clean_data["organizer"] = "College Committee"
+            if not clean_data.get("registration_required"):
+                clean_data["registration_required"] = "No"
+            if not clean_data.get("category"):
+                clean_data["category"] = "Technical Events"
+            if not clean_data.get("venue"):
+                clean_data["venue"] = "SVIT Auditorium"
+            if not clean_data.get("event_date"):
+                clean_data["event_date"] = clean_data.get("start_date") or datetime.utcnow().strftime('%Y-%m-%d')
+            if not clean_data.get("event_name") and clean_data.get("title"):
+                clean_data["event_name"] = clean_data["title"]
 
         # Validate required fields
         for field in config["fields"]:
@@ -1615,6 +1674,17 @@ class AdminCRUDService:
         clean_data = dict(data)
         clean_data.pop("_id", None)
         id_field = config["id_field"]
+
+        if module_key == "notices":
+            if "is_urgent" in clean_data:
+                clean_data["is_urgent"] = bool(clean_data["is_urgent"] and str(clean_data["is_urgent"]).lower() not in ("false", "0", "no"))
+            elif clean_data.get("priority") in ("Emergency", "Urgent"):
+                clean_data["is_urgent"] = True
+        elif module_key == "events":
+            if not clean_data.get("event_name") and clean_data.get("title"):
+                clean_data["event_name"] = clean_data["title"]
+            if not clean_data.get("event_date") and clean_data.get("start_date"):
+                clean_data["event_date"] = clean_data["start_date"]
 
         # Prevent altering primary keys if not allowed
         clean_data["id"] = existing["id"]

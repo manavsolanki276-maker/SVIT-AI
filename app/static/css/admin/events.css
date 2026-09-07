@@ -1,14 +1,14 @@
 /* SVIT Admin - Events Responsive Stylesheet */
 :root {
     --event-hero-bg: linear-gradient(135deg, #FCE7F3 0%, #FFFFFF 65%, #E8EBFA 100%);
-    --event-hero-border: var(--svit-border);
+    --event-hero-border: #E1E5F0;
     --event-card-bg: #FFFFFF;
-    --event-card-border: var(--svit-border);
+    --event-card-border: #E1E5F0;
     --event-card-hover: #F8F9FE;
-    --event-accent: var(--svit-pink);
+    --event-accent: #EC4899;
     --event-accent-light: #F472B6;
-    --event-text-primary: var(--svit-text);
-    --event-text-muted: var(--svit-text-secondary);
+    --event-text-primary: #171D3A;
+    --event-text-muted: #66708F;
 }
 
 .events-hero-card {
@@ -20,5 +20,38 @@
 }
 
 .events-hero-card:hover {
-    box-shadow: 0 8px 28px rgba(229, 138, 240, 0.2);
+    box-shadow: 0 8px 28px rgba(236, 72, 153, 0.15);
+}
+
+.badge-event-cat {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.65rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    border-radius: 9999px;
+    background-color: #FCE7F3;
+    color: #DB2777;
+    border: 1px solid #FBCFE8;
+}
+
+.event-banner-box {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.75rem;
+    background-color: #FCE7F3;
+    border: 1px solid #FBCFE8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.event-card-box {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.event-card-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(23, 29, 58, 0.1);
 }
