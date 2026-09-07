@@ -13,6 +13,7 @@ env/
 
 # Databases and Local Stores
 *.db
+!app/svit_assistant.db
 *.sqlite3
 instance/
 chroma_db/
