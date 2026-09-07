@@ -542,6 +542,8 @@ def legacy_retired_modules_fallback():
 # 4. SUPER ADMIN USER MANAGEMENT VIEW
 # =========================================================================
 @admin_bp.route('/admins')
+@admin_bp.route('/admin-management')
+@admin_bp.route('/admin_management')
 @require_role(ROLE_SUPER_ADMIN)
 def admin_management():
     """Renders the Admin Accounts Management view for Super Admin."""

@@ -82,6 +82,24 @@ def clear_response_cache() -> None:
     _RESPONSE_CACHE.clear()
 
 
+def contains_keyword(text: str, keyword: str) -> bool:
+    """
+    Checks if a keyword exists in text as a distinct word or boundary phrase.
+    Prevents false-positive substring collisions like 'bus' in 'syllabus'.
+    """
+    if not text or not keyword:
+        return False
+    pattern = r'\b' + re.escape(keyword) + r'\b'
+    return bool(re.search(pattern, text, re.IGNORECASE))
+
+
+def has_any_keyword(text: str, keywords: list) -> bool:
+    """Checks if any keyword in the list matches as a distinct word/phrase in text."""
+    if not text or not keywords:
+        return False
+    return any(contains_keyword(text, k) for k in keywords)
+
+
 def route_query_sources(user_message: str) -> list[tuple[str, float]]:
     """
     Detects query intent via keyword matching from INTENT_CONFIG 
@@ -95,7 +113,7 @@ def route_query_sources(user_message: str) -> list[tuple[str, float]]:
     if re.search(r'\b[a-z]{2,4}[-.]?\d{2,3}\b', msg):
         return [("rooms_facilities.csv", 1.0), ("campus_info.csv", 0.5), ("general_faq.csv", 0.1)]
 
-    is_location_query = any(k in msg for k in ["where is", "where", "locate", "find", "how to reach", "location of"])
+    is_location_query = has_any_keyword(msg, ["where is", "where", "locate", "find", "how to reach", "location of"])
 
     # For location queries, check facilities/campus_info first so they aren't
     # overshadowed by generic placement/faculty/departments intent matches
@@ -104,12 +122,12 @@ def route_query_sources(user_message: str) -> list[tuple[str, float]]:
         for intent_key in location_first_intents:
             if intent_key in INTENT_CONFIG:
                 config = INTENT_CONFIG[intent_key]
-                if any(keyword in msg for keyword in config["keywords"]):
+                if has_any_keyword(msg, config["keywords"]):
                     return config["sources"]
 
     source_map = {}
     for intent, config in INTENT_CONFIG.items():
-        if any(keyword in msg for keyword in config["keywords"]):
+        if has_any_keyword(msg, config["keywords"]):
             for src, weight in config["sources"]:
                 if src not in source_map or weight > source_map[src]:
                     source_map[src] = weight
@@ -273,7 +291,7 @@ class RAGPipeline:
         # -------------------------------------------------------------
         # 2. BUS & TRANSPORTATION CHECK
         # -------------------------------------------------------------
-        is_transport = any(k in msg for k in transport_keywords)
+        is_transport = has_any_keyword(msg, transport_keywords)
         if is_transport:
             trans_ctx, trans_img, trans_srcs, trans_loc = process_transport_context(question, user_profile=user_profile)
             if trans_ctx:
@@ -282,7 +300,7 @@ class RAGPipeline:
         # -------------------------------------------------------------
         # 3. SUBJECTS / CURRICULUM CHECK
         # -------------------------------------------------------------
-        is_subject = any(k in msg for k in subject_keywords) and not any(k in msg for k in ['time', 'schedule', 'room', 'bus'])
+        is_subject = has_any_keyword(msg, subject_keywords) and not has_any_keyword(msg, ['time', 'schedule', 'room', 'bus'])
         if is_subject:
             subj_ctx, subj_srcs = process_subject_context(question, user_profile=user_profile)
             if subj_ctx and "NO_SUBJECTS" not in subj_ctx:
@@ -291,7 +309,7 @@ class RAGPipeline:
         # -------------------------------------------------------------
         # 4. TIMETABLE CHECK
         # -------------------------------------------------------------
-        is_timetable = any(k in msg for k in timetable_keywords)
+        is_timetable = has_any_keyword(msg, timetable_keywords)
         if is_timetable:
             intent_category = "timetable"
             context = process_timetable_context([], question, user_profile=user_profile)
@@ -312,7 +330,7 @@ class RAGPipeline:
         # -------------------------------------------------------------
         # 4. NOTICES & ANNOUNCEMENTS
         # -------------------------------------------------------------
-        is_notice = any(k in msg for k in notice_keywords)
+        is_notice = has_any_keyword(msg, notice_keywords)
         if is_notice:
             intent_category = "notice"
             context = process_notice_context([], question, user_profile=user_profile)
@@ -344,7 +362,7 @@ class RAGPipeline:
         # -------------------------------------------------------------
         # 5. FACULTY & DEPARTMENT
         # -------------------------------------------------------------
-        is_faculty = any(k in msg for k in faculty_keywords)
+        is_faculty = has_any_keyword(msg, faculty_keywords)
         if is_faculty:
             intent_category = "faculty"
             context = process_faculty_context([], question, user_profile=user_profile)
@@ -365,7 +383,7 @@ class RAGPipeline:
         # -------------------------------------------------------------
         # 6. EVENTS & WORKSHOPS
         # -------------------------------------------------------------
-        is_events = any(k in msg for k in events_keywords)
+        is_events = has_any_keyword(msg, events_keywords)
         if is_events:
             intent_category = "events"
             context = process_events_context(question)
@@ -397,7 +415,7 @@ class RAGPipeline:
         # -------------------------------------------------------------
         # 7. PLACEMENTS & DRIVES
         # -------------------------------------------------------------
-        is_placement = any(k in msg for k in placement_keywords)
+        is_placement = has_any_keyword(msg, placement_keywords)
         if is_placement:
             intent_category = "placement"
             context = process_placement_context(question, user_profile=user_profile)
@@ -409,9 +427,9 @@ class RAGPipeline:
         # -------------------------------------------------------------
         # 8. GENERAL VECTOR RETRIEVAL (Transport, Canteen, Library, Contact, FAQs)
         # -------------------------------------------------------------
-        is_transport = any(k in msg for k in transport_keywords)
-        is_library = any(k in msg for k in library_keywords)
-        is_contact = any(k in msg for k in contact_keywords)
+        is_transport = has_any_keyword(msg, transport_keywords)
+        is_library = has_any_keyword(msg, library_keywords)
+        is_contact = has_any_keyword(msg, contact_keywords)
 
         intent_category = "general"
         if is_transport:
@@ -430,7 +448,7 @@ class RAGPipeline:
             "gymnasium", "sports complex", "library", "central library",
             "canteen", "campus", "gate", "block", "building", "where is"
         ]
-        if intent_category == "general" and any(k in msg for k in campus_facility_keywords):
+        if intent_category == "general" and has_any_keyword(msg, campus_facility_keywords):
             intent_category = "campus_info"
 
         if filter_dict and "source" in filter_dict:

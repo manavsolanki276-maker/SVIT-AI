@@ -242,9 +242,26 @@ def create_app():
         from app.routes.auth import logout
         return logout()
 
+    @app.route('/static/uploads/<subfolder>/<filename>')
+    def serve_uploaded_file(subfolder, filename):
+        from app.utils.file_upload import get_upload_dir
+        from flask import send_from_directory, abort
+        if subfolder not in ('images', 'documents'):
+            abort(404)
+        upload_dir = get_upload_dir(subfolder)
+        return send_from_directory(upload_dir, filename)
+
     @app.errorhandler(403)
     def handle_403(e):
         return render_template('errors/403.html', error_message=getattr(e, 'description', 'Access Denied: You do not have permission to view this resource.')), 403
+
+    @app.errorhandler(404)
+    def handle_404(e):
+        return render_template('errors/404.html', error_message=getattr(e, 'description', 'The requested page or document was not found.')), 404
+
+    @app.errorhandler(500)
+    def handle_500(e):
+        return render_template('errors/500.html', error_message="An unexpected server error occurred. Please refresh or try again shortly."), 500
 
     # =========================================================
     # 7. MODEL METADATA REGISTRATION, MIGRATION & SEEDING

@@ -22,9 +22,30 @@ MAX_DOCUMENT_SIZE_BYTES = 15 * 1024 * 1024   # 15 MB
 
 
 def get_upload_dir(subfolder: str = 'images') -> str:
-    """Returns absolute path to upload directory and ensures it exists."""
-    base_static = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'static')
-    target_dir = os.path.join(base_static, 'uploads', subfolder)
+    """
+    Returns absolute path to upload directory and ensures it exists.
+    Seamlessly adapts to local development (app/static/uploads) and Vercel/serverless
+    read-only environments (/tmp/svit_uploads) to prevent [Errno 30] Read-only file system.
+    """
+    is_serverless = bool(os.environ.get('VERCEL') or os.environ.get('AWS_LAMBDA_FUNCTION_NAME'))
+    
+    if not is_serverless:
+        base_static = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'static')
+        target_dir = os.path.join(base_static, 'uploads', subfolder)
+        try:
+            os.makedirs(target_dir, exist_ok=True)
+            # Verify write access
+            test_file = os.path.join(target_dir, '.write_test')
+            with open(test_file, 'w') as f:
+                f.write('ok')
+            os.remove(test_file)
+            return target_dir
+        except OSError:
+            pass  # Fall through to serverless /tmp directory
+
+    # Serverless or read-only filesystem fallback
+    import tempfile
+    target_dir = os.path.join(tempfile.gettempdir(), 'svit_uploads', subfolder)
     os.makedirs(target_dir, exist_ok=True)
     return target_dir
 
@@ -136,7 +157,7 @@ def validate_and_save_file(
 def delete_uploaded_file(file_url_or_filename: str) -> bool:
     """
     Safely deletes a previously uploaded file given its public URL or filename.
-    Prevents path traversal.
+    Prevents path traversal. Checks both local static and serverless temporary upload directories.
     """
     if not file_url_or_filename:
         return False
@@ -146,11 +167,19 @@ def delete_uploaded_file(file_url_or_filename: str) -> bool:
     if not filename:
         return False
 
+    import tempfile
     base_static = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'static')
+    tmp_uploads = os.path.join(tempfile.gettempdir(), 'svit_uploads')
     
-    # Check in both images and documents directories
-    for sub in ['images', 'documents']:
-        file_path = os.path.join(base_static, 'uploads', sub, filename)
+    search_dirs = [
+        os.path.join(base_static, 'uploads', 'images'),
+        os.path.join(base_static, 'uploads', 'documents'),
+        os.path.join(tmp_uploads, 'images'),
+        os.path.join(tmp_uploads, 'documents'),
+    ]
+
+    for sdir in search_dirs:
+        file_path = os.path.join(sdir, filename)
         if os.path.exists(file_path) and os.path.isfile(file_path):
             try:
                 os.remove(file_path)

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found | SVIT AI</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Theme System Stylesheet & Single Theme Enforcer -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/loader.js') }}"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        body {
+            background-color: var(--svit-bg, #F8F9FE);
+            color: var(--svit-text, #171D3A);
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .error-card {
+            background-color: #FFFFFF;
+            border: 1px solid var(--svit-border, #E1E5F0);
+            border-radius: var(--radius-xl, 16px);
+            color: var(--svit-text, #171D3A);
+            box-shadow: 0 4px 20px rgba(23, 29, 58, 0.06);
+            max-width: 460px;
+            width: 100%;
+            padding: 32px 24px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+        .error-icon-box {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            background: #EFF6FF;
+            border: 1.5px solid #BFDBFE;
+            color: #2563EB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .error-pill {
+            display: inline-flex;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            background: #EFF6FF;
+            color: #1E40AF;
+            border: 1px solid #BFDBFE;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .error-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--svit-text, #171D3A);
+            margin-top: -4px;
+        }
+        .error-desc {
+            font-size: 13.5px;
+            color: var(--svit-text-secondary, #66708F);
+            line-height: 1.5;
+        }
+        .action-row {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            margin-top: 8px;
+        }
+        .btn-primary-action {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: var(--svit-primary, #8B5CF6);
+            color: #FFFFFF;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.18s ease;
+            box-shadow: 0 2px 6px rgba(139, 92, 246, 0.25);
+            border: none;
+        }
+        .btn-primary-action:hover {
+            background: var(--svit-primary-hover, #7C4FE8);
+            transform: translateY(-1px);
+        }
+        .btn-secondary-action {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: #FFFFFF;
+            border: 1px solid var(--svit-border, #E1E5F0);
+            color: var(--svit-text, #171D3A);
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.18s ease;
+        }
+        .btn-secondary-action:hover {
+            background: var(--svit-surface-soft, #E8EBFA);
+            border-color: var(--svit-primary, #8B5CF6);
+            color: var(--svit-primary, #8B5CF6);
+        }
+        .error-footer-text {
+            font-size: 11.5px;
+            color: var(--svit-muted, #8C95AD);
+            border-top: 1px solid var(--svit-border, #E1E5F0);
+            padding-top: 12px;
+            width: 100%;
+        }
+        @media (max-width: 480px) {
+            .error-card {
+                padding: 24px 16px;
+            }
+            .action-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- GLOBAL ANIMATED LOADER -->
+    {% include "partials/loader.html" %}
+
+    <div class="error-card">
+        <div class="error-icon-box">
+            <i data-lucide="compass" style="width: 30px; height: 30px;"></i>
+        </div>
+
+        <span class="error-pill">HTTP 404 Not Found</span>
+        <h1 class="error-title">Page Not Found</h1>
+        <p class="error-desc">
+            {{ error_message if error_message else "The requested page, resource, or document could not be found on the server. It may have been moved, renamed, or deleted." }}
+        </p>
+
+        <div class="action-row">
+            <a href="/" class="btn-primary-action">
+                <i data-lucide="home" style="width: 15px; height: 15px;"></i>
+                <span>Back to Home</span>
+            </a>
+            <a href="javascript:history.back()" class="btn-secondary-action">
+                <i data-lucide="arrow-left" style="width: 15px; height: 15px;"></i>
+                <span>Go Back</span>
+            </a>
+        </div>
+
+        <p class="error-footer-text">SVIT AI Assistant &copy; 2026 Sardar Vallabhbhai Patel Institute of Technology</p>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

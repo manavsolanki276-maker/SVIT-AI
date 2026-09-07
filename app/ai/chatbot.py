@@ -34,20 +34,22 @@ class EnhancedRAGPipeline(RAGPipeline):
     def route_query_filter(self, question: str) -> Optional[Dict[str, str]]:
         """
         Detects query intent and returns metadata filters for target CSV source files.
+        Uses word-boundary matching to prevent collisions like 'bus' in 'syllabus'.
         """
-        q = question.lower()
+        def has_word(kw_list):
+            return any(bool(re.search(r'\b' + re.escape(k) + r'\b', question, re.IGNORECASE)) for k in kw_list)
 
-        if any(k in q for k in ['event', 'workshop', 'hackathon', 'festival', 'symposium', 'techfest']):
+        if has_word(['event', 'workshop', 'hackathon', 'festival', 'symposium', 'techfest']):
             return {"source_file": "events_faq.csv"}
-        elif any(k in q for k in ['contact', 'phone', 'email', 'office', 'admin', 'number', 'address', 'location']):
+        elif has_word(['contact', 'phone', 'email', 'office', 'admin', 'number', 'address', 'location']):
             return {"source_file": "contact_faq.csv"}
-        elif any(k in q for k in ['timetable', 'schedule', 'class time', 'lecture', 'timing']):
+        elif has_word(['timetable', 'schedule', 'class time', 'lecture', 'timing']):
             return {"source_file": "timetable.csv"}
-        elif any(k in q for k in ['bus', 'route', 'transport', 'commute', 'pickup']):
+        elif has_word(['bus', 'route', 'transport', 'commute', 'pickup']):
             return {"source_file": "transport.csv"}
-        elif any(k in q for k in ['exam', 'result', 'gtu', 'marks', 'midsem', 're-check']):
+        elif has_word(['exam', 'result', 'gtu', 'marks', 'midsem', 're-check']):
             return {"source_file": "examination_faq.csv"}
-        elif any(k in q for k in ['faculty', 'professor', 'hod', 'teacher', 'sir', 'madam', 'faculty list']):
+        elif has_word(['faculty', 'professor', 'hod', 'teacher', 'sir', 'madam', 'faculty list']):
             return {"source_file": "faculty_faq.csv"}
 
         return None  # Search all collections/sources if no specific keyword matched

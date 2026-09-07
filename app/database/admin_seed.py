@@ -266,4 +266,96 @@ def seed_admin_accounts(app=None) -> Dict[str, int]:
     except Exception as e:
         logger.warning(f"[Seed] MongoDB admin seeding notice: {e}")
 
+    # 4. Seed Active Demo Student Account for immediate testing and evaluation
+    try:
+        seed_demo_student_account()
+    except Exception as e:
+        logger.warning(f"[Seed] Demo student seeding notice: {e}")
+
     return stats
+
+
+DEFAULT_STUDENT_ACCOUNT: Dict[str, Any] = {
+    "enrollment_no": "210410107001",
+    "full_name": "SVIT Demo Student",
+    "email": "student@svit.ac.in",
+    "password": "Student@123",
+    "department": "Computer Engineering",
+    "program": "BE",
+    "semester": 3,
+    "division": "A",
+    "batch": "A1",
+    "status": "active",
+    "is_profile_complete": True,
+}
+
+
+def seed_demo_student_account() -> bool:
+    """
+    Seeds a verified, active demo student account into SQLite and MongoDB Atlas.
+    Allows immediate student dashboard and AI chat evaluation without waiting for admin approval.
+    """
+    from app.database.models.student import Student
+    from app.extensions import db
+
+    # 1. Seed SQLite Student
+    try:
+        acc = DEFAULT_STUDENT_ACCOUNT
+        student = Student.query.filter(
+            (Student.email == acc["email"]) | (Student.enrollment_no == acc["enrollment_no"])
+        ).first()
+
+        if not student:
+            student = Student(
+                enrollment_no=acc["enrollment_no"],
+                full_name=acc["full_name"],
+                email=acc["email"],
+                department=acc["department"],
+                program=acc["program"],
+                semester=acc["semester"],
+                division=acc["division"],
+                batch=acc["batch"],
+                status="active",
+                is_profile_complete=True
+            )
+            student.set_password(acc["password"])
+            db.session.add(student)
+        else:
+            student.full_name = acc["full_name"]
+            student.status = "active"
+            student.is_profile_complete = True
+            student.set_password(acc["password"])
+
+        db.session.commit()
+    except Exception as e:
+        try:
+            db.session.rollback()
+        except Exception:
+            pass
+        logger.warning(f"[Seed] SQLite demo student notice: {e}")
+
+    # 2. Seed MongoDB Student
+    try:
+        from app.database.mongodb import get_collection
+        coll = get_collection('students')
+        if coll is not None:
+            acc = dict(DEFAULT_STUDENT_ACCOUNT)
+            pwd = acc.pop("password")
+            acc["password_hash"] = generate_password_hash(pwd)
+            acc["name"] = acc["full_name"]
+            acc["id"] = acc["enrollment_no"]
+            acc["status"] = "active"
+            acc["is_profile_complete"] = True
+            acc["is_profile_completed"] = True
+            acc["updated_at"] = datetime.utcnow().isoformat()
+
+            coll.update_one(
+                {"$or": [{"email": acc["email"]}, {"enrollment_no": acc["enrollment_no"]}]},
+                {"$set": acc, "$setOnInsert": {"created_at": datetime.utcnow().isoformat()}},
+                upsert=True
+            )
+            logger.info("[Seed] Demo student account synchronized in MongoDB.")
+    except Exception as e:
+        logger.warning(f"[Seed] MongoDB demo student notice: {e}")
+
+    return True
