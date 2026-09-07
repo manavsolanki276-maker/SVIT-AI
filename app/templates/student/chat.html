@@ -302,11 +302,58 @@
                 box-shadow: none !important;
             }
         }
+        .explore-cards-grid.guest-grid {
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)) !important;
+            gap: 12px;
+        }
+        .guest-top-banner {
+            background: linear-gradient(90deg, #312e81 0%, #4338ca 50%, #6366f1 100%);
+            color: #ffffff;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 500;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(49, 46, 129, 0.15);
+        }
+        @media (max-width: 640px) {
+            .guest-top-banner {
+                flex-direction: column;
+                gap: 6px;
+                text-align: center;
+                padding: 10px 12px;
+            }
+        }
     </style>
 </head>
 <body>
+    {% set is_auth = (current_user is defined and current_user and current_user.is_authenticated) %}
+    {% set guest_mode = (is_guest is defined and is_guest) or not is_auth %}
+    <script>window.IS_GUEST_MODE = {{ 'true' if guest_mode else 'false' }};</script>
+
     <!-- GLOBAL ANIMATED LOADER -->
     {% include "partials/loader.html" %}
+
+    {% if guest_mode %}
+    <div class="guest-top-banner">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="background: rgba(255,255,255,0.22); color: #fff; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase;">Guest Mode</span>
+            <span>Exploring <strong>11 Public SVIT Categories</strong>.</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <a href="https://svitvasad.ac.in/" target="_blank" rel="noopener" style="color: #e0e7ff; text-decoration: none; font-size: 12px; display: inline-flex; align-items: center; gap: 4px;">
+                <span>Official SVIT Website</span>
+                <i data-lucide="external-link" style="width: 12px; height: 12px;"></i>
+            </a>
+            <a href="{{ url_for('auth.login') }}" style="background: #ffffff; color: #4338ca; padding: 4px 12px; border-radius: 8px; font-weight: 700; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
+                <i data-lucide="log-in" style="width: 12px; height: 12px;"></i>
+                <span>Sign In / Register &gt;</span>
+            </a>
+        </div>
+    </div>
+    {% endif %}
 
     <div class="portal-layout">
 
@@ -317,7 +364,7 @@
         <aside class="sidebar" id="sidebar">
             <!-- 1. Top Header: Logo + Title + Collapse/Search Icons -->
             <div class="sidebar-header">
-                <a href="/" class="sidebar-brand" title="SVIT AI Assistant">
+                <a href="{% if guest_mode %}/guest/chat{% else %}/{% endif %}" class="sidebar-brand" title="SVIT AI Assistant">
                     <div class="brand-icon">
                         <img src="{{ url_for('static', filename='logo/svit logo u.png') }}" alt="SVIT Logo" class="brand-logo-img">
                     </div>
@@ -342,6 +389,20 @@
             </div>
 
             <!-- Mobile Drawer Dedicated Profile Card (Visible only in mobile drawer) -->
+            {% if guest_mode %}
+            <div class="drawer-profile-card" id="drawerProfileCard">
+                <div class="drawer-profile-avatar" style="background: #e0e7ff; color: #4338ca;">
+                    <span>GU</span>
+                </div>
+                <div class="drawer-profile-meta">
+                    <div class="drawer-profile-name">Guest User</div>
+                    <div class="drawer-profile-role" style="color: #6366f1;">Public Access Mode</div>
+                </div>
+                <a href="{{ url_for('auth.login') }}" class="drawer-view-profile-btn" onclick="toggleMobileSidebar(false);" title="Sign in as Student">
+                    <span>Sign In &gt;</span>
+                </a>
+            </div>
+            {% else %}
             <div class="drawer-profile-card" id="drawerProfileCard">
                 <div class="drawer-profile-avatar">
                     <span>{{ (current_user.full_name or current_user.name or 'Student')[:2]|upper }}</span>
@@ -354,6 +415,7 @@
                     <span>View Profile &gt;</span>
                 </a>
             </div>
+            {% endif %}
 
             <!-- 2. Main Navigation: New Chat, Menu Links & Collapsed Rail -->
             <div class="sidebar-main-nav">
@@ -364,6 +426,26 @@
                 </a>
 
                 <!-- Core Navigation Menu Links (Visible in Expanded & Mobile Drawer) -->
+                {% if guest_mode %}
+                <div class="sidebar-menu-links">
+                    <a href="/guest/chat" class="sidebar-menu-link active" id="menuChatLink" title="Public Chat" onclick="toggleMobileSidebar(false);">
+                        <i data-lucide="message-square"></i>
+                        <span>Public Chat</span>
+                    </a>
+                    <a href="https://svitvasad.ac.in/" target="_blank" rel="noopener" class="sidebar-menu-link" id="menuWebsiteLink" title="Official SVIT Website" onclick="toggleMobileSidebar(false);">
+                        <i data-lucide="globe"></i>
+                        <span>Official Website</span>
+                    </a>
+                    <a href="{{ url_for('auth.login') }}" class="sidebar-menu-link" id="menuLoginLink" title="Student Sign In" onclick="toggleMobileSidebar(false);">
+                        <i data-lucide="log-in"></i>
+                        <span>Student Sign In</span>
+                    </a>
+                    <a href="{{ url_for('auth.register') }}" class="sidebar-menu-link" id="menuRegisterLink" title="Register Account" onclick="toggleMobileSidebar(false);">
+                        <i data-lucide="user-plus"></i>
+                        <span>Register</span>
+                    </a>
+                </div>
+                {% else %}
                 <div class="sidebar-menu-links">
                     <a href="/student/chat" class="sidebar-menu-link active" id="menuChatLink" title="Student Chat" onclick="toggleMobileSidebar(false);">
                         <i data-lucide="message-square"></i>
@@ -382,8 +464,22 @@
                         <span>Exit Chat</span>
                     </a>
                 </div>
+                {% endif %}
 
                 <!-- Collapsed Icon Rail Navigation (ChatGPT Style for Desktop) -->
+                {% if guest_mode %}
+                <div class="sidebar-rail-nav" id="sidebarRailNav">
+                    <a href="/guest/chat" class="rail-icon-btn active" id="railChatBtn" title="Public Chat" aria-label="Public Chat">
+                        <i data-lucide="message-square"></i>
+                    </a>
+                    <a href="https://svitvasad.ac.in/" target="_blank" rel="noopener" class="rail-icon-btn" id="railWebsiteBtn" title="Official Website" aria-label="Official Website">
+                        <i data-lucide="globe"></i>
+                    </a>
+                    <a href="{{ url_for('auth.login') }}" class="rail-icon-btn" id="railLoginBtn" title="Student Sign In" aria-label="Student Sign In">
+                        <i data-lucide="log-in"></i>
+                    </a>
+                </div>
+                {% else %}
                 <div class="sidebar-rail-nav" id="sidebarRailNav">
                     <button type="button" class="rail-icon-btn" id="railSearchBtn" title="Search Chats" onclick="toggleSidebarSearch()" aria-label="Search Chats">
                         <i data-lucide="search"></i>
@@ -398,6 +494,7 @@
                         <i data-lucide="history"></i>
                     </a>
                 </div>
+                {% endif %}
 
                 <!-- Collapsible Search Filter Box -->
                 <div class="sidebar-search-box" id="sidebarSearchBox" style="display: none;">
@@ -421,6 +518,14 @@
             </div>
 
             <!-- Mobile Drawer Dedicated Bottom Action Area (Anchored to Bottom) -->
+            {% if guest_mode %}
+            <div class="drawer-bottom-actions" id="drawerBottomActions">
+                <a href="{{ url_for('auth.login') }}" class="drawer-exit-chat-btn" onclick="toggleMobileSidebar(false);" title="Sign In">
+                    <i data-lucide="log-in"></i>
+                    <span>Student Sign In</span>
+                </a>
+            </div>
+            {% else %}
             <div class="drawer-bottom-actions" id="drawerBottomActions">
                 <a href="/chat/history-page" class="drawer-view-all-chats-btn" onclick="toggleMobileSidebar(false);" title="View All Chats">
                     <i data-lucide="history"></i>
@@ -431,8 +536,25 @@
                     <span>Sign out</span>
                 </a>
             </div>
+            {% endif %}
 
-            <!-- 4. Sidebar Bottom: Student User Card & Logout (Desktop View) -->
+            <!-- 4. Sidebar Bottom: User Card & Action (Desktop View) -->
+            {% if guest_mode %}
+            <div class="sidebar-footer">
+                <a href="{{ url_for('auth.login') }}" class="sidebar-user-card" title="Sign In for Full Student Access">
+                    <div class="sidebar-user-avatar sidebar-collapsed-user-icon" style="background: #e0e7ff; color: #4338ca;">
+                        <span>GU</span>
+                    </div>
+                    <div class="sidebar-user-info">
+                        <span class="user-display-name">Guest User</span>
+                        <span class="user-program-badge" style="color: #6366f1;">Public Access Mode</span>
+                    </div>
+                </a>
+                <a href="{{ url_for('auth.login') }}" class="sidebar-logout-btn" title="Sign In" aria-label="Sign In">
+                    <i data-lucide="log-in"></i>
+                </a>
+            </div>
+            {% else %}
             <div class="sidebar-footer">
                 <a href="/student/profile/" class="sidebar-user-card" title="View & Edit Profile">
                     <div class="sidebar-user-avatar sidebar-collapsed-user-icon">
@@ -447,7 +569,9 @@
                     <i data-lucide="log-out"></i>
                 </a>
             </div>
+            {% endif %}
         </aside>
+
 
         <!-- Main Chat Area Wrapper (Fixed Flex Layout Column) -->
         <div class="main-wrapper" id="mainWrapper">
@@ -467,17 +591,29 @@
                     </div>
                 </div>
                 <div class="mobile-top-actions">
+                    {% if guest_mode %}
+                    <a href="{{ url_for('auth.login') }}" class="mobile-action-btn" title="Sign In as Student" style="text-decoration:none; color:inherit;">
+                        <i data-lucide="log-in"></i>
+                    </a>
+                    {% else %}
                     <div class="student-notif-wrapper">
                         <button type="button" class="mobile-action-btn" id="mobileNotifBellBtn" onclick="toggleMobileNotifDrawer(true)" aria-label="Notifications" title="Notifications" style="position: relative;">
                             <i data-lucide="bell"></i>
                             <span id="mobileStudentUnreadBadge" style="display:none; position:absolute; top:2px; right:2px; background:#ef4444; color:#fff; font-size:9px; font-weight:700; border-radius:50%; width:14px; height:14px; line-height:14px; text-align:center;">0</span>
                         </button>
                     </div>
+                    {% endif %}
                 </div>
             </header>
 
             <!-- ChatGPT-Style Conversation Top-Right Header Controls (Desktop View) -->
             <div class="chat-top-header-controls" id="chatTopHeaderControls">
+                {% if guest_mode %}
+                <a href="{{ url_for('auth.login') }}" class="chat-header-btn" style="background: #eef2ff; color: #4f46e5; border-color: #c7d2fe; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                    <i data-lucide="log-in" style="width: 14px; height: 14px;"></i>
+                    <span>Student Sign In</span>
+                </a>
+                {% else %}
                 <!-- Student Notification Bell Button with Dropdown -->
                 <div class="student-notif-wrapper">
                     <button type="button" class="chat-header-btn" id="desktopStudentNotifBtn" onclick="toggleStudentNotifDropdown(event)" title="Notifications" style="position: relative;">
@@ -505,6 +641,7 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
             </div>
 
             <!-- Chat & Dashboard Body -->
@@ -524,18 +661,27 @@
                     <div class="student-home-hero">
                         <div class="student-home-hero-left">
                             <div class="greeting-pill student-home-greeting">
-                                <span>✨ Hello, {{ current_user.full_name or current_user.name or 'Student' }}! 👋</span>
+                                <span>✨ Hello, {% if guest_mode %}Guest{% else %}{{ current_user.full_name or current_user.name or 'Student' }}{% endif %}! 👋</span>
                             </div>
                             <h1 class="student-home-title">
+                                {% if guest_mode %}
+                                <span class="title-dark">Explore SVIT Vasad.</span><br>
+                                <span class="title-gradient">11 Public Categories.</span>
+                                {% else %}
                                 <span class="title-dark">Your Campus.</span><br>
                                 <span class="title-gradient">Your AI Assistant.</span>
+                                {% endif %}
                             </h1>
                             <p class="student-home-desc">
+                                {% if guest_mode %}
+                                Official public information on admissions, courses, fees, timings, events, bus facilities, library, and sports.
+                                {% else %}
                                 Ask anything about your college — timetables, rooms, events, placements and more.
+                                {% endif %}
                             </p>
                             <div class="student-home-tagline">
                                 <span class="tagline-bolt">⚡</span>
-                                <span>Smart answers. Instantly.</span>
+                                <span>{% if guest_mode %}11 Public Categories • Verified SVIT Data{% else %}Smart answers. Instantly.{% endif %}</span>
                             </div>
                         </div>
                         <div class="student-home-hero-visual" aria-hidden="true">
@@ -557,7 +703,7 @@
                             <div class="composer-leading-logo">
                                 <img src="{{ url_for('static', filename='logo/svit logo u.png') }}" alt="SVIT AI" class="composer-logo-img" onerror="this.outerHTML='<span class=\'composer-sparkle-icon\'>✨</span>'">
                             </div>
-                            <input type="text" placeholder="Ask anything about timetables, rooms, events..." id="homeChatInput" autocomplete="off" required>
+                            <input type="text" placeholder="{% if guest_mode %}Ask about admissions, courses, fees, timings, bus, library...{% else %}Ask anything about timetables, rooms, events...{% endif %}" id="homeChatInput" autocomplete="off" required>
                             <div class="composer-action-btns">
                                 <button type="button" class="voice-btn" id="homeVoiceBtn" onclick="triggerHomeVoiceInput(event)" title="Voice Input (Speech-to-Text)">
                                     <i data-lucide="mic"></i>
@@ -572,9 +718,35 @@
                         <div class="home-prompt-chips">
                             <div class="home-prompt-chips-header">
                                 <span class="home-prompt-chips-label"><i data-lucide="sparkles"></i> Try asking</span>
-                                <button type="button" class="view-all-prompts-btn" onclick="sendSuggested('What is SVIT AI?')">View all &gt;</button>
+                                <button type="button" class="view-all-prompts-btn" onclick="sendSuggested('{% if guest_mode %}Tell me about SVIT Vasad, PKM Trust, and the campus{% else %}What is SVIT AI?{% endif %}')">View all &gt;</button>
                             </div>
                             <div class="prompt-chips-wrapper">
+                                {% if guest_mode %}
+                                <button type="button" class="student-home-chip" onclick="sendSuggested('Tell me about SVIT Vasad, PKM Trust, and the campus')">
+                                    <span class="chip-emoji">🏛️</span>
+                                    <span>About SVIT</span>
+                                </button>
+                                <button type="button" class="student-home-chip" onclick="sendSuggested('What courses and degree programs are available at SVIT?')">
+                                    <span class="chip-emoji">📚</span>
+                                    <span>Available Courses</span>
+                                </button>
+                                <button type="button" class="student-home-chip" onclick="sendSuggested('What is the fees structure and scholarships for B.E. and MCA?')">
+                                    <span class="chip-emoji">💰</span>
+                                    <span>Fees Structure</span>
+                                </button>
+                                <button type="button" class="student-home-chip" onclick="sendSuggested('What is the admission process for engineering at SVIT Vasad?')">
+                                    <span class="chip-emoji">🎓</span>
+                                    <span>Admission Process</span>
+                                </button>
+                                <button type="button" class="student-home-chip" onclick="sendSuggested('What are the college, administrative office, and library timings?')">
+                                    <span class="chip-emoji">⏰</span>
+                                    <span>College Timings</span>
+                                </button>
+                                <button type="button" class="student-home-chip" onclick="sendSuggested('What bus facilities and routes are available for students?')">
+                                    <span class="chip-emoji">🚌</span>
+                                    <span>Bus Facilities</span>
+                                </button>
+                                {% else %}
                                 <button type="button" class="student-home-chip" onclick="sendSuggested('What is my next class right now?')">
                                     <span class="chip-emoji">🕐</span>
                                     <span>What's my next class?</span>
@@ -591,102 +763,176 @@
                                     <span class="chip-emoji">📊</span>
                                     <span>Placement stats</span>
                                 </button>
+                                {% endif %}
                             </div>
                         </div>
 
-                        <p class="disclaimer-text">SVIT AI Assistant provides official campus layout & academic information. Please verify notice deadlines with official department boards.</p>
+                        <p class="disclaimer-text">{% if guest_mode %}Guest Mode provides verified information on 11 public categories. For personal timetables, attendance, and notices, please sign in.{% else %}SVIT AI Assistant provides official campus layout & academic information. Please verify notice deadlines with official department boards.{% endif %}</p>
                     </div>
 
-                    <!-- 3. Explore SVIT: 6 Compact Mini-Cards -->
+                    <!-- 3. Explore SVIT: 11 Categories for Guest OR 6 Student Cards -->
                     <div class="student-home-explore">
-                        <div class="explore-section-title">Explore SVIT</div>
+                        <div class="explore-section-title">{% if guest_mode %}11 Public Information Categories{% else %}Explore SVIT{% endif %}</div>
+                        {% if guest_mode %}
+                        <div class="explore-cards-grid guest-grid">
+                            <!-- 1. About SVIT -->
+                            <div class="explore-card" onclick="sendSuggested('Tell me about SVIT Vasad, PKM Trust, and the campus')" tabindex="0" role="button">
+                                <div class="explore-card-top">
+                                    <div class="explore-card-icon-wrap" style="background:#e0e7ff; color:#4338ca;"><i data-lucide="school"></i></div>
+                                    <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                                </div>
+                                <div class="explore-card-title">About SVIT</div>
+                                <div class="explore-card-desc">History, PKM Trust, 26-acre campus &amp; leadership</div>
+                            </div>
+                            <!-- 2. Available Courses -->
+                            <div class="explore-card" onclick="sendSuggested('What courses and degree programs are available at SVIT?')" tabindex="0" role="button">
+                                <div class="explore-card-top">
+                                    <div class="explore-card-icon-wrap" style="background:#dbeafe; color:#1d4ed8;"><i data-lucide="book-open"></i></div>
+                                    <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                                </div>
+                                <div class="explore-card-title">Available Courses</div>
+                                <div class="explore-card-desc">B.E., M.E., MCA, B.Arch &amp; Diploma programs</div>
+                            </div>
+                            <!-- 3. Fees Structure -->
+                            <div class="explore-card" onclick="sendSuggested('What is the fees structure and scholarships for B.E. and MCA?')" tabindex="0" role="button">
+                                <div class="explore-card-top">
+                                    <div class="explore-card-icon-wrap" style="background:#dcfce7; color:#15803d;"><i data-lucide="credit-card"></i></div>
+                                    <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                                </div>
+                                <div class="explore-card-title">Fees Structure</div>
+                                <div class="explore-card-desc">FRC approved fee rates &amp; MYSY scholarships</div>
+                            </div>
+                            <!-- 4. Admission Process -->
+                            <div class="explore-card" onclick="sendSuggested('What is the admission process for engineering at SVIT Vasad?')" tabindex="0" role="button">
+                                <div class="explore-card-top">
+                                    <div class="explore-card-icon-wrap" style="background:#fef3c7; color:#b45309;"><i data-lucide="user-plus"></i></div>
+                                    <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                                </div>
+                                <div class="explore-card-title">Admission Process</div>
+                                <div class="explore-card-desc">ACPC online steps, merit list &amp; counseling</div>
+                            </div>
+                            <!-- 5. Eligibility Criteria -->
+                            <div class="explore-card" onclick="sendSuggested('What is the eligibility criteria for admission in B.E.?')" tabindex="0" role="button">
+                                <div class="explore-card-top">
+                                    <div class="explore-card-icon-wrap" style="background:#f3e8ff; color:#7e22ce;"><i data-lucide="check-circle"></i></div>
+                                    <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                                </div>
+                                <div class="explore-card-title">Eligibility Criteria</div>
+                                <div class="explore-card-desc">10+2 PCM percentage &amp; GUJCET/JEE cutoffs</div>
+                            </div>
+                            <!-- 6. Seats Available -->
+                            <div class="explore-card" onclick="sendSuggested('How many seats are available in each branch at SVIT?')" tabindex="0" role="button">
+                                <div class="explore-card-top">
+                                    <div class="explore-card-icon-wrap" style="background:#fee2e2; color:#b91c1c;"><i data-lucide="users"></i></div>
+                                    <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                                </div>
+                                <div class="explore-card-title">Seats Available</div>
+                                <div class="explore-card-desc">1,200+ annual intake across departments</div>
+                            </div>
+                            <!-- 7. College Timings -->
+                            <div class="explore-card" onclick="sendSuggested('What are the college, administrative office, and library timings?')" tabindex="0" role="button">
+                                <div class="explore-card-top">
+                                    <div class="explore-card-icon-wrap" style="background:#e0f2fe; color:#0369a1;"><i data-lucide="clock"></i></div>
+                                    <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                                </div>
+                                <div class="explore-card-title">College Timings</div>
+                                <div class="explore-card-desc">Academic, administrative &amp; library hours</div>
+                            </div>
+                            <!-- 8. Events & Fests -->
+                            <div class="explore-card" onclick="sendSuggested('What events, techfests, and cultural activities are held at SVIT?')" tabindex="0" role="button">
+                                <div class="explore-card-top">
+                                    <div class="explore-card-icon-wrap" style="background:#fce7f3; color:#be185d;"><i data-lucide="sparkles"></i></div>
+                                    <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                                </div>
+                                <div class="explore-card-title">Events &amp; Fests</div>
+                                <div class="explore-card-desc">PRAKARSHT, SPANDAN &amp; HackSVIT</div>
+                            </div>
+                            <!-- 9. Bus Facilities -->
+                            <div class="explore-card" onclick="sendSuggested('What bus facilities and routes are available for students?')" tabindex="0" role="button">
+                                <div class="explore-card-top">
+                                    <div class="explore-card-icon-wrap" style="background:#ffedd5; color:#c2410c;"><i data-lucide="bus"></i></div>
+                                    <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                                </div>
+                                <div class="explore-card-title">Bus Facilities</div>
+                                <div class="explore-card-desc">20+ routes across Vadodara, Anand &amp; Nadiad</div>
+                            </div>
+                            <!-- 10. Central Library -->
+                            <div class="explore-card" onclick="sendSuggested('Tell me about the Central Library, reading room, and book facilities')" tabindex="0" role="button">
+                                <div class="explore-card-top">
+                                    <div class="explore-card-icon-wrap" style="background:#ccfbf1; color:#0f766e;"><i data-lucide="library"></i></div>
+                                    <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                                </div>
+                                <div class="explore-card-title">Central Library</div>
+                                <div class="explore-card-desc">50,000+ volumes, IEEE digital lab &amp; reading hall</div>
+                            </div>
+                            <!-- 11. Sports & Gym -->
+                            <div class="explore-card" onclick="sendSuggested('What sports grounds, indoor games, and gym facilities are available?')" tabindex="0" role="button">
+                                <div class="explore-card-top">
+                                    <div class="explore-card-icon-wrap" style="background:#ede9fe; color:#6d28d9;"><i data-lucide="trophy"></i></div>
+                                    <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                                </div>
+                                <div class="explore-card-title">Sports &amp; Gym</div>
+                                <div class="explore-card-desc">Cricket ground, indoor badminton &amp; modern gym</div>
+                            </div>
+                        </div>
+                        {% else %}
                         <div class="explore-cards-grid">
-
                             <!-- Card 1: Classes -->
                             <div class="explore-card card-classes" onclick="sendSuggested('Show my timetable and schedule for today')" tabindex="0" role="button" aria-label="Classes - Timetables, today's schedule & rooms">
                                 <div class="explore-card-top">
-                                    <div class="explore-card-icon-wrap icon-purple">
-                                        <i data-lucide="calendar"></i>
-                                    </div>
-                                    <div class="explore-card-arrow">
-                                        <i data-lucide="arrow-up-right"></i>
-                                    </div>
+                                    <div class="explore-card-icon-wrap icon-purple"><i data-lucide="calendar"></i></div>
+                                    <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
                                 </div>
                                 <div class="explore-card-title">Classes</div>
                                 <div class="explore-card-desc">Timetables, today's schedule &amp; rooms</div>
                             </div>
-
                             <!-- Card 2: Campus Guide -->
                             <div class="explore-card card-guide" onclick="sendSuggested('Where is the library, labs and department buildings located?')" tabindex="0" role="button" aria-label="Campus Guide - Find labs, departments & important places">
                                 <div class="explore-card-top">
-                                    <div class="explore-card-icon-wrap icon-blue">
-                                        <i data-lucide="map-pin"></i>
-                                    </div>
-                                    <div class="explore-card-arrow">
-                                        <i data-lucide="arrow-up-right"></i>
-                                    </div>
+                                    <div class="explore-card-icon-wrap icon-blue"><i data-lucide="map-pin"></i></div>
+                                    <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
                                 </div>
                                 <div class="explore-card-title">Campus Guide</div>
                                 <div class="explore-card-desc">Find labs, departments &amp; important places</div>
                             </div>
-
                             <!-- Card 3: Notices & Alerts -->
                             <div class="explore-card card-notices" onclick="sendSuggested('What are the latest college notices and announcements?')" tabindex="0" role="button" aria-label="Notices & Alerts - Latest announcements from your college">
                                 <div class="explore-card-top">
-                                    <div class="explore-card-icon-wrap icon-red">
-                                        <i data-lucide="bell"></i>
-                                    </div>
-                                    <div class="explore-card-arrow">
-                                        <i data-lucide="arrow-up-right"></i>
-                                    </div>
+                                    <div class="explore-card-icon-wrap icon-red"><i data-lucide="bell"></i></div>
+                                    <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
                                 </div>
                                 <div class="explore-card-title">Notices &amp; Alerts</div>
                                 <div class="explore-card-desc">Latest announcements from your college</div>
                             </div>
-
                             <!-- Card 4: Events -->
                             <div class="explore-card card-events" onclick="sendSuggested('What are the upcoming technical events, workshops and fests?')" tabindex="0" role="button" aria-label="Events - Workshops, fests & important dates">
                                 <div class="explore-card-top">
-                                    <div class="explore-card-icon-wrap icon-violet">
-                                        <i data-lucide="sparkles"></i>
-                                    </div>
-                                    <div class="explore-card-arrow">
-                                        <i data-lucide="arrow-up-right"></i>
-                                    </div>
+                                    <div class="explore-card-icon-wrap icon-violet"><i data-lucide="sparkles"></i></div>
+                                    <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
                                 </div>
                                 <div class="explore-card-title">Events</div>
                                 <div class="explore-card-desc">Workshops, fests &amp; important dates</div>
                             </div>
-
                             <!-- Card 5: Placements -->
                             <div class="explore-card card-placements" onclick="sendSuggested('Show placement drives, salary statistics & opportunities')" tabindex="0" role="button" aria-label="Placements - Job drives, stats & opportunities">
                                 <div class="explore-card-top">
-                                    <div class="explore-card-icon-wrap icon-green">
-                                        <i data-lucide="briefcase"></i>
-                                    </div>
-                                    <div class="explore-card-arrow">
-                                        <i data-lucide="arrow-up-right"></i>
-                                    </div>
+                                    <div class="explore-card-icon-wrap icon-green"><i data-lucide="briefcase"></i></div>
+                                    <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
                                 </div>
                                 <div class="explore-card-title">Placements</div>
                                 <div class="explore-card-desc">Job drives, stats &amp; opportunities</div>
                             </div>
-
                             <!-- Card 6: Connect -->
                             <div class="explore-card card-connect" onclick="sendSuggested('Show department heads, faculty and administration contact details')" tabindex="0" role="button" aria-label="Connect - Departments, faculty & admin contacts">
                                 <div class="explore-card-top">
-                                    <div class="explore-card-icon-wrap icon-pink">
-                                        <i data-lucide="users"></i>
-                                    </div>
-                                    <div class="explore-card-arrow">
-                                        <i data-lucide="arrow-up-right"></i>
-                                    </div>
+                                    <div class="explore-card-icon-wrap icon-pink"><i data-lucide="users"></i></div>
+                                    <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
                                 </div>
                                 <div class="explore-card-title">Connect</div>
                                 <div class="explore-card-desc">Departments, faculty &amp; admin contacts</div>
                             </div>
-
                         </div>
+                        {% endif %}
                     </div>
 
                 </div>
@@ -726,7 +972,7 @@
                     <div class="composer-leading-logo">
                         <img src="{{ url_for('static', filename='logo/svit logo u.png') }}" alt="SVIT AI" class="composer-logo-img" onerror="this.outerHTML='<span class=\'composer-sparkle-icon\'>✨</span>'">
                     </div>
-                    <input type="text" placeholder="Ask anything about timetables, rooms, events..." id="chatInput" autocomplete="off" required>
+                    <input type="text" placeholder="{% if guest_mode %}Ask about admissions, courses, fees, timings, bus, library...{% else %}Ask anything about timetables, rooms, events...{% endif %}" id="chatInput" autocomplete="off" required>
                     <div class="composer-action-btns">
                         <button type="button" class="voice-btn" id="voiceBtn" onclick="toggleVoiceInput(event)" title="Voice Input (Speech-to-Text)">
                             <i data-lucide="mic"></i>
@@ -751,18 +997,27 @@
             <div class="student-home-hero">
                 <div class="student-home-hero-left">
                     <div class="greeting-pill student-home-greeting">
-                        <span>✨ Hello, {{ current_user.full_name or current_user.name or 'Student' }}! 👋</span>
+                        <span>✨ Hello, {% if guest_mode %}Guest{% else %}{{ current_user.full_name or current_user.name or 'Student' }}{% endif %}! 👋</span>
                     </div>
                     <h1 class="student-home-title">
+                        {% if guest_mode %}
+                        <span class="title-dark">Explore SVIT Vasad.</span><br>
+                        <span class="title-gradient">11 Public Categories.</span>
+                        {% else %}
                         <span class="title-dark">Your Campus.</span><br>
                         <span class="title-gradient">Your AI Assistant.</span>
+                        {% endif %}
                     </h1>
                     <p class="student-home-desc">
+                        {% if guest_mode %}
+                        Official public information on admissions, courses, fees, timings, events, bus facilities, library, and sports.
+                        {% else %}
                         Ask anything about your college — timetables, rooms, events, placements and more.
+                        {% endif %}
                     </p>
                     <div class="student-home-tagline">
                         <span class="tagline-bolt">⚡</span>
-                        <span>Smart answers. Instantly.</span>
+                        <span>{% if guest_mode %}11 Public Categories • Verified SVIT Data{% else %}Smart answers. Instantly.{% endif %}</span>
                     </div>
                 </div>
                 <div class="student-home-hero-visual" aria-hidden="true">
@@ -782,9 +1037,9 @@
             <div class="student-home-composer" id="homeComposerWrapper">
                 <form id="homeChatForm" class="home-input-box" onsubmit="handleHomeFormSubmit(event)">
                     <div class="composer-leading-logo">
-                        <img src="/static/logo/svit%20logo%20u.png" alt="SVIT AI" class="composer-logo-img" onerror="this.outerHTML='<span class=\'composer-sparkle-icon\'>✨</span>'">
+                        <img src="{{ url_for('static', filename='logo/svit logo u.png') }}" alt="SVIT AI" class="composer-logo-img" onerror="this.outerHTML='<span class=\'composer-sparkle-icon\'>✨</span>'">
                     </div>
-                    <input type="text" placeholder="Ask anything about timetables, rooms, events..." id="homeChatInput" autocomplete="off" required>
+                    <input type="text" placeholder="{% if guest_mode %}Ask about admissions, courses, fees, timings, bus, library...{% else %}Ask anything about timetables, rooms, events...{% endif %}" id="homeChatInput" autocomplete="off" required>
                     <div class="composer-action-btns">
                         <button type="button" class="voice-btn" id="homeVoiceBtn" onclick="triggerHomeVoiceInput(event)" title="Voice Input (Speech-to-Text)">
                             <i data-lucide="mic"></i>
@@ -799,9 +1054,35 @@
                 <div class="home-prompt-chips">
                     <div class="home-prompt-chips-header">
                         <span class="home-prompt-chips-label"><i data-lucide="sparkles"></i> Try asking</span>
-                        <button type="button" class="view-all-prompts-btn" onclick="sendSuggested('What is SVIT AI?')">View all &gt;</button>
+                        <button type="button" class="view-all-prompts-btn" onclick="sendSuggested('{% if guest_mode %}Tell me about SVIT Vasad, PKM Trust, and the campus{% else %}What is SVIT AI?{% endif %}')">View all &gt;</button>
                     </div>
                     <div class="prompt-chips-wrapper">
+                        {% if guest_mode %}
+                        <button type="button" class="student-home-chip" onclick="sendSuggested('Tell me about SVIT Vasad, PKM Trust, and the campus')">
+                            <span class="chip-emoji">🏛️</span>
+                            <span>About SVIT</span>
+                        </button>
+                        <button type="button" class="student-home-chip" onclick="sendSuggested('What courses and degree programs are available at SVIT?')">
+                            <span class="chip-emoji">📚</span>
+                            <span>Available Courses</span>
+                        </button>
+                        <button type="button" class="student-home-chip" onclick="sendSuggested('What is the fees structure and scholarships for B.E. and MCA?')">
+                            <span class="chip-emoji">💰</span>
+                            <span>Fees Structure</span>
+                        </button>
+                        <button type="button" class="student-home-chip" onclick="sendSuggested('What is the admission process for engineering at SVIT Vasad?')">
+                            <span class="chip-emoji">🎓</span>
+                            <span>Admission Process</span>
+                        </button>
+                        <button type="button" class="student-home-chip" onclick="sendSuggested('What are the college, administrative office, and library timings?')">
+                            <span class="chip-emoji">⏰</span>
+                            <span>College Timings</span>
+                        </button>
+                        <button type="button" class="student-home-chip" onclick="sendSuggested('What bus facilities and routes are available for students?')">
+                            <span class="chip-emoji">🚌</span>
+                            <span>Bus Facilities</span>
+                        </button>
+                        {% else %}
                         <button type="button" class="student-home-chip" onclick="sendSuggested('What is my next class right now?')">
                             <span class="chip-emoji">🕐</span>
                             <span>What's my next class?</span>
@@ -818,15 +1099,119 @@
                             <span class="chip-emoji">📊</span>
                             <span>Placement stats</span>
                         </button>
+                        {% endif %}
                     </div>
                 </div>
 
-                <p class="disclaimer-text">SVIT AI Assistant provides official campus layout & academic information. Please verify notice deadlines with official department boards.</p>
+                <p class="disclaimer-text">{% if guest_mode %}Guest Mode provides verified information on 11 public categories. For personal timetables, attendance, and notices, please sign in.{% else %}SVIT AI Assistant provides official campus layout & academic information. Please verify notice deadlines with official department boards.{% endif %}</p>
             </div>
 
-            <!-- 3. Explore SVIT: 6 Compact Mini-Cards -->
+            <!-- 3. Explore SVIT: 11 Categories for Guest OR 6 Student Cards -->
             <div class="student-home-explore">
-                <div class="explore-section-title">Explore SVIT</div>
+                <div class="explore-section-title">{% if guest_mode %}11 Public Information Categories{% else %}Explore SVIT{% endif %}</div>
+                {% if guest_mode %}
+                <div class="explore-cards-grid guest-grid">
+                    <!-- 1. About SVIT -->
+                    <div class="explore-card" onclick="sendSuggested('Tell me about SVIT Vasad, PKM Trust, and the campus')" tabindex="0" role="button">
+                        <div class="explore-card-top">
+                            <div class="explore-card-icon-wrap" style="background:#e0e7ff; color:#4338ca;"><i data-lucide="school"></i></div>
+                            <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                        </div>
+                        <div class="explore-card-title">About SVIT</div>
+                        <div class="explore-card-desc">History, PKM Trust, 26-acre campus &amp; leadership</div>
+                    </div>
+                    <!-- 2. Available Courses -->
+                    <div class="explore-card" onclick="sendSuggested('What courses and degree programs are available at SVIT?')" tabindex="0" role="button">
+                        <div class="explore-card-top">
+                            <div class="explore-card-icon-wrap" style="background:#dbeafe; color:#1d4ed8;"><i data-lucide="book-open"></i></div>
+                            <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                        </div>
+                        <div class="explore-card-title">Available Courses</div>
+                        <div class="explore-card-desc">B.E., M.E., MCA, B.Arch &amp; Diploma programs</div>
+                    </div>
+                    <!-- 3. Fees Structure -->
+                    <div class="explore-card" onclick="sendSuggested('What is the fees structure and scholarships for B.E. and MCA?')" tabindex="0" role="button">
+                        <div class="explore-card-top">
+                            <div class="explore-card-icon-wrap" style="background:#dcfce7; color:#15803d;"><i data-lucide="credit-card"></i></div>
+                            <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                        </div>
+                        <div class="explore-card-title">Fees Structure</div>
+                        <div class="explore-card-desc">FRC approved fee rates &amp; MYSY scholarships</div>
+                    </div>
+                    <!-- 4. Admission Process -->
+                    <div class="explore-card" onclick="sendSuggested('What is the admission process for engineering at SVIT Vasad?')" tabindex="0" role="button">
+                        <div class="explore-card-top">
+                            <div class="explore-card-icon-wrap" style="background:#fef3c7; color:#b45309;"><i data-lucide="user-plus"></i></div>
+                            <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                        </div>
+                        <div class="explore-card-title">Admission Process</div>
+                        <div class="explore-card-desc">ACPC online steps, merit list &amp; counseling</div>
+                    </div>
+                    <!-- 5. Eligibility Criteria -->
+                    <div class="explore-card" onclick="sendSuggested('What is the eligibility criteria for admission in B.E.?')" tabindex="0" role="button">
+                        <div class="explore-card-top">
+                            <div class="explore-card-icon-wrap" style="background:#f3e8ff; color:#7e22ce;"><i data-lucide="check-circle"></i></div>
+                            <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                        </div>
+                        <div class="explore-card-title">Eligibility Criteria</div>
+                        <div class="explore-card-desc">10+2 PCM percentage &amp; GUJCET/JEE cutoffs</div>
+                    </div>
+                    <!-- 6. Seats Available -->
+                    <div class="explore-card" onclick="sendSuggested('How many seats are available in each branch at SVIT?')" tabindex="0" role="button">
+                        <div class="explore-card-top">
+                            <div class="explore-card-icon-wrap" style="background:#fee2e2; color:#b91c1c;"><i data-lucide="users"></i></div>
+                            <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                        </div>
+                        <div class="explore-card-title">Seats Available</div>
+                        <div class="explore-card-desc">1,200+ annual intake across departments</div>
+                    </div>
+                    <!-- 7. College Timings -->
+                    <div class="explore-card" onclick="sendSuggested('What are the college, administrative office, and library timings?')" tabindex="0" role="button">
+                        <div class="explore-card-top">
+                            <div class="explore-card-icon-wrap" style="background:#e0f2fe; color:#0369a1;"><i data-lucide="clock"></i></div>
+                            <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                        </div>
+                        <div class="explore-card-title">College Timings</div>
+                        <div class="explore-card-desc">Academic, administrative &amp; library hours</div>
+                    </div>
+                    <!-- 8. Events & Fests -->
+                    <div class="explore-card" onclick="sendSuggested('What events, techfests, and cultural activities are held at SVIT?')" tabindex="0" role="button">
+                        <div class="explore-card-top">
+                            <div class="explore-card-icon-wrap" style="background:#fce7f3; color:#be185d;"><i data-lucide="sparkles"></i></div>
+                            <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                        </div>
+                        <div class="explore-card-title">Events &amp; Fests</div>
+                        <div class="explore-card-desc">PRAKARSHT, SPANDAN &amp; HackSVIT</div>
+                    </div>
+                    <!-- 9. Bus Facilities -->
+                    <div class="explore-card" onclick="sendSuggested('What bus facilities and routes are available for students?')" tabindex="0" role="button">
+                        <div class="explore-card-top">
+                            <div class="explore-card-icon-wrap" style="background:#ffedd5; color:#c2410c;"><i data-lucide="bus"></i></div>
+                            <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                        </div>
+                        <div class="explore-card-title">Bus Facilities</div>
+                        <div class="explore-card-desc">20+ routes across Vadodara, Anand &amp; Nadiad</div>
+                    </div>
+                    <!-- 10. Central Library -->
+                    <div class="explore-card" onclick="sendSuggested('Tell me about the Central Library, reading room, and book facilities')" tabindex="0" role="button">
+                        <div class="explore-card-top">
+                            <div class="explore-card-icon-wrap" style="background:#ccfbf1; color:#0f766e;"><i data-lucide="library"></i></div>
+                            <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                        </div>
+                        <div class="explore-card-title">Central Library</div>
+                        <div class="explore-card-desc">50,000+ volumes, IEEE digital lab &amp; reading hall</div>
+                    </div>
+                    <!-- 11. Sports & Gym -->
+                    <div class="explore-card" onclick="sendSuggested('What sports grounds, indoor games, and gym facilities are available?')" tabindex="0" role="button">
+                        <div class="explore-card-top">
+                            <div class="explore-card-icon-wrap" style="background:#ede9fe; color:#6d28d9;"><i data-lucide="trophy"></i></div>
+                            <div class="explore-card-arrow"><i data-lucide="arrow-up-right"></i></div>
+                        </div>
+                        <div class="explore-card-title">Sports &amp; Gym</div>
+                        <div class="explore-card-desc">Cricket ground, indoor badminton &amp; modern gym</div>
+                    </div>
+                </div>
+                {% else %}
                 <div class="explore-cards-grid">
                     <!-- Card 1: Classes -->
                     <div class="explore-card card-classes" onclick="sendSuggested('Show my timetable and schedule for today')" tabindex="0" role="button" aria-label="Classes - Timetables, today's schedule & rooms">
@@ -888,6 +1273,7 @@
                         <div class="explore-card-desc">Departments, faculty &amp; admin contacts</div>
                     </div>
                 </div>
+                {% endif %}
             </div>
         </div>
     </template>
@@ -901,9 +1287,9 @@
 
             <form id="chatForm" class="input-box" onsubmit="handleNormalFormSubmit(event)">
                 <div class="composer-leading-logo">
-                    <img src="/static/logo/svit%20logo%20u.png" alt="SVIT AI" class="composer-logo-img" onerror="this.outerHTML='<span class=\'composer-sparkle-icon\'>✨</span>'">
+                    <img src="{{ url_for('static', filename='logo/svit logo u.png') }}" alt="SVIT AI" class="composer-logo-img" onerror="this.outerHTML='<span class=\'composer-sparkle-icon\'>✨</span>'">
                 </div>
-                <input type="text" placeholder="Ask anything about timetables, rooms, events..." id="chatInput" autocomplete="off" required>
+                <input type="text" placeholder="{% if guest_mode %}Ask about admissions, courses, fees, timings, bus, library...{% else %}Ask anything about timetables, rooms, events...{% endif %}" id="chatInput" autocomplete="off" required>
                 <div class="composer-action-btns">
                     <button type="button" class="voice-btn" id="voiceBtn" onclick="toggleVoiceInput(event)" title="Voice Input (Speech-to-Text)">
                         <i data-lucide="mic"></i>
@@ -916,6 +1302,7 @@
         </div>
     </template>
 
+    {% if not guest_mode %}
     <!-- Mobile Student Profile Slide-in Modal/Panel -->
     <div class="mobile-profile-backdrop" id="mobileProfileBackdrop" onclick="closeMobileProfilePanel()"></div>
     <div class="mobile-profile-panel" id="mobileProfilePanel">
@@ -983,6 +1370,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
     <!-- Mobile Dedicated Notification Slide-in Drawer / Sheet -->
     <div class="mobile-notif-backdrop" id="mobileNotifBackdrop" onclick="toggleMobileNotifDrawer(false)"></div>

@@ -8,7 +8,7 @@ import re
 import json
 import uuid
 from datetime import datetime
-from flask import Blueprint, request, jsonify, current_app, Response, stream_with_context
+from flask import Blueprint, request, jsonify, current_app, Response, stream_with_context, session
 from flask_login import current_user
 
 
@@ -223,11 +223,56 @@ def handle_chat_stream():
     if not user_text:
         return jsonify({"status": "error", "message": "Message cannot be empty."}), 400
 
+    # Detect whether request is under Guest mode
+    is_authenticated = bool(current_user and getattr(current_user, 'is_authenticated', False))
+    is_guest = bool(data.get('is_guest')) or bool(session.get('is_guest')) or not is_authenticated
+
+    conv_id = conversation_id or str(uuid.uuid4())
+
+    # 1. GUEST ACCESS RESTRICTION & ROUTING
+    if is_guest:
+        from app.ai.guest_service import classify_guest_query
+        guest_res = classify_guest_query(user_text)
+
+        def guest_event_stream():
+            ans_text = guest_res.get("response_text") or ""
+            words = ans_text.split(" ")
+            chunk_size = 4
+            for i in range(0, len(words), chunk_size):
+                chunk = " ".join(words[i:i+chunk_size])
+                if i + chunk_size < len(words):
+                    chunk += " "
+                yield f"data: {json.dumps({'chunk': chunk, 'conversation_id': conv_id})}\n\n"
+
+            sources = ["https://svitvasad.ac.in/ (Official SVIT Portal)"] if guest_res.get("is_guest_allowed") else ["SVIT Guest Access Policy"]
+            suggestions = guest_res.get("followup_suggestions") or []
+
+            yield f"data: {json.dumps({'done': True, 'conversation_id': conv_id, 'message_id': 'guest_msg_' + conv_id[:8], 'answer': ans_text, 'image': None, 'location': None, 'sources': sources, 'suggestions': suggestions})}\n\n"
+
+        return Response(stream_with_context(guest_event_stream()), mimetype='text/event-stream')
+
+    # For logged-in students, also provide instant official answers to public informational categories
+    from app.ai.guest_service import classify_guest_query
+    pub_res = classify_guest_query(user_text)
+    if pub_res.get("is_guest_allowed") and pub_res.get("matched_category") in ["about_svit", "fees", "admission", "eligibility", "seats", "timing"] and not pub_res.get("is_greeting"):
+        ans_text = pub_res.get("response_text")
+        def student_pub_stream():
+            words = ans_text.split(" ")
+            chunk_size = 4
+            for i in range(0, len(words), chunk_size):
+                chunk = " ".join(words[i:i+chunk_size])
+                if i + chunk_size < len(words):
+                    chunk += " "
+                yield f"data: {json.dumps({'chunk': chunk, 'conversation_id': conv_id})}\n\n"
+            sources = ["https://svitvasad.ac.in/ (Official SVIT Portal)"]
+            suggestions = pub_res.get("followup_suggestions") or []
+            yield f"data: {json.dumps({'done': True, 'conversation_id': conv_id, 'message_id': 'msg_' + conv_id[:8], 'answer': ans_text, 'image': None, 'location': None, 'sources': sources, 'suggestions': suggestions})}\n\n"
+        return Response(stream_with_context(student_pub_stream()), mimetype='text/event-stream')
+
     student_id = get_real_student_id()
     user_profile = get_current_student_profile()
 
     # Pre-resolve or create conversation session
-    conv_id = conversation_id or str(uuid.uuid4())
     title_summary = user_text[:35].strip() + ("..." if len(user_text) > 35 else "")
 
     # Save to MongoDB
@@ -371,10 +416,53 @@ def handle_chat():
     if not user_text:
         return jsonify({"status": "error", "message": "Message cannot be empty."}), 400
 
+    is_authenticated = bool(current_user and getattr(current_user, 'is_authenticated', False))
+    is_guest = bool(data.get('is_guest')) or bool(session.get('is_guest')) or not is_authenticated
+
+    conv_id = conversation_id or str(uuid.uuid4())
+
+    # 1. GUEST ACCESS RESTRICTION & ROUTING
+    if is_guest:
+        from app.ai.guest_service import classify_guest_query
+        guest_res = classify_guest_query(user_text)
+        ans_text = guest_res.get("response_text") or ""
+        sources = ["https://svitvasad.ac.in/ (Official SVIT Portal)"] if guest_res.get("is_guest_allowed") else ["SVIT Guest Access Policy"]
+        suggestions = guest_res.get("followup_suggestions") or []
+
+        return jsonify({
+            "status": "success",
+            "conversation_id": conv_id,
+            "message_id": "guest_msg_" + conv_id[:8],
+            "answer": ans_text,
+            "response": ans_text,
+            "image": None,
+            "location": None,
+            "sources": sources,
+            "suggestions": suggestions
+        })
+
+    # For logged-in students, also provide instant official answers to public informational categories
+    from app.ai.guest_service import classify_guest_query
+    pub_res = classify_guest_query(user_text)
+    if pub_res.get("is_guest_allowed") and pub_res.get("matched_category") in ["about_svit", "fees", "admission", "eligibility", "seats", "timing"] and not pub_res.get("is_greeting"):
+        ans_text = pub_res.get("response_text")
+        sources = ["https://svitvasad.ac.in/ (Official SVIT Portal)"]
+        suggestions = pub_res.get("followup_suggestions") or []
+        return jsonify({
+            "status": "success",
+            "conversation_id": conv_id,
+            "message_id": "msg_" + conv_id[:8],
+            "answer": ans_text,
+            "response": ans_text,
+            "image": None,
+            "location": None,
+            "sources": sources,
+            "suggestions": suggestions
+        })
+
     student_id = get_real_student_id()
     user_profile = get_current_student_profile()
 
-    conv_id = conversation_id or str(uuid.uuid4())
     title_summary = user_text[:35].strip() + ("..." if len(user_text) > 35 else "")
 
     # Save to MongoDB

@@ -36,6 +36,14 @@ def is_safe_url(target: str) -> bool:
 # =========================================================
 # 1. UNIFIED LOGIN ROUTE (Handles Student / Faculty & Admin)
 # =========================================================
+@auth_bp.route('/guest')
+@auth_bp.route('/skip')
+def guest_entry():
+    """Allows skipping login to access SVIT public chatbot as a guest."""
+    session['is_guest'] = True
+    return redirect(url_for('guest.guest_chat'))
+
+
 @auth_bp.route('/student/login', methods=['GET', 'POST'])
 @auth_bp.route('/login', methods=['GET', 'POST'], endpoint='login')
 def student_login():

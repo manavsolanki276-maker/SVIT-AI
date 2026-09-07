@@ -120,7 +120,8 @@ async function submitMessage(text) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 message: text,
-                conversation_id: activeConvId
+                conversation_id: activeConvId,
+                is_guest: Boolean(window.IS_GUEST_MODE)
             })
         });
 
@@ -210,7 +211,8 @@ async function submitMessage(text) {
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             message: text,
-                            conversation_id: activeConvId
+                            conversation_id: activeConvId,
+                            is_guest: Boolean(window.IS_GUEST_MODE)
                         })
                     });
                     if (res.status !== 404) {
@@ -1626,6 +1628,20 @@ window.triggerSidebarAction = triggerSidebarAction;
 async function loadSidebarRecents() {
     const container = document.getElementById('sidebarRecentList');
     if (!container) return;
+
+    if (window.IS_GUEST_MODE) {
+        container.innerHTML = `
+            <div class="recents-guest-box" style="padding: 14px 12px; text-align: center; color: #64748b; font-size: 0.78rem; background: #f8fafc; border-radius: 8px; border: 1px dashed #cbd5e1; margin: 8px 4px;">
+                <div style="font-weight: 600; color: #334155; margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                    <i data-lucide="compass" style="width: 14px; height: 14px; color: #4f46e5;"></i>
+                    <span>Public Guest Mode</span>
+                </div>
+                <div style="line-height: 1.4; color: #64748b;">Chat history is disabled for guest sessions. <a href="/login" style="color: #4f46e5; font-weight: 600; text-decoration: underline;">Sign in</a> to save chats.</div>
+            </div>
+        `;
+        if (window.lucide) lucide.createIcons();
+        return;
+    }
 
     try {
         const res = await fetch('/chat/history');

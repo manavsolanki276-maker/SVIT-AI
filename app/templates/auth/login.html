@@ -21,6 +21,42 @@
     <!-- Stylesheets -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/auth/login.css') }}">
+    <style>
+        .guest-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            width: 100%;
+            padding: 11px 16px;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            color: #334155;
+            font-size: 13.5px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+        }
+        .guest-btn:hover {
+            background: #eef2ff;
+            border-color: #818cf8;
+            color: #4338ca;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.12);
+        }
+        .guest-pill {
+            background: #e0e7ff;
+            color: #4338ca;
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+    </style>
 </head>
 <body>
     <!-- GLOBAL ANIMATED LOADER -->
@@ -164,6 +200,15 @@
                             <span id="loginBtnText">Sign In</span>
                         </button>
                     </form>
+
+                    <!-- Skip & Continue as Guest Button -->
+                    <div style="margin-top: 14px;">
+                        <a href="{{ url_for('guest.guest_chat') }}" class="guest-btn" id="guestLoginBtn" title="Continue as Guest without login (11 Public SVIT Categories)">
+                            <i data-lucide="compass" style="width: 17px; height: 17px; color: #6366f1;"></i>
+                            <span>Skip &amp; Continue as Guest</span>
+                            <span class="guest-pill">Public Info</span>
+                        </a>
+                    </div>
 
                     <!-- Divider -->
                     <div class="divider">

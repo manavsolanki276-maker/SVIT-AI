@@ -146,8 +146,12 @@ def create_app():
     except ImportError:
         notification_bp = None
 
+    # Guest Blueprint (Public access without login)
+    from app.routes.guest import guest_bp
+
     # Register Blueprints
     app.register_blueprint(auth_bp)        # Handles /auth/...
+    app.register_blueprint(guest_bp)       # Handles /guest/...
     app.register_blueprint(student_bp)     # Handles /student/...
     app.register_blueprint(chat_bp)        # Handles /api/chat
     app.register_blueprint(history_bp)     # Handles /chat/history-page, /chat/clear-range
@@ -199,6 +203,7 @@ def create_app():
     # =========================================================
     @app.route('/')
     def index():
+        from flask import session
         if current_user.is_authenticated:
             if getattr(current_user, 'is_admin', False):
                 return redirect(url_for('admin.dashboard'))
@@ -219,9 +224,20 @@ def create_app():
                 return redirect('/student/profile/complete')
             
             # Render chat page directly without an intermediate 302 bounce
-            return render_template('student/chat.html')
+            return render_template('student/chat.html', is_guest=False)
+
+        if session.get('is_guest'):
+            return redirect(url_for('guest.guest_chat'))
 
         return redirect(url_for('auth.login'))
+
+    @app.route('/guest')
+    @app.route('/skip')
+    @app.route('/continue-as-guest')
+    def root_guest():
+        from flask import session
+        session['is_guest'] = True
+        return redirect(url_for('guest.guest_chat'))
 
     @app.route('/login', methods=['GET', 'POST'])
     def root_login():
