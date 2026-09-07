@@ -141,11 +141,17 @@ CATEGORY_RESPONSES = {
         "* 📞 **Engineering (B.E., M.E., MCA, D.Voc)**: `+91-9510782981 / 82` | `+91-9510782983 / 84`\n"
         "* 💼 **Training & Placement Cell**: `+91-9316770768`\n"
         "* 🏛️ **Architecture & Interior Design**: `+91-9510782985`\n"
-        "* 📧 **Official Email**: `principal@svitvasad.ac.in`\n"
-        "* 🌐 **Official Website**: [https://svitvasad.ac.in/](https://svitvasad.ac.in/)\n"
-        "* 📄 **About Us Portal**: [https://svitvasad.ac.in/Engineering/AboutUs/index.html](https://svitvasad.ac.in/Engineering/AboutUs/index.html)"
+        "* 📧 **Official Email**: `principal@svitvasad.ac.in`\n\n"
+        "#### 🌐 Official SVIT Portals & Web Links:\n"
+        "* 🏠 **Official Website Home**: [https://svitvasad.ac.in/Home/Index/index.html](https://svitvasad.ac.in/Home/Index/index.html)\n"
+        "* 📜 **About Us Portal**: [https://svitvasad.ac.in/Engineering/AboutUs/index.html](https://svitvasad.ac.in/Engineering/AboutUs/index.html)\n"
+        "* 🏛️ **The College (Board of Management & Chairman's Message)**: [https://svitvasad.ac.in/Home/TheCollege/index.html](https://svitvasad.ac.in/Home/TheCollege/index.html)\n"
+        "* 🏢 **Central Facilities**: [https://svitvasad.ac.in/Home/Facilities/index.html](https://svitvasad.ac.in/Home/Facilities/index.html)\n"
+        "* 💼 **Placement & Career**: [https://svitvasad.ac.in/Home/Placement/index.html](https://svitvasad.ac.in/Home/Placement/index.html)\n"
+        "* 🎓 **Admissions Portal**: [https://svitvasad.ac.in/Home/Admissions/index.html](https://svitvasad.ac.in/Home/Admissions/index.html)\n"
+        "* 💳 **Online Fees Payment (SVIT ERP)**: [https://sviterp.com/](https://sviterp.com/)\n"
+        "* 🤝 **SVIT Alumni Portal**: [https://alumni.svitvasad.ac.in/](https://alumni.svitvasad.ac.in/)"
     ),
-
 
     "courses": (
         "### 📚 Academic Programs & Courses Offered at SVIT Vasad\n\n"
@@ -168,7 +174,7 @@ CATEGORY_RESPONSES = {
         "* Computer Engineering, Information Technology, Mechanical, Civil, Electrical, and Automobile Engineering.\n\n"
         "#### 4. Architecture:\n"
         "* 🏛️ **B.Arch (Bachelor of Architecture)** — 5-Year degree offered through the SVIT College of Architecture.\n\n"
-        "🌐 Official Details: [https://svitvasad.ac.in/departments](https://svitvasad.ac.in/)"
+        "🌐 Official Details: [https://svitvasad.ac.in/Home/Index/index.html](https://svitvasad.ac.in/Home/Index/index.html)"
     ),
 
     "fees": (
@@ -180,6 +186,8 @@ CATEGORY_RESPONSES = {
         "* **Master of Engineering (M.E.)**: Approx. **₹72,000 – ₹75,000 / year**\n"
         "* **Diploma Engineering**: Approx. **₹42,000 – ₹45,000 / year**\n\n"
         "*(Note: Official fees are subject to periodic revision by FRC Gujarat. Examination and university enrollment fees are paid separately as per GTU regulations).* \n\n"
+        "#### 💳 Online Fees Payment Portal:\n"
+        "* Students and parents can pay college fees online through the **SVIT ERP Portal**: [https://sviterp.com/](https://sviterp.com/)\n\n"
         "#### 🎓 Government Scholarships & Financial Aid:\n"
         "* **MYSY (Mukhyamantri Yuva Swavalamban Yojana)**: 50% tuition fee subsidy (up to ₹50,000/year) for eligible students with ≥80 percentile in 10+2 and family income ≤ ₹6 LPA.\n"
         "* **Digital Gujarat Scholarships**: Full/partial fee reimbursement for SC / ST / SEBC / NT-DNT / EWS category students.\n"
@@ -196,6 +204,8 @@ CATEGORY_RESPONSES = {
         "3. **Choice Filling (Mock & Actual Rounds)**: Log in and select **Sardar Vallabhbhai Patel Institute of Technology (SVIT), Vasad** and your desired branches (e.g., Computer, IT, AI & ML) in your preference list.\n"
         "4. **Seat Allotment**: ACPC publishes Round 1 & Round 2 allotment results based on your merit percentile and branch choices.\n"
         "5. **Fee Token & Reporting**: Pay the online token admission fee through ACPC to confirm your seat, download the allotment letter, and report to the SVIT Vasad campus student section for final admission confirmation.\n\n"
+        "#### 🔗 Official SVIT Admissions Portal:\n"
+        "* For official college admission circulars, vacant quota notices, and branch seats, visit: [https://svitvasad.ac.in/Home/Admissions/index.html](https://svitvasad.ac.in/Home/Admissions/index.html)\n\n"
         "#### 🏫 Management & Vacant Quota:\n"
         "* Vacant seats remaining after ACPC online rounds are filled strictly as per ACPC guidelines through institute-level merit notices published on [https://svitvasad.ac.in/](https://svitvasad.ac.in/).\n\n"
         "#### 📌 Other Programs:\n"
@@ -325,7 +335,35 @@ CATEGORY_RESPONSES = {
         "#### 🏋️ Modern Fitness Gymnasium:\n"
         "* Fully equipped air-cooled gym with motorized treadmills, elliptical trainers, cross-trainers, dumbbells, bench presses, and multi-gym workout stations under the guidance of a qualified physical training instructor.\n"
         "* **Gym Timings**: 06:30 AM – 08:00 AM (Morning) & 04:30 PM – 06:30 PM (Evening).\n\n"
-        "SVIT teams actively participate and consistently win laurels in the annual **GTU Spirit Sports Tournaments** and inter-university meets."
+        "SVIT teams actively participate and consistently win laurels in the annual **GTU Spirit Sports Tournaments** and inter-university meets.\n\n"
+        "#### 🏢 Central Facilities Portal:\n"
+        "* For details on all sports arenas, gym, and grounds, visit: [https://svitvasad.ac.in/Home/Facilities/index.html](https://svitvasad.ac.in/Home/Facilities/index.html)"
+    ),
+
+    "placement": (
+        "### 💼 SVIT Vasad Training & Placement Cell\n\n"
+        "SVIT Vasad has a highly active Training & Placement Cell that prepares students for corporate careers and conducts campus placement drives with top global companies.\n\n"
+        "#### 🌟 Placement Highlights & Top Recruiters:\n"
+        "* **Top Recruiters**: TCS, Infosys, L&T, Reliance Industries, Adani Group, Cognizant, Wipro, Capgemini, Torrent Power, Polycab, MG Motors, and eInfochips.\n"
+        "* **Salary Packages**: Highest salary package reaching **₹12 – ₹15 LPA** with an average package of **₹3.5 – ₹5.5 LPA**.\n"
+        "* **Training Programs**: Technical coding bootcamps, mock aptitude tests, group discussions, and expert career guidance.\n\n"
+        "#### 🔗 Official Placement & Career Portal:\n"
+        "* 💼 **Placement Portal**: [https://svitvasad.ac.in/Home/Placement/index.html](https://svitvasad.ac.in/Home/Placement/index.html)\n"
+        "* 📞 **Placement Officer**: `+91-9316770768` | `placement@svitvasad.ac.in`"
+    ),
+
+    "facilities": (
+        "### 🏢 Central Facilities & Campus Infrastructure at SVIT Vasad\n\n"
+        "SVIT Vasad features comprehensive, world-class facilities across its 26-acre campus on the banks of River Mahisagar:\n\n"
+        "#### 📌 Central Facilities Overview:\n"
+        "* 📖 **Central Library**: 50,000+ volumes, IEEE digital resources, and 250+ capacity reading hall.\n"
+        "* 💻 **Computing Labs**: Modern computer laboratories with high-speed internet connectivity.\n"
+        "* ⚙️ **Engineering Workshops**: Advanced mechanical, civil, electrical, and electronics practical labs.\n"
+        "* ☕ **Central & Diploma Canteens**: Clean, hygienic food courts for students and staff.\n"
+        "* ⚽ **5-Acre Sports Zone**: Cricket ground, indoor badminton courts, modern gymnasium, and basketball courts.\n"
+        "* 🏦 **Campus Amenities**: Bank counter, student stationery store, medical first-aid room, and 24x7 security.\n\n"
+        "#### 🔗 Official Central Facilities Portal:\n"
+        "* 🏢 **Central Facilities Portal**: [https://svitvasad.ac.in/Home/Facilities/index.html](https://svitvasad.ac.in/Home/Facilities/index.html)"
     )
 }
 
@@ -343,7 +381,9 @@ CATEGORY_KEYWORDS = {
         "vision", "mission", "vision and mission", "vision & mission", "aim", "objective", "objectives",
         "nest", "new english school", "new english school trust",
         "shantibhai", "shantibhai amin", "prof shantibhai amin", "shivabhai", "shivabhai patel",
-        "board of management", "founding chairman", "chairman", "leadership", "founder", "founders",
+        "the college", "thecollege", "board of management", "founding chairman", "chairman", "chairman message",
+        "leadership", "founder", "founders",
+        "alumni", "alumni portal", "alumni network", "home page", "official home",
         "mandatory disclosure", "contact number", "phone number", "helpline", "phone", "helpline number",
         "history of svit", "how svit was founded", "who founded svit", "why svit was named"
     ],
@@ -359,13 +399,22 @@ CATEGORY_KEYWORDS = {
         "fee", "fees", "fee structure", "fees structure", "tuition fee", "cost of study",
         "frc", "frc fee", "scholarship", "scholarships", "mysy", "digital gujarat",
         "how much is fee", "fee for be", "fee for mca", "fee for diploma", "payment",
-        "annual fee", "yearly fee", "concession", "financial aid"
+        "annual fee", "yearly fee", "concession", "financial aid",
+        "sviterp", "sviterp.com", "online fees", "fee portal", "pay fee", "pay fees", "pay online"
     ],
     "admission": [
         "admission", "admissions", "admission process", "how to apply", "how to get admission",
         "how can i get admission", "acpc", "acpdc", "gujcet", "merit list", "choice filling",
         "seat allotment", "reporting", "vacant quota", "management quota", "counseling",
-        "application form", "admission procedure", "steps for admission", "apply online"
+        "application form", "admission procedure", "steps for admission", "apply online",
+        "admission link", "admission portal", "admissions page", "apply link"
+    ],
+    "placement": [
+        "placement", "placements", "career", "campus placement", "recruiter", "recruiters",
+        "training and placement", "job", "jobs", "salary package", "highest package", "placement portal"
+    ],
+    "facilities": [
+        "facilities", "facility", "central facilities", "campus facilities", "infrastructure portal"
     ],
     "eligibility": [
         "eligibility", "eligible", "eligibility criteria", "cut off", "cutoff",
