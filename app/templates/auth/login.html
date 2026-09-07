@@ -91,12 +91,95 @@
             text-decoration: underline !important;
         }
 
+        /* 3-Tab Role Selector Support */
+        .role-tabs {
+            display: flex;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 22px;
+            gap: 4px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 6px;
+            border: none;
+            background: transparent;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 12px;
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .tab-btn i {
+            width: 15px;
+            height: 15px;
+            flex-shrink: 0;
+        }
+
+        .tab-btn.active {
+            background: #ffffff;
+            color: #1d4ed8;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .tab-btn.tab-guest {
+            color: #4f46e5;
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px dashed rgba(99, 102, 241, 0.35);
+        }
+
+        .tab-btn.tab-guest:hover {
+            background: #4f46e5;
+            color: #ffffff;
+            border-style: solid;
+            border-color: #4f46e5;
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
+        }
+
+        .tab-btn.tab-guest i {
+            color: #6366f1;
+            transition: color 0.2s ease;
+        }
+
+        .tab-btn.tab-guest:hover i {
+            color: #ffffff;
+        }
+
+        .tab-text-short {
+            display: none;
+        }
+
         @media (max-width: 640px) {
             .skip-side-btn {
                 top: 14px;
                 right: 14px;
                 padding: 4px 9px;
                 font-size: 11px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tab-text-full {
+                display: none;
+            }
+            .tab-text-short {
+                display: inline;
+            }
+            .tab-btn {
+                padding: 8px 4px;
+                font-size: 11px;
+                gap: 4px;
             }
         }
     </style>
@@ -201,16 +284,21 @@
                       {% endif %}
                     {% endwith %}
 
-                    <!-- Role Tabs (Student / Faculty & Admin) -->
+                    <!-- Role Tabs (Student / Faculty, Admin & Skip / Guest) -->
                     <div class="role-tabs">
                         <button type="button" class="tab-btn {% if selected_tab != 'admin' %}active{% endif %}" id="studentTab" onclick="switchRole('student')">
                             <i data-lucide="user"></i>
-                            <span>Student / Faculty</span>
+                            <span class="tab-text-full">Student / Faculty</span>
+                            <span class="tab-text-short">Student</span>
                         </button>
                         <button type="button" class="tab-btn {% if selected_tab == 'admin' %}active{% endif %}" id="adminTab" onclick="switchRole('admin')">
                             <i data-lucide="shield-check"></i>
                             <span>Admin</span>
                         </button>
+                        <a href="{{ url_for('guest.guest_chat') }}" class="tab-btn tab-guest" id="guestTab" title="Skip login & continue as Guest" aria-label="Skip for Guest">
+                            <i data-lucide="compass"></i>
+                            <span>Skip / Guest</span>
+                        </a>
                     </div>
 
                     <!-- Login Form -->
