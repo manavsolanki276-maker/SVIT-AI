@@ -22,39 +22,82 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/auth/login.css') }}">
     <style>
-        .guest-btn {
-            display: flex;
+        .form-card {
+            position: relative;
+        }
+
+        /* Small Side Button for Skip */
+        .skip-side-btn {
+            position: absolute;
+            top: 20px;
+            right: 22px;
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            gap: 9px;
-            width: 100%;
-            padding: 11px 16px;
-            border-radius: 12px;
-            background: #f8fafc;
-            border: 1.5px solid #e2e8f0;
-            color: #334155;
-            font-size: 13.5px;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 9999px;
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            color: #4f46e5;
+            font-size: 12px;
             font-weight: 600;
             text-decoration: none;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 1px 2px rgba(79, 70, 229, 0.08);
+            z-index: 10;
         }
-        .guest-btn:hover {
-            background: #eef2ff;
-            border-color: #818cf8;
-            color: #4338ca;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.12);
+
+        .skip-side-btn:hover {
+            background: #4f46e5;
+            color: #ffffff;
+            border-color: #4f46e5;
+            transform: translateX(2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
         }
-        .guest-pill {
-            background: #e0e7ff;
-            color: #4338ca;
-            font-size: 10.5px;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
+
+        .skip-side-btn .skip-side-icon {
+            width: 13px;
+            height: 13px;
+            color: #6366f1;
+            transition: color 0.2s ease;
+        }
+
+        .skip-side-btn:hover .skip-side-icon {
+            color: #ffffff;
+        }
+
+        .skip-side-btn .skip-side-arrow {
+            width: 13px;
+            height: 13px;
+            transition: transform 0.2s ease;
+        }
+
+        .skip-side-btn:hover .skip-side-arrow {
+            transform: translateX(2px);
+        }
+
+        .skip-prompt-sep {
+            margin: 0 6px;
+            color: #cbd5e1;
+        }
+
+        .skip-prompt-link {
+            color: #4f46e5 !important;
+            font-weight: 600 !important;
+            text-decoration: none;
+        }
+
+        .skip-prompt-link:hover {
+            text-decoration: underline !important;
+        }
+
+        @media (max-width: 640px) {
+            .skip-side-btn {
+                top: 14px;
+                right: 14px;
+                padding: 4px 9px;
+                font-size: 11px;
+            }
         }
     </style>
 </head>
@@ -130,6 +173,13 @@
         <div class="form-section">
             <div class="form-scroll-container">
                 <div class="form-card">
+                    <!-- Small Side Skip Button -->
+                    <a href="{{ url_for('guest.guest_chat') }}" class="skip-side-btn" id="guestSkipSideBtn" title="Continue as Guest without login" aria-label="Continue as Guest">
+                        <i data-lucide="compass" class="skip-side-icon"></i>
+                        <span>Skip for Guest</span>
+                        <i data-lucide="chevron-right" class="skip-side-arrow"></i>
+                    </a>
+
                     <!-- Form Header with SVIT Logo in Rounded Card -->
                     <div class="form-header">
                         <div class="form-logo-box">
@@ -201,15 +251,6 @@
                         </button>
                     </form>
 
-                    <!-- Skip & Continue as Guest Button -->
-                    <div style="margin-top: 14px;">
-                        <a href="{{ url_for('guest.guest_chat') }}" class="guest-btn" id="guestLoginBtn" title="Continue as Guest without login (11 Public SVIT Categories)">
-                            <i data-lucide="compass" style="width: 17px; height: 17px; color: #6366f1;"></i>
-                            <span>Skip &amp; Continue as Guest</span>
-                            <span class="guest-pill">Public Info</span>
-                        </a>
-                    </div>
-
                     <!-- Divider -->
                     <div class="divider">
                         <span>or continue with</span>
@@ -231,9 +272,11 @@
                         </button>
                     </div>
 
-                    <!-- Register Link -->
+                    <!-- Register Link with subtle skip option -->
                     <p class="register-prompt">
                         New here? <a href="{{ url_for('auth.register') }}">Register now</a>
+                        <span class="skip-prompt-sep">•</span>
+                        <a href="{{ url_for('guest.guest_chat') }}" class="skip-prompt-link" title="Continue as Guest">Continue as Guest</a>
                     </p>
                 </div>
 
