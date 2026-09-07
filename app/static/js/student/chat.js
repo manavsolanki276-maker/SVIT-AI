@@ -823,7 +823,11 @@ function sendFirstSuggestionOrFocus() {
     } else if (normalInput && normalInput.value.trim()) {
         handleNormalFormSubmit();
     } else {
-        sendSuggested("What's my next class right now?");
+        if (window.IS_GUEST_MODE) {
+            sendSuggested("Tell me about SVIT Vasad, PKM Trust, and the campus");
+        } else {
+            sendSuggested("What's my next class right now?");
+        }
     }
 }
 window.sendFirstSuggestionOrFocus = sendFirstSuggestionOrFocus;

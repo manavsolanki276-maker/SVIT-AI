@@ -113,17 +113,39 @@ CATEGORY_RESPONSES = {
     "about_svit": (
         "### 🏛️ About SVIT Vasad (Sardar Vallabhbhai Patel Institute of Technology)\n\n"
         "**Sardar Vallabhbhai Patel Institute of Technology (SVIT)**, Vasad was established in **1997** "
-        "with the noble vision of imparting high-quality technical and management education in Gujarat.\n\n"
-        "#### 📌 Key Institutional Highlights:\n"
-        "* **Managing Trust**: Managed by **Prajapati Kelavani Mandal (PKM)** (Trust Reg. No. E-274 Kheda), a premier registered charitable educational trust dedicated to advancing technical education.\n"
-        "* **Affiliation & Approvals**: Approved by the **All India Council for Technical Education (AICTE)**, New Delhi, recognized by the Directorate of Technical Education (DTE), Government of Gujarat, and affiliated to **Gujarat Technological University (GTU)**, Ahmedabad.\n"
-        "* **Institutional Leadership**: Guided by **Principal & Professor Dr. D. P. Soni**.\n"
-        "* **Scenic Campus**: Spread across **26 lush green acres** located peacefully on the banks of River Mahisagar at Vasad, Anand district.\n"
-        "* **Location & Connectivity**: Behind Vasad Railway Station, Vasad - 388306, District Anand, Gujarat. Strategically situated right on the NH-48 corridor between Vadodara (~18 km) and Anand (~20 km).\n"
-        "* **Official Website**: [https://svitvasad.ac.in/](https://svitvasad.ac.in/)\n"
-        "* **Contact**: `principal@svitvasad.ac.in` | `02692-274766`\n\n"
-        "The institute boasts modern computing laboratories, advanced engineering workshops, an active Training & Placement Cell, vibrant student clubs, and state-of-the-art sports facilities."
+        "by **The New English School Trust (NEST)** as a tribute to the great national leader **Sardar Vallabhbhai Patel**, "
+        "with the noble mission of imparting high-quality technical education in Gujarat.\n\n"
+        "#### 📜 Institutional History & Founding:\n"
+        "* **Founding Leadership**: The Trust requested **Prof. Shantibhai Amin**, a philanthropic-administrator, to take the responsibility of establishing the college as **Chairman of the Board of Management**, supported by **Shri Shivabhai Patel** and eminent educationists and technocrats of the region.\n"
+        "* **1997 Genesis**: Started with three conventional engineering disciplines — **Civil Engineering (60 seats)**, **Mechanical Engineering (60 seats)**, and **Electrical Engineering (60 seats)**, approved by AICTE New Delhi and affiliated with Gujarat University (now GTU).\n"
+        "* **Expansion Milestones**: \n"
+        "  - **1998**: Introduced **Computer Engineering** and **Information Technology** (+80 intake).\n"
+        "  - **1999**: Introduced **Electronics & Communication Engineering** (40 intake).\n"
+        "  - **2003**: Introduced **MCA (Master of Computer Applications)**.\n"
+        "* **Managing Trust**: Managed by **The New English School Trust (NEST)** / **Prajapati Kelavani Mandal (PKM)** (Trust Reg. No. E-274 Kheda).\n"
+        "* **Institutional Leadership Today**: Guided by **Principal & Professor Dr. D. P. Soni**.\n\n"
+        "#### 🎯 Official Vision Statement:\n"
+        "> *\"To be an excellent academic institute by imparting quality technical education to the prospective engineers and carve them into value added technocrats who seek professional excellence, nation building and social responsibility.\"*\n\n"
+        "#### 🚀 Official Mission Statements (6 Core Pillars):\n"
+        "1. **Institution of Repute**: To be known as an institution of repute safeguarding societal and national interest.\n"
+        "2. **Faculty Excellence**: To cultivate adaptability and groom faculty members with changing trends in their fields by giving them opportunities to upgrade.\n"
+        "3. **Societal & Industry Alignment**: To constantly align and orient as per societal needs by delivering knowledge on contemporary themes in accordance with job potential.\n"
+        "4. **Student-Centric Environment**: To facilitate a student–centric environment and offer them industrial and practical exposure.\n"
+        "5. **Research & Innovation**: To adopt appropriate processes and practices in the field of education, research and innovation to prepare students for professional challenges.\n"
+        "6. **Ethical Values & Sardar Patel Ideals**: To offer robust co-curricular & extra-curricular activity support to inculcate ethical values, right attitude and sound professionalism, following the ideals of Sardar Patel.\n\n"
+        "#### 📍 Scenic Campus & Location:\n"
+        "* **Campus Size**: **26 lush green acres** located on the serene banks of the **River Mahisagar** at Vasad, Anand district, Gujarat.\n"
+        "* **Connectivity**: Behind Vasad Railway Station, Vasad - 388306. Strategically situated right on the NH-48 corridor between Vadodara (~18 km) and Anand (~20 km).\n"
+        "* **Infrastructure**: High-tech computer centers, specialized mechanical workshops, civil material labs, 50,000+ volume Central Library, auditorium, bank counter, and student amenities.\n\n"
+        "#### 📞 Official Contact & Helplines:\n"
+        "* 📞 **Engineering (B.E., M.E., MCA, D.Voc)**: `+91-9510782981 / 82` | `+91-9510782983 / 84`\n"
+        "* 💼 **Training & Placement Cell**: `+91-9316770768`\n"
+        "* 🏛️ **Architecture & Interior Design**: `+91-9510782985`\n"
+        "* 📧 **Official Email**: `principal@svitvasad.ac.in`\n"
+        "* 🌐 **Official Website**: [https://svitvasad.ac.in/](https://svitvasad.ac.in/)\n"
+        "* 📄 **About Us Portal**: [https://svitvasad.ac.in/Engineering/AboutUs/index.html](https://svitvasad.ac.in/Engineering/AboutUs/index.html)"
     ),
+
 
     "courses": (
         "### 📚 Academic Programs & Courses Offered at SVIT Vasad\n\n"
@@ -317,7 +339,13 @@ CATEGORY_KEYWORDS = {
         "svit vasad", "pkm", "prajapati kelavani mandal", "trust", "principal", "dr. d. p. soni",
         "d. p. soni", "history", "established", "campus area", "acres", "river mahisagar",
         "mahisagar", "gtu affiliation", "aicte approval", "overview of svit", "who is principal",
-        "tell me about svit", "where is svit", "svit website", "official website"
+        "tell me about svit", "where is svit", "svit website", "official website",
+        "vision", "mission", "vision and mission", "vision & mission", "aim", "objective", "objectives",
+        "nest", "new english school", "new english school trust",
+        "shantibhai", "shantibhai amin", "prof shantibhai amin", "shivabhai", "shivabhai patel",
+        "board of management", "founding chairman", "chairman", "leadership", "founder", "founders",
+        "mandatory disclosure", "contact number", "phone number", "helpline", "phone", "helpline number",
+        "history of svit", "how svit was founded", "who founded svit", "why svit was named"
     ],
     "courses": [
         "course", "courses", "available course", "available courses", "branch", "branches",
