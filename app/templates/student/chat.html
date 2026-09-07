@@ -317,6 +317,9 @@
             font-weight: 500;
             z-index: 1000;
             box-shadow: 0 2px 8px rgba(49, 46, 129, 0.15);
+            flex-shrink: 0;
+            box-sizing: border-box;
+            min-height: 38px;
         }
         @media (max-width: 640px) {
             .guest-top-banner {
@@ -328,7 +331,7 @@
         }
     </style>
 </head>
-<body>
+<body class="{% if guest_mode %}is-guest-mode{% endif %}">
     {% set is_auth = (current_user is defined and current_user and current_user.is_authenticated) %}
     {% set guest_mode = (is_guest is defined and is_guest) or not is_auth %}
     <script>window.IS_GUEST_MODE = {{ 'true' if guest_mode else 'false' }};</script>
