@@ -786,15 +786,17 @@ class MongoNotificationService:
     @staticmethod
     def notify_audience(title: str, message: str, category: str = "general", target_audience: str = "All Students", department: Optional[str] = None, semester: Optional[Any] = None, program: Optional[str] = None, batch: Optional[str] = None, data: Optional[Dict[str, Any]] = None, link: Optional[str] = None) -> Optional[str]:
         """Creates a group/broadcast notification for student audience targeting."""
+        is_all_dept = not department or str(department).strip().lower() in ("all", "all departments", "all_departments", "general")
+        norm_dept = None if is_all_dept else department
         return MongoNotificationService.create_notification(
-            user_id=department or "all",
-            recipient_id="all_students" if not department else department,
+            user_id="all" if is_all_dept else department,
+            recipient_id="all_students" if is_all_dept else department,
             recipient_type="student",
             title=title,
             message=message,
             category=category,
             target_audience=target_audience,
-            department=department,
+            department=norm_dept,
             semester=semester,
             program=program,
             batch=batch,
@@ -893,9 +895,8 @@ class MongoNotificationService:
 
         # Audience matching conditions
         or_clauses: List[Dict[str, Any]] = [
-            {"user_id": {"$in": cands + cands_str}},
-            {"recipient_id": {"$in": cands + cands_str}},
-            {"recipient_id": {"$in": ["all", "all_students", "All Students", "All Students & Faculty"]}},
+            {"user_id": {"$in": cands + cands_str + ["all", "all_students"]}},
+            {"recipient_id": {"$in": cands + cands_str + ["all", "all_students", "All Students", "All Students & Faculty", "All Departments", "all_departments"]}},
             {"target_audience": {"$in": ["all", "all_students", "All Students", "All Students & Faculty", "All Students & Staff"]}}
         ]
 

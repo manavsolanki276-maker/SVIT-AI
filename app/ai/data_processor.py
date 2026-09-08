@@ -1169,7 +1169,7 @@ def process_timetable_context(docs: list, query: str, user_profile: dict = None)
 def process_notice_context(docs: list, query: str, user_profile: dict = None) -> str:
     """Parses notices with student profile filtering for semester and department."""
     cleaned_query = query.replace('"', '').replace("'", "").strip().lower()
-    keywords = re.findall(r'\b(exam|form|fee|submission|mid-term|holiday|result|re-check|hall ticket|notice)\b', cleaned_query)
+    keywords = re.findall(r'\b(exam|form|fee|submission|mid-term|midsem|holiday|result|re-check|hall ticket|notice|urgent|alert|weather|rain|cyclone|cancellation|closed|open|announcement|circular)\b', cleaned_query)
     notice_blocks = []
 
     user_profile = user_profile or {}
@@ -1199,23 +1199,38 @@ def process_notice_context(docs: list, query: str, user_profile: dict = None) ->
                     if not temp_df.empty:
                         matched_df = temp_df
 
-            if keywords:
-                pattern = "|".join(keywords)
-                content_cols = [c for c in df.columns if c.lower() in ['title', 'notice', 'description', 'subject', 'category']]
+            # Search by keywords if specific keywords present (excluding generic 'notice')
+            specific_keywords = [k for k in keywords if k not in ('notice', 'notices')]
+            if specific_keywords:
+                pattern = "|".join(specific_keywords)
+                content_cols = [c for c in df.columns if c.lower() in ['title', 'notice', 'description', 'subject', 'category', 'priority']]
                 if content_cols:
-                    mask = matched_df[content_cols].apply(lambda row: row.str.contains(pattern, case=False, na=False)).any(axis=1)
+                    mask = matched_df[content_cols].apply(lambda row: row.astype(str).str.contains(pattern, case=False, na=False)).any(axis=1)
                     if mask.any():
                         matched_df = matched_df[mask]
+
+            # Sort by publish date descending so freshest notices appear first
+            date_col = next((c for c in matched_df.columns if c.lower() in ['publish_date', 'date', 'created_at']), None)
+            if date_col:
+                try:
+                    matched_df = matched_df.sort_values(by=date_col, ascending=False)
+                except Exception:
+                    pass
 
             if len(matched_df) > 5:
                 matched_df = matched_df.head(5)
 
             for idx, row in matched_df.iterrows():
+                not_title = row.get('title') or row.get('Title') or 'Notice'
+                not_date = row.get('publish_date') or row.get('date') or row.get('Date') or 'N/A'
+                not_desc = row.get('description') or row.get('Details') or row.get('body') or 'N/A'
+                not_cat = row.get('category') or row.get('Category') or 'General'
+                not_prio = row.get('priority') or row.get('Priority') or 'Normal'
+                not_target = row.get('target_audience') or row.get('department') or 'All'
                 notice_str = (
-                    f"Notice Title: {row.get('title', row.get('Title', 'N/A'))} | "
-                    f"Date: {row.get('date', row.get('Date', 'N/A'))} | "
-                    f"Details: {row.get('description', row.get('Details', 'N/A'))} | "
-                    f"Target Dept/Sem: {row.get('department', 'All')} Sem {row.get('semester', 'All')}"
+                    f"Notice Title: {not_title} | Category: {not_cat} | Priority: {not_prio} | "
+                    f"Date: {not_date} | Details: {not_desc} | "
+                    f"Target: {not_target}"
                 )
                 notice_blocks.append(f"notices.csv (Row {idx + 2}): {notice_str}")
 
@@ -1465,7 +1480,7 @@ def process_placement_context(query: str, user_profile: dict = None, docs: List[
 
 
 def process_events_context(question: str) -> str:
-    """Directly processes events using in-memory DataFrame."""
+    """Directly processes events using in-memory DataFrame (MongoDB Atlas or CSV fallback)."""
     try:
         df = get_cached_dataframe("events.csv")
         if df is None or df.empty:
@@ -1474,28 +1489,63 @@ def process_events_context(question: str) -> str:
         clean_q = question.lower()
         matched_df = df.copy()
 
-        if "ai" in clean_q or "artificial intelligence" in clean_q:
-            name_col = next((c for c in df.columns if 'name' in c.lower() or 'event' in c.lower()), None)
-            if name_col:
-                matched_df = matched_df[matched_df[name_col].str.lower().str.contains('ai|artificial intelligence|machine learning', na=False)]
+        # Extract search keywords from question excluding stopwords and generic query words
+        stopwords = {
+            'what', 'when', 'where', 'which', 'tell', 'about', 'some', 'upcoming', 'happening', 
+            'scheduled', 'svit', 'college', 'held', 'there', 'list', 'show', 'give', 'and', 
+            'for', 'the', 'with', 'event', 'events', 'programs', 'program', 'activities', 'any', 'are'
+        }
+        tokens = [w for w in re.findall(r'\b[a-zA-Z0-9_\-]{3,}\b', clean_q) if w not in stopwords]
+
+        # Name / searchable columns
+        title_cols = [c for c in df.columns if any(k in c.lower() for k in ['name', 'title'])]
+        other_cols = [c for c in df.columns if any(k in c.lower() for k in ['category', 'organizer', 'description', 'department', 'venue'])]
+
+        if tokens:
+            search_pat = "|".join(re.escape(t) for t in tokens)
+            # Prioritize matching on event name/title first
+            title_mask = matched_df[title_cols].apply(lambda row: row.astype(str).str.contains(search_pat, case=False, na=False)).any(axis=1) if title_cols else None
+            if title_mask is not None and title_mask.any():
+                matched_df = matched_df[title_mask]
+            elif other_cols:
+                mask = matched_df[other_cols].apply(lambda row: row.astype(str).str.contains(search_pat, case=False, na=False)).any(axis=1)
+                if mask.any():
+                    matched_df = matched_df[mask]
 
         if matched_df.empty:
             return "STATUS: NO_EVENTS_FOUND"
 
+        # Sort by date descending if present
+        date_col = next((c for c in matched_df.columns if 'date' in c.lower()), None)
+        if date_col:
+            try:
+                matched_df = matched_df.sort_values(by=date_col, ascending=False)
+            except Exception:
+                pass
+
         context_lines = ["HEADER_EVENT_LIST:"]
         for idx, row in matched_df.head(5).iterrows():
+            ev_name = row.get('event_name') or row.get('Event/Workshop Name') or row.get('Name') or row.get('title') or 'College Event'
+            ev_date = row.get('event_date') or row.get('Date & Time') or row.get('Date') or row.get('date') or 'TBA'
+            ev_time = row.get('start_time', '')
+            date_time_str = f"{ev_date} at {ev_time}" if ev_time and ev_time != 'None' else str(ev_date)
+            ev_venue = row.get('venue') or row.get('Venue') or 'SVIT Campus'
+            ev_cat = row.get('category') or row.get('Category') or 'General'
+            ev_org = row.get('organizer') or row.get('Organizer') or 'SVIT Committee'
+            ev_reg = row.get('registration_required') or 'No'
+            ev_desc = row.get('description') or row.get('Description') or 'N/A'
+
             context_lines.append(
-                f"Event: {row.get('Event/Workshop Name', row.get('event_name', row.get('Name', 'Event')))} | "
-                f"Date: {row.get('Date & Time', row.get('Date', row.get('date', 'TBA')))} | "
-                f"Venue: {row.get('Venue', row.get('venue', 'Main Campus'))} | "
-                f"Description: {row.get('Description', row.get('description', 'N/A'))} | "
+                f"Event: {ev_name} | Category: {ev_cat} | Date & Time: {date_time_str} | "
+                f"Venue: {ev_venue} | Organizer: {ev_org} | Registration Required: {ev_reg} | "
+                f"Description: {ev_desc} | "
                 f"[Source: events.csv (Row {idx + 2})]"
             )
 
         return "\n".join(context_lines)
 
     except Exception as e:
-        print(f"[Error] Reading events CSV: {e}")
+        print(f"[Error] Reading events context: {e}")
         return "STATUS: NO_EVENTS_FOUND"
 
 
