@@ -77,6 +77,7 @@ ALL_ADMIN_ROLES = [
     ROLE_EVENT_ADMIN,
     ROLE_BUS_ADMIN,
     ROLE_CANTEEN_ADMIN,
+    ROLE_LIBRARY_ADMIN,
 ]
 
 ROLE_DISPLAY_NAMES = {
@@ -88,7 +89,7 @@ ROLE_DISPLAY_NAMES = {
     ROLE_EVENT_ADMIN: "Event Admin",
     ROLE_BUS_ADMIN: "Bus Admin",
     ROLE_CANTEEN_ADMIN: "Canteen Admin",
-    ROLE_LIBRARY_ADMIN: "Library Admin (Retired)",
+    ROLE_LIBRARY_ADMIN: "Library Admin",
     ROLE_SPORTS_ADMIN: "Sports Admin (Retired)",
 }
 
@@ -174,10 +175,14 @@ ROLE_PERMISSIONS: Dict[str, Set[str]] = {
     },
     ROLE_LIBRARY_ADMIN: {
         "library",
+        "library_books",
+        "library_issues",
         "books",
         "members",
         "issue_return",
         "library_info",
+        "documents",
+        "module_documents",
     },
     ROLE_SPORTS_ADMIN: {
         "sports",

@@ -1,0 +1,272 @@
+/* =========================================================================
+   app/static/css/admin/library.css
+   SVIT Library Management System - Premium Stylesheet
+   Brand Colors: Deep Navy (#171D3A), Indigo (#4F46E5), Purple (#8B5CF6)
+   ========================================================================= */
+
+.library-hero-card {
+    background: linear-gradient(135deg, #FFFFFF 0%, #F8F9FE 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.library-hero-card::after {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 220px;
+    height: 220px;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+/* Nav Tabs */
+.library-nav-tab {
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.library-nav-tab.active {
+    background: #E8EBFA;
+    color: #8B5CF6;
+    border-color: rgba(139, 92, 246, 0.3);
+    box-shadow: 0 1px 3px rgba(139, 92, 246, 0.1);
+}
+
+/* Badges */
+.badge-stock-avail {
+    background: #ECFDF5;
+    color: #047857;
+    border: 1px solid #A7F3D0;
+    padding: 0.2rem 0.6rem;
+    border-radius: 9999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.badge-stock-out {
+    background: #FEF2F2;
+    color: #B91C1C;
+    border: 1px solid #FECACA;
+    padding: 0.2rem 0.6rem;
+    border-radius: 9999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.badge-stock-ref {
+    background: #FFFBEB;
+    color: #B45309;
+    border: 1px solid #FDE68A;
+    padding: 0.2rem 0.6rem;
+    border-radius: 9999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.badge-issue-active {
+    background: #EFF6FF;
+    color: #1D4ED8;
+    border: 1px solid #BFDBFE;
+    padding: 0.2rem 0.6rem;
+    border-radius: 9999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.badge-issue-overdue {
+    background: #FEF2F2;
+    color: #DC2626;
+    border: 1px solid #FCA5A5;
+    padding: 0.2rem 0.6rem;
+    border-radius: 9999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.badge-issue-returned {
+    background: #F3F4F6;
+    color: #4B5563;
+    border: 1px solid #E5E7EB;
+    padding: 0.2rem 0.6rem;
+    border-radius: 9999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+/* Modals */
+.library-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    opacity: 1;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.library-modal-backdrop.hidden {
+    display: none !important;
+}
+
+.library-modal-content {
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(16px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Autocomplete Dropdown */
+.autocomplete-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #FFFFFF;
+    border: 1px solid #E1E5F0;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    max-height: 240px;
+    overflow-y: auto;
+    z-index: 10000;
+    margin-top: 4px;
+}
+
+.autocomplete-item {
+    padding: 0.6rem 0.85rem;
+    cursor: pointer;
+    font-size: 0.75rem;
+    border-bottom: 1px solid #F1F3F9;
+    transition: background 0.15s ease;
+}
+
+.autocomplete-item:last-child {
+    border-bottom: none;
+}
+
+.autocomplete-item:hover {
+    background: #F8F9FE;
+}
+
+.autocomplete-item.selected {
+    background: #E8EBFA;
+    color: #8B5CF6;
+}
+
+/* Pagination Control Buttons */
+.page-ctrl-btn {
+    min-width: 28px;
+    height: 28px;
+    padding: 0 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #66708F;
+    border: 1px solid #E1E5F0;
+    background: #FFFFFF;
+    transition: all 0.15s ease;
+}
+
+.page-ctrl-btn:hover:not(:disabled) {
+    background: #F8F9FE;
+    color: #171D3A;
+    border-color: #8B5CF6;
+}
+
+.page-ctrl-btn.active {
+    background: #8B5CF6;
+    color: #FFFFFF;
+    border-color: #8B5CF6;
+    box-shadow: 0 1px 3px rgba(139, 92, 246, 0.3);
+}
+
+.page-ctrl-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Mobile Card Table Transformation */
+@media (max-width: 768px) {
+    .mobile-card-table thead {
+        display: none;
+    }
+
+    .mobile-card-table,
+    .mobile-card-table tbody,
+    .mobile-card-table tr,
+    .mobile-card-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .mobile-card-table tr {
+        margin-bottom: 1rem;
+        background: #FFFFFF;
+        border: 1px solid #E1E5F0;
+        border-radius: 1rem;
+        padding: 1rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .mobile-card-table td {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #F1F3F9;
+        font-size: 0.8rem;
+    }
+
+    .mobile-card-table td:last-child {
+        border-bottom: none;
+        padding-top: 0.75rem;
+        justify-content: flex-end;
+    }
+
+    .mobile-card-table td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: #8C95AD;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        letter-spacing: 0.05em;
+        margin-right: 1rem;
+    }
+}

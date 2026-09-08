@@ -514,20 +514,60 @@ def canteen_menu():
 def food_items():
     return render_module('canteen', 'admin/food_items.html')
 
-# RETIRED MODULES (LIBRARY & SPORTS) - GRACEFUL FALLBACK REDIRECT (NO 404s)
+# =========================================================================
+# LIBRARY ADMIN
+# =========================================================================
 @admin_bp.route('/library')
 @admin_bp.route('/library-info')
 @admin_bp.route('/library_info')
 @admin_bp.route('/library-books')
 @admin_bp.route('/library_books')
 @admin_bp.route('/books')
+@admin_required
+def library_books():
+    """Renders the Library Admin Dashboard (Catalog tab)."""
+    return render_module('library_books', 'admin/library.html')
+
+@admin_bp.route('/library-issue-return')
+@admin_bp.route('/library_issue_return')
+@admin_bp.route('/issue-return')
+@admin_bp.route('/issue_return')
+@admin_required
+def library_issues():
+    """Renders the Library Admin Dashboard (Issue / Return tab)."""
+    config = MODULE_CONFIGS.get('library_books', {})
+    req_perm = config.get("required_permission", "library")
+    if not has_permission(current_user, req_perm) and not has_role(current_user, ROLE_SUPER_ADMIN):
+        flash(f"Access Denied: You do not have permission to access Library.", "error")
+        abort(403)
+    return render_template(
+        'admin/library.html',
+        module_name='library_books',
+        config=config,
+        admin=current_user,
+        active_tab='issues'
+    )
+
 @admin_bp.route('/library-members')
 @admin_bp.route('/library_members')
 @admin_bp.route('/members')
-@admin_bp.route('/issue-return')
-@admin_bp.route('/issue_return')
-@admin_bp.route('/library-issue-return')
-@admin_bp.route('/library_issue_return')
+@admin_required
+def library_members():
+    """Renders the Library Admin Dashboard (Members tab)."""
+    config = MODULE_CONFIGS.get('library_books', {})
+    req_perm = config.get("required_permission", "library")
+    if not has_permission(current_user, req_perm) and not has_role(current_user, ROLE_SUPER_ADMIN):
+        flash(f"Access Denied: You do not have permission to access Library.", "error")
+        abort(403)
+    return render_template(
+        'admin/library.html',
+        module_name='library_books',
+        config=config,
+        admin=current_user,
+        active_tab='members'
+    )
+
+# RETIRED MODULES (SPORTS) - GRACEFUL FALLBACK REDIRECT (NO 404s)
 @admin_bp.route('/sports')
 @admin_bp.route('/sports-events')
 @admin_bp.route('/sports_events')
@@ -536,6 +576,7 @@ def food_items():
 def legacy_retired_modules_fallback():
     flash("The requested module has been retired and consolidated.", "info")
     return redirect(url_for('admin.dashboard'))
+
 
 
 # =========================================================================
@@ -680,7 +721,8 @@ def api_delete_item(module_name: str, item_id: str):
 
     success, msg = AdminCRUDService.delete_item(module_name, item_id)
     if not success:
-        return jsonify({"status": "error", "error": "Not Found", "message": msg}), 404
+        status_code = 404 if "not found" in msg.lower() else 400
+        return jsonify({"status": "error", "message": msg}), status_code
 
     return jsonify({"status": "success", "message": msg}), 200
 
@@ -967,6 +1009,124 @@ def api_admin_notifications_mark_all_read():
     from app.database.mongo_models import MongoNotificationService
     MongoNotificationService.mark_all_admin_notifications_read()
     return jsonify({"status": "success"}), 200
+
+
+# =========================================================================
+# 5B. DEDICATED LIBRARY MANAGEMENT REST APIS
+# =========================================================================
+@admin_bp.route('/api/library/stats', methods=['GET'])
+@admin_required
+@require_permission('library', 'library_books')
+def api_library_stats():
+    """Returns dynamic stats for library cards: total, available, issued, overdue, members."""
+    stats = AdminCRUDService.get_library_stats()
+    return jsonify({"status": "success", "stats": stats}), 200
+
+
+@admin_bp.route('/api/library/issue', methods=['POST'])
+@admin_required
+@require_permission('library', 'library_books')
+def api_library_issue():
+    """Issues a book to a registered student member."""
+    data = request.get_json(silent=True) or request.form or {}
+    book_id = str(data.get('book_id', '')).strip()
+    student_id = str(data.get('enrollment_no') or data.get('student_id', '')).strip()
+    student_name = str(data.get('student_name', '')).strip()
+    due_date = str(data.get('due_date', '')).strip()
+    notes = str(data.get('notes', '')).strip()
+
+    if not book_id:
+        return jsonify({"status": "error", "message": "Book Accession ID is required."}), 400
+    if not student_id:
+        return jsonify({"status": "error", "message": "Student Enrollment Number is required."}), 400
+
+    success, msg, issue_rec = AdminCRUDService.issue_book(
+        book_id=book_id,
+        student_id=student_id,
+        student_name=student_name,
+        due_date=due_date,
+        notes=notes,
+        admin_user=current_user
+    )
+    if not success:
+        return jsonify({"status": "error", "message": msg}), 400
+    return jsonify({"status": "success", "message": msg, "issue": issue_rec}), 201
+
+
+@admin_bp.route('/api/library/return/<issue_id>', methods=['POST'])
+@admin_required
+@require_permission('library', 'library_books')
+def api_library_return(issue_id):
+    """Reconciles return of an issued book, restoring catalog availability."""
+    success, msg, updated = AdminCRUDService.return_book(issue_id=issue_id, admin_user=current_user)
+    if not success:
+        return jsonify({"status": "error", "message": msg}), 400
+    return jsonify({"status": "success", "message": msg, "issue": updated}), 200
+
+
+@admin_bp.route('/api/library/issues', methods=['GET'])
+@admin_required
+@require_permission('library', 'library_books')
+def api_library_issues():
+    """Lists circulation issue & return records with filtering, searching, and pagination."""
+    search = request.args.get('search', '').strip()
+    status_filter = request.args.get('status', '').strip()
+    page = int(request.args.get('page', 1))
+    limit_raw = request.args.get('limit', '20')
+    try:
+        limit = int(limit_raw)
+    except ValueError:
+        limit = 20
+
+    filters = {}
+    if status_filter and status_filter.lower() != 'all':
+        filters['status'] = status_filter
+
+    result = AdminCRUDService.list_items(
+        module_key='library_issues',
+        search=search,
+        filters=filters,
+        page=page,
+        limit=limit,
+        sort_by='created_at',
+        sort_order=-1
+    )
+    return jsonify({"status": "success", **result}), 200
+
+
+@admin_bp.route('/api/library/members', methods=['GET'])
+@admin_required
+@require_permission('library', 'library_books')
+def api_library_members():
+    """Searches registered student members for issue autocomplete or members tab."""
+    query = request.args.get('q', '').strip()
+    limit_raw = request.args.get('limit', '20')
+    try:
+        limit = int(limit_raw)
+    except ValueError:
+        limit = 20
+    members = AdminCRUDService.search_members(query=query, limit=limit)
+    return jsonify({"status": "success", "members": members}), 200
+
+
+@admin_bp.route('/api/library/books-lookup', methods=['GET'])
+@admin_required
+@require_permission('library', 'library_books')
+def api_library_books_lookup():
+    """Quick lookup of books for issue modal autocomplete."""
+    q = request.args.get('q', '').strip()
+    limit_raw = request.args.get('limit', '20')
+    try:
+        limit = int(limit_raw)
+    except ValueError:
+        limit = 20
+    filters = {}
+    only_avail = request.args.get('available_only', 'false').lower() in ('true', '1')
+    if only_avail:
+        filters['availability'] = 'Available'
+    res = AdminCRUDService.list_items('library_books', search=q, filters=filters, limit=limit, page=1)
+    return jsonify({"status": "success", "books": res.get("items", [])}), 200
+
 
 
 # =========================================================================
