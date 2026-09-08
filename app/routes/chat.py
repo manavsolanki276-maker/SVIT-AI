@@ -251,23 +251,28 @@ def handle_chat_stream():
 
         return Response(stream_with_context(guest_event_stream()), mimetype='text/event-stream')
 
-    # For logged-in students, also provide instant official answers to public informational categories
-    from app.ai.guest_service import classify_guest_query
-    pub_res = classify_guest_query(user_text)
-    if pub_res.get("is_guest_allowed") and pub_res.get("matched_category") in ["about_svit", "fees", "admission", "eligibility", "seats", "timing"] and not pub_res.get("is_greeting"):
-        ans_text = pub_res.get("response_text")
-        def student_pub_stream():
-            words = ans_text.split(" ")
-            chunk_size = 4
-            for i in range(0, len(words), chunk_size):
-                chunk = " ".join(words[i:i+chunk_size])
-                if i + chunk_size < len(words):
-                    chunk += " "
-                yield f"data: {json.dumps({'chunk': chunk, 'conversation_id': conv_id})}\n\n"
-            sources = ["https://svitvasad.ac.in/ (Official SVIT Portal)"]
-            suggestions = pub_res.get("followup_suggestions") or []
-            yield f"data: {json.dumps({'done': True, 'conversation_id': conv_id, 'message_id': 'msg_' + conv_id[:8], 'answer': ans_text, 'image': None, 'location': None, 'sources': sources, 'suggestions': suggestions})}\n\n"
-        return Response(stream_with_context(student_pub_stream()), mimetype='text/event-stream')
+    # For logged-in students, check if this is an ERP personal service query first
+    from app.ai.erp_intent import ERPIntentClassifier
+    student_erp_intent = ERPIntentClassifier.classify(user_text)
+
+    # Only provide public informational answers if this is NOT a personal student ERP request
+    if not student_erp_intent:
+        from app.ai.guest_service import classify_guest_query
+        pub_res = classify_guest_query(user_text)
+        if pub_res.get("is_guest_allowed") and pub_res.get("matched_category") in ["about_svit", "fees", "admission", "eligibility", "seats", "timing"] and not pub_res.get("is_greeting"):
+            ans_text = pub_res.get("response_text")
+            def student_pub_stream():
+                words = ans_text.split(" ")
+                chunk_size = 4
+                for i in range(0, len(words), chunk_size):
+                    chunk = " ".join(words[i:i+chunk_size])
+                    if i + chunk_size < len(words):
+                        chunk += " "
+                    yield f"data: {json.dumps({'chunk': chunk, 'conversation_id': conv_id})}\n\n"
+                sources = ["https://svitvasad.ac.in/ (Official SVIT Portal)"]
+                suggestions = pub_res.get("followup_suggestions") or []
+                yield f"data: {json.dumps({'done': True, 'conversation_id': conv_id, 'message_id': 'msg_' + conv_id[:8], 'answer': ans_text, 'image': None, 'location': None, 'sources': sources, 'suggestions': suggestions})}\n\n"
+            return Response(stream_with_context(student_pub_stream()), mimetype='text/event-stream')
 
     student_id = get_real_student_id()
     user_profile = get_current_student_profile()

@@ -1,0 +1,144 @@
+{% extends "admin/base.html" %}
+
+{% block title %}SVIT Admin - ERP Background Synchronization{% endblock %}
+
+{% block content %}
+<div class="p-6 max-w-7xl mx-auto space-y-6">
+
+    <!-- TOP HEADER -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-extrabold text-[#171D3A] tracking-tight">Authorized ERP Data Sync</h1>
+            <p class="text-xs text-[#66708F] mt-1">Background synchronization bridge between authorized college ERP records and MongoDB.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <button id="btnSyncNow" onclick="runErpSync()" class="px-5 py-2.5 bg-[#8B5CF6] text-white text-xs font-bold rounded-xl hover:bg-[#7C3AED] transition flex items-center gap-2 shadow-sm">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                <span id="syncBtnText">Sync Now</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- SECURITY NOTICE -->
+    <div class="bg-[#EEF2FF] border border-[#C7D2FE] rounded-2xl p-4 flex items-start gap-3">
+        <i data-lucide="shield-check" class="w-5 h-5 text-[#4F46E5] flex-shrink-0 mt-0.5"></i>
+        <div class="text-xs text-[#312E81] leading-relaxed">
+            <strong>ERP Password Security Policy:</strong> In compliance with security standards, student ERP passwords are <em>never</em> scraped, stored, or processed. SVIT-AI utilizes authorized database integrations and encrypted session mappings.
+        </div>
+    </div>
+
+    <!-- STATUS OVERVIEW CARDS -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white p-4 rounded-2xl border border-[#E1E5F0] shadow-sm">
+            <span class="text-[11px] font-bold text-[#8C95AD] uppercase tracking-wider">Sync Status</span>
+            <div class="mt-1 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full {{ 'bg-[#16A34A]' if sync_status.sync_status == 'SUCCESS' else 'bg-[#D97706]' }}"></span>
+                <p class="text-xl font-black text-[#171D3A]">{{ sync_status.sync_status or 'SUCCESS' }}</p>
+            </div>
+            <span class="text-[10px] text-[#8C95AD]">Operational State</span>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl border border-[#E1E5F0] shadow-sm">
+            <span class="text-[11px] font-bold text-[#8C95AD] uppercase tracking-wider">Last Sync Completed</span>
+            <p class="text-sm font-bold text-[#171D3A] mt-1 truncate">{{ sync_status.last_synced_at[:19].replace('T', ' ') if sync_status.last_synced_at else 'Recent' }}</p>
+            <span class="text-[10px] text-[#8C95AD]">UTC Timestamp</span>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl border border-[#E1E5F0] shadow-sm">
+            <span class="text-[11px] font-bold text-[#8C95AD] uppercase tracking-wider">Students Synced</span>
+            <p class="text-xl font-black text-[#16A34A] mt-1">{{ sync_status.students_synced or 0 }}</p>
+            <span class="text-[10px] text-[#16A34A]">Active Profiles Verified</span>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl border border-[#E1E5F0] shadow-sm">
+            <span class="text-[11px] font-bold text-[#8C95AD] uppercase tracking-wider">Failed Records</span>
+            <p class="text-xl font-black text-[#DC2626] mt-1">{{ sync_status.failed_records or 0 }}</p>
+            <span class="text-[10px] text-[#8C95AD]">Integrity Exceptions</span>
+        </div>
+    </div>
+
+    <!-- AUDIT SYNC LOGS -->
+    <div class="bg-white rounded-2xl border border-[#E1E5F0] shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-[#E1E5F0] flex items-center justify-between">
+            <h2 class="text-sm font-bold text-[#171D3A] flex items-center gap-2">
+                <i data-lucide="history" class="w-4 h-4 text-[#8B5CF6]"></i>
+                <span>Audit Synchronization Logs</span>
+            </h2>
+            <span class="text-[11px] text-[#8C95AD]">Showing latest {{ logs|length }} runs</span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                    <tr class="bg-[#F8F9FE] border-b border-[#E1E5F0] text-[#8C95AD] font-bold uppercase tracking-wider text-[10px]">
+                        <th class="p-3.5">Sync ID</th>
+                        <th class="p-3.5">Timestamp</th>
+                        <th class="p-3.5">Source / Method</th>
+                        <th class="p-3.5">Triggered By</th>
+                        <th class="p-3.5">Status</th>
+                        <th class="p-3.5">Synced / Failed</th>
+                        <th class="p-3.5">Details</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-[#E1E5F0] font-medium text-[#171D3A]">
+                    {% for l in logs %}
+                    <tr class="hover:bg-[#F8F9FE]/60 transition">
+                        <td class="p-3.5 font-mono text-[11px] text-[#64748B]">{{ l.sync_id }}</td>
+                        <td class="p-3.5 text-[#64748B] text-[11px]">{{ l.timestamp[:19].replace('T', ' ') if l.timestamp else 'Recent' }}</td>
+                        <td class="p-3.5">{{ l.source or 'Authorized ERP Webhook' }}</td>
+                        <td class="p-3.5 font-semibold text-[#8B5CF6]">{{ l.triggered_by or 'System' }}</td>
+                        <td class="p-3.5">
+                            {% if l.status == 'SUCCESS' %}
+                                <span class="px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#15803D] font-bold text-[10px]">SUCCESS</span>
+                            {% else %}
+                                <span class="px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#B45309] font-bold text-[10px]">{{ l.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="p-3.5">
+                            <span class="font-bold text-[#16A34A]">{{ l.students_synced or 0 }}</span> / 
+                            <span class="text-[#DC2626] font-bold">{{ l.failed_records or 0 }}</span>
+                        </td>
+                        <td class="p-3.5 text-[#64748B] text-[11px] max-w-xs truncate">{{ l.details or 'Completed successfully' }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="p-8 text-center text-[#8C95AD]">
+                            No sync logs recorded yet. Click "Sync Now" to initialize.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    async function runErpSync() {
+        const btn = document.getElementById('btnSyncNow');
+        const txt = document.getElementById('syncBtnText');
+        btn.disabled = true;
+        txt.innerText = 'Syncing...';
+
+        try {
+            const res = await fetch('/admin/api/erp/sync', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await res.json();
+            if (res.ok && data.status === 'success') {
+                alert(`✅ Synchronization complete!\n\nStudents Synced: ${data.students_synced}\nFailed Records: ${data.failed_records}`);
+                window.location.reload();
+            } else {
+                alert(`⚠️ Sync finished with warnings: ${data.error || 'Check logs for details'}`);
+                window.location.reload();
+            }
+        } catch (e) {
+            alert('Failed to connect to ERP synchronization service.');
+        } finally {
+            btn.disabled = false;
+            txt.innerText = 'Sync Now';
+        }
+    }
+</script>
+{% endblock %}

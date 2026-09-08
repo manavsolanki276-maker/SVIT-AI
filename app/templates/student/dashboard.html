@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVIT Student ERP Portal - SVIT-AI</title>
+    <!-- Theme & Icons -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Razorpay Official Checkout Script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/student/dashboard.css') }}">
+</head>
+<body class="erp-dashboard-body">
+
+    <!-- TOP HEADER NAVBAR -->
+    <header class="erp-navbar">
+        <div class="erp-nav-left">
+            <a href="{{ url_for('student.dashboard') }}" class="erp-brand">
+                <img src="/static/logo/svit%20logo%20u.png" alt="SVIT Logo" class="erp-logo" onerror="this.style.display='none'">
+                <div class="erp-brand-text">
+                    <span class="erp-brand-title">SVIT ERP</span>
+                    <span class="erp-brand-sub">Student Services Portal</span>
+                </div>
+            </a>
+        </div>
+        <div class="erp-nav-right">
+            <a href="{{ url_for('student.chat') }}" class="btn-nav-chat">
+                <i data-lucide="bot"></i>
+                <span>SVIT-AI Chatbot</span>
+            </a>
+            <a href="{{ url_for('student.profile') }}" class="btn-nav-icon" title="My Profile">
+                <i data-lucide="user"></i>
+            </a>
+            <a href="{{ url_for('auth.logout') }}" class="btn-nav-icon logout" title="Sign Out">
+                <i data-lucide="log-out"></i>
+            </a>
+        </div>
+    </header>
+
+    <main class="erp-container">
+
+        <!-- STUDENT PROFILE HERO CARD -->
+        <section class="student-hero-card">
+            <div class="student-avatar-box">
+                <div class="student-avatar">
+                    {{ (profile.full_name[:2] if profile.full_name else 'ST') | upper }}
+                </div>
+            </div>
+            <div class="student-details">
+                <div class="student-header-row">
+                    <h1 class="student-name">{{ profile.full_name or 'Student' }}</h1>
+                    <span class="status-badge-active"><i data-lucide="check-circle-2"></i> Active Student</span>
+                </div>
+                <div class="student-meta-grid">
+                    <div class="meta-item">
+                        <span class="meta-label">Enrollment No</span>
+                        <span class="meta-val font-mono">{{ profile.enrollment_no or '210410107001' }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Program & Branch</span>
+                        <span class="meta-val">{{ profile.program or 'BE' }} — {{ profile.department or 'Computer Engineering' }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Semester / Div</span>
+                        <span class="meta-val">Sem {{ profile.semester or 3 }} (Div {{ profile.division or 'A' }} - {{ profile.batch or 'A1' }})</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Roll Number</span>
+                        <span class="meta-val">{{ profile.roll_no or '001' }}</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- KPI SUMMARY CARDS -->
+        <section class="kpi-grid">
+            
+            <!-- Attendance Card -->
+            <div class="kpi-card" id="cardAttendance">
+                <div class="kpi-top">
+                    <div class="kpi-icon-box purple">
+                        <i data-lucide="percent"></i>
+                    </div>
+                    <span class="kpi-badge good">{{ attendance.status or 'Good' }} Standing</span>
+                </div>
+                <div class="kpi-body">
+                    <div class="kpi-main-num">{{ attendance.overall_percentage or 78.5 }}%</div>
+                    <div class="kpi-title">Overall Attendance</div>
+                    <div class="kpi-sub">{{ attendance.attended_classes or 181 }} of {{ attendance.total_classes or 221 }} lectures attended</div>
+                </div>
+                <div class="kpi-footer">
+                    <button class="btn-card-action" onclick="openErpModal('modalAttendance')">View Subject Breakdown →</button>
+                </div>
+            </div>
+
+            <!-- Fee Balance Card -->
+            <div class="kpi-card" id="cardFees">
+                <div class="kpi-top">
+                    <div class="kpi-icon-box amber">
+                        <i data-lucide="credit-card"></i>
+                    </div>
+                    {% if fees.pending_fee and fees.pending_fee > 0 %}
+                        <span class="kpi-badge pending">Due: {{ fees.due_date or '15 Oct 2026' }}</span>
+                    {% else %}
+                        <span class="kpi-badge good">Fully Paid</span>
+                    {% endif %}
+                </div>
+                <div class="kpi-body">
+                    <div class="kpi-main-num fee">₹{{ "{:,}".format(fees.pending_fee or 0) }}</div>
+                    <div class="kpi-title">Pending Fee Balance</div>
+                    <div class="kpi-sub">Total: ₹{{ "{:,}".format(fees.total_fee or 45000) }} | Paid: ₹{{ "{:,}".format(fees.paid_fee or 30000) }}</div>
+                </div>
+                <div class="kpi-footer-dual">
+                    {% if fees.pending_fee and fees.pending_fee > 0 %}
+                        <button class="btn-pay-now" onclick="triggerOnlinePayment('{{ fees.pending_fee }}')">
+                            <i data-lucide="shield-check"></i> Pay ₹{{ "{:,}".format(fees.pending_fee) }}
+                        </button>
+                    {% endif %}
+                    <button class="btn-card-action" onclick="openErpModal('modalFees')">Fee Details & History →</button>
+                </div>
+            </div>
+
+            <!-- Results Card -->
+            <div class="kpi-card" id="cardResults">
+                <div class="kpi-top">
+                    <div class="kpi-icon-box blue">
+                        <i data-lucide="award"></i>
+                    </div>
+                    <span class="kpi-badge good">{{ results.status or 'PASS' }}</span>
+                </div>
+                <div class="kpi-body">
+                    <div class="kpi-main-num result">{{ results.spi or 8.45 }} <span class="kpi-scale">SPI</span></div>
+                    <div class="kpi-title">Semester {{ results.semester or 2 }} Result</div>
+                    <div class="kpi-sub">Cumulative CPI: <strong>{{ results.cpi or 8.20 }}</strong></div>
+                </div>
+                <div class="kpi-footer">
+                    <button class="btn-card-action" onclick="openErpModal('modalResults')">View Full Marksheet →</button>
+                </div>
+            </div>
+
+            <!-- Services & Transport Card -->
+            <div class="kpi-card" id="cardTransport">
+                <div class="kpi-top">
+                    <div class="kpi-icon-box green">
+                        <i data-lucide="bus"></i>
+                    </div>
+                    <span class="kpi-badge active">{{ transport.pass_status or 'Active Pass' }}</span>
+                </div>
+                <div class="kpi-body">
+                    <div class="kpi-main-num route">{{ transport.route_no or 'Route 04' }}</div>
+                    <div class="kpi-title">{{ transport.pickup_point or 'Manjalpur' }} Pickup</div>
+                    <div class="kpi-sub">Morning: {{ transport.morning_pickup_time or '08:15 AM' }} | Bus {{ transport.bus_number or 'GJ-06' }}</div>
+                </div>
+                <div class="kpi-footer">
+                    <button class="btn-card-action" onclick="openErpModal('modalTransport')">Bus & Pass Details →</button>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- CHATBOT FIRST HERO BANNER -->
+        <section class="chatbot-erp-banner">
+            <div class="banner-content">
+                <div class="bot-badge">
+                    <i data-lucide="sparkles"></i> SVIT-AI Assistant
+                </div>
+                <h2>Primary Student Interface</h2>
+                <p>You no longer need to open the old external ERP portal. Ask SVIT-AI anything about your fees, attendance, results, hall tickets, or pay directly in the chatbot.</p>
+                <div class="quick-prompts-bar">
+                    <a href="{{ url_for('student.chat') }}?q=What+is+my+attendance" class="prompt-pill">📊 "What is my attendance?"</a>
+                    <a href="{{ url_for('student.chat') }}?q=How+much+fee+is+pending" class="prompt-pill">💰 "How much fee is pending?"</a>
+                    <a href="{{ url_for('student.chat') }}?q=Pay+my+fees" class="prompt-pill pay">💳 "Pay my fees"</a>
+                    <a href="{{ url_for('student.chat') }}?q=Show+my+result" class="prompt-pill">📈 "Show my result"</a>
+                    <a href="{{ url_for('student.chat') }}?q=Show+my+hall+ticket" class="prompt-pill">🎫 "Show my hall ticket"</a>
+                    <a href="{{ url_for('student.chat') }}?q=What+is+my+timetable+today" class="prompt-pill">📅 "Today's timetable"</a>
+                </div>
+            </div>
+            <div class="banner-action">
+                <a href="{{ url_for('student.chat') }}" class="btn-open-chat-lg">
+                    <i data-lucide="message-square"></i> Open Chatbot
+                </a>
+            </div>
+        </section>
+
+        <!-- QUICK ACTION SERVICES GRID -->
+        <section class="services-section">
+            <h2 class="section-title"><i data-lucide="layers"></i> Student ERP Quick Services</h2>
+            <div class="services-grid">
+                
+                <div class="service-tile" onclick="openErpModal('modalAttendance')">
+                    <div class="tile-icon purple"><i data-lucide="calendar-check"></i></div>
+                    <div class="tile-label">Attendance</div>
+                    <div class="tile-desc">Detailed subject-wise stats</div>
+                </div>
+
+                <div class="service-tile" onclick="openErpModal('modalFees')">
+                    <div class="tile-icon amber"><i data-lucide="receipt"></i></div>
+                    <div class="tile-label">Fees & Dues</div>
+                    <div class="tile-desc">Breakdown & due dates</div>
+                </div>
+
+                <div class="service-tile highlight" onclick="triggerOnlinePayment('{{ fees.pending_fee }}')">
+                    <div class="tile-icon green"><i data-lucide="credit-card"></i></div>
+                    <div class="tile-label">Pay Fees Online</div>
+                    <div class="tile-desc">Instant Razorpay checkout</div>
+                </div>
+
+                <div class="service-tile" onclick="openErpModal('modalResults')">
+                    <div class="tile-icon blue"><i data-lucide="award"></i></div>
+                    <div class="tile-label">Results & Marks</div>
+                    <div class="tile-desc">Semester SPI/CPI cards</div>
+                </div>
+
+                <div class="service-tile" onclick="openChatWithPrompt('What is my timetable today?')">
+                    <div class="tile-icon indigo"><i data-lucide="calendar"></i></div>
+                    <div class="tile-label">Timetable</div>
+                    <div class="tile-desc">Daily class schedule</div>
+                </div>
+
+                <div class="service-tile" onclick="openChatWithPrompt('Show my hall ticket')">
+                    <div class="tile-icon red"><i data-lucide="ticket"></i></div>
+                    <div class="tile-label">Hall Ticket</div>
+                    <div class="tile-desc">Exam seat & center info</div>
+                </div>
+
+                <div class="service-tile" onclick="openChatWithPrompt('Show my syllabus')">
+                    <div class="tile-icon teal"><i data-lucide="book-open"></i></div>
+                    <div class="tile-label">Syllabus</div>
+                    <div class="tile-desc">GTU curriculum & scheme</div>
+                </div>
+
+                <div class="service-tile" onclick="openErpModal('modalApplications')">
+                    <div class="tile-icon orange"><i data-lucide="file-text"></i></div>
+                    <div class="tile-label">Applications</div>
+                    <div class="tile-desc">Bonafide & leave status</div>
+                </div>
+
+                <div class="service-tile" onclick="openChatWithPrompt('Show my documents')">
+                    <div class="tile-icon slate"><i data-lucide="folder-check"></i></div>
+                    <div class="tile-label">Documents</div>
+                    <div class="tile-desc">Verified certificates</div>
+                </div>
+
+                <div class="service-tile" onclick="openChatWithPrompt('What is my bus information?')">
+                    <div class="tile-icon yellow"><i data-lucide="bus"></i></div>
+                    <div class="tile-label">Transport & Bus</div>
+                    <div class="tile-desc">Route & pass status</div>
+                </div>
+
+                <div class="service-tile" onclick="openChatWithPrompt('Railway concession')">
+                    <div class="tile-icon sky"><i data-lucide="train"></i></div>
+                    <div class="tile-label">Railway Concession</div>
+                    <div class="tile-desc">Vouchers & pass renewal</div>
+                </div>
+
+                <div class="service-tile" onclick="openChatWithPrompt('Lodge a complaint')">
+                    <div class="tile-icon rose"><i data-lucide="help-circle"></i></div>
+                    <div class="tile-label">Grievance Box</div>
+                    <div class="tile-desc">Complaint & issue redressal</div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ========================================================= -->
+    <!-- MODALS FOR QUICK SERVICE POPUPS -->
+    <!-- ========================================================= -->
+
+    <!-- Attendance Modal -->
+    <div id="modalAttendance" class="erp-modal-backdrop" style="display:none;">
+        <div class="erp-modal-box">
+            <div class="erp-modal-header">
+                <h3><i data-lucide="percent"></i> Subject Attendance Breakdown</h3>
+                <button class="btn-close-modal" onclick="closeErpModal('modalAttendance')"><i data-lucide="x"></i></button>
+            </div>
+            <div class="erp-modal-body">
+                <div class="modal-stat-bar">
+                    <div>Overall Attendance: <strong>{{ attendance.overall_percentage }}%</strong></div>
+                    <div>Lectures Held: <strong>{{ attendance.attended_classes }} / {{ attendance.total_classes }}</strong></div>
+                </div>
+                <table class="erp-table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Subject</th>
+                            <th>Attended / Total</th>
+                            <th>Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in attendance.subjects %}
+                        <tr>
+                            <td class="font-mono">{{ s.subject_code }}</td>
+                            <td>{{ s.subject_name }}</td>
+                            <td>{{ s.attended }} / {{ s.total }}</td>
+                            <td>
+                                <strong class="{{ 'text-green' if s.percentage >= 75 else 'text-amber' }}">{{ s.percentage }}%</strong>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fees Modal -->
+    <div id="modalFees" class="erp-modal-backdrop" style="display:none;">
+        <div class="erp-modal-box">
+            <div class="erp-modal-header">
+                <h3><i data-lucide="receipt"></i> Fee Breakdown & Receipts</h3>
+                <button class="btn-close-modal" onclick="closeErpModal('modalFees')"><i data-lucide="x"></i></button>
+            </div>
+            <div class="erp-modal-body">
+                <div class="modal-stat-bar">
+                    <div>Total Fee: <strong>₹{{ "{:,}".format(fees.total_fee or 0) }}</strong></div>
+                    <div>Paid: <strong class="text-green">₹{{ "{:,}".format(fees.paid_fee or 0) }}</strong></div>
+                    <div>Pending: <strong class="text-red">₹{{ "{:,}".format(fees.pending_fee or 0) }}</strong></div>
+                </div>
+                <h4 style="margin: 16px 0 8px;">Fee Components</h4>
+                <table class="erp-table">
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Total</th>
+                            <th>Paid</th>
+                            <th>Pending</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in fees.breakdown %}
+                        <tr>
+                            <td>{{ b.component }}</td>
+                            <td>₹{{ "{:,}".format(b.total) }}</td>
+                            <td>₹{{ "{:,}".format(b.paid) }}</td>
+                            <td><strong>₹{{ "{:,}".format(b.pending) }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+                    {% if fees.pending_fee and fees.pending_fee > 0 %}
+                    <button class="btn-pay-now" onclick="triggerOnlinePayment('{{ fees.pending_fee }}')">
+                        💳 Pay ₹{{ "{:,}".format(fees.pending_fee) }} Now
+                    </button>
+                    {% endif %}
+                    <button class="btn-secondary" onclick="openChatWithPrompt('Show my previous payments')">
+                        📜 View Payment History
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Modal -->
+    <div id="modalResults" class="erp-modal-backdrop" style="display:none;">
+        <div class="erp-modal-box">
+            <div class="erp-modal-header">
+                <h3><i data-lucide="award"></i> Examination Result — Sem {{ results.semester }}</h3>
+                <button class="btn-close-modal" onclick="closeErpModal('modalResults')"><i data-lucide="x"></i></button>
+            </div>
+            <div class="erp-modal-body">
+                <div class="modal-stat-bar">
+                    <div>SPI: <strong>{{ results.spi }}</strong></div>
+                    <div>CPI: <strong>{{ results.cpi }}</strong></div>
+                    <div>Status: <span class="badge-success">{{ results.status }}</span></div>
+                </div>
+                <table class="erp-table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Subject</th>
+                            <th>Credits</th>
+                            <th>Grade</th>
+                            <th>Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sub in results.subjects %}
+                        <tr>
+                            <td class="font-mono">{{ sub.code }}</td>
+                            <td>{{ sub.name }}</td>
+                            <td>{{ sub.credits }}</td>
+                            <td><strong>{{ sub.grade }}</strong></td>
+                            <td>{{ sub.points }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transport Modal -->
+    <div id="modalTransport" class="erp-modal-backdrop" style="display:none;">
+        <div class="erp-modal-box">
+            <div class="erp-modal-header">
+                <h3><i data-lucide="bus"></i> Transport & Bus Pass Details</h3>
+                <button class="btn-close-modal" onclick="closeErpModal('modalTransport')"><i data-lucide="x"></i></button>
+            </div>
+            <div class="erp-modal-body">
+                <div class="transport-card-details">
+                    <p><strong>Route:</strong> {{ transport.route_no }} — {{ transport.route_name }}</p>
+                    <p><strong>Pickup Stop:</strong> {{ transport.pickup_point }}</p>
+                    <p><strong>Morning Pickup:</strong> {{ transport.morning_pickup_time }}</p>
+                    <p><strong>Evening Departure:</strong> {{ transport.evening_departure_time }}</p>
+                    <p><strong>Bus Registration:</strong> <code>{{ transport.bus_number }}</code></p>
+                    <p><strong>Driver:</strong> {{ transport.driver_name }} ({{ transport.driver_contact }})</p>
+                    <p><strong>Pass Status:</strong> <span class="badge-success">{{ transport.pass_status }}</span> (Valid until {{ transport.valid_until }})</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Applications Modal -->
+    <div id="modalApplications" class="erp-modal-backdrop" style="display:none;">
+        <div class="erp-modal-box">
+            <div class="erp-modal-header">
+                <h3><i data-lucide="file-text"></i> Student Applications Tracker</h3>
+                <button class="btn-close-modal" onclick="closeErpModal('modalApplications')"><i data-lucide="x"></i></button>
+            </div>
+            <div class="erp-modal-body">
+                <table class="erp-table">
+                    <thead>
+                        <tr>
+                            <th>Application ID</th>
+                            <th>Service Type</th>
+                            <th>Status</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in applications %}
+                        <tr>
+                            <td class="font-mono">{{ a.application_id }}</td>
+                            <td>{{ a.type }}</td>
+                            <td><span class="badge-success">{{ a.status }}</span></td>
+                            <td>{{ a.remarks }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/student/dashboard.js') }}"></script>
+    <script>
+        if (window.lucide) lucide.createIcons();
+    </script>
+</body>
+</html>

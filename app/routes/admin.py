@@ -1702,3 +1702,128 @@ def test_sports_access():
         "admin": current_user.username,
         "role": current_user.role
     }), 200
+
+
+# =========================================================================
+# 16. PAYMENT MANAGEMENT & FINANCIAL RECONCILIATION
+# =========================================================================
+@admin_bp.route('/payments')
+@admin_required
+def payments():
+    """ Payment Management dashboard with stats and transactions list """
+    coll = get_collection('payments')
+    payments_list = []
+    if coll is not None:
+        try:
+            payments_list = list(coll.find().sort("created_at", -1).limit(200))
+            for p in payments_list:
+                p["_id"] = str(p["_id"])
+        except Exception:
+            pass
+
+    total_collected = sum(p.get("amount", 0) for p in payments_list if p.get("status") == "paid")
+    successful_count = sum(1 for p in payments_list if p.get("status") == "paid")
+    pending_count = sum(1 for p in payments_list if p.get("status") in ("created", "pending"))
+    failed_count = sum(1 for p in payments_list if p.get("status") == "failed")
+    refunded_count = sum(1 for p in payments_list if p.get("status") == "refunded")
+
+    stats = {
+        "total_payments": len(payments_list),
+        "successful_payments": successful_count,
+        "pending_payments": pending_count,
+        "failed_payments": failed_count,
+        "refunded_payments": refunded_count,
+        "total_collected": total_collected
+    }
+
+    return render_template('admin/payments.html', payments=payments_list, stats=stats)
+
+
+@admin_bp.route('/api/payments/stats')
+@admin_required
+def api_payments_stats():
+    """ Returns JSON summary of payment metrics """
+    coll = get_collection('payments')
+    payments_list = list(coll.find({})) if coll is not None else []
+
+    total_collected = sum(p.get("amount", 0) for p in payments_list if p.get("status") == "paid")
+    successful_count = sum(1 for p in payments_list if p.get("status") == "paid")
+    pending_count = sum(1 for p in payments_list if p.get("status") in ("created", "pending"))
+    failed_count = sum(1 for p in payments_list if p.get("status") == "failed")
+    refunded_count = sum(1 for p in payments_list if p.get("status") == "refunded")
+
+    return jsonify({
+        "status": "success",
+        "stats": {
+            "total_payments": len(payments_list),
+            "successful_payments": successful_count,
+            "pending_payments": pending_count,
+            "failed_payments": failed_count,
+            "refunded_payments": refunded_count,
+            "total_collected": total_collected
+        }
+    }), 200
+
+
+@admin_bp.route('/api/payments/list')
+@admin_required
+def api_payments_list():
+    """ Paginated and filtered payment transactions """
+    coll = get_collection('payments')
+    status_filter = request.args.get('status', '').strip()
+    search = request.args.get('search', '').strip()
+
+    query = {}
+    if status_filter:
+        query["status"] = status_filter
+    if search:
+        query["$or"] = [
+            {"student_id": {"$regex": search, "$options": "i"}},
+            {"enrollment_no": {"$regex": search, "$options": "i"}},
+            {"razorpay_payment_id": {"$regex": search, "$options": "i"}},
+            {"receipt_number": {"$regex": search, "$options": "i"}}
+        ]
+
+    payments_list = []
+    if coll is not None:
+        try:
+            payments_list = list(coll.find(query).sort("created_at", -1).limit(100))
+            for p in payments_list:
+                p["_id"] = str(p["_id"])
+        except Exception:
+            pass
+
+    return jsonify({"status": "success", "payments": payments_list}), 200
+
+
+# =========================================================================
+# 17. ERP BACKGROUND SYNCHRONIZATION
+# =========================================================================
+@admin_bp.route('/erp-sync')
+@admin_required
+def erp_sync():
+    """ ERP Data Synchronization management panel """
+    from app.database.erp_sync_service import ERPSyncService
+    sync_status = ERPSyncService.get_sync_status()
+    logs = ERPSyncService.get_sync_logs(limit=20)
+    return render_template('admin/erp_sync.html', sync_status=sync_status, logs=logs)
+
+
+@admin_bp.route('/api/erp/sync', methods=['POST'])
+@admin_required
+def api_trigger_erp_sync():
+    """ Triggers background sync cycle """
+    admin_name = getattr(current_user, 'username', 'admin')
+    from app.database.erp_sync_service import ERPSyncService
+    res = ERPSyncService.trigger_sync(admin_user=admin_name)
+    return jsonify(res), (200 if res.get("status") == "success" else 500)
+
+
+@admin_bp.route('/api/erp/status')
+@admin_required
+def api_erp_status():
+    """ Returns current ERP synchronization status """
+    from app.database.erp_sync_service import ERPSyncService
+    status = ERPSyncService.get_sync_status()
+    return jsonify({"status": "success", "sync_status": status}), 200
+

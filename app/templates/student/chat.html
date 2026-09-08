@@ -12,6 +12,8 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Marked.js for rendering Markdown -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Razorpay Official Checkout Script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/student/chat.css') }}">
     <style>
         @keyframes pulse {
@@ -454,6 +456,10 @@
                         <i data-lucide="message-square"></i>
                         <span>Student Chat</span>
                     </a>
+                    <a href="/student/dashboard" class="sidebar-menu-link" id="menuDashboardLink" title="Student ERP Dashboard" onclick="toggleMobileSidebar(false);">
+                        <i data-lucide="layout-dashboard"></i>
+                        <span>ERP Dashboard</span>
+                    </a>
                     <a href="/student/profile/" class="sidebar-menu-link" id="menuProfileLink" title="Student Profile" onclick="toggleMobileSidebar(false);">
                         <i data-lucide="user"></i>
                         <span>Profile</span>
@@ -489,6 +495,9 @@
                     </button>
                     <a href="/student/chat" class="rail-icon-btn active" id="railChatBtn" title="Student Chat" aria-label="Student Chat">
                         <i data-lucide="message-square"></i>
+                    </a>
+                    <a href="/student/dashboard" class="rail-icon-btn" id="railDashboardBtn" title="Student ERP Dashboard" aria-label="ERP Dashboard">
+                        <i data-lucide="layout-dashboard"></i>
                     </a>
                     <a href="/student/profile/" class="rail-icon-btn" id="railProfileBtn" title="Student Profile" aria-label="Student Profile">
                         <i data-lucide="user"></i>

@@ -919,6 +919,29 @@ class RAGPipeline:
             }
 
         # ---------------------------------------------------------
+        # STEP 0.3: STUDENT ERP SERVICES INTERCEPTION (Instant Cards)
+        # ---------------------------------------------------------
+        from app.ai.erp_intent import ERPIntentClassifier, format_erp_response_card
+        erp_intent = ERPIntentClassifier.classify(question)
+        if erp_intent and erp_intent not in ("syllabus", "notices"):
+            sid = (user_profile.get("enrollment_no") or user_profile.get("id")) if user_profile else None
+            if not sid and "student_" in session_id:
+                m_sid = re.search(r"student_([^_]+)", session_id)
+                if m_sid:
+                    sid = m_sid.group(1)
+            if not sid:
+                sid = "210410107001"
+            card_ans, card_srcs, card_sugs = format_erp_response_card(erp_intent, sid)
+            memory_manager.add_message(session_id, "user", question)
+            memory_manager.add_message(session_id, "assistant", card_ans)
+            return {
+                "answer": card_ans,
+                "image": None,
+                "sources": card_srcs,
+                "suggestions": card_sugs
+            }
+
+        # ---------------------------------------------------------
         # STEP 0.5: FAST NEXT CLASS REAL-TIME INTERCEPTION (0ms)
         # ---------------------------------------------------------
         nav_bypass_words = ['transport', 'office', 'canteen', 'food', 'gate', 'library', 'auditorium', 'sports', 'gym', 'hostel', 'parking', 'amphitheatre', 'placement', 'cell', 'reading room', 'girls room']
@@ -1078,6 +1101,24 @@ class RAGPipeline:
             suggestions = ["Show today's timetable 📅", "Where is my next class right now? 📍", "Who is my HOD? 👨‍🏫"]
             yield {"chunk": profile_ans, "done": False}
             yield {"done": True, "answer": profile_ans, "image": None, "sources": ["student_profile.db"], "suggestions": suggestions}
+            return
+
+        # Step 0.3: Student ERP Services (Fees, Attendance, Results, Payments, Hall Ticket, etc.)
+        from app.ai.erp_intent import ERPIntentClassifier, format_erp_response_card
+        erp_intent = ERPIntentClassifier.classify(question)
+        if erp_intent and erp_intent not in ("syllabus", "notices"):
+            sid = (user_profile.get("enrollment_no") or user_profile.get("id")) if user_profile else None
+            if not sid and "student_" in session_id:
+                m_sid = re.search(r"student_([^_]+)", session_id)
+                if m_sid:
+                    sid = m_sid.group(1)
+            if not sid:
+                sid = "210410107001"
+            card_ans, card_srcs, card_sugs = format_erp_response_card(erp_intent, sid)
+            memory_manager.add_message(session_id, "user", question)
+            memory_manager.add_message(session_id, "assistant", card_ans)
+            yield {"chunk": card_ans, "done": False}
+            yield {"done": True, "answer": card_ans, "image": None, "sources": card_srcs, "suggestions": card_sugs}
             return
 
         # Step 0.5: Next class now

@@ -58,6 +58,27 @@ document.addEventListener('DOMContentLoaded', () => {
             triggerHomeVoiceInput(e);
             return;
         }
+
+        // Delegated click for ERP Action Buttons in chat messages
+        const erpActionBtn = e.target.closest('.btn-erp-action');
+        if (erpActionBtn) {
+            e.preventDefault();
+            const promptText = erpActionBtn.getAttribute('data-prompt');
+            if (promptText) {
+                sendSuggested(promptText);
+            }
+            return;
+        }
+
+        // Delegated click for ERP Pay Buttons in chat messages
+        const erpPayBtn = e.target.closest('.btn-erp-pay');
+        if (erpPayBtn) {
+            e.preventDefault();
+            const pendingAmount = erpPayBtn.getAttribute('data-amount') || '15000';
+            const feeType = erpPayBtn.getAttribute('data-type') || 'tuition_fee';
+            executeChatbotOnlinePayment(pendingAmount, feeType, erpPayBtn);
+            return;
+        }
     });
 
     // Restore Sidebar Collapse State from LocalStorage
@@ -69,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check if a specific conversation or prompt was requested via URL query params
     const urlParams = new URLSearchParams(window.location.search);
     const convIdParam = urlParams.get('conversation_id');
-    const promptParam = urlParams.get('prompt');
+    const promptParam = urlParams.get('prompt') || urlParams.get('q');
 
     if (convIdParam) {
         loadConversationMessages(convIdParam);
@@ -81,6 +102,132 @@ document.addEventListener('DOMContentLoaded', () => {
         showHomeState();
     }
 });
+
+/**
+ * Executes Razorpay payment checkout directly inside the chatbot thread.
+ */
+async function executeChatbotOnlinePayment(pendingAmount, feeType, triggerBtn) {
+    try {
+        if (triggerBtn) {
+            triggerBtn.disabled = true;
+            triggerBtn.innerText = 'Creating Order...';
+        }
+
+        const res = await fetch('/student/api/payment/create-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fee_type: feeType })
+        });
+        const orderData = await res.json();
+
+        if (triggerBtn) {
+            triggerBtn.disabled = false;
+            triggerBtn.innerText = `💳 Pay ₹${Number(pendingAmount).toLocaleString()}`;
+        }
+
+        if (!res.ok || orderData.status === 'error') {
+            appendBotMessage(`⚠️ ${orderData.message || 'Unable to initiate fee payment order.'}`);
+            return;
+        }
+
+        if (typeof Razorpay === 'undefined') {
+            appendBotMessage('⚠️ Payment gateway script is still loading. Please check your internet connection and try again.');
+            return;
+        }
+
+        const options = {
+            key: orderData.key_id,
+            amount: orderData.amount,
+            currency: orderData.currency || 'INR',
+            name: 'SVIT Vasad',
+            description: 'Student Fee Payment',
+            image: '/static/logo/svit%20logo%20u.png',
+            order_id: orderData.order_id,
+            handler: async function (response) {
+                try {
+                    const verifyRes = await fetch('/student/api/payment/verify', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                            payment_method: 'UPI / Online'
+                        })
+                    });
+                    const verifyData = await verifyRes.json();
+
+                    if (verifyRes.ok && verifyData.status === 'success') {
+                        const receiptNo = verifyData.receipt_number;
+                        const amtFormatted = Number(verifyData.amount).toLocaleString();
+                        const successCard = `### ✅ PAYMENT SUCCESSFUL!\n\n` +
+                            `* 💰 **Amount Paid:** **₹${amtFormatted}**\n` +
+                            `* 💳 **Payment Method:** ${verifyData.payment_method}\n` +
+                            `* 🆔 **Transaction ID:** \`${verifyData.payment_id}\`\n` +
+                            `* 🧾 **Receipt Number:** \`${receiptNo}\`\n` +
+                            `* 📅 **Date:** ${verifyData.date}\n\n` +
+                            `<div class="erp-action-group" style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">` +
+                            `<a href="/student/api/payment/receipt/${receiptNo}" target="_blank" class="btn-erp-receipt" style="background: #16A34A; color: white; text-decoration: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">📥 Download Fee Receipt</a>` +
+                            `<button class="btn-erp-action" data-prompt="Show my previous payments" style="background: #F1F5F9; color: #1E293B; border: 1px solid #CBD5E1; padding: 8px 16px; border-radius: 8px; font-weight: 500; cursor: pointer;">📜 Payment History</button>` +
+                            `</div>`;
+                        appendBotMessage(successCard, null, ["SVIT Accounts Gateway"]);
+                    } else {
+                        appendBotMessage(`❌ Payment verification failed: ${verifyData.message || 'Signature mismatch'}.`);
+                    }
+                } catch (vErr) {
+                    appendBotMessage('❌ Error verifying payment. Please contact SVIT Accounts Section.');
+                }
+            },
+            prefill: {
+                name: orderData.student_name,
+                email: orderData.student_email,
+                contact: orderData.student_phone
+            },
+            theme: { color: '#8B5CF6' },
+            modal: {
+                ondismiss: async function () {
+                    try {
+                        await fetch('/student/api/payment/failure', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                razorpay_order_id: orderData.order_id,
+                                error_description: 'User dismissed checkout window.'
+                            })
+                        });
+                    } catch (e) {}
+                }
+            }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.on('payment.failed', async function (failedResponse) {
+            try {
+                await fetch('/student/api/payment/failure', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        razorpay_order_id: orderData.order_id,
+                        error_description: failedResponse.error?.description || 'Payment failed'
+                    })
+                });
+            } catch (e) {}
+            const failCard = `### ❌ Payment Failed\n\n` +
+                `* ⚠️ **Reason:** ${failedResponse.error?.description || 'Transaction declined by bank/network'}\n` +
+                `* 💡 **What to do:** You can try again using UPI or another payment method.\n\n` +
+                `<div class="erp-action-group" style="margin-top: 12px; display: flex; gap: 8px;">` +
+                `<button class="btn-erp-pay" data-amount="${pendingAmount}" data-type="${feeType}" style="background: #8B5CF6; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer;">🔄 Try Again</button>` +
+                `<button class="btn-erp-action" data-prompt="Show my previous payments" style="background: #F1F5F9; color: #1E293B; border: 1px solid #CBD5E1; padding: 8px 16px; border-radius: 8px; font-weight: 500; cursor: pointer;">Payment History</button>` +
+                `</div>`;
+            appendBotMessage(failCard);
+        });
+        rzp.open();
+
+    } catch (err) {
+        appendBotMessage('❌ An unexpected error occurred while initiating payment.');
+    }
+}
+window.executeChatbotOnlinePayment = executeChatbotOnlinePayment;
 
 // =========================================================
 // 2. UNIFIED MESSAGE SUBMISSION & STREAMING ENGINE
