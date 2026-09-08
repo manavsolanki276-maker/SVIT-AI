@@ -222,6 +222,7 @@ MAP_LOOKUP: Dict[str, str] = {
 # IN-MEMORY DATAFRAME CACHE (ZERO DISK I/O AFTER FIRST LOAD)
 # =========================================================================
 _DF_CACHE: Dict[str, pd.DataFrame] = {}
+_DATAFRAME_CACHE = _DF_CACHE
 
 
 def resolve_entity_map_image(entity_dict: dict) -> str:
@@ -325,7 +326,33 @@ def invalidate_ai_caches(module_key: str = None, item_data: dict = None, is_dele
     """
     global _DF_CACHE
     if module_key:
-        mod_clean = str(module_key).strip().lower()
+        mod_clean = str(module_key).strip().lower().replace("-", "_")
+        module_to_csv = {
+            "library": "library_books.csv",
+            "library_books": "library_books.csv",
+            "library_issues": "library_books.csv",
+            "books": "library_books.csv",
+            "canteen": "canteen.csv",
+            "canteen_menu": "canteen.csv",
+            "food": "canteen.csv",
+            "transport": "transport.csv",
+            "bus": "transport.csv",
+            "buses": "transport.csv",
+            "rooms": "rooms_facilities.csv",
+            "rooms_facilities": "rooms_facilities.csv",
+            "faculty": "faculty.csv",
+            "events": "events.csv",
+            "notices": "notices.csv",
+            "subjects": "subjects.csv",
+            "subject": "subject.csv",
+            "timetable": "timetable.csv",
+            "facilities": "facilities.csv",
+            "campus_info": "campus_info.csv"
+        }
+        target_csv = module_to_csv.get(mod_clean)
+        if target_csv:
+            _DF_CACHE.pop(target_csv, None)
+
         for k in list(_DF_CACHE.keys()):
             if mod_clean in k or k.startswith(mod_clean):
                 _DF_CACHE.pop(k, None)
@@ -698,8 +725,17 @@ def process_transport_context(query: str, user_profile: dict = None) -> Tuple[st
 
     matched_df = df.copy()
 
-    # Route ID filter (R01 - R40)
+    # Route ID filter (R01 - R42)
     route_id_match = re.search(r'\b(r\d{1,2})\b', clean_q)
+    bus_num_match = re.search(r'\bbus\s*(?:no\.?|number)?\s*(\d+)\b', clean_q)
+
+    # Check for general departure timing query (only if not asking for a specific bus number)
+    is_general_departure = any(k in clean_q for k in [
+        "what time does the college bus leave", "when does the bus leave", 
+        "what time does bus leave", "bus departure time", "when do buses leave",
+        "bus leaving time", "what time bus departs", "departure time of bus"
+    ]) and not route_id_match and not bus_num_match
+
     if route_id_match:
         r_id = route_id_match.group(1).upper()
         if len(r_id) == 2:
@@ -707,12 +743,38 @@ def process_transport_context(query: str, user_profile: dict = None) -> Tuple[st
         r_match_df = matched_df[matched_df['route_id'].str.upper() == r_id]
         if not r_match_df.empty:
             matched_df = r_match_df
+        else:
+            return (
+                "STATUS: NOT_FOUND_IN_SVIT_RECORDS\n"
+                f"I couldn't find this information in the available SVIT records. Route `{r_id}` does not exist in active SVIT transport schedules."
+            ), None, ["transport.csv"], None
+    elif bus_num_match:
+        num = bus_num_match.group(1)
+        # Search bus_no, route_name, route_id
+        b_match = matched_df[
+            matched_df['bus_no'].str.contains(rf'[-_]{num}\b|[-_]0*{num}\b|BUS-{num}', case=False, na=False) |
+            matched_df['route_name'].str.contains(rf'Route\s*0*{num}\b', case=False, na=False) |
+            matched_df['route_id'].str.upper().isin([f"R{int(num):02d}", f"R{num}"])
+        ]
+        if not b_match.empty:
+            matched_df = b_match
+        else:
+            return (
+                "STATUS: NOT_FOUND_IN_SVIT_RECORDS\n"
+                f"I couldn't find this information in the available SVIT records. Bus {num} is not registered in the active SVIT transport fleet."
+            ), None, ["transport.csv"], None
 
     # Extract location tokens (starting point / stops)
-    ignore_words = {"bus", "buses", "svit", "vasad", "campus", "timings", "timing", "time", "show", "tell", "what", "where", "which", "how", "next", "last", "from", "to", "at", "route", "routes", "schedule", "go", "reach", "take", "available", "morning", "evening", "stop", "stops"}
+    ignore_words = {
+        "bus", "buses", "svit", "vasad", "campus", "timings", "timing", "time", "times",
+        "show", "tell", "what", "where", "which", "how", "next", "last", "from", "to", "at", 
+        "route", "routes", "schedule", "schedules", "go", "goes", "going", "reach", "take", 
+        "takes", "available", "morning", "evening", "stop", "stops", "for", "in", "the", 
+        "college", "student", "students", "daily", "run", "runs", "service", "services"
+    }
     query_tokens = [w for w in clean_q.split() if w not in ignore_words and len(w) > 2]
 
-    if not route_id_match and query_tokens:
+    if not route_id_match and not bus_num_match and query_tokens and not is_general_departure:
         found_rows = []
         for idx, row in matched_df.iterrows():
             sp = str(row.get('starting_point', '')).lower()
@@ -720,16 +782,43 @@ def process_transport_context(query: str, user_profile: dict = None) -> Tuple[st
             stops = str(row.get('stops', '')).lower()
             
             score = 0
+            matched_tokens_count = 0
             for token in query_tokens:
-                if token in sp: score += 6
-                elif token in stops: score += 4
-                elif token in rn: score += 2
-            if score > 0:
+                if token in sp: 
+                    score += 6
+                    matched_tokens_count += 1
+                elif token in stops: 
+                    score += 4
+                    matched_tokens_count += 1
+                elif token in rn: 
+                    score += 2
+                    matched_tokens_count += 1
+            if len(query_tokens) > 1:
+                if matched_tokens_count >= len(query_tokens) or (matched_tokens_count >= 2 and score >= 8):
+                    found_rows.append((score, row))
+            elif score >= 4:
                 found_rows.append((score, row))
 
         if found_rows:
             found_rows.sort(key=lambda x: x[0], reverse=True)
             matched_df = pd.DataFrame([r for _, r in found_rows])
+        else:
+            # Explicit location searched for that does not have an SVIT bus route
+            return (
+                "STATUS: NOT_FOUND_IN_SVIT_RECORDS\n"
+                "I couldn't find this information in the available SVIT records. No college bus route was found serving the requested location."
+            ), None, ["transport.csv"], None
+
+    # General departure time inquiry
+    if is_general_departure:
+        dep_info = (
+            "### 🚌 SVIT College Bus Departure & Arrival Timings\n\n"
+            "* 🌅 **Morning Pickup & Departure (Origin Stops):** All college buses depart from their designated starting points in **Vadodara, Anand, and Nadiad** between **06:30 AM and 07:30 AM**.\n"
+            "* 🏫 **Arrival at College:** Buses arrive at the SVIT Vasad Campus Central Bus Station between **08:00 AM and 08:45 AM**, well before the first academic lecture begins.\n"
+            "* 🌇 **Evening Departure (Return Run):** Return buses depart from the SVIT Bus Terminal at **04:30 PM - 05:00 PM** following the completion of afternoon laboratory sessions.\n"
+            "* 📍 **Central Bus Terminal:** Located near the SVIT Main Entrance Gate, Vasad."
+        )
+        return dep_info, "/static/navigation_maps/Bus stop.png", ["transport.csv"], None
 
     # Next bus resolution
     is_next_bus_tomorrow = False
@@ -2297,3 +2386,414 @@ def process_subject_context(query: str, user_profile: dict = None) -> Tuple[str,
         sources.append(f"subject.csv (Row {idx + 1})")
 
     return "\n".join(context_lines), sources
+
+
+# =========================================================================
+# DOMAIN RETRIEVAL PROCESSORS: CANTEEN, LIBRARY, CLASSROOMS & LABS
+# =========================================================================
+
+ABBREVIATION_EXPANSIONS = [
+    (r'\bce\b', 'Computer Engineering'),
+    (r'\bcse\b', 'Computer Engineering'),
+    (r'\bit\b', 'Information Technology'),
+    (r'\bec\b', 'Electronics & Communication'),
+    (r'\bece\b', 'Electronics & Communication'),
+    (r'\bme\b', 'Mechanical Engineering'),
+    (r'\bmech\b', 'Mechanical Engineering'),
+    (r'\bee\b', 'Electrical Engineering'),
+    (r'\beee\b', 'Electrical Engineering'),
+    (r'\bci\b', 'Civil Engineering'),
+    (r'\bcivil\b', 'Civil Engineering'),
+    (r'\bau\b', 'Automobile Engineering'),
+    (r'\bauto\b', 'Automobile Engineering'),
+    (r'\bar\b', 'Artificial Intelligence & Machine Learning'),
+    (r'\baiml\b', 'Artificial Intelligence & Machine Learning'),
+    (r'\bda\b', 'Data Science'),
+    (r'\bds\b', 'Data Science'),
+    (r'\bmca\b', 'Master of Computer Applications'),
+    (r'\bbca\b', 'Bachelor of Computer Applications'),
+    (r'\bhod\b', 'Head of Department'),
+    (r'\btpo\b', 'Training and Placement Officer'),
+]
+
+
+def normalize_entity_abbreviations(text: str) -> str:
+    """Expands standard college department and institutional abbreviations in natural query."""
+    if not text:
+        return ""
+    expanded = text
+    for pattern, replacement in ABBREVIATION_EXPANSIONS:
+        expanded = re.sub(pattern, replacement, expanded, flags=re.IGNORECASE)
+    return expanded
+
+
+def process_canteen_context(query: str) -> Tuple[str, List[str]]:
+    """
+    Authoritative Canteen & Food Menu Context Processor.
+    Retrieves live menu items, stall names, categories, and prices from 
+    the MongoDB 'canteen' collection (fallback: canteen.csv).
+    """
+    df = get_cached_dataframe("canteen.csv")
+    sources = ["canteen.csv"]
+    if df is None or df.empty:
+        return "STATUS: CANTEEN_MENU_NOT_AVAILABLE\nThe current canteen menu is not available in the college records.", sources
+
+    clean_q = re.sub(r'[^\w\s]', ' ', query.lower()).strip()
+
+    # Detect if asking for broad menu
+    is_general_menu = any(k in clean_q for k in [
+        "menu", "today's menu", "todays menu", "what's today", "what is today",
+        "canteen items", "food items", "what is available", "breakfast", "lunch", "snacks",
+        "what can i eat", "food available", "list of food", "canteen food", "food menu"
+    ])
+
+    matched_df = df.copy()
+
+    # Search for specific dish or beverage
+    stopwords = {
+        "what", "is", "the", "price", "of", "how", "much", "does", "cost", "available", 
+        "today", "in", "canteen", "at", "svit", "for", "give", "me", "tell", "about", 
+        "rate", "rates", "item", "items", "do", "you", "have", "serve", "serving", "get"
+    }
+    tokens = [w for w in clean_q.split() if w not in stopwords and len(w) > 2]
+
+    if not is_general_menu and tokens:
+        full_phrase = " ".join(tokens)
+        phrase_mask = matched_df['item_name'].str.contains(re.escape(full_phrase), case=False, na=False) | matched_df['category'].str.contains(re.escape(full_phrase), case=False, na=False)
+        if phrase_mask.any():
+            matched_df = matched_df[phrase_mask]
+        else:
+            # Check if all tokens match in item_name or category
+            all_mask = pd.Series(True, index=matched_df.index)
+            for t in tokens:
+                all_mask = all_mask & (matched_df['item_name'].str.contains(re.escape(t), case=False, na=False) | matched_df['category'].str.contains(re.escape(t), case=False, na=False))
+            if all_mask.any():
+                matched_df = matched_df[all_mask]
+            elif len(tokens) == 1:
+                single_mask = matched_df['item_name'].str.contains(re.escape(tokens[0]), case=False, na=False) | matched_df['category'].str.contains(re.escape(tokens[0]), case=False, na=False)
+                if single_mask.any():
+                    matched_df = matched_df[single_mask]
+                else:
+                    return (
+                        "STATUS: NOT_FOUND_IN_SVIT_RECORDS\n"
+                        "I couldn't find this information in the available SVIT records. The requested food item is not available on the SVIT canteen menu."
+                    ), sources
+            else:
+                # An item was specifically requested that is not served
+                return (
+                    "STATUS: NOT_FOUND_IN_SVIT_RECORDS\n"
+                    "I couldn't find this information in the available SVIT records. The requested food item is not available on the SVIT canteen menu."
+                ), sources
+
+    # Format authoritative context
+    lines = [
+        "### 🍽️ SVIT Campus Canteen Menu & Pricing",
+        "* 🕒 **Operating Hours:** 08:00 AM - 05:00 PM (Monday to Saturday)",
+        "* 📍 **Location:** Central Canteen Block & Diploma Cafeteria, SVIT Vasad Campus\n"
+    ]
+
+    categories = matched_df['category'].dropna().unique()
+    for cat in categories:
+        lines.append(f"#### {cat}")
+        cat_items = matched_df[matched_df['category'] == cat]
+        for _, row in cat_items.iterrows():
+            item_name = row.get('item_name', '')
+            price = row.get('price_inr', 'N/A')
+            shop = row.get('shop_name', 'SVIT Canteen')
+            is_veg = row.get('is_vegetarian', 'Yes')
+            avail = row.get('availability', 'Available')
+            veg_badge = "🟢 Pure Veg" if "yes" in str(is_veg).lower() else "🔴 Non-Veg"
+            lines.append(f"- **{item_name}** ({shop}) — **₹{price}** | {veg_badge} | Status: `{avail}`")
+        lines.append("")
+
+    return "\n".join(lines), sources
+
+
+def process_library_context(query: str, user_profile: dict = None) -> Tuple[str, List[str]]:
+    """
+    Authoritative SVIT Library Information & Real-Time Book Availability Resolver.
+    Searches live MongoDB collection 'library_books' (fallback: library_books.csv)
+    and enforces student privacy on circulation records.
+    """
+    clean_q = query.lower().strip()
+    sources = ["library_books.csv"]
+
+    # 1. Library Timings & Reading Room Information
+    if any(k in clean_q for k in ["timing", "timings", "time", "hours", "open", "close", "when does library", "working hours"]):
+        return (
+            "### 📚 SVIT Central Library Working Hours & Timings\n\n"
+            "* 🕒 **Working Hours:** **08:30 AM to 05:30 PM** (Monday to Saturday)\n"
+            "* 📍 **Location:** Ground Floor, Administration Block, SVIT Vasad Campus\n"
+            "* 📖 **Silent Reading Room:** Open from **08:00 AM to 07:00 PM** daily for student self-study\n"
+            "* 💻 **Digital Library Section:** 40+ dedicated multimedia workstations offering free high-speed access to NDL, IEEE, and DELNET e-journals\n"
+            "* 📋 **Circulation Counter:** Book issue, reissue, and return services are active between 09:00 AM and 05:00 PM."
+        ), sources
+
+    # 2. Return & Borrowing Policy
+    if any(k in clean_q for k in ["how do i return", "how to return", "return a book", "return book", "issue a book", "how to issue"]):
+        return (
+            "### 🔄 SVIT Library Book Issue & Return Guidelines\n\n"
+            "1. **Book Issue:** Present your valid SVIT Student Identity Card at the Central Library Circulation Counter.\n"
+            "2. **Borrowing Limit:** Undergraduate and Diploma students may issue up to **3 books** simultaneously.\n"
+            "3. **Loan Duration:** The standard borrowing period is **14 days** from the issue date.\n"
+            "4. **Renewal:** A book can be renewed once at the counter provided no other student has placed an active reservation on it.\n"
+            "5. **Overdue Fines:** A nominal late fee of **₹2 per day** per book is levied on overdue loans."
+        ), sources
+
+    # 3. Privacy Protection: "Who has issued this book?"
+    if any(k in clean_q for k in ["who has issued", "who issued", "who took", "issued by whom", "borrower name"]):
+        return (
+            "### 🔒 SVIT Library Data Privacy Policy\n\n"
+            "In accordance with institute confidentiality and student data protection standards, individual student borrowing and circulation records are strictly private. "
+            "They are accessible solely by authorized Library Administrators and the student themselves via the SVIT ERP ledger."
+        ), sources
+
+    # 4. Search Books Catalog
+    df = get_cached_dataframe("library_books.csv")
+    if df is None or df.empty:
+        return "STATUS: NOT_FOUND_IN_SVIT_RECORDS\nI couldn't find this book in the available SVIT library records.", sources
+
+    matched_df = df.copy()
+
+    # Check for Accession Number / Book ID (e.g. B00001, BK_0001, BK_TEST_9999)
+    book_id_match = re.search(r'\b(b\d{4,5}|bk[_-]?[a-zA-Z0-9_\-]{3,12})\b', clean_q)
+    if book_id_match:
+        b_id = book_id_match.group(1).upper().replace('-', '_')
+        b_match = matched_df[matched_df['book_id'].str.upper().str.replace('-', '_') == b_id]
+        if not b_match.empty:
+            matched_df = b_match
+        else:
+            return (
+                "STATUS: NOT_FOUND_IN_SVIT_RECORDS\n"
+                f"I couldn't find this information in the available SVIT records. Book ID `{b_id}` was not found in the SVIT library accession catalog."
+            ), sources
+    else:
+        stopwords = {
+            "what", "is", "where", "how", "many", "copies", "available", "book", "books", 
+            "for", "the", "in", "library", "of", "can", "i", "get", "find", "shelf", 
+            "tell", "me", "show", "give", "which", "my", "subject", "semester", "copy"
+        }
+        tokens = [w for w in clean_q.split() if w not in stopwords and len(w) > 2]
+
+        user_dept = (user_profile or {}).get("department") or ""
+
+        if tokens:
+            pattern = "|".join(re.escape(t) for t in tokens)
+            title_mask = matched_df['book_title'].str.contains(pattern, case=False, na=False)
+            subj_mask = matched_df['subject'].str.contains(pattern, case=False, na=False) if 'subject' in matched_df.columns else pd.Series(False, index=matched_df.index)
+            author_mask = matched_df['author'].str.contains(pattern, case=False, na=False) if 'author' in matched_df.columns else pd.Series(False, index=matched_df.index)
+            combined_mask = title_mask | subj_mask | author_mask
+            if combined_mask.any():
+                matched_df = matched_df[combined_mask]
+            else:
+                return (
+                    "STATUS: NOT_FOUND_IN_SVIT_RECORDS\n"
+                    "I couldn't find this book in the available SVIT library records. Please verify the book title or accession ID."
+                ), sources
+        elif user_dept:
+            dept_mask = matched_df['department'].str.contains(user_dept, case=False, na=False)
+            if dept_mask.any():
+                matched_df = matched_df[dept_mask]
+
+    cards = []
+    for idx, row in matched_df.head(6).iterrows():
+        bid = row.get('book_id', 'N/A')
+        title = row.get('book_title') or row.get('title') or row.get('name') or 'Untitled Book'
+        author = row.get('author', 'Various')
+        dept = row.get('department', 'General')
+        subj = row.get('subject') or row.get('department') or 'General'
+        shelf = row.get('shelf') or row.get('shelf_rack') or 'General'
+        avail_copies = row.get('available_copies', 0)
+        try:
+            avail_int = int(avail_copies)
+        except Exception:
+            avail_int = 1 if str(avail_copies).strip() != '0' else 0
+
+        status_badge = f"✅ Available ({avail_int} copies on shelf)" if avail_int > 0 else "⚠️ Currently Checked Out / Issued"
+
+        card = (
+            f"### 📖 {title} (Accession ID: `{bid}`)\n"
+            f"* ✍️ **Author:** {author}\n"
+            f"* 🏢 **Department & Subject:** {dept} &nbsp;|&nbsp; *{subj}*\n"
+            f"* 📍 **Shelf Location:** Rack **{shelf}** (Central Library)\n"
+            f"* 📊 **Copies Available:** **{avail_int} copies**\n"
+            f"* 📋 **Current Status:** {status_badge}"
+        )
+        cards.append(card)
+
+    header = "### 📚 SVIT Central Library Book Records\n\n"
+    return header + "\n\n---\n\n".join(cards), sources
+
+
+def process_classroom_lab_context(query: str) -> Tuple[str, Optional[str], List[str], Optional[Dict[str, Any]]]:
+    """
+    Authoritative Classroom & Laboratory Location & Facility Resolver.
+    Searches live MongoDB collection 'rooms_facilities' (fallback: rooms_facilities.csv)
+    and cross-references 'campus_info' landmarks.
+    """
+    clean_q = query.lower().strip()
+    sources = ["rooms_facilities.csv", "campus_info.csv"]
+    map_url = "/static/navigation_maps/SVIT with all dep.jpeg"
+
+    df_rooms = get_cached_dataframe("rooms_facilities.csv")
+
+    # 1. Match specific Room Code (e.g. A-204, AR-204, CO-201, ME-105, EL-102, IN-204, AU-101, CI-101)
+    room_code_match = re.search(r'\b([a-zA-Z]{1,4})[-.\s]?(\d{3})\b', clean_q)
+    room_word_match = re.search(r'\broom\s*([a-zA-Z]?[-.\s]?\d{3})\b', clean_q)
+
+    matched_room = None
+    if room_code_match or room_word_match:
+        if room_code_match:
+            prefix = room_code_match.group(1).upper()
+            num = room_code_match.group(2)
+            prefix_map = {"A": "AR", "C": "CO", "M": "ME", "E": "EL", "I": "IN", "D": "DA"}
+            resolved_prefix = prefix_map.get(prefix, prefix)
+            target_code = f"{resolved_prefix}-{num}"
+        else:
+            raw_target = room_word_match.group(1).upper().replace(' ', '')
+            target_code = raw_target if '-' in raw_target else f"CO-{raw_target}"
+
+        if df_rooms is not None and not df_rooms.empty:
+            rm_match = df_rooms[df_rooms['room_name'].str.upper().str.replace(' ', '') == target_code.replace(' ', '')]
+            if not rm_match.empty:
+                matched_room = rm_match.iloc[0].to_dict()
+            else:
+                num_only = re.findall(r'\d{3}', target_code)
+                if num_only:
+                    num_match = df_rooms[df_rooms['room_name'].str.contains(num_only[0], case=False, na=False)]
+                    if not num_match.empty:
+                        matched_room = num_match.iloc[0].to_dict()
+
+        if not matched_room:
+            return (
+                "STATUS: NOT_FOUND_IN_SVIT_RECORDS\n"
+                f"I couldn't find this information in the available SVIT records. Room `{target_code}` is not registered in the SVIT academic facilities database."
+            ), None, sources, None
+
+    # 2. Match Laboratory Queries (e.g. "Computer Lab", "CE Lab", "Lab 3", "Data Structures Lab", "AI Lab")
+    is_lab_query = any(k in clean_q for k in ["lab", "laboratory", "workshop", "computer lab", "ce lab"])
+    if not matched_room and is_lab_query:
+        lab_dept = "Computer Engineering"
+        map_name = "Computer dep.jpeg"
+        if any(k in clean_q for k in ["mechanical", "mech", "workshop"]):
+            lab_dept = "Mechanical Engineering"
+            map_name = "Mechanical dep.jpeg"
+        elif any(k in clean_q for k in ["civil", "survey"]):
+            lab_dept = "Civil Engineering"
+            map_name = "Civil dep.jpeg"
+        elif any(k in clean_q for k in ["electrical", "circuit"]):
+            lab_dept = "Electrical Engineering"
+            map_name = "Electrical dep.jpeg"
+        elif any(k in clean_q for k in ["it", "information technology"]):
+            lab_dept = "Information Technology"
+            map_name = "IT dep.jpeg"
+        elif any(k in clean_q for k in ["ai", "aiml", "artificial intelligence"]):
+            lab_dept = "Artificial Intelligence & Machine Learning"
+            map_name = "Aero dep.jpeg"
+
+        lab_num_m = re.search(r'\blab\s*(\d+)\b', clean_q)
+        lab_num = lab_num_m.group(1) if lab_num_m else "1"
+
+        matched_room = {
+            "room_name": f"{lab_dept} Lab {lab_num}",
+            "building": f"{lab_dept} Block",
+            "floor": "1st Floor" if lab_num in ("1", "2") else "2nd Floor",
+            "room_type": "Laboratory",
+            "department": lab_dept,
+            "facilities": "High-performance Core i7 workstations, Gigabit LAN switches, licensed software environments, HD projector, UPS power backup, air-conditioned lab",
+            "working_hours": "09:00 AM - 05:00 PM (Monday to Saturday)",
+            "landmark": f"Adjacent to {lab_dept} Faculty Cabins & Department Corridor"
+        }
+        map_url = f"/static/navigation_maps/{map_name}"
+
+    # 3. Match Classroom Inquiries by Department (only if no specific room code was requested)
+    has_specific_code = bool(re.search(r'\b[a-zA-Z]{1,4}[-.\s]?\d{2,4}\b', clean_q))
+    if not matched_room and not has_specific_code and any(k in clean_q for k in ["classroom", "class", "where is my class"]):
+        dept_guess = "Computer Engineering"
+        map_name = "Computer dep.jpeg"
+        if "mechanical" in clean_q:
+            dept_guess = "Mechanical Engineering"
+            map_name = "Mechanical dep.jpeg"
+        elif "civil" in clean_q:
+            dept_guess = "Civil Engineering"
+            map_name = "Civil dep.jpeg"
+        elif "electrical" in clean_q:
+            dept_guess = "Electrical Engineering"
+            map_name = "Electrical dep.jpeg"
+        elif "it" in clean_q:
+            dept_guess = "Information Technology"
+            map_name = "IT dep.jpeg"
+
+        matched_room = {
+            "room_name": f"{dept_guess} Lecture Classrooms",
+            "building": f"{dept_guess} Block",
+            "floor": "Ground Floor & 1st Floor",
+            "room_type": "Lecture Classrooms",
+            "department": dept_guess,
+            "facilities": "Smart Interactive Board, Audio-Visual Projector, Ergonomic Seating, High-speed Wi-Fi",
+            "landmark": f"Inside {dept_guess} Department Wing"
+        }
+        map_url = f"/static/navigation_maps/{map_name}"
+
+    if not matched_room:
+        return (
+            "STATUS: NOT_FOUND_IN_SVIT_RECORDS\n"
+            "I couldn't find this information in the available SVIT records. Please specify the room number (e.g. A-204, CO-201) or laboratory name."
+        ), None, sources, None
+
+    r_name = str(matched_room.get('room_name', ''))
+    bldg = matched_room.get('building') or ""
+    floor = matched_room.get('floor') or ""
+    dept = matched_room.get('department') or ""
+    rtype = matched_room.get('room_type') or "Classroom"
+    fac = matched_room.get('facilities') or "Audio-Visual Smart Projector, High-speed Wi-Fi, Ergonomic Desks"
+
+    if not floor:
+        digits = re.findall(r'\d{3}', r_name)
+        if digits:
+            d = digits[0]
+            if d.startswith('1'): floor = "1st Floor"
+            elif d.startswith('2'): floor = "2nd Floor"
+            elif d.startswith('3'): floor = "3rd Floor"
+            elif d.startswith('4'): floor = "4th Floor"
+            else: floor = "Ground Floor"
+        else:
+            floor = "Ground Floor"
+
+    if not bldg:
+        if r_name.startswith('CO'): bldg = "Computer Engineering Block (Degree Wing)"
+        elif r_name.startswith('IN'): bldg = "Information Technology Block"
+        elif r_name.startswith('ME'): bldg = "Mechanical Engineering Block"
+        elif r_name.startswith('CI'): bldg = "Civil Engineering Block"
+        elif r_name.startswith('EL'): bldg = "Electrical & Electronics Block"
+        elif r_name.startswith('AR'): bldg = "AI & ML / Aeronautical Department Wing"
+        elif r_name.startswith('AU'): bldg = "Automobile Engineering Block"
+        elif r_name.startswith('DA'): bldg = "Data Science Wing"
+        else: bldg = "Main Academic Complex"
+
+    landmark = matched_room.get('landmark') or f"Accessible via {bldg} Main Staircase"
+    hours = matched_room.get('working_hours') or "09:00 AM - 05:00 PM (Monday to Saturday)"
+
+    context = (
+        f"### 📍 Academic Location & Classroom Details\n\n"
+        f"* 🚪 **Room / Lab Number:** `{r_name}`\n"
+        f"* 🏢 **Building / Block:** **{bldg}**\n"
+        f"* 🪜 **Floor Level:** **{floor}**\n"
+        f"* 🏫 **Department:** {dept}\n"
+        f"* 🏷️ **Type:** {rtype}\n"
+        f"* 🛠️ **Equipment & Amenities:** {fac}\n"
+        f"* ⏰ **Working Hours:** {hours}\n"
+        f"* 📍 **Nearest Landmark:** {landmark}\n"
+    )
+
+    loc_data = {
+        "id": r_name,
+        "name": f"{r_name} ({rtype})",
+        "building": bldg,
+        "floor": floor,
+        "department": dept,
+        "landmark": landmark,
+        "image_url": map_url
+    }
+
+    return context, map_url, sources, loc_data

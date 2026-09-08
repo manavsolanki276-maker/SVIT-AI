@@ -38,6 +38,10 @@ from app.ai.data_processor import (
     process_campus_navigation_context,
     process_subject_context,
     process_transport_context,
+    process_canteen_context,
+    process_library_context,
+    process_classroom_lab_context,
+    normalize_entity_abbreviations,
     resolve_day_and_date,
     generate_followup_suggestions,
     resolve_student_profile_query,
@@ -205,7 +209,8 @@ class RAGPipeline:
         Prepares the context string, map image, sources, and detected intent category
         incorporating logged-in student profile metadata and authoritative campus datasets.
         """
-        msg = question.lower().strip()
+        norm_question = normalize_entity_abbreviations(question)
+        msg = norm_question.lower().strip()
 
         # Fallback navigation map image resolution
         map_image = None
@@ -265,12 +270,50 @@ class RAGPipeline:
 
         transport_keywords = ['bus', 'route', 'transport', 'commute', 'pickup', 'driver', 'bus pass']
         library_keywords = ['library', 'book', 'issue', 'fine', 'author', 'reading room', 'journal']
-        contact_keywords = ['contact', 'phone', 'email', 'office', 'admin', 'number', 'address']
+        canteen_keywords = [
+            'canteen', 'menu', 'food', 'breakfast', 'lunch', 'snacks', 'vadapav', 'coffee', 
+            'tea', 'dosa', 'thali', 'pizza', 'sandwich', 'puff', 'samosa', 'burger', 
+            'beverage', 'beverages', 'cafeteria', 'mess', 'eat'
+        ]
+
+        library_keywords = [
+            'library', 'book', 'books', 'author', 'isbn', 'shelf', 'copies', 
+            'available copies', 'how many copies', 'issue', 'return date', 'how do i return', 
+            'reading room', 'accession', 'catalogue', 'borrow', 'circulation'
+        ]
 
         # -------------------------------------------------------------
-        # 1. CAMPUS NAVIGATION / LANDMARK / FACILITIES CHECK FIRST
+        # 1. CANTEEN & FOOD MENU CHECK
         # -------------------------------------------------------------
-        nav_res = process_campus_navigation_context(question)
+        is_canteen = has_any_keyword(msg, canteen_keywords) and not any(k in msg for k in ["where is canteen", "location of canteen", "how to reach canteen"])
+        if is_canteen:
+            cant_ctx, cant_srcs = process_canteen_context(norm_question)
+            if cant_ctx:
+                return cant_ctx, "navigation_maps/SVIT Canteen loc.png", cant_srcs, "canteen", None
+
+        # -------------------------------------------------------------
+        # 2. LIBRARY & BOOKS CHECK
+        # -------------------------------------------------------------
+        is_library_query = has_any_keyword(msg, library_keywords) and not any(k in msg for k in ["where is library", "location of library", "how to reach library"])
+        if is_library_query:
+            lib_ctx, lib_srcs = process_library_context(norm_question, user_profile=user_profile)
+            if lib_ctx:
+                return lib_ctx, None, lib_srcs, "library", None
+
+        # -------------------------------------------------------------
+        # 3. CLASSROOM & LABORATORY ROOM RESOLUTION CHECK
+        # -------------------------------------------------------------
+        is_room_or_lab = bool(re.search(r'\b(?:room|classroom|classrooms|lab|laboratory|laboratories|workshop|floor|a-204|co-|ar-|me-|el-|in-|ci-|au-|da-)\b', msg)) or bool(re.search(r'\b[a-zA-Z]{1,4}[-.\s]?\d{3}\b', msg))
+        if is_room_or_lab and not any(k in msg for k in ["washroom", "girls room", "reading room", "common room"]):
+            room_ctx, room_img, room_srcs, room_loc = process_classroom_lab_context(norm_question)
+            if room_ctx:
+                intent_cat = "laboratory" if any(k in msg for k in ["lab", "laboratory", "workshop"]) else "classroom"
+                return room_ctx, room_img, room_srcs, intent_cat, room_loc
+
+        # -------------------------------------------------------------
+        # 4. CAMPUS NAVIGATION / LANDMARK / FACILITIES CHECK
+        # -------------------------------------------------------------
+        nav_res = process_campus_navigation_context(norm_question)
         nav_loc = getattr(nav_res, 'location_data', None)
         if nav_loc is None and isinstance(nav_res, (list, tuple)) and len(nav_res) >= 4:
             nav_ctx, nav_img, nav_srcs, nav_loc = nav_res[0], nav_res[1], nav_res[2], nav_res[3]
@@ -283,26 +326,26 @@ class RAGPipeline:
                 map_image = clean_img
 
             if nav_loc is None and map_image:
-                nav_loc = self._resolve_location_from_map_or_query(map_image, question)
+                nav_loc = self._resolve_location_from_map_or_query(map_image, norm_question)
 
             intent_category = "facilities" if any("facilities.csv" in s for s in nav_srcs) else "campus_info"
             return nav_ctx, map_image, nav_srcs, intent_category, nav_loc
 
         # -------------------------------------------------------------
-        # 2. BUS & TRANSPORTATION CHECK
+        # 5. BUS & TRANSPORTATION CHECK
         # -------------------------------------------------------------
         is_transport = has_any_keyword(msg, transport_keywords)
         if is_transport:
-            trans_ctx, trans_img, trans_srcs, trans_loc = process_transport_context(question, user_profile=user_profile)
+            trans_ctx, trans_img, trans_srcs, trans_loc = process_transport_context(norm_question, user_profile=user_profile)
             if trans_ctx:
                 return trans_ctx, trans_img or "navigation_maps/Bus stop.png", trans_srcs, "transport", trans_loc
 
         # -------------------------------------------------------------
-        # 3. SUBJECTS / CURRICULUM CHECK
+        # 6. SUBJECTS / CURRICULUM CHECK
         # -------------------------------------------------------------
         is_subject = has_any_keyword(msg, subject_keywords) and not has_any_keyword(msg, ['time', 'schedule', 'room', 'bus'])
         if is_subject:
-            subj_ctx, subj_srcs = process_subject_context(question, user_profile=user_profile)
+            subj_ctx, subj_srcs = process_subject_context(norm_question, user_profile=user_profile)
             if subj_ctx and "NO_SUBJECTS" not in subj_ctx:
                 return subj_ctx, None, subj_srcs, "subjects", None
 
@@ -546,19 +589,19 @@ class RAGPipeline:
         Builds a clean, structured direct Markdown answer with compact mobile cards
         from extracted RAG context when external LLM is unavailable or unconfigured.
         """
-        if not context or 'NO_DATA' in context or 'NO_CLASSES' in context or 'NO_NOTICES_FOUND' in context or 'NO_FACULTY_DETAILS_FOUND' in context:
+        if not context or 'STATUS: NOT_FOUND_IN_SVIT_RECORDS' in context or 'CANTEEN_MENU_NOT_AVAILABLE' in context or 'NO_DATA' in context or 'NO_CLASSES' in context or 'NO_NOTICES_FOUND' in context or 'NO_FACULTY_DETAILS_FOUND' in context:
+            if 'STATUS: NOT_FOUND_IN_SVIT_RECORDS' in context or 'CANTEEN_MENU_NOT_AVAILABLE' in context:
+                return "I couldn't find this information in the available SVIT records."
             if intent_category == 'timetable':
                 return "### 📅 Timetable & Schedule\n\nNo classes are currently scheduled for the selected day or semester. Please check your department notice board for special lab batch allocations."
             elif intent_category == 'placement':
                 return "### 💼 SVIT Placement Opportunities\n\nNo matching placement records found. Please check with the Training & Placement Cell (T&P) for current drive schedules."
             elif intent_category == 'faculty':
                 return "### 👨‍🏫 Faculty Information\n\nNo specific faculty record found for your search. Please ask for the faculty name or visit the Department Head office."
+            elif intent_category in ('canteen', 'library', 'classroom', 'laboratory', 'transport'):
+                return "I couldn't find this information in the available SVIT records."
             else:
-                return (
-                    f"Thank you for asking about **\"{question}\"**!\n\n"
-                    "I am the **SVIT AI Assistant**. I could not find a specific record in the local database for this query. "
-                    "For official academic details, please consult your department coordinator or the student section."
-                )
+                return "I couldn't find this information in the available SVIT records."
 
         # 1. CAMPUS NAVIGATION / LOCATION / FACILITIES FORMATTING
         if intent_category in ('campus_info', 'navigation', 'facilities'):
@@ -818,11 +861,27 @@ class RAGPipeline:
             clean_ctx = re.sub(r'HEADER_NOTICE_LIST:\s*|\[Source:.*?\]', '', context)
             return f"### 📌 Official Notices & Circulars\n\n{clean_ctx.strip()}"
 
-        # 8. BUS & TRANSPORTATION FORMATTING
+        # 8. CANTEEN FORMATTING
+        elif intent_category == 'canteen':
+            clean_ctx = re.sub(r'STATUS:.*?\n', '', context).strip()
+            return clean_ctx
+
+        # 9. LIBRARY FORMATTING
+        elif intent_category == 'library':
+            clean_ctx = re.sub(r'STATUS:.*?\n', '', context).strip()
+            return clean_ctx
+
+        # 10. CLASSROOM & LABORATORY FORMATTING
+        elif intent_category in ('classroom', 'laboratory'):
+            clean_ctx = re.sub(r'STATUS:.*?\n', '', context).strip()
+            return clean_ctx
+
+        # 11. BUS & TRANSPORTATION FORMATTING
         elif intent_category == 'transport':
-            if "### 🚌" in context:
-                return context.strip()
-            clean_ctx = re.sub(r'\[Source:.*?\]', '', context).strip()
+            clean_ctx = re.sub(r'STATUS:.*?\n', '', context).strip()
+            if "### 🚌" in clean_ctx:
+                return clean_ctx
+            clean_ctx = re.sub(r'\[Source:.*?\]', '', clean_ctx).strip()
             return f"### 🚌 SVIT Campus Transport Schedule & Bus Routes\n\n{clean_ctx}"
 
         # 9. GENERAL / FAQ / DEFAULT FORMATTING
@@ -923,7 +982,8 @@ class RAGPipeline:
         # ---------------------------------------------------------
         from app.ai.erp_intent import ERPIntentClassifier, format_erp_response_card
         erp_intent = ERPIntentClassifier.classify(question)
-        if erp_intent and erp_intent not in ("syllabus", "notices"):
+        is_personal_transport = erp_intent == "transport" and any(k in clean_q for k in ["my bus", "my pass", "my transport", "my route", "my pickup", "renew bus", "apply bus"])
+        if erp_intent and erp_intent not in ("syllabus", "notices", "timetable") and (erp_intent != "transport" or is_personal_transport):
             sid = (user_profile.get("enrollment_no") or user_profile.get("id")) if user_profile else None
             if not sid and "student_" in session_id:
                 m_sid = re.search(r"student_([^_]+)", session_id)
@@ -1000,6 +1060,18 @@ class RAGPipeline:
         context, map_image, sources, intent_category, location_info = self._prepare_rag_context(
             question, top_k=top_k, filter_dict=filter_dict, user_profile=user_profile
         )
+
+        if not context or 'STATUS: NOT_FOUND_IN_SVIT_RECORDS' in context or 'CANTEEN_MENU_NOT_AVAILABLE' in context:
+            answer = "I couldn't find this information in the available SVIT records."
+            memory_manager.add_message(session_id, "user", question)
+            memory_manager.add_message(session_id, "assistant", answer)
+            return {
+                "answer": answer,
+                "image": None,
+                "location": None,
+                "sources": sources or ["SVIT Records"],
+                "suggestions": ["Show today's timetable 📅", "Where is the library? 📚", "What is in the canteen today? 🍽️"]
+            }
 
         history = memory_manager.format_history_for_prompt(session_id)
         current_date_str = datetime.now(IST).strftime("%A, %d %B %Y")
@@ -1106,7 +1178,8 @@ class RAGPipeline:
         # Step 0.3: Student ERP Services (Fees, Attendance, Results, Payments, Hall Ticket, etc.)
         from app.ai.erp_intent import ERPIntentClassifier, format_erp_response_card
         erp_intent = ERPIntentClassifier.classify(question)
-        if erp_intent and erp_intent not in ("syllabus", "notices"):
+        is_personal_transport = erp_intent == "transport" and any(k in clean_q for k in ["my bus", "my pass", "my transport", "my route", "my pickup", "renew bus", "apply bus"])
+        if erp_intent and erp_intent not in ("syllabus", "notices", "timetable") and (erp_intent != "transport" or is_personal_transport):
             sid = (user_profile.get("enrollment_no") or user_profile.get("id")) if user_profile else None
             if not sid and "student_" in session_id:
                 m_sid = re.search(r"student_([^_]+)", session_id)
@@ -1149,6 +1222,14 @@ class RAGPipeline:
         context, map_image, sources, intent_category, location_info = self._prepare_rag_context(
             question, top_k=top_k, filter_dict=filter_dict, user_profile=user_profile
         )
+
+        if not context or 'STATUS: NOT_FOUND_IN_SVIT_RECORDS' in context or 'CANTEEN_MENU_NOT_AVAILABLE' in context:
+            ans = "I couldn't find this information in the available SVIT records."
+            memory_manager.add_message(session_id, "user", question)
+            memory_manager.add_message(session_id, "assistant", ans)
+            yield {"chunk": ans, "done": False}
+            yield {"done": True, "answer": ans, "image": None, "sources": sources or ["SVIT Records"], "suggestions": ["Show today's timetable 📅", "Where is the library? 📚"]}
+            return
 
         history = memory_manager.format_history_for_prompt(session_id)
         current_date_str = datetime.now(IST).strftime("%A, %d %B %Y")

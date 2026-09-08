@@ -111,10 +111,10 @@ class ERPIntentClassifier:
             r"\b(?:railway\s*concession|train\s*pass|railway\s*pass|railway\s*form|train\s*concession|concession\s*voucher)\b"
         ]),
 
-        # 15. Transport / Bus (Word-boundary guarded against "syllabus")
+        # 15. Transport / Bus Pass (Personal ERP Pass)
         ("transport", [
-            r"\b(?:bus|buses|transport|bus\s*route|bus\s*pass|bus\s*timing|pickup\s*point|driver\s*contact|college\s*bus)\b",
-            r"\bwhat\s*is\s*my\s*bus\s*(?:information|details|timing|route)\b"
+            r"\b(?:my\s*bus|my\s*transport|my\s*bus\s*pass|my\s*bus\s*route|my\s*pickup|my\s*bus\s*stop|bus\s*pass\s*status|renew\s*bus\s*pass|apply\s*bus\s*pass|bus\s*pass|bus\s*timing)\b",
+            r"\bwhat\s*is\s*my\s*bus\s*(?:information|details|timing|route|pass)\b"
         ]),
 
         # 16. Timetable

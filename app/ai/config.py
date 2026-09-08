@@ -151,6 +151,14 @@ INTENT_CONFIG = {
             "thursday", "friday", "saturday"
         ],
         "sources": [("timetable.csv", 1.0), ("academics_faq.csv", 0.5), ("general_faq.csv", 0.2)]
+    },
+    "library": {
+        "keywords": [
+            "library", "book", "books", "author", "isbn", "shelf", "copies",
+            "available copies", "issue", "return date", "reading room", "accession",
+            "catalogue", "borrow"
+        ],
+        "sources": [("library_books.csv", 1.0), ("facilities.csv", 0.8), ("campus_info.csv", 0.7), ("general_faq.csv", 0.3)]
     }
 }
 
@@ -168,4 +176,8 @@ INTENT_TO_MODULE_MAP = {
     "subjects": "syllabus",
     "syllabus": "syllabus",
     "faculty": "faculty",
+    "library": "library",
+    "rooms": "academic",
+    "classroom": "academic",
+    "laboratory": "academic",
 }

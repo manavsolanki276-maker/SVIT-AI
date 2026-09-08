@@ -39,3 +39,5 @@ R37,Vadodara Route 37,GJ06-BUS-137,Dabhoi Road,SVIT Vasad Campus,Dabhoi Road -> 
 R38,Vadodara Route 38,GJ06-BUS-138,Ajwa Road,SVIT Vasad Campus,Ajwa Road -> Gorwa -> Kalali -> Vasna Road -> Halol -> Harni -> Vasad -> SVIT,06:45 AM,08:00 AM,Driver 38,9768619167,50,Active
 R39,Vadodara Route 39,GJ06-BUS-139,Padra,SVIT Vasad Campus,Padra -> Gotri -> Sayajigunj -> New VIP Road -> Alkapuri -> Makarpura -> Vasad -> SVIT,07:30 AM,08:30 AM,Driver 39,9443325567,45,Active
 R40,Vadodara Route 40,GJ06-BUS-140,Sindhrot,SVIT Vasad Campus,Sindhrot -> Karjan -> New VIP Road -> Kareli Baug -> Makarpura -> Bapod -> Vasad -> SVIT,06:30 AM,08:15 AM,Driver 40,9691799109,45,Active
+R41,Anand Route 1,GJ23-BUS-201,Anand (Bus Stand),SVIT Vasad Campus,Anand Bus Stand -> Vidyanagar -> Borsad Chokdi -> Samarkha -> Vasad Highway -> SVIT,07:15 AM,08:15 AM,Driver Anand,9825012345,52,Active
+R42,Nadiad Route 1,GJ07-BUS-301,Nadiad (Santram Temple),SVIT Vasad Campus,Nadiad Santram -> Nadiad Bus Stand -> Piplag -> Uttarsanda -> Vasad Cross Road -> SVIT,07:00 AM,08:20 AM,Driver Nadiad,9825067890,50,Active
